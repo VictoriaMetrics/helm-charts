@@ -96,6 +96,15 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
+  - name: restarts
+    expr: {{ printf "sum(changes(vm_app_start_timestamp{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    enable: true
+    hide: false
+    iconColor: dark-yellow
+    textFormat: '{{`{{`}}job{{`}}`}} restarted'
 panels:
 - title: Overview
   collapsed: false

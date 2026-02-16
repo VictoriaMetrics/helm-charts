@@ -38,7 +38,7 @@ rules:
   labels:
     severity: warning
 - alert: AlertmanagerClusterFailedToSendAlerts
-  expr: {{ printf "min(rate(alertmanager_notifications_failed_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration=~\".*\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration=~\".*\"}[15m])) by(namespace,service,integration,%s) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
+  expr: {{ printf "min((rate(alertmanager_notifications_failed_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration=~\".*\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration=~\".*\"}[15m])) > 0) by(namespace,service,integration,%s) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
   annotations:
     description: The minimum notification failure rate to {{`{{`}} $labels.integration {{`}}`}} sent from any instance in the {{`{{`}}$labels.job{{`}}`}} cluster is {{`{{`}} $value | humanizePercentage {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerclusterfailedtosendalerts
@@ -48,7 +48,7 @@ rules:
   labels:
     severity: critical
 - alert: AlertmanagerClusterFailedToSendAlerts
-  expr: {{ printf "min(rate(alertmanager_notifications_failed_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration!~\".*\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration!~\".*\"}[15m])) by(namespace,service,integration,%s) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
+  expr: {{ printf "min((rate(alertmanager_notifications_failed_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration!~\".*\"}[15m]) / ignoring(reason) group_left() rate(alertmanager_notifications_total{job=\"%s\",container=\"alertmanager\",namespace=\"%s\",integration!~\".*\"}[15m])) > 0) by(namespace,service,integration,%s) > 0.01" (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) (include "vm-k8s-stack.alertmanager.name" .) (include "vm.namespace" .) $groupLabels }}
   annotations:
     description: The minimum notification failure rate to {{`{{`}} $labels.integration {{`}}`}} sent from any instance in the {{`{{`}}$labels.job{{`}}`}} cluster is {{`{{`}} $value | humanizePercentage {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/alertmanager/alertmanagerclusterfailedtosendalerts

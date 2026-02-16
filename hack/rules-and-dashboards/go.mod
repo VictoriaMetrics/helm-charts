@@ -3,7 +3,7 @@ module VictoriaMetrics/dashboards
 go 1.25.1
 
 require (
-	github.com/VictoriaMetrics/metricsql v0.84.9-0.20251003065828-34e335c536c7
+	github.com/VictoriaMetrics/metricsql v0.84.11-0.20260216201840-cb987704cd21
 	github.com/google/go-jsonnet v0.21.0
 	gopkg.in/yaml.v2 v2.4.0
 )

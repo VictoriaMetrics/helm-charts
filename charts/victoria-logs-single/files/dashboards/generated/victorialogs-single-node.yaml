@@ -21,9 +21,11 @@ templating:
     refresh: 1
     regex: ""
   - name: job
+    multi: true
+    includeAll: true
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     type: query
     query:
       query: {{ printf "label_values(vm_app_version{version=~\"victoria-logs-.*\",%s=~\"$cluster\"}, job)" $clusterLabel }}
@@ -38,13 +40,12 @@ templating:
     includeAll: true
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     type: query
     query:
       query: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
       refId: StandardVariableQuery
     definition: {{ printf "label_values(vm_app_version{job=~\"$job\",%s=~\"$cluster\"}, instance)" $clusterLabel }}
-    allValue: .*
     current: {}
     options: []
     refresh: 1
@@ -52,7 +53,7 @@ templating:
   - name: version
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     type: query
     query:
       qryType: 1
@@ -67,7 +68,7 @@ templating:
   - name: adhoc
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     type: adhoc
     baseFilters: []
     filters: []
@@ -104,28 +105,34 @@ annotations:
       type: dashboard
     type: dashboard
   - name: version change
-    expr: {{ printf "sum(vm_app_version{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(short_version,%s) unless sum(vm_app_version{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"} offset $__interval) by(short_version,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     enable: true
     hide: true
     iconColor: blue
+    target:
+      expr: sum(vm_app_version{job=~"$job", instance=~"$instance"}) by(short_version) unless (sum(vm_app_version{job=~"$job", instance=~"$instance"} offset $__interval) by(short_version))
+      interval: ""
+      refId: Anno
     textFormat: '{{`{{`}}short_version{{`}}`}}'
     titleFormat: Version change
   - name: restarts
-    expr: {{ printf "sum(changes(vm_app_start_timestamp{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__interval])) by(job,%s)" $clusterLabel $clusterLabel }}
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     enable: true
     hide: true
     iconColor: orange
+    target:
+      expr: sum(changes(vm_app_start_timestamp{job=~"$job", instance=~"$instance"}[$__interval])) by(instance)
+      interval: ""
+      refId: Anno
     textFormat: '{{`{{`}}instance{{`}}`}} restarted'
   - name: gc
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     enable: false
     filter:
       exclude: false
@@ -153,7 +160,7 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(vl_storage_rows{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -165,7 +172,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: Total amount of log entries in the storage.
   fieldConfig:
     defaults:
@@ -181,7 +188,7 @@ panels:
     overrides: []
   gridPos:
     h: 4
-    w: 4
+    w: 5
     x: 0
     "y": 1
   id: 133
@@ -207,7 +214,7 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(increase(vl_rows_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[24h])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -219,7 +226,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: The total number of log entries ingested over the past 24 hours.
   fieldConfig:
     defaults:
@@ -236,7 +243,7 @@ panels:
   gridPos:
     h: 4
     w: 5
-    x: 4
+    x: 5
     "y": 1
   id: 134
   maxDataPoints: 100
@@ -261,7 +268,7 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(rate(vl_rows_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -273,7 +280,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: Average ingestion rate of log entries.
   fieldConfig:
     defaults:
@@ -289,8 +296,8 @@ panels:
     overrides: []
   gridPos:
     h: 4
-    w: 5
-    x: 9
+    w: 4
+    x: 10
     "y": 1
   id: 135
   maxDataPoints: 100
@@ -315,7 +322,7 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(vl_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -327,7 +334,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: |-
     Total amount of used disk space.
     Accounts for all compressed log entries and index size.
@@ -373,7 +380,7 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(vm_available_cpu_cores{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -385,7 +392,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: Integer number of CPU cores available to the application. This value is automatically rounded down from fractional CPU quotas. For optimal performance, fractional CPU units should be avoided. See the [best practices](https://docs.victoriametrics.com/victoriametrics/bestpractices/#kubernetes) documentation for more details.
   fieldConfig:
     defaults:
@@ -423,28 +430,65 @@ panels:
     wideLayout: true
   pluginVersion: 12.3.0
   type: stat
-- title: Version
-  description: See [latest releases](https://docs.victoriametrics.com/victorialogs/changelog/).
+- title: Total ingested size (uncompressed)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "sum(vl_uncompressed_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: false
+    format: time_series
+    instant: true
+    interval: ""
+    intervalFactor: 1
+    legendFormat: total
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: Total log data (uncompressed) currently stored and still present in the system. This excludes data removed by retention or detached partitions.
+  fieldConfig:
+    defaults:
+      color:
+        mode: thresholds
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+      unit: bytes
+    overrides: []
   gridPos:
     h: 4
-    w: 4
+    w: 5
     x: 0
     "y": 5
-  id: 138
+  id: 144
+  maxDataPoints: 100
   options:
-    code:
-      language: plaintext
-      showLineNumbers: false
-      showMiniMap: false
-    content: '<div style="text-align: center;">$version</div>'
-    mode: markdown
+    colorMode: value
+    graphMode: area
+    justifyMode: auto
+    orientation: horizontal
+    percentChangeColorMode: standard
+    reduceOptions:
+      calcs:
+      - lastNotNull
+      fields: ""
+      values: false
+    showPercentChange: false
+    text: {}
+    textMode: auto
+    wideLayout: true
   pluginVersion: 12.3.0
-  type: text
+  type: stat
 - title: Ingested bytes 24h
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(increase(vl_bytes_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[24h])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -456,7 +500,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: "The cumulative number of log entries ingested over the last 24h. \n\nThe size is calculated before compression."
   fieldConfig:
     defaults:
@@ -473,7 +517,7 @@ panels:
   gridPos:
     h: 4
     w: 5
-    x: 4
+    x: 5
     "y": 5
   id: 139
   maxDataPoints: 100
@@ -498,7 +542,7 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",path=~\"/select/.*\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -510,7 +554,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: Rate of HTTP read requests.
   fieldConfig:
     defaults:
@@ -526,8 +570,8 @@ panels:
     overrides: []
   gridPos:
     h: 4
-    w: 5
-    x: 9
+    w: 4
+    x: 10
     "y": 5
   id: 140
   maxDataPoints: 100
@@ -552,7 +596,7 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(vl_uncompressed_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s) / sum(vl_compressed_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -564,7 +608,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: "The ratio between original data size and compressed data stored on disk. This metric excludes indexdb size. \n\nThe ratio can go up or down as the system performs automatic maintenance and applies retention policies. For examples:\n- Background merges: [Merges](https://docs.victoriametrics.com/victorialogs/#forced-merge) improve compression by combining data into larger, more efficiently compressed blocks\n- Retention policies: When old data is deleted due to retention settings, the ratio changes as different time periods have varying compression characteristics\n\n"
   fieldConfig:
     defaults:
@@ -605,7 +649,7 @@ panels:
 - title: Available memory
   targets:
   - datasource:
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(vm_available_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -617,7 +661,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: Total system memory available to the application. This represents the system or container's memory capacity or limit, not the currently free memory.
   fieldConfig:
     defaults:
@@ -668,8 +712,8 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(rate(vl_rows_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s) > 0" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "sum(rate(vl_rows_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     hide: false
@@ -679,8 +723,8 @@ panels:
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(rate(vl_bytes_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s) > 0" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "sum(rate(vl_bytes_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     hide: false
     instant: false
@@ -689,7 +733,7 @@ panels:
     refId: B
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: Ingestion rate in number of log entries and bytes per second.
   fieldConfig:
     defaults:
@@ -744,6 +788,18 @@ panels:
         value: right
       - id: unit
         value: bytes
+    - matcher:
+        id: byValue
+        options:
+          op: gte
+          reducer: allIsZero
+          value: 0
+      properties:
+      - id: custom.hideFrom
+        value:
+          legend: true
+          tooltip: true
+          viz: true
   gridPos:
     h: 8
     w: 12
@@ -755,10 +811,11 @@ panels:
       calcs:
       - mean
       - lastNotNull
+      - max
       displayMode: table
       placement: bottom
       showLegend: true
-      sortBy: Last *
+      sortBy: Max
       sortDesc: true
     tooltip:
       hideZeros: false
@@ -770,8 +827,8 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s) > 0" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     interval: ""
@@ -781,7 +838,7 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: |-
     * `*` - unsupported query path
     * `/insert` - [inserts](https://docs.victoriametrics.com/victorialogs/data-ingestion/)
@@ -832,7 +889,19 @@ panels:
         - color: red
           value: 80
       unit: short
-    overrides: []
+    overrides:
+    - matcher:
+        id: byValue
+        options:
+          op: gte
+          reducer: allIsZero
+          value: 0
+      properties:
+      - id: custom.hideFrom
+        value:
+          legend: true
+          tooltip: true
+          viz: true
   gridPos:
     h: 8
     w: 12
@@ -848,7 +917,7 @@ panels:
       displayMode: table
       placement: bottom
       showLegend: true
-      sortBy: Last *
+      sortBy: Max
       sortDesc: true
     tooltip:
       hideZeros: false
@@ -860,19 +929,19 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(rate(vm_http_request_errors_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s)" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "sum(rate(vm_http_request_errors_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,reason,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     format: time_series
     interval: ""
     intervalFactor: 1
-    legendFormat: '{{`{{`}}path{{`}}`}}'
+    legendFormat: '{{`{{`}}path{{`}}`}} - {{`{{`}}reason{{`}}`}}'
     range: true
     refId: A
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     expr: {{ printf "sum(rate(vl_http_errors_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
@@ -885,7 +954,7 @@ panels:
     refId: B
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: |-
     * `*` - unsupported query path
     * `/insert` - [inserts](https://docs.victoriametrics.com/victorialogs/data-ingestion/)
@@ -935,7 +1004,19 @@ panels:
         - color: red
           value: 80
       unit: short
-    overrides: []
+    overrides:
+    - matcher:
+        id: byValue
+        options:
+          op: gte
+          reducer: allIsZero
+          value: 0
+      properties:
+      - id: custom.hideFrom
+        value:
+          legend: true
+          tooltip: true
+          viz: true
   gridPos:
     h: 8
     w: 12
@@ -960,8 +1041,8 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(path,%s) > 0" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(path,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     intervalFactor: 1
@@ -970,8 +1051,15 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
-  description: 99th percentile response time for VictoriaLogs HTTP endpoints, grouped by instance and path. This means 99% of requests are faster than this value. **Lower numbers are better**, as they indicate faster responses and fewer slow requests.
+    uid: $DS_PROMETHEUS
+  description: |-
+    Tail latency of VictoriaLogs HTTP endpoints, split by request `path` (seconds).
+
+    This shows the p99 response time, i.e. the slowest 1% of requests. It is the first place to look when users report 'slow queries' or 'slow ingestion'.
+
+    Because the chart takes the maximum across the selected instances, a single unhealthy node will stand out. If you see spikes, correlate with error rate and resource panels (CPU, memory, I/O pressure) to decide whether it is client load, a slow node, or storage pressure.
+
+    `/internal/*` endpoints are excluded.
   fieldConfig:
     defaults:
       color:
@@ -1017,7 +1105,19 @@ panels:
         - color: red
           value: 80
       unit: s
-    overrides: []
+    overrides:
+    - matcher:
+        id: byValue
+        options:
+          op: gte
+          reducer: allIsZero
+          value: 0
+      properties:
+      - id: custom.hideFrom
+        value:
+          legend: true
+          tooltip: true
+          viz: true
   gridPos:
     h: 8
     w: 12
@@ -1033,7 +1133,7 @@ panels:
       displayMode: table
       placement: bottom
       showLegend: true
-      sortBy: Last *
+      sortBy: Max
       sortDesc: true
     tooltip:
       hideZeros: false
@@ -1045,8 +1145,8 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "max(vl_total_disk_space_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(vl_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     hide: false
@@ -1057,9 +1157,10 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
+    uid: $DS_PROMETHEUS
   description: |-
-    Amount of on-disk space occupied by all the data stored in the storage.
+    Total amount of used disk space.
+    Accounts for all compressed log entries and index size.
 
     See how to [control disk usage](https://docs.victoriametrics.com/victorialogs/#retention-by-disk-space-usage).
   fieldConfig:
@@ -1124,7 +1225,7 @@ panels:
       displayMode: table
       placement: bottom
       showLegend: true
-      sortBy: Last *
+      sortBy: Max
       sortDesc: true
     tooltip:
       hideZeros: false
@@ -1136,8 +1237,8 @@ panels:
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(rate(vm_log_messages_total{job=~\"$job\",instance=~\"$instance\",level!=\"info\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,level,location,%s)" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "sum(rate(vm_log_messages_total{job=~\"$job\",instance=~\"$instance\",level!=\"info\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,level,app_version,location,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     interval: 5m
     legendFormat: '{{`{{`}}instance{{`}}`}} - {{`{{`}}level{{`}}`}}: {{`{{`}}location{{`}}`}}'
@@ -1145,8 +1246,8 @@ panels:
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
-  description: Rate of VictoriaLogs' own application log messages (errors, warnings, debug) - NOT the logs that VictoriaLogs is collecting from external sources.
+    uid: $DS_PROMETHEUS
+  description: Rate of VictoriaLogs' own application log messages (debug, warnings, errors) - NOT the logs that VictoriaLogs is collecting from external sources.
   fieldConfig:
     defaults:
       color:
@@ -1180,6 +1281,10 @@ panels:
           mode: none
         thresholdsStyle:
           mode: "off"
+      links:
+      - targetBlank: true
+        title: Source Code
+        url: https://l2s.victoriametrics.com/?app_version=${__field.labels.app_version}&location=${__field.labels.location}
       mappings: []
       thresholds:
         mode: absolute
@@ -1205,6 +1310,18 @@ panels:
         value:
           fixedColor: red
           mode: fixed
+    - matcher:
+        id: byValue
+        options:
+          op: gte
+          reducer: allIsZero
+          value: 0
+      properties:
+      - id: custom.hideFrom
+        value:
+          legend: true
+          tooltip: true
+          viz: true
   gridPos:
     h: 8
     w: 12
@@ -1220,7 +1337,7 @@ panels:
       displayMode: table
       placement: bottom
       showLegend: true
-      sortBy: Last *
+      sortBy: Max
       sortDesc: true
     tooltip:
       hideZeros: false
@@ -1228,115 +1345,35 @@ panels:
       sort: none
   pluginVersion: 12.3.0
   type: timeseries
-- title: Troubleshooting
+- title: Resource usage
   collapsed: false
   gridPos:
     h: 1
     w: 24
     x: 0
     "y": 34
-  id: 68
+  id: 28
   type: row
-- title: Restarts
+- title: Total memory % usage ($instance)
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(changes(vm_app_start_timestamp{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(max_over_time(process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_memory_limit_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
-    format: time_series
-    hide: false
-    instant: false
-    legendFormat: '{{`{{`}}instance{{`}}`}}'
-    refId: A
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
-  description: "Number of restarts per job. The chart can be useful to identify periodic process restarts and correlate them with potential issues or anomalies. \n\nNormally, processes shouldn't restart unless restart was inited by user. The reason of restarts should be figured out by checking the logs of each specific service. "
-  fieldConfig:
-    defaults:
-      color:
-        mode: palette-classic
-      custom:
-        axisBorderShow: false
-        axisCenteredZero: false
-        axisColorMode: text
-        axisLabel: ""
-        axisPlacement: auto
-        axisSoftMin: 0
-        barAlignment: 0
-        barWidthFactor: 0.6
-        drawStyle: line
-        fillOpacity: 0
-        gradientMode: none
-        hideFrom:
-          legend: false
-          tooltip: false
-          viz: false
-        insertNulls: false
-        lineInterpolation: stepAfter
-        lineWidth: 1
-        pointSize: 5
-        scaleDistribution:
-          type: linear
-        showPoints: never
-        spanNulls: false
-        stacking:
-          group: A
-          mode: none
-        thresholdsStyle:
-          mode: "off"
-      decimals: 0
-      links: []
-      mappings: []
-      noValue: "0"
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: 0
-        - color: red
-          value: 80
-      unit: none
-    overrides: []
-  gridPos:
-    h: 8
-    w: 12
-    x: 0
-    "y": 35
-  id: 62
-  options:
-    legend:
-      calcs:
-      - lastNotNull
-      displayMode: table
-      placement: bottom
-      showLegend: true
-      sortBy: Last *
-      sortDesc: true
-    tooltip:
-      hideZeros: false
-      mode: multi
-      sort: desc
-  pluginVersion: 12.1.0
-  type: timeseries
-- title: Streams churn rate 24h ($instance)
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(increase(vl_streams_created_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1d])) by(instance,%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    format: time_series
+    exemplar: false
     interval: ""
-    intervalFactor: 1
     legendFormat: '{{`{{`}}instance{{`}}`}}'
     range: true
     refId: A
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
-  description: The number of new [log streams](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) created over the last 24 hours. Lower rate is better. See [How to determine which fields must be associated with log streams?](https://docs.victoriametrics.com/victorialogs/keyconcepts/#how-to-determine-which-fields-must-be-associated-with-log-streams)
+    uid: $DS_PROMETHEUS
+  description: |-
+    How much memory (RAM) the VictoriaLogs process is actually using, compared to its allowed container or system limit. See 'Memory Usage' panel for a detailed breakdown.
+
+    - Good: Below 70% most of the time, maybe spiking a bit under load.
+    - Bad: Above 90% for more than 5 minutes = risk of out-of-memory (`OOM`) kill.
   fieldConfig:
     defaults:
       color:
@@ -1358,13 +1395,1102 @@ panels:
           viz: false
         insertNulls: false
         lineInterpolation: linear
-        lineStyle:
-          fill: solid
         lineWidth: 1
         pointSize: 5
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      links: []
+      mappings: []
+      max: 1
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: percentunit
+    overrides: []
+  gridPos:
+    h: 9
+    w: 12
+    x: 0
+    "y": 35
+  id: 38
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: desc
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Anonymous memory % usage ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(max_over_time(process_resident_memory_anon_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_memory_limit_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    intervalFactor: 1
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: ""
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      links: []
+      mappings: []
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: percentunit
+    overrides: []
+  gridPos:
+    h: 9
+    w: 12
+    x: 12
+    "y": 35
+  id: 40
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: desc
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Memory allocations rate
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(go_memstats_alloc_bytes_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}job{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: Rate of allocations in memory. Sudden increase in allocations would mean increased pressure on Go Garbage Collector and can saturate CPU resources of the application.
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: line
+      decimals: 0
+      links: []
+      mappings: []
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+      unit: bytes
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    "y": 44
+  id: 145
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: desc
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Memory pressure
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_pressure_memory_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "sum(rate(process_pressure_memory_stalled_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
+    range: true
+    refId: B
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: |-
+    Lower is better, e.g. 20% means the process was delayed by memory pressure 20% of the time. See [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
+
+    - waiting: Time fraction where at least one thread was blocked on memory.
+    - stalled: Time fraction where every thread was blocked on memory (severe pressure).
+
+    If queries slow down and both series spike, the host is likely limited by RAM or I/O throughput.
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      decimals: 0
+      links: []
+      mappings: []
+      max: 1
+      min: 0
+      noValue: "0"
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 0.2
+      unit: percentunit
+    overrides:
+    - matcher:
+        id: byValue
+        options:
+          op: gte
+          reducer: allIsZero
+          value: 0
+      properties:
+      - id: custom.hideFrom
+        value:
+          legend: true
+          tooltip: true
+          viz: true
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    "y": 44
+  id: 73
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Name
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: desc
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: CPU % usage ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
+    editorMode: code
+    exemplar: false
+    format: time_series
+    interval: ""
+    intervalFactor: 1
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: CPU utilization per instance as a fraction of available cores. Sustained values above 80% indicate CPU saturation; correlate with CPU PSI and query latency.
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      links: []
+      mappings: []
+      max: 1
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: percentunit
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    "y": 52
+  id: 118
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: none
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: CPU pressure
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_pressure_cpu_waiting_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_pressure_cpu_stalled_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
+    range: true
+    refId: B
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: |-
+    Helps troubleshoot high CPU usage or throttling:
+
+    - waiting: The percentage of time at least one task in the VictoriaLogs process was ready to run (runnable) but couldn't get scheduled on the CPU.
+    - stalled: The percentage of time all tasks in the process (except idle ones) were unable to get CPU time — a full CPU stall.
+
+    If there's a CPU burst, it's normal to see waiting or stalled > 1%. It only becomes a concern if it consistently climbs above 5–10% and aligns with latency spikes or GC slowdowns.
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        axisSoftMax: 1
+        axisSoftMin: 0
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: line
+      decimals: 0
+      links: []
+      mappings: []
+      min: 0
+      noValue: "0"
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+      unit: percentunit
+    overrides:
+    - matcher:
+        id: byValue
+        options:
+          op: gte
+          reducer: allIsZero
+          value: 0
+      properties:
+      - id: custom.hideFrom
+        value:
+          legend: true
+          tooltip: true
+          viz: true
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    "y": 52
+  id: 72
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Name
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: desc
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Disk writes/reads ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_io_storage_read_bytes_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 1
+    legendFormat: read
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_io_storage_written_bytes_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 1
+    legendFormat: write
+    range: true
+    refId: C
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: |-
+    Measure the actual bytes read from and written to disk by the process:
+
+    - read: physical bytes the kernel actually pulled from the storage device on behalf of the process (after checking page-cache).
+    - write: physical bytes the kernel ultimately wrote to the storage device for the process (after combining, caching, or delaying writes).
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      links: []
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: bytes
+    overrides:
+    - matcher:
+        id: byName
+        options: read
+      properties:
+      - id: custom.transform
+        value: negative-Y
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    "y": 60
+  id: 52
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: none
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Storage read/write syscalls ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_io_read_syscalls_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 1
+    legendFormat: read calls
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_io_write_syscalls_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 1
+    legendFormat: write calls
+    range: true
+    refId: B
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: |-
+    Number of read/write calls application makes:
+
+    - read call: Number of read*()-family system calls your process has issued since start. Each call can move 1 byte or megabytes, cached or uncached.
+    - write call: Number of write*()-family system calls (including write, pwrite, writev, etc.) made by the process.
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      links: []
+      mappings: []
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: short
+    overrides:
+    - matcher:
+        id: byName
+        options: read calls
+      properties:
+      - id: custom.transform
+        value: negative-Y
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    "y": 60
+  id: 56
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: none
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Open FDs % usage ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max_over_time(process_open_fds{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_max_fds{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: |-
+    Percentage of open file descriptors (files, sockets, pipes, etc.,) compared to the limit set in the OS. Reaching the limit of open files can cause various issues and must be prevented.
+
+    See [how to change limits](https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a).
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic-by-name
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      decimals: 2
+      links: []
+      mappings: []
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: percentunit
+    overrides:
+    - matcher:
+        id: byName
+        options: max
+      properties:
+      - id: color
+        value:
+          fixedColor: '#C4162A'
+          mode: fixed
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    "y": 68
+  id: 46
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: none
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: IO pressure
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_pressure_io_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}}: waiting'
+    range: true
+    refId: A
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(process_pressure_io_stalled_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}}: stalled'
+    range: true
+    refId: B
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: |-
+    IO pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html). The lower the better.
+
+    - waiting: at least one runnable thread blocked on block-`I/O` (disk, NVMe, network-storage) while others could still make progress.
+    - stalled: all non-idle threads simultaneously waiting on `I/O`; no useful user code ran during these periods → true `I/O` thrashing.
+
+    If stalled > 0 while querying, it's recommended to increase queue depth on NVMe, raise blk-mq budgets, or relax cgroup I/O limits.
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic-by-name
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: line
+      decimals: 0
+      links: []
+      mappings: []
+      min: 0
+      noValue: "0"
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+      unit: percentunit
+    overrides:
+    - matcher:
+        id: byValue
+        options:
+          op: gte
+          reducer: allIsZero
+          value: 0
+      properties:
+      - id: custom.hideFrom
+        value:
+          legend: true
+          tooltip: true
+          viz: true
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    "y": 68
+  id: 74
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: desc
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: TCP connections ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(vm_tcplistener_conns{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    intervalFactor: 1
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: Current number of active TCP connections to VictoriaLogs. This metric helps monitor connection pool usage and identify potential connection leaks. High values may indicate clients not properly closing connections or connection pooling issues. Monitor for gradual increases that could lead to resource exhaustion.
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic-by-name
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      links: []
+      mappings: []
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    "y": 76
+  id: 60
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: none
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: TCP connections rate ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(vm_tcplistener_accepts_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    hide: false
+    intervalFactor: 1
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: Rate of incoming TCP connections accepted by VictoriaLogs. This metric indicates network activity and client connection patterns. Sudden spikes may indicate increased load or potential DDoS attacks. Sustained high rates should be correlated with resource usage to ensure adequate capacity.
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic-by-name
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
@@ -1387,8 +2513,8 @@ panels:
     h: 8
     w: 12
     x: 12
-    "y": 35
-  id: 26
+    "y": 76
+  id: 58
   options:
     legend:
       calcs:
@@ -1398,117 +2524,31 @@ panels:
       displayMode: table
       placement: bottom
       showLegend: true
-      sortBy: Last *
+      sortBy: Max
       sortDesc: true
     tooltip:
       hideZeros: false
       mode: multi
-      sort: desc
-  pluginVersion: 12.1.0
+      sort: none
+  pluginVersion: 12.3.0
   type: timeseries
-- title: Non-default flags
+- title: CPU spent on GC ($instance)
   targets:
   - datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(flag{is_set=\"true\",job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,instance,name,value,%s)" $clusterLabel $clusterLabel }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(rate(go_gc_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / rate(process_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
-    exemplar: false
-    format: table
-    instant: true
-    legendFormat: '{{`{{`}}name{{`}}`}}={{`{{`}}value{{`}}`}}'
-    range: false
-    refId: A
-  datasource:
-    type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
-  description: Flags explicitly set to non-default values
-  fieldConfig:
-    defaults:
-      color:
-        mode: thresholds
-      custom:
-        align: auto
-        cellOptions:
-          type: auto
-        inspect: false
-      mappings: []
-      thresholds:
-        mode: absolute
-        steps:
-        - color: green
-          value: 0
-        - color: red
-          value: 80
-    overrides:
-    - matcher:
-        id: byName
-        options: Time
-      properties:
-      - id: custom.hidden
-        value: true
-    - matcher:
-        id: byName
-        options: Value
-      properties:
-      - id: custom.hidden
-        value: true
-    - matcher:
-        id: byName
-        options: job
-      properties:
-      - id: custom.hidden
-        value: true
-  gridPos:
-    h: 8
-    w: 12
-    x: 0
-    "y": 43
-  id: 70
-  options:
-    cellHeight: sm
-    footer:
-      countRows: false
-      fields: ""
-      reducer:
-      - sum
-      show: false
-    showHeader: true
-  pluginVersion: 12.1.0
-  type: table
-- title: Logs dropped for last 1h
-  targets:
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(increase(vl_rows_dropped_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1h])) by(reason,%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    exemplar: true
-    hide: false
+    format: time_series
     interval: ""
-    legendFormat: '{{`{{`}}reason{{`}}`}}'
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
     range: true
     refId: A
-  - datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    expr: {{ printf "sum(increase(vl_too_long_lines_skipped_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1h])) by(%s)" $clusterLabel $clusterLabel }}
-    editorMode: code
-    hide: false
-    instant: false
-    legendFormat: line_too_long
-    range: true
-    refId: B
   datasource:
     type: {{ $defaultDatasource }}
-    uid: ${DS_PROMETHEUS}
-  description: |-
-    Number of log entries ignored or dropped on insertion due to the following reasons:
-    * Timestamp out of the retention period or in the future
-    * Number of fields per entry exceeded
-    * Line too long
-
-    If this occurs, check the VictoriaLogs log for details.
+    uid: $DS_PROMETHEUS
+  description: "Percent of CPU spent on garbage collection.\n\nIf % is high, then CPU usage can be decreased by changing `GOGC` to higher values. Increasing `GOGC` value will increase memory usage, and decrease CPU usage.\n\nTry searching for keyword `GOGC` at https://docs.victoriametrics.com/victoriametrics/troubleshooting/ "
   fieldConfig:
     defaults:
       color:
@@ -1535,14 +2575,101 @@ panels:
         scaleDistribution:
           type: linear
         showPoints: never
+        showValues: false
         spanNulls: false
         stacking:
           group: A
           mode: none
         thresholdsStyle:
           mode: "off"
+      decimals: 0
+      links: []
       mappings: []
-      noValue: "0"
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: percentunit
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    "y": 84
+  id: 119
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: desc
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Goroutines ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(go_goroutines{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic-by-name
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      decimals: 0
+      links: []
+      mappings: []
+      min: 0
       thresholds:
         mode: absolute
         steps:
@@ -1556,8 +2683,8 @@ panels:
     h: 8
     w: 12
     x: 12
-    "y": 43
-  id: 71
+    "y": 84
+  id: 50
   options:
     legend:
       calcs:
@@ -1567,258 +2694,202 @@ panels:
       displayMode: table
       placement: bottom
       showLegend: true
-      sortBy: Last *
+      sortBy: Max
       sortDesc: true
     tooltip:
       hideZeros: false
       mode: multi
       sort: none
-  pluginVersion: 12.1.0
+  pluginVersion: 12.3.0
   type: timeseries
-- title: Resource usage
+- title: Threads ($instance)
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "max(process_num_threads{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic-by-name
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: "off"
+      decimals: 0
+      links: []
+      mappings: []
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 80
+      unit: short
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 0
+    "y": 92
+  id: 54
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: none
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Go scheduling latency
+  targets:
+  - datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    expr: {{ printf "sum(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,le,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
+    editorMode: code
+    format: time_series
+    interval: ""
+    intervalFactor: 2
+    legendFormat: '{{`{{`}}instance{{`}}`}}'
+    range: true
+    refId: A
+  datasource:
+    type: {{ $defaultDatasource }}
+    uid: $DS_PROMETHEUS
+  description: "Time goroutines have spent in runnable state before actually running. The lower is better.\n\nHigh values or values exceeding the threshold is usually a sign of            insufficient CPU resources or CPU throttling. \n\nVerify that service has enough CPU resources. Otherwise, the service could work unreliably with delays in processing."
+  fieldConfig:
+    defaults:
+      color:
+        mode: palette-classic
+      custom:
+        axisBorderShow: false
+        axisCenteredZero: false
+        axisColorMode: text
+        axisLabel: ""
+        axisPlacement: auto
+        barAlignment: 0
+        barWidthFactor: 0.6
+        drawStyle: line
+        fillOpacity: 0
+        gradientMode: none
+        hideFrom:
+          legend: false
+          tooltip: false
+          viz: false
+        insertNulls: false
+        lineInterpolation: linear
+        lineWidth: 1
+        pointSize: 5
+        scaleDistribution:
+          type: linear
+        showPoints: never
+        showValues: false
+        spanNulls: false
+        stacking:
+          group: A
+          mode: none
+        thresholdsStyle:
+          mode: line
+      decimals: 0
+      links: []
+      mappings: []
+      min: 0
+      thresholds:
+        mode: absolute
+        steps:
+        - color: green
+          value: 0
+        - color: red
+          value: 0.1
+      unit: s
+    overrides: []
+  gridPos:
+    h: 8
+    w: 12
+    x: 12
+    "y": 92
+  id: 61
+  options:
+    legend:
+      calcs:
+      - mean
+      - lastNotNull
+      - max
+      displayMode: table
+      placement: bottom
+      showLegend: true
+      sortBy: Max
+      sortDesc: true
+    tooltip:
+      hideZeros: false
+      mode: multi
+      sort: desc
+  pluginVersion: 12.3.0
+  type: timeseries
+- title: Troubleshooting
   panels:
-  - title: RSS % of memory limit
+  - title: Restarts
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(max_over_time(process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / vm_available_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(changes(vm_app_start_timestamp{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
-      exemplar: false
       format: time_series
-      instant: true
-      interval: ""
-      intervalFactor: 1
+      hide: false
+      instant: false
       legendFormat: '{{`{{`}}instance{{`}}`}}'
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: Percentage of physical RAM used compared to the memory limit. If this percentage is high, check the `RSS` anonymous vs resident ratio panel for more details.
-    fieldConfig:
-      defaults:
-        color:
-          mode: thresholds
-        mappings: []
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: yellow
-            value: 0.8
-          - color: red
-            value: 0.9
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 5
-      w: 7
-      x: 0
-      "y": 52
-    id: 79
-    maxDataPoints: 100
-    options:
-      colorMode: value
-      graphMode: area
-      justifyMode: auto
-      orientation: horizontal
-      percentChangeColorMode: standard
-      reduceOptions:
-        calcs:
-        - lastNotNull
-        fields: ""
-        values: false
-      showPercentChange: false
-      text: {}
-      textMode: auto
-      wideLayout: true
-    pluginVersion: 12.1.0
-    type: stat
-  - title: Physical memory usage ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(max_over_time(process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / vm_available_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: false
-      interval: ""
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      How much memory (RAM) the VictoriaLogs process is actually using, compared to its allowed container or system limit. See 'Memory Usage' panel for a detailed breakdown.
-
-      - Good: Below 70% most of the time, maybe spiking a bit under load.
-      - Bad: Above 90% for more than 5 minutes = risk of out-of-memory (OOM) kill.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic-by-name
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        max: 1
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 10
-      w: 17
-      x: 7
-      "y": 52
-    id: 38
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Anonymous / Resident ratio
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(process_resident_memory_anon_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"} / process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: false
-      format: time_series
-      instant: true
-      interval: ""
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: Portion of RAM that CANNOT be reclaimed without swapping. If both the `RSS`-to-limit percentage and this ratio are high, the process is at high risk of an `OOM` kill.
-    fieldConfig:
-      defaults:
-        color:
-          mode: thresholds
-        mappings: []
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 5
-      w: 7
-      x: 0
-      "y": 57
-    id: 78
-    maxDataPoints: 100
-    options:
-      colorMode: value
-      graphMode: area
-      justifyMode: auto
-      orientation: horizontal
-      percentChangeColorMode: standard
-      reduceOptions:
-        calcs:
-        - lastNotNull
-        fields: ""
-        values: false
-      showPercentChange: false
-      text: {}
-      textMode: auto
-      wideLayout: true
-    pluginVersion: 12.1.0
-    type: stat
-  - title: Memory usage ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(process_resident_memory_anon_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      intervalFactor: 1
-      legendFormat: anonymous resident memory
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(process_resident_memory_file_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      intervalFactor: 1
-      legendFormat: file-backed resident memory
-      range: true
-      refId: B
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(process_resident_memory_shared_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      intervalFactor: 1
-      legendFormat: shared resident memory
-      range: true
-      refId: C
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      - Anonymous resident memory: Private memory allocated to the application that **cannot** be reclaimed by the kernel. Refer to the [Check/profile](https://docs.victoriametrics.com/victorialogs/#profiling) Go heap section for troubleshooting.
-      - File-backed resident memory: Memory mapped from files, which can be safely reclaimed. Increases during querying. Correlate with `I/O` panels for further analysis.
-      - Shared resident memory: Typically negligible. Large spikes may indicate unexpected shared memory consumers.
+      uid: $DS_PROMETHEUS
+    description: "Number of restarts per job. The chart can be useful to identify periodic process restarts and correlate them with potential issues or anomalies. \n\nNormally, processes shouldn't restart unless restart was inited by user. The reason of restarts should be figured out by checking the logs of each specific service. "
     fieldConfig:
       defaults:
         color:
@@ -1829,300 +2900,6 @@ panels:
           axisColorMode: text
           axisLabel: ""
           axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: bytes
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 62
-    id: 40
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: CPU % usage ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(rate(process_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_cpu_cores_available{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: false
-      format: time_series
-      interval: ""
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        max: 1
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 62
-    id: 118
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: none
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Memory pressure
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(process_pressure_memory_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}} - waiting'
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(process_pressure_memory_stalled_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}} - stalled'
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      Lower is better, e.g. 20% means the process was delayed by memory pressure 20% of the time. See [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html).
-
-      - waiting: Time fraction where at least one thread was blocked on memory.
-      - stalled: Time fraction where every thread was blocked on memory (severe pressure).
-
-      If queries slow down and both series spike, the host is likely limited by RAM or I/O throughput.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        decimals: 0
-        links: []
-        mappings: []
-        max: 1
-        min: 0
-        noValue: "0"
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 0.2
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 70
-    id: 73
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: CPU pressure
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(process_pressure_cpu_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}: waiting'
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(process_pressure_cpu_stalled_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}: stalled'
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      Helps troubleshoot high CPU usage or throttling:
-
-      - waiting: The percentage of time at least one task in the VictoriaLogs process was ready to run (runnable) but couldn't get scheduled on the CPU.
-      - stalled: The percentage of time all tasks in the process (except idle ones) were unable to get CPU time — a full CPU stall.
-
-      If there's a CPU burst, it's normal to see waiting or stalled > 1%. It only becomes a concern if it consistently climbs above 5–10% and aligns with latency spikes or GC slowdowns.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          axisSoftMax: 1
           axisSoftMin: 0
           barAlignment: 0
           barWidthFactor: 0.6
@@ -2134,239 +2911,135 @@ panels:
             tooltip: false
             viz: false
           insertNulls: false
-          lineInterpolation: linear
+          lineInterpolation: stepAfter
           lineWidth: 1
           pointSize: 5
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
             mode: none
           thresholdsStyle:
-            mode: line
+            mode: "off"
         decimals: 0
         links: []
         mappings: []
-        min: 0
         noValue: "0"
         thresholds:
           mode: absolute
           steps:
           - color: green
             value: 0
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 70
-    id: 72
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Read/Write syscalls ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(rate(process_io_read_syscalls_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 1
-      legendFormat: read calls
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(rate(process_io_write_syscalls_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 1
-      legendFormat: write calls
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      Number of read/write calls application makes:
-
-      - read call: Number of read*()-family system calls your process has issued since start. Each call can move 1 byte or megabytes, cached or uncached.
-      - write call: Number of write*()-family system calls (including write, pwrite, writev, etc.) made by the process.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
           - color: red
             value: 80
-        unit: short
+        unit: none
       overrides:
       - matcher:
-          id: byName
-          options: read calls
-        properties:
-        - id: custom.transform
-          value: negative-Y
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 78
-    id: 56
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: none
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Open FDs % usage ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max_over_time(process_open_fds{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / process_max_fds{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      Percentage of open file descriptors (files, sockets, pipes, etc.,) compared to the limit set in the OS. Reaching the limit of open files can cause various issues and must be prevented.
-
-      See [how to change limits](https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a).
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic-by-name
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        decimals: 2
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
             value: 0
-          - color: red
-            value: 80
-        unit: percentunit
-      overrides:
-      - matcher:
-          id: byName
-          options: max
         properties:
-        - id: color
+        - id: custom.hideFrom
           value:
-            fixedColor: '#C4162A'
-            mode: fixed
+            legend: true
+            tooltip: true
+            viz: true
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 157
+    id: 62
+    options:
+      legend:
+        calcs:
+        - lastNotNull
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.3.0
+    type: timeseries
+  - title: Streams churn rate 24h ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(increase(vl_streams_created_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1d])) by(instance,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      interval: ""
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}instance{{`}}`}}'
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: The number of new [log streams](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) created over the last 24 hours. Lower rate is better. See [How to determine which fields must be associated with log streams?](https://docs.victoriametrics.com/victorialogs/keyconcepts/#how-to-determine-which-fields-must-be-associated-with-log-streams)
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic-by-name
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineStyle:
+            fill: solid
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
     gridPos:
       h: 8
       w: 12
       x: 12
-      "y": 78
-    id: 46
+      "y": 157
+    id: 26
     options:
       legend:
         calcs:
@@ -2381,43 +3054,124 @@ panels:
       tooltip:
         hideZeros: false
         mode: multi
-        sort: none
-    pluginVersion: 12.1.0
+        sort: desc
+    pluginVersion: 12.3.0
     type: timeseries
-  - title: Disk writes/reads ($instance)
+  - title: Non-default flags
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(rate(process_io_storage_read_bytes_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(flag{is_set=\"true\",job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,name,value,%s) or label_replace(label_replace(sum(flag{is_set=\"true\",job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s), \"name\", \"---------\", \"instance\", \"(.*)\"), \"value\", \"---------\", \"instance\", \"(.*)\")" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
-      format: time_series
+      exemplar: false
+      format: table
+      instant: true
+      legendFormat: '{{`{{`}}name{{`}}`}}={{`{{`}}value{{`}}`}}'
+      range: false
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: Flags explicitly set to non-default values
+    fieldConfig:
+      defaults:
+        color:
+          mode: thresholds
+        custom:
+          align: auto
+          cellOptions:
+            type: auto
+          footer:
+            reducers: []
+          inspect: false
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: transparent
+            value: 0
+      overrides:
+      - matcher:
+          id: byName
+          options: name
+        properties:
+        - id: mappings
+          value:
+          - options:
+              '---------':
+                color: '#292929'
+                index: 0
+            type: value
+        - id: custom.cellOptions
+          value:
+            applyToRow: true
+            mode: basic
+            type: color-background
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 189
+    id: 149
+    options:
+      cellHeight: sm
+      showHeader: true
+      sortBy:
+      - desc: true
+        displayName: instance
+    pluginVersion: 12.3.0
+    transformations:
+    - id: groupBy
+      options:
+        fields:
+          instance:
+            aggregations:
+            - uniqueValues
+            operation: groupby
+          job:
+            aggregations: []
+            operation: groupby
+          name:
+            aggregations: []
+            operation: groupby
+          value:
+            aggregations: []
+            operation: groupby
+    type: table
+  - title: Logs dropped for last 1h
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(increase(vl_rows_dropped_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1h])) by(reason,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      exemplar: true
       hide: false
       interval: ""
-      intervalFactor: 1
-      legendFormat: read
+      legendFormat: '{{`{{`}}reason{{`}}`}}'
       range: true
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(rate(process_io_storage_written_bytes_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(increase(vl_too_long_lines_skipped_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1h])) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
-      format: time_series
       hide: false
-      interval: ""
-      intervalFactor: 1
-      legendFormat: write
+      instant: false
+      legendFormat: line_too_long
       range: true
-      refId: C
+      refId: B
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
-      Measure the actual bytes read from and written to disk by the process:
+      Number of log entries ignored or dropped on insertion due to the following reasons:
+      * Timestamp out of the retention period or in the future
+      * Number of fields per entry exceeded
+      * Line too long
 
-      - read: physical bytes the kernel actually pulled from the storage device on behalf of the process (after checking page-cache).
-      - write: physical bytes the kernel ultimately wrote to the storage device for the process (after combining, caching, or delaying writes).
+      If this occurs, check the VictoriaLogs log for details.
     fieldConfig:
       defaults:
         color:
@@ -2444,211 +3198,20 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
             mode: none
           thresholdsStyle:
             mode: "off"
-        links: []
         mappings: []
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: bytes
-      overrides:
-      - matcher:
-          id: byName
-          options: read
-        properties:
-        - id: custom.transform
-          value: negative-Y
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 86
-    id: 52
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: none
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: IO pressure
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(rate(process_pressure_io_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}: waiting'
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(process_pressure_io_stalled_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}: stalled'
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      IO pressure based on [Pressure Stall Information](https://docs.kernel.org/accounting/psi.html). The lower the better.
-
-      - waiting: at least one runnable thread blocked on block-`I/O` (disk, NVMe, network-storage) while others could still make progress.
-      - stalled: all non-idle threads simultaneously waiting on `I/O`; no useful user code ran during these periods → true `I/O` thrashing.
-
-      If stalled > 0 while querying, it's recommended to increase queue depth on NVMe, raise blk-mq budgets, or relax cgroup I/O limits.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic-by-name
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: line
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
         noValue: "0"
         thresholds:
           mode: absolute
           steps:
           - color: green
             value: 0
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 86
-    id: 74
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: TCP connections ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(vm_tcplistener_conns{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: Current number of active TCP connections to VictoriaLogs. This metric helps monitor connection pool usage and identify potential connection leaks. High values may indicate clients not properly closing connections or connection pooling issues. Monitor for gradual increases that could lead to resource exhaustion.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic-by-name
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
           - color: red
             value: 80
         unit: short
@@ -2656,9 +3219,9 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 0
-      "y": 94
-    id: 60
+      x: 12
+      "y": 189
+    id: 71
     options:
       legend:
         calcs:
@@ -2674,431 +3237,15 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Goroutines ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(go_goroutines{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic-by-name
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 94
-    id: 50
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: none
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: TCP connections rate ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(rate(vm_tcplistener_accepts_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: Rate of incoming TCP connections accepted by VictoriaLogs. This metric indicates network activity and client connection patterns. Sudden spikes may indicate increased load or potential DDoS attacks. Sustained high rates should be correlated with resource usage to ensure adequate capacity.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic-by-name
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 102
-    id: 58
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: none
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Threads ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(process_num_threads{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic-by-name
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 102
-    id: 54
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: none
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: CPU spent on GC ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(rate(go_gc_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval]) / rate(process_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: "Percent of CPU spent on garbage collection.\n\nIf % is high, then CPU usage can be decreased by changing `GOGC` to higher values. Increasing `GOGC` value will increase memory usage, and decrease CPU usage.\n\nTry searching for keyword `GOGC` at https://docs.victoriametrics.com/victoriametrics/troubleshooting/ "
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: percentunit
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 110
-    id: 119
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Go scheduling latency
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,le,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      interval: ""
-      intervalFactor: 2
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: "Time goroutines have spent in runnable state before actually running. The lower is better.\n\nHigh values or values exceeding the threshold is usually a sign of            insufficient CPU resources or CPU throttling. \n\nVerify that service has enough CPU resources. Otherwise, the service could work unreliably with delays in processing."
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: line
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 0.1
-        unit: s
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 110
-    id: 61
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    "y": 51
-  id: 28
+    "y": 100
+  id: 68
   type: row
 - title: Storage
   panels:
@@ -3106,7 +3253,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "sum(vl_partitions{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: false
@@ -3118,8 +3265,11 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: "Total number of time-based (daily) partitions in storage. The number typically grows over time as new data arrives and is partitioned by time periods. \n\nExcessive partition counts may indicate retention policy issues or very high data ingestion rates that could impact query performance."
+      uid: $DS_PROMETHEUS
+    description: |-
+      Number of daily partitions currently stored on disk.
+
+      VictoriaLogs stores data in daily partitions, so this roughly matches the number of days with data kept. It increases as new days arrive and decreases when retention removes older days.
     fieldConfig:
       defaults:
         color:
@@ -3136,7 +3286,7 @@ panels:
       h: 8
       w: 3
       x: 0
-      "y": 53
+      "y": 102
     id: 88
     maxDataPoints: 100
     options:
@@ -3154,13 +3304,13 @@ panels:
       text: {}
       textMode: auto
       wideLayout: true
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: stat
   - title: Part count max by type ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(vl_storage_parts{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -3171,7 +3321,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: Number of storage parts (data files) in each tier. More parts mean fragmentation; fewer parts suggest successful merging. High part counts may slow queries and trigger background merge operations.
     fieldConfig:
       defaults:
@@ -3199,6 +3349,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -3219,7 +3370,7 @@ panels:
       h: 8
       w: 9
       x: 3
-      "y": 53
+      "y": 102
     id: 84
     options:
       legend:
@@ -3230,45 +3381,34 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Disk ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "(max(max_over_time(vl_max_disk_space_usage_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s) / max(vl_total_disk_space_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,%s)) > 0" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(sum(max_over_time(vl_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / on(instance,%s) vl_total_disk_space_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
       hide: false
       interval: ""
-      legendFormat: max space retention of instances
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(max_over_time(vl_data_size_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s) / max(vl_total_disk_space_bytes{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(job,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
-      editorMode: code
-      exemplar: true
-      hide: false
-      interval: ""
-      legendFormat: '{{`{{`}}job{{`}}`}}'
+      legendFormat: '{{`{{`}}instance{{`}}`}}'
       range: true
       refId: B
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
-      Disk space usage and limits for VictoriaLogs storage. Tracks current data usage against the configured retention limit or available disk space.
+      Disk space usage and limits for VictoriaLogs storage. Tracks current data usage against the configured retention limit and total disk space.
 
-      The red line indicates the space retention limit. When usage approaches this limit, older data will be automatically deleted. If the space retention limit (`-retention.maxDiskSpaceUsageBytes`) is not specified, the red line represents the maximum disk space. In that case, the storage will switch to read-only mode when the limit is reached.
+      The orange line indicates the space retention limit. When usage approaches this limit, older data will be automatically deleted. If the space retention limit (`-retention.maxDiskSpaceUsageBytes`) is not specified, it won't show.
     fieldConfig:
       defaults:
         color:
@@ -3297,6 +3437,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -3327,8 +3468,8 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 53
-    id: 110
+      "y": 102
+    id: 147
     options:
       legend:
         calcs:
@@ -3338,19 +3479,19 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Merge events
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "sum(increase(vl_merges_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -3361,7 +3502,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: Number of storage merge operations by type (sum across instances). Merges compact smaller parts into larger ones; bursts are normal after activity spikes.
     fieldConfig:
       defaults:
@@ -3389,6 +3530,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -3411,7 +3553,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 61
+      "y": 110
     id: 112
     options:
       legend:
@@ -3422,20 +3564,20 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Merge duration p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(vl_merge_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.9\",%s=~\"$cluster\"}) by(type,%s) > 0" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(vl_merge_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
       hide: false
@@ -3445,7 +3587,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: "99th percentile duration of merge operations by storage type. Merge operations combine smaller storage parts into larger ones for optimization. \n\nNormal merge durations vary by storage type and data volume. Consistently high durations may indicate storage performance issues, high write load, or insufficient resources for background operations. Monitor for trends that could impact overall system performance."
     fieldConfig:
       defaults:
@@ -3473,6 +3615,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -3494,7 +3637,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 61
+      "y": 110
     id: 86
     options:
       legend:
@@ -3505,20 +3648,20 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Merge bytes p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(vl_merge_bytes{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(type,%s) > 0" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(vl_merge_bytes{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
       hide: false
@@ -3528,7 +3671,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: "99th percentile of data volume processed during merge operations by storage type. \n\nThis metric indicates the scale of background storage optimization activities. Larger merge sizes generally improve storage efficiency but require more resources. Consistently high values may indicate heavy write loads or large storage parts that need optimization. Monitor correlation with merge duration for performance insights."
     fieldConfig:
       defaults:
@@ -3556,6 +3699,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -3576,9 +3720,9 @@ panels:
       overrides: []
     gridPos:
       h: 8
-      w: 24
+      w: 12
       x: 0
-      "y": 69
+      "y": 118
     id: 109
     options:
       legend:
@@ -3589,484 +3733,19 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
-    type: timeseries
-  collapsed: true
-  gridPos:
-    h: 1
-    w: 24
-    x: 0
-    "y": 52
-  id: 82
-  type: row
-- title: Ingestion
-  panels:
-  - title: Logs ingestion rate
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(vl_rows_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s) > 0" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}type{{`}}`}}'
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(vl_bytes_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s) > 0" $clusterLabel $clusterLabel }}
-      editorMode: code
-      hide: false
-      instant: false
-      legendFormat: '{{`{{`}}type{{`}}`}} (bytes)'
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      Rate of incoming log insertion requests by endpoint path. This metric tracks the ingestion load on VictoriaLogs, including different insertion methods and protocols.
-
-      Higher rates indicate increased log ingestion activity. Monitor for sudden spikes that might indicate new log sources, application deployments, or potential issues requiring capacity planning. Sustained high rates may require scaling ingestion capacity.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: short
-      overrides:
-      - matcher:
-          id: byRegexp
-          options: /.*(bytes)/
-        properties:
-        - id: custom.axisPlacement
-          value: right
-        - id: unit
-          value: bytes
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 54
-    id: 113
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Request rate
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",path=~\"^/(internal/)?insert.*\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s) > 0" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      interval: ""
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}path{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: "Rate of incoming query requests by endpoint path. This metric tracks the query load on VictoriaLogs, including different query interfaces and internal operations. \n\nHigher rates indicate increased query activity from users or applications. Monitor for sudden spikes that might indicate new dashboards, automated queries, or potential performance issues. Sustained high rates may require scaling query processing capacity."
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        min: 0
-        noValue: "0"
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 54
-    id: 117
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Insert duration p99
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",path=~\"^/(internal/)?insert.*\",%s=~\"$cluster\"}) by(path,%s) > 0" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}path{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: 99th percentile of insert operation duration. This represents the time it takes for 99% of insert operations to complete. High values indicate slow ingestion performance that could affect overall system throughput. Spikes may suggest storage bottlenecks, resource contention, or inefficient data processing.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: s
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 62
-    id: 103
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Request duration p99 ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",path=~\"^/(internal/)?insert.*\",%s=~\"$cluster\"}) by(path,%s) > 0" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}path{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: 99th percentile response time for VictoriaLogs HTTP endpoints, grouped by instance and path. This means 99% of requests are faster than this value. **Lower numbers are better**, as they indicate faster responses and fewer slow requests.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        min: 0
-        noValue: "0"
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: s
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 62
-    id: 116
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
-    type: timeseries
-  - title: Message processors ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(max_over_time(vl_insert_processors_count{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      interval: ""
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}instance{{`}}`}}'
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(max_over_time(vm_concurrent_insert_capacity{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
-      editorMode: code
-      hide: false
-      instant: false
-      legendFormat: soft limit
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |-
-      Number of active message processors handling log ingestion. These processors parse and process incoming log messages before storage. The count typically correlates with the ingestion load.
-
-      If this number is unusually high or inflated (which is rare), check memory usage. It may indicate a heavy, concurrently ingestion load or processing bottlenecks that could benefit from performance tuning.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic-by-name
-        custom:
-          axisBorderShow: false
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          barWidthFactor: 0.6
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: opacity
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          insertNulls: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        noValue: "0"
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-            value: 0
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 70
-    id: 97
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        - max
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        hideZeros: false
-        mode: multi
-        sort: desc
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Pending rows ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "sum(vl_pending_rows{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4077,7 +3756,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Number of log rows waiting to be written to storage, categorized by type. Pending rows indicate temporary queuing during ingestion. Consistently high values may suggest storage write bottlenecks or insufficient write capacity.
 
@@ -4111,6 +3790,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4133,8 +3813,92 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 70
-    id: 104
+      "y": 118
+    id: 148
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Max
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.3.0
+    type: timeseries
+  - title: Storage read-only ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(max_over_time(vl_storage_is_read_only{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      exemplar: true
+      hide: false
+      interval: ""
+      legendFormat: '{{`{{`}}instance{{`}}`}}'
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: |-
+      Shows whether the VictoriaLogs instance is in read-only mode.
+      Value is 1 when storage is read-only (free disk space below `-storage.minFreeDiskSpaceBytes`), otherwise 0.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic-by-name
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          axisSoftMax: 1
+          axisSoftMin: 0
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: line
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 126
+    id: 150
     options:
       legend:
         calcs:
@@ -4149,14 +3913,630 @@ panels:
       tooltip:
         hideZeros: false
         mode: multi
+        sort: none
+    pluginVersion: 12.3.0
+    type: timeseries
+  collapsed: true
+  gridPos:
+    h: 1
+    w: 24
+    x: 0
+    "y": 101
+  id: 82
+  type: row
+- title: Ingestion
+  panels:
+  - title: Logs ingestion rate
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(rate(vl_rows_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      hide: false
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}type{{`}}`}}'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(rate(vl_bytes_ingested_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      hide: false
+      instant: false
+      legendFormat: '{{`{{`}}type{{`}}`}} (bytes)'
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: |-
+      How fast logs are coming in.
+
+      This shows the ingestion rate, split by source type (for example: Loki, Elasticsearch, syslog). You'll see both:
+      - events per second
+      - estimated data volume per second
+
+      If this suddenly spikes, expect higher CPU and disk usage. If it drops to near zero, check upstream shippers/agents and this cluster's insert health.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides:
+      - matcher:
+          id: byRegexp
+          options: /.*(bytes)/
+        properties:
+        - id: custom.axisPlacement
+          value: right
+        - id: unit
+          value: bytes
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 625
+    id: 113
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Max
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
         sort: desc
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
+    type: timeseries
+  - title: Request rate
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",path=~\"^/(internal/)?insert.*\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      interval: ""
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}path{{`}}`}}'
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: "Rate of incoming query requests by endpoint path. This metric tracks the query load on VictoriaLogs, including different query interfaces and internal operations. \n\nHigher rates indicate increased query activity from users or applications. Monitor for sudden spikes that might indicate new dashboards, automated queries, or potential performance issues. Sustained high rates may require scaling query processing capacity."
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        noValue: "0"
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides:
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 625
+    id: 117
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Max
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.3.0
+    type: timeseries
+  - title: Insert duration p99
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",path=~\"^/(internal/)?insert.*\",%s=~\"$cluster\"}) by(path,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}path{{`}}`}}'
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: 99th percentile of insert operation duration. This represents the time it takes for 99% of insert operations to complete. High values indicate slow ingestion performance that could affect overall system throughput. Spikes may suggest storage bottlenecks, resource contention, or inefficient data processing.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: s
+      overrides:
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 633
+    id: 103
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Max
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.3.0
+    type: timeseries
+  - title: Request duration p99 ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",path=~\"^/(internal/)?insert.*\",%s=~\"$cluster\"}) by(path,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}path{{`}}`}}'
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: 99th percentile response time for VictoriaLogs HTTP endpoints, grouped by instance and path. This means 99% of requests are faster than this value. **Lower numbers are better**, as they indicate faster responses and fewer slow requests.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        noValue: "0"
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: s
+      overrides:
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 633
+    id: 116
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Max
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.3.0
+    type: timeseries
+  - title: Message processors ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(max_over_time(vl_insert_processors_count{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      interval: ""
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}instance{{`}}`}}'
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(max_over_time(vm_concurrent_insert_capacity{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      hide: false
+      instant: false
+      legendFormat: soft limit
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: |-
+      Number of active message processors handling log ingestion. These processors parse and process incoming log messages before storage.
+
+      The `soft limit` line is the configured concurrency limit for insert request processing (`-maxConcurrentInserts`). It is marked as soft because streaming/slow clients may keep many HTTP requests in-flight while only a limited number of them are actively processed at the same time.
+
+      If processors are consistently high, correlate with ingestion rate and memory/CPU usage. Sudden growth may indicate burst traffic, slow clients/network, or backpressure from storage nodes.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic-by-name
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: opacity
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        noValue: "0"
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 641
+    id: 97
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Max
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.3.0
+    type: timeseries
+  - title: Max pending rows ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(vl_pending_rows{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      interval: ""
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}type{{`}}`}}'
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $DS_PROMETHEUS
+    description: |-
+      Number of log rows waiting to be written to storage, categorized by type. Pending rows indicate temporary queuing during ingestion. Consistently high values may suggest storage write bottlenecks or insufficient write capacity.
+
+      Pending rows are flushed in two ways:
+
+      - After a specific time period (typically 1 second)
+      - When the pending row size exceeds a threshold (typically 1.75 MB)
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic-by-name
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 641
+    id: 104
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Max
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Concurrent insert limit reached ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(increase(vm_concurrent_insert_limit_reached_total[$__rate_interval])) by(instance,%s)" $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4167,9 +4547,13 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
-    description: |
-      Number of concurrent insert operations has reached the configured limit: -maxConcurrentInserts (default: 2x CPU cores
+      uid: $DS_PROMETHEUS
+    description: |-
+      Insert requests that hit the ingestion concurrency limit and had to wait in a queue (per time interval).
+
+      VictoriaLogs limits the number of concurrent insert requests with `-maxConcurrentInserts`. This protects the server from too many simultaneous in-flight inserts.
+
+      If this is frequently above zero, ingestion is under pressure. A common reason is slow client networks (requests take longer, so they occupy concurrency slots longer). In that case, increasing `-maxConcurrentInserts` can help if the server still has CPU headroom. If CPU is already saturated, prefer scaling out insert nodes and/or reducing client-side parallelism/batch size instead.
     fieldConfig:
       defaults:
         color:
@@ -4196,6 +4580,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4215,18 +4600,22 @@ panels:
         unit: short
       overrides:
       - matcher:
-          id: byName
-          options: limit
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
         properties:
-        - id: color
+        - id: custom.hideFrom
           value:
-            fixedColor: red
-            mode: fixed
+            legend: true
+            tooltip: true
+            viz: true
     gridPos:
       h: 8
       w: 12
       x: 0
-      "y": 78
+      "y": 649
     id: 143
     options:
       legend:
@@ -4237,19 +4626,19 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
-  - title: Insert timeouts ($Instance)
+  - title: Insert timeouts ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "sum(rate(vm_concurrent_insert_limit_timeout_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       interval: ""
@@ -4258,7 +4647,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Number of insert requests that timed out while waiting for available concurrency slots. This indicates sustained ingestion overload beyond configured limits.
 
@@ -4287,7 +4676,6 @@ panels:
           hideFrom:
             legend: false
             tooltip: false
-            vis: false
             viz: false
           insertNulls: false
           lineInterpolation: linear
@@ -4296,6 +4684,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4311,12 +4700,24 @@ panels:
           - color: red
             value: 1
         unit: reqps
-      overrides: []
+      overrides:
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
     gridPos:
       h: 8
       w: 12
       x: 12
-      "y": 78
+      "y": 649
     id: 131
     options:
       legend:
@@ -4327,18 +4728,20 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
+        sortBy: Max
+        sortDesc: true
       tooltip:
         hideZeros: false
         mode: single
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Flush duration p99
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(vl_insert_flush_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(type,%s) > 0" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(vl_insert_flush_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",%s=~\"$cluster\"}) by(type,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       intervalFactor: 1
@@ -4347,7 +4750,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: 99th percentile duration of background flush operations by type. High values may indicate disk pressure or heavy ingestion. Correlate with `I/O` panels.
     fieldConfig:
       defaults:
@@ -4375,6 +4778,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4392,12 +4796,24 @@ panels:
           - color: red
             value: 80
         unit: s
-      overrides: []
+      overrides:
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
     gridPos:
       h: 8
       w: 12
       x: 0
-      "y": 86
+      "y": 657
     id: 115
     options:
       legend:
@@ -4408,20 +4824,20 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    "y": 53
+    "y": 102
   id: 83
   type: row
 - title: Querying
@@ -4430,8 +4846,8 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",path=~\"^/(internal/)?select.*\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s) > 0" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(rate(vl_http_requests_total{job=~\"$job\",instance=~\"$instance\",path=~\"^/(internal/)?select.*\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -4441,7 +4857,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: "Rate of incoming query requests by endpoint path. This metric tracks the query load on VictoriaLogs, including different query interfaces and internal operations. \n\nHigher rates indicate increased query activity from users or applications. Monitor for sudden spikes that might indicate new dashboards, automated queries, or potential performance issues. Sustained high rates may require scaling query processing capacity."
     fieldConfig:
       defaults:
@@ -4469,6 +4885,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4487,12 +4904,24 @@ panels:
           - color: red
             value: 80
         unit: short
-      overrides: []
+      overrides:
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
     gridPos:
       h: 8
       w: 12
       x: 0
-      "y": 55
+      "y": 859
     id: 102
     options:
       legend:
@@ -4503,20 +4932,20 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Query duration p99
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",path=~\"^/(internal/)?select.*\",%s=~\"$cluster\"}) by(path,%s) > 0" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(vl_http_request_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.99\",path=~\"^/(internal/)?select.*\",%s=~\"$cluster\"}) by(path,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       intervalFactor: 1
@@ -4525,7 +4954,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: "99th percentile of query execution duration. This represents the time it takes for 99% of queries to complete:\n\n- High values indicate slow query performance that affects user experience. \n- Spikes may suggest complex queries, resource contention, or inefficient indexes. Monitor for trends that could indicate degrading performance."
     fieldConfig:
       defaults:
@@ -4553,6 +4982,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4571,12 +5001,24 @@ panels:
           - color: red
             value: 80
         unit: s
-      overrides: []
+      overrides:
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
     gridPos:
       h: 8
       w: 12
       x: 12
-      "y": 55
+      "y": 859
     id: 108
     options:
       legend:
@@ -4587,30 +5029,30 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Concurrent queries ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "max(max_over_time(vl_concurrent_select_current{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "max(max_over_time(vl_concurrent_select_current{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
       intervalFactor: 1
-      legendFormat: current
+      legendFormat: '{{`{{`}}instance{{`}}`}}'
       range: true
       refId: A
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(max_over_time(vl_concurrent_select_capacity{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
@@ -4622,7 +5064,7 @@ panels:
       refId: B
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Number of concurrent select (query) operations compared to the configured limit.
 
@@ -4655,6 +5097,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4685,7 +5128,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 63
+      "y": 899
     id: 107
     options:
       legend:
@@ -4696,20 +5139,20 @@ panels:
         displayMode: table
         placement: bottom
         showLegend: true
-        sortBy: Last *
+        sortBy: Max
         sortDesc: true
       tooltip:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Query timeouts ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
-      expr: {{ printf "sum(rate(vl_concurrent_select_limit_timeout_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) > 0" $clusterLabel $clusterLabel }}
+        uid: $DS_PROMETHEUS
+      expr: {{ printf "sum(rate(vl_concurrent_select_limit_timeout_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}instance{{`}}`}}'
@@ -4717,7 +5160,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Number of queries that timed out while waiting for available concurrency slots. This indicates sustained query overload beyond configured limits.
 
@@ -4746,7 +5189,6 @@ panels:
           hideFrom:
             legend: false
             tooltip: false
-            vis: false
             viz: false
           insertNulls: false
           lineInterpolation: linear
@@ -4755,6 +5197,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4770,12 +5213,24 @@ panels:
           - color: red
             value: 1
         unit: reqps
-      overrides: []
+      overrides:
+      - matcher:
+          id: byValue
+          options:
+            op: gte
+            reducer: allIsZero
+            value: 0
+        properties:
+        - id: custom.hideFrom
+          value:
+            legend: true
+            tooltip: true
+            viz: true
     gridPos:
       h: 8
       w: 12
       x: 12
-      "y": 63
+      "y": 899
     id: 132
     options:
       legend:
@@ -4787,14 +5242,14 @@ panels:
         hideZeros: false
         mode: single
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    "y": 54
+    "y": 103
   id: 81
   type: row
 - title: Slow Query Troubleshooting
@@ -4803,7 +5258,7 @@ panels:
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vl_storage_per_query_processed_blocks_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -4814,15 +5269,16 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
-      Number of storage blocks scanned per query (99th percentile). Each block contains logs for a specific time period and field combination. High values indicate queries scanning too many blocks, often caused by:
+      Number of storage blocks scanned per query (99th percentile). Each block contains logs for a single log stream over some time range.
 
-      - Wide time ranges without specific filters
-      - Queries missing indexed fields (like `_stream`, `kubernetes.*`)
-      - Non-selective filters that don't utilize `bloom filters`
+      High values usually mean the query has to consider many blocks, for example because:
+      - The time range is wide
+      - The query doesn’t narrow down log streams (e.g. no good stream filter)
+      - The filters are not selective and cannot quickly skip blocks
 
-      Correlate with `Bytes/query p99` - if blocks are high but bytes are low, blocks contain little data (good). If both are high, query is reading large amounts of data.
+      Correlate with `Bytes/query p99`: if blocks are high but bytes are low, each block contributes little data (often OK). If both are high, the query is reading a lot of data from storage.
     fieldConfig:
       defaults:
         color:
@@ -4849,6 +5305,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4865,13 +5322,13 @@ panels:
             value: 0
           - color: red
             value: 80
-        unit: bytes
+        unit: short
       overrides: []
     gridPos:
       h: 8
       w: 12
       x: 0
-      "y": 56
+      "y": 860
     id: 130
     options:
       legend:
@@ -4888,13 +5345,13 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Bytes/query p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vl_storage_per_query_total_read_bytes_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -4905,7 +5362,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Total bytes read from disk per query (99th percentile). This represents the complete `I/O` overhead for query execution, including:
 
@@ -4941,6 +5398,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4963,7 +5421,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 56
+      "y": 860
     id: 121
     options:
       legend:
@@ -4980,13 +5438,13 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Block header bytes/query p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vl_storage_per_query_block_headers_read_bytes_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(instance,%s) > 0.001" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -4997,7 +5455,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Bytes read from block headers per query (99th percentile). Block headers contain metadata about each storage block including `time ranges`, `field names`, and data location pointers.
 
@@ -5033,6 +5491,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5055,7 +5514,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 64
+      "y": 868
     id: 124
     options:
       legend:
@@ -5072,13 +5531,13 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Bloom filter bytes/query p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vl_storage_per_query_bloom_filters_read_bytes_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(instance,%s) > 0.001" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -5089,7 +5548,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Bytes read from Bloom filters per query (99th percentile). `Bloom filters` are probabilistic data structures that quickly eliminate blocks that definitely don't contain search terms.
 
@@ -5125,6 +5584,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5147,7 +5607,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 64
+      "y": 868
     id: 129
     options:
       legend:
@@ -5162,13 +5622,13 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Value bytes/query p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vl_storage_per_query_values_read_bytes_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -5179,17 +5639,16 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
-      Bytes read from actual log values per query (99th percentile). This represents the uncompressed log content being retrieved and processed for the query result.
+      Bytes read from log values per query (99th percentile). This measures storage I/O spent on reading field values (not metadata like headers/bloom filters).
 
-      High values indicate:
-      - Queries returning large result sets (add `LIMIT` clause)
-      - Retrieving logs with large payloads (`JSON` objects, stack traces)
-      - Missing filters that would reduce matching log volume
-      - Functions like `uniq` or `stats` processing many log entries
+      High values indicate queries that have to fetch lots of log content from disk, for example because:
+      - The time range is wide or filters are not selective
+      - The query matches many logs
+      - Logs have large payloads (large messages / JSON blobs / stack traces)
 
-      Reduce by: adding selective filters, using field extractors instead of full log retrieval, limiting result count.
+      If you want to understand how much data was processed after decompression/decoding (CPU work), compare with the corresponding “uncompressed values processed bytes” metric/panel.
     fieldConfig:
       defaults:
         color:
@@ -5216,6 +5675,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5238,7 +5698,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 72
+      "y": 876
     id: 122
     options:
       legend:
@@ -5255,13 +5715,13 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: _time bytes/query p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vl_storage_per_query_timestamps_read_bytes_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -5272,16 +5732,13 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
-      Bytes read from timestamp column (`_time`) per query (99th percentile). The `_time` column is automatically indexed and used for time-range filtering during query execution.
+      Bytes read from the `_time` field per query (99th percentile). The `_time` field is used to narrow queries to the selected time range.
 
-      High values indicate:
-      - Queries with very wide time ranges requiring timestamp scanning
-      - Time-based aggregations over large datasets
-      - Missing time-range restrictions in query filters
+      High values usually mean the query spans a wide time range and/or touches many blocks, so more timestamp data needs to be read.
 
-      This is usually the smallest component of query `I/O`. Spikes correlate with time range width and data density in the queried period.
+      This is typically a smaller part of total query I/O compared to reading log values, so correlate with `Bytes/query p99` and `Value bytes/query p99` when investigating slow queries.
     fieldConfig:
       defaults:
         color:
@@ -5308,6 +5765,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5330,7 +5788,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 72
+      "y": 876
     id: 127
     options:
       legend:
@@ -5347,13 +5805,13 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Column header index bytes/query p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vl_storage_per_query_columns_header_indexes_read_bytes_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -5364,7 +5822,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Bytes read from column header indexes per query (99th percentile). `Column header indexes` contain metadata about which fields exist in each block and their data types.
 
@@ -5401,6 +5859,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5423,7 +5882,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 80
+      "y": 884
     id: 128
     options:
       legend:
@@ -5440,13 +5899,13 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   - title: Column header bytes/query p99 ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
-        uid: ${DS_PROMETHEUS}
+        uid: $DS_PROMETHEUS
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vl_storage_per_query_columns_headers_read_bytes_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
@@ -5457,7 +5916,7 @@ panels:
       refId: A
     datasource:
       type: {{ $defaultDatasource }}
-      uid: ${DS_PROMETHEUS}
+      uid: $DS_PROMETHEUS
     description: |-
       Bytes read from column headers per query (99th percentile). `Column headers` store the actual field schema and compression metadata for each block's columns.
 
@@ -5493,6 +5952,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -5515,7 +5975,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 80
+      "y": 884
     id: 123
     options:
       legend:
@@ -5532,20 +5992,20 @@ panels:
         hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 12.1.0
+    pluginVersion: 12.3.0
     type: timeseries
   collapsed: true
   gridPos:
     h: 1
     w: 24
     x: 0
-    "y": 55
+    "y": 104
   id: 126
   type: row
 __elements: {}
 __inputs:
 - description: ""
-  label: prometheus
+  label: Prometheus
   name: DS_PROMETHEUS
   pluginId: prometheus
   pluginName: Prometheus
@@ -5565,10 +6025,6 @@ __requires:
   version: ""
 - id: table
   name: Table
-  type: panel
-  version: ""
-- id: text
-  name: Text
   type: panel
   version: ""
 - id: timeseries
@@ -5617,5 +6073,5 @@ time:
   to: now
 timepicker: {}
 uid: OqPIZTX4z
-version: 7
+version: 9
 weekStart: ""

@@ -128,6 +128,15 @@ annotations:
     iconColor: dark-blue
     textFormat: '{{`{{`}}version{{`}}`}}'
     titleFormat: Version change
+  - name: restarts
+    expr: {{ printf "sum(changes(vm_app_start_timestamp{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    enable: true
+    hide: false
+    iconColor: dark-yellow
+    textFormat: '{{`{{`}}job{{`}}`}} restarted'
 panels:
 - title: Stats
   collapsed: false
@@ -1210,8 +1219,8 @@ panels:
           mode: "off"
       links:
       - targetBlank: true
-        title: asd
-        url: asd
+        title: Drilldown
+        url: /d/wNf0q_kZk?viewPanel=154&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
       mappings: []
       thresholds:
         mode: absolute
@@ -6566,13 +6575,13 @@ panels:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $ds
-      expr: {{ printf "sum(rate(vm_log_messages_total{job=~\"$job\",instance=~\"$instance\",level!=\"info\",%s=~\"$cluster\"}[$__rate_interval])) by(job,instance,level,location,%s) > 0" $clusterLabel $clusterLabel }}
+      expr: {{ printf "sum(rate(vm_log_messages_total{job=~\"$job\",instance=~\"$instance\",level!=\"info\",%s=~\"$cluster\"}[$__rate_interval])) by(job,instance,level,app_version,location,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       exemplar: true
       format: time_series
       interval: 5m
       intervalFactor: 1
-      legendFormat: __auto
+      legendFormat: '{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}}) - {{`{{`}}level{{`}}`}}: {{`{{`}}location{{`}}`}}'
       range: true
       refId: A
     datasource:
@@ -6614,8 +6623,8 @@ panels:
             mode: "off"
         links:
         - targetBlank: true
-          title: Drilldown
-          url: /d/wNf0q_kZk?viewPanel=154&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          title: Source Code
+          url: https://l2s.victoriametrics.com/?app_version=${__field.labels.app_version}&location=${__field.labels.location}
         mappings: []
         min: 0
         thresholds:

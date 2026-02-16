@@ -194,7 +194,7 @@ panels:
   type: bargauge
 - title: CPU Busy
   targets:
-  - expr: {{ printf "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\",instance=\"$node\",%s=~\"$cluster\"}[$__rate_interval])) by(%s))" $clusterLabel $clusterLabel }}
+  - expr: {{ printf "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s))" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     instant: true
@@ -262,7 +262,7 @@ panels:
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${ds_prometheus}
-  description: System load  over all CPU cores together
+  description: System load over all CPU cores together
   fieldConfig:
     defaults:
       color:
@@ -360,7 +360,7 @@ panels:
   type: gauge
 - title: SWAP Used
   targets:
-  - expr: {{ printf "((node_memory_SwapTotal_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} - node_memory_SwapFree_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) / node_memory_SwapTotal_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) * 100" $clusterLabel $clusterLabel $clusterLabel }}
+  - expr: {{ printf "((node_memory_SwapTotal_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * ((node_memory_SwapTotal_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} - node_memory_SwapFree_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) / node_memory_SwapTotal_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"})) * 100" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     instant: true
@@ -1056,7 +1056,7 @@ panels:
   - expr: {{ printf "rate(node_network_transmit_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) * 8" $clusterLabel }}
     editorMode: code
     format: time_series
-    legendFormat: 'Tx {{`{{`}}device{{`}}`}} '
+    legendFormat: Tx {{`{{`}}device{{`}}`}}
     range: true
     refId: B
     step: 240
@@ -1797,14 +1797,14 @@ panels:
     type: timeseries
   - title: Network Saturation
     targets:
-    - expr: {{ printf "rate(node_network_receive_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / ignoring(speed) node_network_speed_bytes{instance=\"$node\",job=\"$job\",speed!=\"-1\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(node_network_speed_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * (rate(node_network_receive_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / ignoring(speed) node_network_speed_bytes{instance=\"$node\",job=\"$job\",speed!=\"-1\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: '{{`{{`}}device{{`}}`}} - Rx in'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "rate(node_network_transmit_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / ignoring(speed) node_network_speed_bytes{instance=\"$node\",job=\"$job\",speed!=\"-1\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(node_network_speed_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * (rate(node_network_transmit_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / ignoring(speed) node_network_speed_bytes{instance=\"$node\",job=\"$job\",speed!=\"-1\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: '{{`{{`}}device{{`}}`}} - Tx out'
@@ -2345,7 +2345,7 @@ panels:
       type: {{ $defaultDatasource }}
       uid: ${ds_prometheus}
     description: |-
-      How often tasks experience CPU, memory, or I/O delays. “Some” indicates partial slowdown; “Full” indicates all tasks are stalled. Based on Linux PSI metrics:
+      How often tasks experience CPU, memory, or I/O delays. 'Some' indicates partial slowdown; 'Full' indicates all tasks are stalled. Based on Linux PSI metrics:
       https://docs.kernel.org/accounting/psi.html
     fieldConfig:
       defaults:
@@ -3605,7 +3605,7 @@ panels:
     type: timeseries
   - title: Memory HugePages
     targets:
-    - expr: {{ printf "node_memory_HugePages_Free{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * node_memory_Hugepagesize_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(node_memory_HugePages_Total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} - node_memory_HugePages_Free{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) * node_memory_Hugepagesize_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: HugePages Used – Currently allocated
@@ -4928,7 +4928,7 @@ panels:
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / (irate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) + irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]))" $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "((irate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) + irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) >bool 0) * (irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / (irate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) + irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -5918,11 +5918,11 @@ panels:
     type: timeseries
   - title: Cooling Device Utilization
     targets:
-    - expr: {{ printf "(100 * node_cooling_device_cur_state{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) / node_cooling_device_max_state{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(node_cooling_device_max_state{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * ((100 * node_cooling_device_cur_state{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) / node_cooling_device_max_state{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
-      legendFormat: '{{`{{`}} name {{`}}`}} - {{`{{`}} type {{`}}`}} '
+      legendFormat: '{{`{{`}}name{{`}}`}} - {{`{{`}}type{{`}}`}}'
       range: true
       refId: A
       step: 240
@@ -6750,14 +6750,14 @@ panels:
     type: timeseries
   - title: Disk Average Wait Time
     targets:
-    - expr: {{ printf "irate(node_disk_read_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / irate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(irate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) >bool 0) * (irate(node_disk_read_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / irate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]))" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Read'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_disk_write_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / irate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(irate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) >bool 0) * (irate(node_disk_write_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / irate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]))" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Write'
@@ -8762,7 +8762,7 @@ panels:
     datasource:
       type: {{ $defaultDatasource }}
       uid: ${ds_prometheus}
-    description: Operational and physical link status of each network interface. Values are Yes for 'up' or link present, and No for 'down' or no carrier."
+    description: Operational and physical link status of each network interface. Values are Yes for 'up' or link present, and No for 'down' or no carrier.
     fieldConfig:
       defaults:
         color:
@@ -9387,7 +9387,7 @@ panels:
     type: timeseries
   - title: Sockstat Average Socket Memory
     targets:
-    - expr: {{ printf "node_sockstat_TCP_mem_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} / node_sockstat_TCP_inuse{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(node_sockstat_TCP_inuse{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * (node_sockstat_TCP_mem_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} / node_sockstat_TCP_inuse{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -9395,7 +9395,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "node_sockstat_UDP_mem_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} / node_sockstat_UDP_inuse{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(node_sockstat_UDP_inuse{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * (node_sockstat_UDP_mem_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} / node_sockstat_UDP_inuse{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10873,7 +10873,7 @@ panels:
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
-  - title: TCP Stat
+  - title: TCP Stat Persistent
     targets:
     - expr: {{ printf "node_tcp_connection_states{state=\"established\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
       editorMode: code
@@ -10967,6 +10967,199 @@ panels:
       x: 12
       "y": 233
     id: 320
+    options:
+      legend:
+        calcs:
+        - min
+        - mean
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 11.6.1
+    type: timeseries
+  - title: TCP Stat Transient
+    targets:
+    - expr: {{ printf "node_tcp_connection_states{state=\"syn_sent\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: SYN_SENT
+      range: true
+      refId: A
+      step: 240
+    - expr: {{ printf "node_tcp_connection_states{state=\"syn_recv\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: SYN_RECV
+      range: true
+      refId: B
+      step: 240
+    - expr: {{ printf "node_tcp_connection_states{state=\"fin_wait1\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: FIN_WAIT1
+      range: true
+      refId: C
+      step: 240
+    - expr: {{ printf "node_tcp_connection_states{state=\"close\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: CLOSE
+      range: true
+      refId: D
+      step: 240
+    - expr: {{ printf "node_tcp_connection_states{state=\"last_ack\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: LAST_ACK
+      range: true
+      refId: E
+      step: 240
+    - expr: {{ printf "node_tcp_connection_states{state=\"closing\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: CLOSING
+      range: true
+      refId: F
+      step: 240
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${ds_prometheus}
+    description: Transient TCP connection states. These are typically short-lived during connection establishment and teardown
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 20
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        noValue: "0"
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+        unit: short
+      overrides: []
+    gridPos:
+      h: 10
+      w: 12
+      x: 0
+      "y": 243
+    id: 339
+    options:
+      legend:
+        calcs:
+        - min
+        - mean
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 11.6.1
+    type: timeseries
+  - title: TCP Socket Queue
+    targets:
+    - expr: {{ printf "node_tcp_connection_states{state=\"rx_queued_bytes\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: RX Queued (waiting to be read)
+      range: true
+      refId: A
+      step: 240
+    - expr: {{ printf "node_tcp_connection_states{state=\"tx_queued_bytes\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: TX Queued (waiting to be sent)
+      range: true
+      refId: B
+      step: 240
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${ds_prometheus}
+    description: TCP socket queue sizes. High rx_queued_bytes indicates application not reading fast enough. High tx_queued_bytes indicates network congestion or slow receiver
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 20
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+        unit: bytes
+      overrides: []
+    gridPos:
+      h: 10
+      w: 12
+      x: 12
+      "y": 243
+    id: 340
     options:
       legend:
         calcs:
@@ -11493,5 +11686,5 @@ time:
   to: now
 timepicker: {}
 uid: rYdddlPWk
-version: 98
+version: 99
 weekStart: ""

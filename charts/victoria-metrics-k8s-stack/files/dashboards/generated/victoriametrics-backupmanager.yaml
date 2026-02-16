@@ -103,6 +103,15 @@ annotations:
       tags: []
       type: dashboard
     type: dashboard
+  - name: restarts
+    expr: {{ printf "sum(changes(vm_app_start_timestamp{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    enable: true
+    hide: false
+    iconColor: dark-yellow
+    textFormat: '{{`{{`}}job{{`}}`}} restarted'
 panels:
 - title: Stats
   collapsed: false
@@ -312,7 +321,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    expr: {{ printf "sum(increase(vm_backup_errors_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1h])) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(vm_backup_errors_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__range])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     legendFormat: __auto
     range: true
@@ -421,7 +430,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    expr: {{ printf "sum(increase(vm_retention_errors_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[1h])) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(increase(vm_retention_errors_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__range])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     legendFormat: __auto
     range: true
