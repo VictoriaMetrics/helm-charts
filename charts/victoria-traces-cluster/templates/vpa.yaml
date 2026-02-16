@@ -1,8 +1,9 @@
 {{- $ctx := dict "helm" . }}
+{{- $ns := include "vm.namespace" . }}
 {{- range $name, $app := .Values }}
-{{- if and (.Capabilities.APIVersions.Has "autoscaling.k8s.io/v1") (kindIs "map" $app) $app.enabled ($app.verticalPodAutoscaler).enabled }}
+{{- if and ($.Capabilities.APIVersions.Has "autoscaling.k8s.io/v1") (kindIs "map" $app) $app.enabled ($app.verticalPodAutoscaler).enabled }}
 {{- $isStatefulSet := eq $name "vtstorage" }}
-{{- $hpa := $app.verticalPodAutoscaler }}
+{{- $vpa := $app.verticalPodAutoscaler }}
 {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
 {{- $_ := set $ctx "appKey" $name }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

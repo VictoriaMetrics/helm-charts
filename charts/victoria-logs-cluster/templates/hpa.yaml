@@ -1,4 +1,5 @@
 {{- $ctx := dict "helm" . }}
+{{- $ns := include "vm.namespace" . }}
 {{- range $name, $app := .Values }}
 {{- if and (kindIs "map" $app) $app.enabled ($app.horizontalPodAutoscaler).enabled }}
 {{- $isStatefulSet := eq $name "vlstorage" }}
@@ -12,7 +13,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   name: {{ $fullname }}
-  namespace: {{ include "vm.namespace" $ }}
+  namespace: {{ $ns }}
 spec:
   maxReplicas: {{ $hpa.maxReplicas }}
   minReplicas: {{ $hpa.minReplicas }}
