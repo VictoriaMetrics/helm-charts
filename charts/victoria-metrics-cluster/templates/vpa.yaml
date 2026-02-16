@@ -1,0 +1,31 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (.Capabilities.APIVersions.Has "autoscaling.k8s.io/v1") (kindIs "map" $app) $app.enabled ($app.verticalPodAutoscaler).enabled }}
+{{- $isStatefulSet := or (eq $name "vmstorage") (eq $app.mode "statefulSet") }}
+{{- $hpa := $app.verticalPodAutoscaler }}
+{{- $_ := set $ctx "extraLabels" $app.extraLabels }}
+{{- $_ := set $ctx "appKey" $name }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+spec:
+  {{- with $vpa.recommenders }}
+  recommenders: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  targetRef:
+    apiVersion: apps/v1
+    kind: {{ ternary "StatefulSet" "Deployment" $isStatefulSet }}
+    name: {{ $fullname }}
+  {{- with $vpa.updatePolicy }}
+  updatePolicy: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $vpa.resourcePolicy }}
+  resourcePolicy: {{ toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

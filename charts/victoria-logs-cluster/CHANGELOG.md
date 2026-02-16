@@ -1,6 +1,7 @@
 ## Next release
 
 - feature: support `tpl` in `envFrom` and `env` fields. See [#2690](https://github.com/VictoriaMetrics/helm-charts/issues/2690)
+- support vertical pod autoscaler
 
 ## 0.0.27
 

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support vertical pod autoscaler
 
 ## 0.32.0
 
