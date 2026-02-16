@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- updates k8s-stack to v0.71.0 version
 
 ## 0.30.0
 
