@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.136.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.136.0)
 - support extra labels for default scrape configurations. See [#2688](https://github.com/VictoriaMetrics/helm-charts/issues/2688).
 
 ## 0.70.0
