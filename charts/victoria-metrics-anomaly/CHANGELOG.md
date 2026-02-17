@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support ingress and httproute. See [#2705](https://github.com/VictoriaMetrics/helm-charts/issues/2705).
 
 ## 1.12.10
 

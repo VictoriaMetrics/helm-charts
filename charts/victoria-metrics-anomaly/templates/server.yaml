@@ -56,12 +56,16 @@ spec:
         - name: model
           image: {{ include "vm.image" $ctx }}
           workingDir: {{ .Values.containerWorkingDir }}
-          {{- if (((.Values.config).monitoring).pull).enabled }}
-          {{- with (((.Values.config).monitoring).pull).port }}
+          {{- if or (((.Values.config).monitoring).pull).enabled ((.Values.config).server).port }}
           ports:
+            {{- with (((.Values.config).monitoring).pull).port }}
             - containerPort: {{ . }}
               name: metrics
-          {{- end }}
+            {{- end }}
+            {{- with ((.Values.config).server).port }}
+            - containerPort: {{ . }}
+              name: http
+            {{- end }}
           {{- end }}
           args: {{ include "vmanomaly.args" $ctx | nindent 12 }}
           {{- with .Values.envFrom }}
