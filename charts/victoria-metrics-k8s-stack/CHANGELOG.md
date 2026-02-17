@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed invalid alertmanager port in notifiers configuration secret
 
 ## 0.71.0
 
