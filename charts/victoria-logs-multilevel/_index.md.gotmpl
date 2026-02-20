@@ -38,7 +38,7 @@ graph TD
         AUTH["VMAuth LB"] --> VLQ1["vlselect-1"]
         AUTH["VMAuth LB"] --> VLQ2["vlselect-2"]
     end
-        
+
     VLQ1 --> VL1["VictoriaLogs Cluster-1"]
     VLQ1 --> VL2["VictoriaLogs Cluster-2"]
     VLQ1 --> VL3["VictoriaLogs Cluster-3"]
@@ -51,17 +51,39 @@ The chart requires setting the list of VictoriaLogs addresses to query in order 
 according to [multi-level VictoriaLogs setup](https://docs.victoriametrics.com/victorialogs/cluster/#multi-level-cluster-setup).
 The list of these addresses must be set via `.Values.storageNodes` option.
 
-Let's deploy multilevel VictoriaLogs chart that queries three VictoriaLogs clusters deployed via [victoria-logs-cluster Helm chart](https://docs.victoriametrics.com/helm/victoria-logs-cluster/):
-- `vl-cluster-1:8427`
-- `vl-cluster-2:8427`
-- `vl-cluster-3:8427`
+To demonstrate how multi-level VictoriaLogs chart work, let's deploy three [VictoriaLogs single-node instances](https://docs.victoriametrics.com/helm/victoria-logs-single/#install-victoria-logs-single-chart) with different retention period and [`victoria-logs-collector`](https://docs.victoriametrics.com/helm/victoria-logs-collector/) chart:
+
+```
+export NAMESPACE=logging
+export VL1_RETENTION=1d
+export VL2_RETENTION=7d
+export VL3_RETENTION=30d
+export VL1_PVC_SIZE=10Gi
+export VL2_PVC_SIZE=20Gi
+export VL3_PVC_SIZE=30Gi
+
+helm install vl1 vm/victoria-logs-single --namespace $NAMESPACE --create-namespace --wait \
+    --set "server.retentionPeriod=$VL1_RETENTION" --set "server.persistentVolume.size=$VL1_PVC_SIZE"
+helm install vl2 vm/victoria-logs-single --namespace $NAMESPACE --wait \
+    --set "server.retentionPeriod=$VL2_RETENTION" --set "server.persistentVolume.size=$VL2_PVC_SIZE"
+helm install vl3 vm/victoria-logs-single --namespace $NAMESPACE --wait \
+    --set "server.retentionPeriod=$VL3_RETENTION" --set "server.persistentVolume.size=$VL3_PVC_SIZE"
+
+# Install victoria-logs-collector chart
+helm install collector vm/victoria-logs-collector --namespace $NAMESPACE \
+    --set "remoteWrite[0].url=http://vl1-victoria-logs-single-server:9428" \
+    --set "remoteWrite[1].url=http://vl2-victoria-logs-single-server:9428" \
+    --set "remoteWrite[2].url=http://vl3-victoria-logs-single-server:9428"
+```
+
+Let's deploy multilevel VictoriaLogs chart that queries three VictoriaLogs instances:
 
 ```sh
 export NAMESPACE=logging
 
 # Install victoria-logs-multicluster chart
 helm install vlm vm/victoria-logs-multilevel --namespace $NAMESPACE --wait \
-    --set "storageNodes={vl-cluster-1:8427,vl-cluster-2:8427,vl-cluster-3:8427}"
+    --set "storageNodes={vl1-victoria-logs-single-server:9428,vl2-victoria-logs-single-server:9428,vl3-victoria-logs-single-server:9428}"
 ```
 
 The chart listens at `http://vlm-victoria-logs-multilevel-vmauth.logging.svc.cluster.local:8427` for incoming queries according

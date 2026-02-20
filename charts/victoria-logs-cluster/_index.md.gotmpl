@@ -78,17 +78,19 @@ In the example above, two `vlstorage` instances are deployed, each with a 30-day
 
 To access the data within the cluster, use the vmauth address: `http://vlc-victoria-logs-cluster-vmauth.logging.svc.cluster.local:8427`.
 You can use this address as Data Source URL in Grafana.
-The vmui interface is available at: `http://vlc-victoria-logs-cluster-vmauth.logging.svc.cluster.local:8427/select/vmui/`.
+
+Standalone VMUI interface is available at: `http://vlc-victoria-logs-cluster-vmauth.logging.svc.cluster.local:8427/select/vmui/`.
+VictoriaLogs can accept logs at `http://vlc-victoria-logs-cluster-vmauth.logging.svc.cluster.local:8427/insert/*` according to [these docs](https://docs.victoriametrics.com/victorialogs/data-ingestion/).
 
 To uninstall these charts, run: `helm uninstall vls collector`.
 Note that this *will not* remove the PVCs, so you will need to delete them manually if no longer needed.
 
 For finer control and easier maintenance, it is recommended to set these
 values in a separate `values` file and use it during installation.
-See [how to install victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/#install-victoria-logs-single-chart) for an example.
+See [how to install victoria-logs-cluster](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#install-victoria-logs-cluster-chart) for an example.
 You can do this later if you want to configure more settings than shown in the default example.
 
-See also [victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/) and [victoria-logs-multilevel](https://docs.victoriametrics.com/helm/victoria-logs-multilevel/) charts.
+See also [victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/) and [victoria-logs-multilevel](https://docs.victoriametrics.com/helm/victoria-logs-multilevel/) charts for different VictoriaLogs configurations.
 
 ## Chart configuration
 
