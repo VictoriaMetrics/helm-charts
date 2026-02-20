@@ -267,5 +267,86 @@ license:
     # -- Key in secret with license key
     key: ""
 
+service:
+  enabled: false
+  # -- Service traffic distribution. Details are [here](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)
+  trafficDistribution: ""
+  # -- Service annotations
+  annotations: {}
+  # -- Service labels
+  labels: {}
+  # -- Service ClusterIP
+  clusterIP: "None"
+  # -- Service external IPs. Details are [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips)
+  externalIPs: []
+  # -- Service load balancer IP
+  loadBalancerIP: ""
+  # -- Load balancer source range
+  loadBalancerSourceRanges: []
+  # -- Service port
+  servicePort: 8490
+  # -- Target port
+  targetPort: http
+  # -- Node port
+  # nodePort: 30000
+  # -- Service type
+  type: ClusterIP
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  externalTrafficPolicy: ""
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  healthCheckNodePort: ""
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+  ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+  ipFamilies: []
+
+ingress:
+  # -- Enable deployment of ingress
+  enabled: false
+  # -- Ingress annotations
+  annotations: {}
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: 'true'
+
+  # -- Ingress extra labels
+  labels: {}
+  # -- Array of host objects
+  hosts:
+    - name: vmanomaly.local
+      path:
+        - /
+      port: http
+
+  # -- Array of TLS objects
+  tls: []
+  #   - secretName: vmanomaly-ingress-tls
+  #     hosts:
+  #       - vmanomaly.local
+  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # ingressClassName: nginx
+  pathType: Prefix
+
+route:
+  # -- Enable deployment of HTTPRoute
+  enabled: false
+  # -- HTTPRoute annotations
+  annotations: {}
+  # -- HTTPRoute extra labels
+  labels: {}
+  # -- HTTPGateway objects refs
+  parentRefs: []
+  # -- Array of hostnames
+  hostnames: []
+  # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+  extraRules: []
+  # -- Filters for a default rule in HTTPRoute
+  filters: []
+  # -- Matches for a default rule in HTTPRoute
+  matches:
+    - path:
+        type: PathPrefix
+        value: '/'
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []

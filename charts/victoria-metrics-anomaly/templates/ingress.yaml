@@ -1,0 +1,45 @@
+{{- $ingress := .Values.ingress }}
+{{- if $ingress.enabled  }}
+{{- $shardingEnabled := gt (int .Values.shardsCount) 1 }}
+{{- if $shardingEnabled }}
+  {{- fail ".Values.ingress.enabled is not allowed when sharding is enabled" }}
+{{- end }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  {{- with $ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $ingress.labels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+spec:
+  {{- with $ingress.ingressClassName }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with $ingress.tls }}
+  tls: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range $host := $ingress.hosts }}
+    {{- $paths := ternary (list $host.path) $host.path (kindIs "string" $host.path) }}
+    - host: {{ tpl $host.name $ | quote }}
+      http:
+        paths:
+          {{- range $path := $paths }}
+          - path: {{ $path }}
+            {{- with $ingress.pathType }}
+            pathType: {{ . }}
+            {{- end }}
+            backend:
+              service:
+                name: {{ $fullname }}
+                port: {{ include "vm.ingress.port" $host | nindent 18 }}
+          {{- end }}
+    {{- end }}
+{{- end }}
