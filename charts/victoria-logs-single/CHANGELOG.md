@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- feature: support `tpl` in `basicAuth` on `VMServiceScrape` and `ServiceMonitor`
 
 ## 0.11.27
 

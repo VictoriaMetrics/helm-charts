@@ -32,7 +32,7 @@ spec:
       port: http
       {{- end }}
       {{- with $app.serviceMonitor.basicAuth }}
-      basicAuth: {{ toYaml . | nindent 8 }}
+      basicAuth: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with $app.serviceMonitor.params }}
       params: {{ tpl (toYaml .) $ | nindent 8 }}
@@ -86,7 +86,7 @@ spec:
       port: http
       {{- end }}
       {{- with $app.vmServiceScrape.basicAuth }}
-      basicAuth: {{ toYaml . | nindent 8 }}
+      basicAuth: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with $app.vmServiceScrape.scheme }}
       scheme: {{ . }}

@@ -1,0 +1,54 @@
+suite: monitor templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - monitor.yaml
+tests:
+  - it: should render tpl in serviceMonitor basicAuth
+    set:
+      server:
+        serviceMonitor:
+          enabled: true
+          basicAuth:
+            username:
+              name: "{{ .Release.Name }}-basic-auth"
+              key: username
+            password:
+              name: "{{ .Release.Name }}-basic-auth"
+              key: password
+    asserts:
+      - equal:
+          path: spec.endpoints[0].basicAuth
+          value:
+            username:
+              name: RELEASE-NAME-basic-auth
+              key: username
+            password:
+              name: RELEASE-NAME-basic-auth
+              key: password
+
+  - it: should render tpl in vmServiceScrape basicAuth
+    set:
+      server:
+        serviceMonitor:
+          enabled: false
+        vmServiceScrape:
+          enabled: true
+          basicAuth:
+            username:
+              name: "{{ .Release.Name }}-basic-auth"
+              key: username
+            password:
+              name: "{{ .Release.Name }}-basic-auth"
+              key: password
+    asserts:
+      - equal:
+          path: spec.endpoints[0].basicAuth
+          value:
+            username:
+              name: RELEASE-NAME-basic-auth
+              key: username
+            password:
+              name: RELEASE-NAME-basic-auth
+              key: password
