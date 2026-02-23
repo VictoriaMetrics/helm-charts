@@ -1,0 +1,28 @@
+{{- $extraRules := mergeOverwrite (deepCopy (.Values.additionalVictoriaMetricsMap | default dict)) (deepCopy (.Values.extraRules | default dict)) }}
+{{- with $extraRules }}
+  {{- $prefix := (include "vm.name" $) }}
+  {{- $ctx := dict "helm" $ "appKey" (list "vmalert" "spec") }}
+  {{- $ns := include "vm.namespace" $ctx }}
+---
+apiVersion: v1
+kind: List
+metadata:
+  name: {{ include "vm.fullname" $ }}-additional-victoria-metrics-rules
+  namespace: {{ $ns }}
+items:
+{{- range $name, $spec := . }}
+  - apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMRule
+    metadata:
+      {{- $fullname := (printf "%s-%s" $prefix $name) }}
+      name: {{ $fullname }}
+      namespace: {{ include "vm.namespace" $ }}
+      {{- $extraLabels := mergeOverwrite (deepCopy ($spec.labels | default dict)) (deepCopy ($spec.additionalLabels | default dict)) -}}
+      {{- $_ := set $extraLabels "app" $prefix }}
+      {{- $_ := set $ctx "extraLabels" $extraLabels }}
+      labels: {{ include "vm.labels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
+    spec:
+      groups: {{ toYaml $spec.groups | nindent 8 }}
+  {{- end }}
+{{- end }}
