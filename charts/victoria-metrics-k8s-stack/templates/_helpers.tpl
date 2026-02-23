@@ -68,7 +68,7 @@
     {{- $notifierConfigRef := dict "name" $configName "key" "notifier-configs.yaml" -}}
     {{- $_ := set $remotes "notifierConfigRef" $notifierConfigRef -}}
   {{- else if $Values.alertmanager.enabled -}}
-    {{- $notifiers := default list -}}
+    {{- $notifiers := list -}}
     {{- $appSecure := not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config) -}}
     {{- $_ := set $ctx "appKey" (list "alertmanager" "spec") -}}
     {{- $_ := set $ctx "appSecure" $appSecure -}}
@@ -107,7 +107,7 @@
       {{- $_ := unset $license "key" -}}
     {{- end -}}
   {{- else -}}
-    {{- $license = default dict -}}
+    {{- $license = dict -}}
   {{- end -}}
   {{- toYaml $license -}}
 {{- end -}}
@@ -160,7 +160,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list }}
   {{- with include "vm.write.endpoint" . -}}
-    {{- $rws := $Values.vmagent.spec.remoteWrite | list (default dict) }}
+    {{- $rws := $Values.vmagent.spec.remoteWrite | default (list (dict)) }}
     {{- $rw := fromYaml . }}
     {{- $remoteWrites = append $remoteWrites (mergeOverwrite $rw (deepCopy (first $rws))) }}
   {{- end -}}
@@ -185,7 +185,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $_ := set . "style" "managed" -}}
-  {{- $vm := default dict -}}
+  {{- $vm := dict -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
     {{- $url := urlParse (include "vm.url" .) -}}
@@ -263,7 +263,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
   {{- $image := dict "tag" (include "vm.image.tag" .) }}
-  {{- $extraArgs := default dict -}}
+  {{- $extraArgs := dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmalert.enabled }}
     {{- $_ := set . "appKey" (list "vmalert" "spec") }}
@@ -280,7 +280,7 @@
 {{- define "vm.select.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
-  {{- $extraArgs := default dict -}}
+  {{- $extraArgs := dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmalert.enabled -}}
     {{- $_ := set . "appKey" (list "vmalert" "spec") -}}
@@ -321,7 +321,7 @@
 {{- define "vm.data.source.enabled" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $grafana := $Values.grafana -}}
-  {{- $installed := default list }}
+  {{- $installed := list }}
   {{- range $plugin := ($grafana.plugins | default list) -}}
     {{- $plugin = splitList ";" $plugin | reverse | first }}
     {{- $installed = append $installed $plugin }}
@@ -338,7 +338,7 @@
   {{- $readURL := include "vm.read.endpoint" $ctx -}}
   {{- if $readURL -}}
     {{- $readEndpoint := fromYaml $readURL -}}
-    {{- $defaultDatasources := default list -}}
+    {{- $defaultDatasources := list -}}
     {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}
       {{- $_ := set $ds "url" $readEndpoint.url -}}
       {{- $defaultDatasources = append $defaultDatasources $ds -}}

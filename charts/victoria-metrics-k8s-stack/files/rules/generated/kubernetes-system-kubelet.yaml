@@ -144,9 +144,9 @@ rules:
   labels:
     severity: warning
 - alert: KubeletDown
-  expr: absent(up{job="kubelet",metrics_path="/metrics"})
+  expr: {{ printf "count(kube_node_info{job=\"kube-state-metrics\"}) by(%s) unless on(%s) count(up{job=\"kubelet\",metrics_path=\"/metrics\"} == 1) by(%s)" $groupLabels $groupLabels $groupLabels }}
   annotations:
-    description: Kubelet has disappeared from Prometheus target discovery.
+    description: Kubelet has disappeared from Prometheus target discovery on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubeletdown
     summary: Target disappeared from Prometheus target discovery.
   condition: {{ ($Values.kubelet).enabled }}

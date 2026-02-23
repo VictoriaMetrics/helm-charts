@@ -71,14 +71,14 @@ Delete condition from group
 {{- /*
 Merge group spec
 */}}
-{{- $groupSpec := mergeOverwrite (deepCopy $groupData) (dig "spec" (default dict) $group) -}}
+{{- $groupSpec := mergeOverwrite (deepCopy $groupData) (dig "spec" (dict) $group) -}}
 
 {{- /*
 Filter out ignore rules
 */}}
-{{- $commonRule := dig "rule" (default dict) $defaultRules }}
-{{- $commonInGroupRule := dig "rules" (default dict) $group }}
-{{- $filteredRulesSpec := default list }}
+{{- $commonRule := dig "rule" (dict) $defaultRules }}
+{{- $commonInGroupRule := dig "rules" (dict) $group }}
+{{- $filteredRulesSpec := list }}
 {{- range $_, $ruleSpec := $rulesSpec }}
   {{- $ruleName := $ruleSpec.alert | default $ruleSpec.record | default "" }}
   {{- $ruleKey := hasKey $ruleSpec "record" | ternary "recording" "alerting" -}}
@@ -89,7 +89,7 @@ Filter out ignore rules
   {{- $defaultInGroup := deepCopy (index $group $ruleKey | default dict) }}
   {{- $resultRule := mergeOverwrite (deepCopy $commonRule) $defaultRule $commonInGroupRule $defaultInGroup $exactRule }}
   {{- if (and (dig "create" true $resultRule) $ruleCondition) }}
-    {{- $ruleSpec := mergeOverwrite (deepCopy $ruleSpec) (dig "spec" (default dict) $resultRule) }}
+    {{- $ruleSpec := mergeOverwrite (deepCopy $ruleSpec) (dig "spec" (dict) $resultRule) }}
     {{- $filteredRulesSpec = append $filteredRulesSpec $ruleSpec }}
   {{- end }}
 {{- end -}}
