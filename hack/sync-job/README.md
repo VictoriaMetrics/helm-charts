@@ -16,6 +16,7 @@ A Go binary that runs as a Kubernetes Job on every Helm install/upgrade. It fetc
 | `CONFIG` | `/etc/config/config.yaml` | Path to the config file |
 | `NAMESPACE` | `default` | Namespace where resources are created |
 | `RELEASE` | _(empty)_ | Helm release name; scopes managed resources per release via `app.kubernetes.io/instance` |
+| `RESOURCE_PREFIX` | value of `RELEASE` | Prefix for managed resource names (`<prefix>-rule-<group>`, `<prefix>-dashboard-<name>`). Defaults to `RELEASE`; falls back to `vm-k8s-stack` when both are unset. |
 | `PRUNE` | `true` | Set to `false` to disable deletion of orphaned resources |
 
 ## Config file

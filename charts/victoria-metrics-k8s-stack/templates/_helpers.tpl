@@ -7,14 +7,10 @@
     {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
   {{- else if and $Values.vmcluster.enabled $Values.vmcluster.spec.vmselect.enabled -}}
     {{- $_ := set . "appKey" (list "vmcluster" "spec" "vmselect") -}}
-    {{- $baseURL := include "vm.url" . -}}
-    {{- $tenant := $Values.tenant | default 0 -}}
-    {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
-  {{- else if $Values.vmdistributed.enabled }}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if $Values.vmdistributed.enabled -}}
     {{- $_ := set . "appKey" (list "vmdistributed" "spec" "vmauth" "spec") -}}
-    {{- $baseURL := include "vm.url" . -}}
-    {{- $tenant := $Values.tenant | default 0 -}}
-    {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
   {{- else if $Values.external.vm.read.url -}}
     {{- $endpoint = $Values.external.vm.read -}}
   {{- end -}}
@@ -29,23 +25,46 @@
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
-    {{- $baseURL := include "vm.url" . -}}
-    {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
   {{- else if and $Values.vmcluster.enabled $Values.vmcluster.spec.vminsert.enabled -}}
     {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
-    {{- $baseURL := include "vm.url" . -}}
-    {{- $tenant := $Values.tenant | default 0 -}}
-    {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
-  {{- else if $Values.vmdistributed.enabled }}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if $Values.vmdistributed.enabled -}}
     {{- $_ := set . "appKey" (list "vmdistributed" "spec" "vmauth" "spec") -}}
-    {{- $baseURL := include "vm.url" . -}}
-    {{- $tenant := $Values.tenant | default 0 -}}
-    {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
   {{- else if $Values.external.vm.write.url -}}
     {{- $endpoint = $Values.external.vm.write -}}
   {{- end -}}
   {{- with $endpoint -}}
     {{- toYaml . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* vm.prometheus.read appends /select/<tenant>/prometheus to vm.read.endpoint for cluster/distributed deployments */ -}}
+{{- define "vm.prometheus.read" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $endpoint := fromYaml (include "vm.read.endpoint" .) -}}
+  {{- if $endpoint.url -}}
+    {{- if or (and $Values.vmcluster.enabled $Values.vmcluster.spec.vmselect.enabled) $Values.vmdistributed.enabled -}}
+      {{- $tenant := $Values.tenant | default 0 -}}
+      {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $endpoint.url (int $tenant)) -}}
+    {{- end -}}
+    {{- toYaml $endpoint -}}
+  {{- end -}}
+{{- end }}
+
+{{- /* vm.prometheus.write appends the prometheus remote-write path to vm.write.endpoint */ -}}
+{{- define "vm.prometheus.write" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $endpoint := fromYaml (include "vm.write.endpoint" .) -}}
+  {{- if $endpoint.url -}}
+    {{- if $Values.vmsingle.enabled -}}
+      {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $endpoint.url) -}}
+    {{- else if or (and $Values.vmcluster.enabled $Values.vmcluster.spec.vminsert.enabled) $Values.vmdistributed.enabled -}}
+      {{- $tenant := $Values.tenant | default 0 -}}
+      {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $endpoint.url (int $tenant)) -}}
+    {{- end -}}
+    {{- toYaml $endpoint -}}
   {{- end -}}
 {{- end -}}
 
@@ -56,22 +75,35 @@
   {{- $remotes := dict -}}
   {{- $fullname := include "vm.managed.fullname" . -}}
   {{- $_ := set $ctx "style" "managed" -}}
-  {{- $remoteWrite := include "vm.write.endpoint" $ctx | fromYaml -}}
+  {{- $vmRemoteWrite := include "vm.prometheus.write" $ctx | fromYaml -}}
   {{- if and $Values.vmalert.remoteWriteVMAgent $Values.vmagent.enabled -}}
     {{- $_ := set $ctx "appKey" (list "vmagent" "spec") -}}
-    {{- $remoteWrite = dict "url" (printf "%s/api/v1/write" (include "vm.url" $ctx)) -}}
+    {{- $vmRemoteWrite = dict "url" (printf "%s/api/v1/write" (include "vm.url" $ctx)) -}}
     {{- $_ := unset $ctx "appKey" -}}
-    {{- $_ := set $remotes "remoteWrite" $remoteWrite -}}
-  {{- else -}}
-    {{- $_ := set $remotes "remoteWrite" $remoteWrite -}}
   {{- end -}}
-  {{- $readEndpoint := include "vm.read.endpoint" $ctx -}}
-  {{- if $readEndpoint }}
-    {{- $remoteRead := fromYaml $readEndpoint -}}
-    {{- $_ := set $remotes "remoteRead" $remoteRead -}}
-    {{- $_ := set $remotes "datasource" $remoteRead -}}
-  {{- else if or (not $Values.vmalert.spec.datasource) (not $Values.vmalert.spec.remoteRead) -}}
-    {{- fail "VM read source required! Either set `vmalert.enabled: false` or provide `vmalert.spec.remoteRead.url` and `vmalert.spec.datasource.url`" -}}
+  {{- with $vmRemoteWrite -}}
+    {{- $_ := set $remotes "remoteWrite" . -}}
+  {{- end -}}
+  {{- $vmReadEndpoint := fromYaml (include "vm.prometheus.read" $ctx) -}}
+  {{- $vlReadEndpoint := fromYaml (include "vl.read.endpoint" $ctx) -}}
+  {{- with $vmReadEndpoint -}}
+    {{- $_ := set $remotes "remoteRead" . -}}
+  {{- end -}}
+  {{- if and $vmReadEndpoint.url $vlReadEndpoint.url -}}
+    {{- $_ := set $ctx "appKey" (list "internal" "vmauth" "spec") -}}
+    {{- $_ := set $ctx "fullname" (include "vm.fullname" $ctx) -}}
+    {{- $_ := set $remotes "datasource" (dict "url" (include "vm.url" $ctx)) -}}
+    {{- $_ := unset $ctx "appKey" -}}
+    {{- $_ := unset $ctx "fullname" -}}
+  {{- else if $vmReadEndpoint.url -}}
+    {{- $_ := set $remotes "datasource" $vmReadEndpoint -}}
+  {{- else if $vlReadEndpoint.url -}}
+    {{- $_ := set $remotes "datasource" $vlReadEndpoint -}}
+  {{- end -}}
+  {{- if not (($remotes.datasource).url) -}}
+    {{- if or (not $Values.vmalert.spec.datasource) (not $Values.vmalert.spec.remoteRead) -}}
+      {{- fail "datasource required for vmalert! Either set `vmalert.enabled: false` or provide a VM/VL read endpoint or `vmalert.spec.datasource.url` and `vmalert.spec.remoteRead.url`" -}}
+    {{- end -}}
   {{- end -}}
   {{- if $Values.vmalert.additionalNotifierConfigs }}
     {{- $configName := printf "%s-additional-notifier" $fullname -}}
@@ -169,11 +201,17 @@
 {{- end -}}
 
 {{- /* VM Agent remoteWrites */ -}}
-{{- define "vm.agent.remote.write" -}}
+{{- /* VMAgent/VLAgent spec. Accepts optional .agentKey and .writeEndpoint on context;
+     defaults to vmagent with vm.prometheus.write when unset. */ -}}
+{{- define "vm.agent.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list }}
-  {{- $rws := $Values.vmagent.spec.remoteWrite | default list }}
-  {{- with include "vm.write.endpoint" . -}}
+  {{- $agentKey := .agentKey | default "vmagent" -}}
+  {{- $agentValues := index $Values $agentKey -}}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
+  {{- $remoteWrites := $agentValues.additionalRemoteWrites | default list }}
+  {{- $rws := $agentValues.spec.remoteWrite | default list }}
+  {{- $writeEndpoint := .writeEndpoint | default (include "vm.prometheus.write" .) -}}
+  {{- with $writeEndpoint -}}
     {{- if $rws -}}
       {{- $rws = prepend (slice $rws 1) (mergeOverwrite (fromYaml .) (deepCopy (first $rws))) -}}
     {{- else -}}
@@ -181,60 +219,63 @@
     {{- end -}}
   {{- end -}}
   {{- $remoteWrites = concat $remoteWrites $rws }}
-  {{- toYaml (dict "remoteWrite" $remoteWrites) -}}
-{{- end -}}
-
-{{- /* VMAgent spec */ -}}
-{{- define "vm.agent.spec" -}}
-  {{- $Values := (.helm).Values | default .Values }}
-  {{- $Chart := (.helm).Chart | default .Chart }}
-  {{- $image := dict "tag" (include "vm.image.tag" .) }}
-  {{- $spec := include "vm.agent.remote.write" . | fromYaml -}}
+  {{- $spec := dict "remoteWrite" $remoteWrites -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
   {{- $_ := set $spec "image" $image -}}
-  {{- tpl (mergeOverwrite (deepCopy $Values.vmagent.spec) (deepCopy $spec) | toYaml) . -}}
+  {{- tpl (mergeOverwrite (deepCopy $agentValues.spec) (deepCopy $spec) | toYaml) . -}}
 {{- end }}
+
+{{- /* Populates .vm, .vl and .vt on the context with read/write URL components */ -}}
+{{- define "vm.auth.context" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $_ := set . "style" "managed" -}}
+  {{- $vm := dict -}}
+  {{- $vmRead := fromYaml (include "vm.read.endpoint" .) -}}
+  {{- if $vmRead.url -}}
+    {{- $url := urlParse $vmRead.url -}}
+    {{- if and $Values.vmcluster.enabled $Values.vmcluster.spec.vmselect.enabled -}}
+      {{- $_ := set $url "path" (printf "%s/select" $url.path) -}}
+    {{- end -}}
+    {{- $_ := set $vm "read" $url -}}
+  {{- end -}}
+  {{- $vmWrite := fromYaml (include "vm.write.endpoint" .) -}}
+  {{- if $vmWrite.url -}}
+    {{- $url := urlParse $vmWrite.url -}}
+    {{- if and $Values.vmcluster.enabled $Values.vmcluster.spec.vminsert.enabled -}}
+      {{- $_ := set $url "path" (printf "%s/insert" $url.path) -}}
+    {{- end -}}
+    {{- $_ := set $vm "write" $url -}}
+  {{- end -}}
+  {{- $_ := set . "vm" $vm -}}
+  {{- $vl := dict -}}
+  {{- $vlRead := fromYaml (include "vl.read.endpoint" .) -}}
+  {{- if $vlRead.url -}}
+    {{- $_ := set $vl "read" (urlParse $vlRead.url) -}}
+  {{- end -}}
+  {{- $vlWrite := fromYaml (include "vl.write.endpoint" .) -}}
+  {{- if $vlWrite.url -}}
+    {{- $_ := set $vl "write" (urlParse $vlWrite.url) -}}
+  {{- end -}}
+  {{- $_ := set . "vl" $vl -}}
+  {{- $vt := dict -}}
+  {{- $vtRead := fromYaml (include "vt.read.endpoint" .) -}}
+  {{- if $vtRead.url -}}
+    {{- $_ := set $vt "read" (urlParse $vtRead.url) -}}
+  {{- end -}}
+  {{- $vtWrite := fromYaml (include "vt.write.endpoint" .) -}}
+  {{- if $vtWrite.url -}}
+    {{- $_ := set $vt "write" (urlParse $vtWrite.url) -}}
+  {{- end -}}
+  {{- $_ := set . "vt" $vt -}}
+{{- end -}}
 
 {{- /* VMAuth spec */ -}}
 {{- define "vm.auth.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $image := dict "tag" (include "vm.image.tag" .) }}
-  {{- $_ := set . "style" "managed" -}}
-  {{- $vm := dict -}}
-  {{- if $Values.vmsingle.enabled -}}
-    {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
-    {{- $url := urlParse (include "vm.url" .) -}}
-    {{- $_ := set $vm "read" $url -}}
-    {{- $_ := set $vm "write" $url -}}
-  {{- else if $Values.vmcluster.enabled -}}
-    {{- if $Values.vmcluster.spec.vminsert.enabled -}}
-      {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
-      {{- $writeURL := urlParse (include "vm.url" .) -}}
-      {{- $_ := set $writeURL "path" (printf "%s/insert" $writeURL.path) -}}
-      {{- $_ := set $vm "write" $writeURL }}
-    {{- else if $Values.external.vm.write.url -}}
-      {{- $_ := set $vm "write" (urlParse $Values.external.vm.write.url) -}}
-    {{- end -}}
-    {{- if $Values.vmcluster.spec.vmselect.enabled -}}
-      {{- $_ := set . "appKey" (list "vmcluster" "spec" "vmselect") -}}
-      {{- $readURL := urlParse (include "vm.url" .) -}}
-      {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
-      {{- $_ := set $vm "read" $readURL }}
-    {{- else if $Values.external.vm.read.url -}}
-      {{- $_ := set $vm "read" (urlParse $Values.external.vm.read.url) -}}
-    {{- end -}}
-    {{- $_ := set . "vm" $vm -}}
-  {{- else if or $Values.external.vm.read.url $Values.external.vm.write.url -}}
-    {{- with $Values.external.vm.read.url -}}
-      {{- $_ := set $vm "read" (urlParse .) -}}
-    {{- end -}}
-    {{- with $Values.external.vm.write.url -}}
-      {{- $_ := set $vm "write" (urlParse .) -}}
-    {{- end -}}
-  {{- end -}}
-  {{- $_ := set . "vm" $vm -}}
+  {{- include "vm.auth.context" . -}}
   {{- $spec := deepCopy $Values.vmauth.spec }}
   {{- if $spec.unauthorizedUserAccessSpec }}
     {{- if $spec.unauthorizedUserAccessSpec.disabled }}
@@ -382,12 +423,32 @@
   {{- $ctx := . }}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $datasources := $Values.defaultDatasources.extra | default list -}}
-  {{- $readURL := include "vm.read.endpoint" $ctx -}}
-  {{- if $readURL -}}
-    {{- $readEndpoint := fromYaml $readURL -}}
+  {{- $vmReadEndpoint := include "vm.prometheus.read" $ctx -}}
+  {{- $vlReadEndpoint := include "vl.read.endpoint" $ctx -}}
+  {{- $vtReadEndpoint := include "vt.read.endpoint" $ctx -}}
+  {{- if $vmReadEndpoint -}}
+    {{- $readEndpoint := fromYaml $vmReadEndpoint -}}
     {{- $defaultDatasources := list -}}
     {{- range $ds := $Values.defaultDatasources.victoriametrics.datasources }}
       {{- $_ := set $ds "url" $readEndpoint.url -}}
+      {{- $defaultDatasources = append $defaultDatasources $ds -}}
+    {{- end }}
+    {{- $datasources = concat $datasources $defaultDatasources -}}
+  {{- end -}}
+  {{- if $vlReadEndpoint -}}
+    {{- $readEndpoint := fromYaml $vlReadEndpoint -}}
+    {{- $defaultDatasources := list -}}
+    {{- range $ds := $Values.defaultDatasources.victorialogs.datasources }}
+      {{- $_ := set $ds "url" $readEndpoint.url -}}
+      {{- $defaultDatasources = append $defaultDatasources $ds -}}
+    {{- end }}
+    {{- $datasources = concat $datasources $defaultDatasources -}}
+  {{- end -}}
+  {{- if $vtReadEndpoint -}}
+    {{- $readEndpoint := fromYaml $vtReadEndpoint -}}
+    {{- $defaultDatasources := list -}}
+    {{- range $ds := $Values.defaultDatasources.victoriatraces.datasources }}
+      {{- $_ := set $ds "url" (printf "%s/select/jaeger" $readEndpoint.url) -}}
       {{- $defaultDatasources = append $defaultDatasources $ds -}}
     {{- end }}
     {{- $datasources = concat $datasources $defaultDatasources -}}
@@ -405,37 +466,6 @@
   {{- end -}}
   {{- toYaml (dict "datasources" $datasources) -}}
 {{- end }}
-
-{{- /* VMRule name */ -}}
-{{- define "vm-k8s-stack.rulegroup.name" -}}
-  {{- printf "%s-%s" (include "vm.fullname" .) (.name | replace "_" "") -}}
-{{- end -}}
-
-{{- /* VMRule labels */ -}}
-{{- define "vm-k8s-stack.rulegroup.labels" -}}
-  {{- $Values := (.helm).Values | default .Values }}
-  {{- $labels := fromYaml (include "vm.labels" .) -}}
-  {{- $_ := set $labels "app.kubernetes.io/component" "vmalert" -}}
-  {{- $labels = mergeOverwrite $labels (deepCopy $Values.defaultRules.labels) -}}
-  {{- toYaml $labels -}}
-{{- end }}
-
-{{- /* VMRule key */ -}}
-{{- define "vm-k8s-stack.rulegroup.key" -}}
-  {{- without (regexSplit "[-_.]" .name -1) "exporter" "rules" | join "-" | camelcase | untitle -}}
-{{- end -}}
-
-{{- /* VMAlertmanager name */ -}}
-{{- define "vm-k8s-stack.alertmanager.name" -}}
-  {{- $Values := (.helm).Values | default .Values }}
-  {{- $_ := set . "appKey" (list "alertmanager" "spec") -}}
-  {{- $Values.alertmanager.name | default (include "vm.managed.fullname" .) -}}
-{{- end -}}
-
-{{- define "vm-k8s-stack.nodeExporter.name" -}}
-  {{- $Values := (.helm).Values | default .Values }}
-  {{- (index $Values "prometheus-node-exporter").service.labels.jobLabel | default "node-exporter" }}
-{{- end -}}
 
 {{- define "vm-k8s-stack.grafana.addr" -}}
   {{- $Values := (.helm).Values | default .Values -}}
@@ -459,4 +489,193 @@
     {{- $grafanaAddr = printf "%s://%s" $grafanaScheme (index $grafanaHosts 0) -}}
   {{- end -}}
   {{- $grafanaAddr -}}
+{{- end -}}
+
+{{- define "vl.read.endpoint" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $endpoint := dict -}}
+  {{- $_ := set . "style" "managed" -}}
+  {{- if $Values.vlsingle.enabled -}}
+    {{- $_ := set . "appKey" (list "vlsingle" "spec") -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if and $Values.vlcluster.enabled $Values.vlcluster.spec.vlselect.enabled -}}
+    {{- $_ := set . "appKey" (list "vlcluster" "spec" "vlselect") -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if $Values.external.vl.read.url -}}
+    {{- $_ := set $endpoint "url" ((($Values.external).vl).read).url -}}
+  {{- end -}}
+  {{- with $endpoint -}}
+    {{- toYaml . -}}
+  {{- end -}}
+{{- end }}
+
+{{- define "vl.write.endpoint" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $endpoint := dict -}}
+  {{- $_ := set . "style" "managed" -}}
+  {{- if $Values.vlsingle.enabled -}}
+    {{- $_ := set . "appKey" (list "vlsingle" "spec") -}}
+    {{- $baseURL := include "vm.url" . -}}
+    {{- $_ := set $endpoint "url" (printf "%s/insert/native" $baseURL) -}}
+  {{- else if and $Values.vlcluster.enabled $Values.vlcluster.spec.vlinsert.enabled -}}
+    {{- $_ := set . "appKey" (list "vlcluster" "spec" "vlinsert") -}}
+    {{- $baseURL := include "vm.url" . -}}
+    {{- $_ := set $endpoint "url" (printf "%s/insert/native" $baseURL) -}}
+  {{- else if $Values.external.vl.write.url -}}
+    {{- $endpoint = $Values.external.vl.write -}}
+  {{- end -}}
+  {{- with $endpoint -}}
+    {{- toYaml . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* VLAgent spec */ -}}
+{{- define "vl.agent.spec" -}}
+  {{- $_ := set . "agentKey" "vlagent" -}}
+  {{- $_ := set . "writeEndpoint" (include "vl.write.endpoint" .) -}}
+  {{- include "vm.agent.spec" . -}}
+  {{- $_ := unset . "agentKey" -}}
+  {{- $_ := unset . "writeEndpoint" -}}
+{{- end }}
+
+{{- /* VLSingle spec */ -}}
+{{- define "vl.single.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
+  {{- $extraArgs := dict -}}
+  {{- if $Values.vmalert.enabled }}
+    {{- $_ := set . "appKey" (list "vmalert" "spec") }}
+    {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" .) -}}
+  {{- end -}}
+  {{- $spec := dict "extraArgs" $extraArgs "image" $image -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- tpl (deepCopy $Values.vlsingle.spec | mergeOverwrite $spec | toYaml) . -}}
+{{- end }}
+
+{{- /* VLCluster select spec */ -}}
+{{- define "vl.select.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $extraArgs := dict -}}
+  {{- if $Values.vmalert.enabled -}}
+    {{- $_ := set . "appKey" (list "vmalert" "spec") -}}
+    {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" .) -}}
+  {{- end -}}
+  {{- $spec := dict "extraArgs" $extraArgs -}}
+  {{- toYaml $spec -}}
+{{- end -}}
+
+{{- /* VLCluster spec */ -}}
+{{- define "vl.cluster.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $clusterSpec := deepCopy $Values.vlcluster.spec -}}
+  {{- $clusterSpec = mergeOverwrite (dict "clusterVersion" (printf "%s-cluster" (include "vm.image.tag" .))) $clusterSpec -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- if ($clusterSpec.requestsLoadBalancer).enabled }}
+    {{- $balancerSpec := $clusterSpec.requestsLoadBalancer.spec | default dict }}
+    {{- $authImage := dict "image" (dict "tag" (include "vm.image.tag" .)) }}
+    {{- $_ := set $clusterSpec.requestsLoadBalancer "spec" (mergeOverwrite $authImage $balancerSpec) }}
+  {{- end }}
+  {{- $clusterSpec = mergeOverwrite (dict "vlselect" (include "vl.select.spec" . | fromYaml)) $clusterSpec }}
+  {{- if not $clusterSpec.vlselect.enabled -}}
+    {{- $_ := unset $clusterSpec "vlselect" -}}
+  {{- else -}}
+    {{- $_ := unset $clusterSpec.vlselect "enabled" -}}
+  {{- end -}}
+  {{- if not $clusterSpec.vlinsert.enabled -}}
+    {{- $_ := unset $clusterSpec "vlinsert" -}}
+  {{- else -}}
+    {{- $_ := unset $clusterSpec.vlinsert "enabled" -}}
+  {{- end -}}
+  {{- tpl (toYaml $clusterSpec) . -}}
+{{- end -}}
+
+{{- define "vt.read.endpoint" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $endpoint := dict -}}
+  {{- $_ := set . "style" "managed" -}}
+  {{- if $Values.vtsingle.enabled -}}
+    {{- $_ := set . "appKey" (list "vtsingle" "spec") -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if and $Values.vtcluster.enabled $Values.vtcluster.spec.vtselect.enabled -}}
+    {{- $_ := set . "appKey" (list "vtcluster" "spec" "vtselect") -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if $Values.external.vt.read.url -}}
+    {{- $_ := set $endpoint "url" ((($Values.external).vt).read).url -}}
+  {{- end -}}
+  {{- with $endpoint -}}
+    {{- toYaml . -}}
+  {{- end -}}
+{{- end }}
+
+{{- define "vt.write.endpoint" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $endpoint := dict -}}
+  {{- $_ := set . "style" "managed" -}}
+  {{- if $Values.vtsingle.enabled -}}
+    {{- $_ := set . "appKey" (list "vtsingle" "spec") -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if and $Values.vtcluster.enabled $Values.vtcluster.spec.vtinsert.enabled -}}
+    {{- $_ := set . "appKey" (list "vtcluster" "spec" "vtinsert") -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if $Values.external.vt.write.url -}}
+    {{- $endpoint = $Values.external.vt.write -}}
+  {{- end -}}
+  {{- with $endpoint -}}
+    {{- toYaml . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* VTSingle spec */ -}}
+{{- define "vt.single.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
+  {{- $spec := dict "image" $image -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- tpl (deepCopy $Values.vtsingle.spec | mergeOverwrite $spec | toYaml) . -}}
+{{- end }}
+
+{{- /* VTCluster select spec */ -}}
+{{- define "vt.select.spec" -}}
+  {{- $spec := dict -}}
+  {{- toYaml $spec -}}
+{{- end -}}
+
+{{- /* VTCluster spec - translates vtinsert/vtselect/vtstorage → insert/select/storage for CRD */ -}}
+{{- define "vt.cluster.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $clusterSpec := deepCopy $Values.vtcluster.spec -}}
+  {{- $clusterSpec = mergeOverwrite (dict "clusterVersion" (printf "%s-cluster" (include "vm.image.tag" .))) $clusterSpec -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- $clusterSpec = mergeOverwrite (dict "vtselect" (include "vt.select.spec" . | fromYaml)) $clusterSpec -}}
+  {{- $vtselect := deepCopy ($clusterSpec.vtselect | default dict) -}}
+  {{- $_ := unset $clusterSpec "vtselect" -}}
+  {{- if $vtselect.enabled -}}
+    {{- $_ := unset $vtselect "enabled" -}}
+    {{- $_ := set $clusterSpec "select" $vtselect -}}
+  {{- end -}}
+  {{- $vtinsert := deepCopy ($clusterSpec.vtinsert | default dict) -}}
+  {{- $_ := unset $clusterSpec "vtinsert" -}}
+  {{- if $vtinsert.enabled -}}
+    {{- $_ := unset $vtinsert "enabled" -}}
+    {{- $_ := set $clusterSpec "insert" $vtinsert -}}
+  {{- end -}}
+  {{- $vtstorage := deepCopy ($clusterSpec.vtstorage | default dict) -}}
+  {{- $_ := unset $clusterSpec "vtstorage" -}}
+  {{- $_ := set $clusterSpec "storage" $vtstorage -}}
+  {{- tpl (toYaml $clusterSpec) . -}}
+{{- end -}}
+
+{{- /* VMAuth spec for routing vmalert: /select/logsql/.* → VL, everything else → VM */ -}}
+{{- define "vm.auth.internal.spec" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- include "vm.auth.context" . -}}
+  {{- tpl (deepCopy $Values.internal.vmauth.spec | toYaml) . -}}
 {{- end -}}

@@ -1,0 +1,73 @@
+suite: vlsingle tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vlsingle/vlsingle.yml
+tests:
+  - it: renders VLSingle CR when enabled
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VLSingle
+      - isAPIVersion:
+          of: operator.victoriametrics.com/v1
+
+  - it: does not render when disabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both vlsingle and vlcluster are enabled
+    set:
+      vlsingle:
+        enabled: true
+      vlcluster:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .vlsingle.enabled and .vlcluster.enabled can be true"
+
+  - it: CR name is derived from release name
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: retentionPeriod is passed through to spec
+    set:
+      vlsingle:
+        enabled: true
+        spec:
+          retentionPeriod: 30d
+    asserts:
+      - equal:
+          path: spec.retentionPeriod
+          value: 30d
+
+  - it: port is passed through to spec
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.port
+          value: "9428"
+
+  - it: vmalert proxyURL is injected into extraArgs
+    set:
+      vlsingle:
+        enabled: true
+      alertmanager:
+        enabled: false
+    asserts:
+      - equal:
+          path: spec.extraArgs["vmalert.proxyURL"]
+          value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8080

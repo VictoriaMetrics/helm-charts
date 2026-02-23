@@ -1,0 +1,160 @@
+suite: vmdistributed tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vmdistributed/vmdistributed.yaml
+tests:
+  - it: renders VMDistributed CR when enabled
+    set:
+      vmsingle:
+        enabled: false
+      vmdistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VMDistributed
+      - isAPIVersion:
+          of: operator.victoriametrics.com/v1alpha1
+
+  - it: does not render when disabled
+    set:
+      vmsingle:
+        enabled: false
+      vmalert:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both vmsingle and vmdistributed are enabled
+    set:
+      vmdistributed:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .Values.vmsingle.enabled, .Values.vmdistributed.enabled and .Values.vmcluster.enabled can be true"
+
+  - it: fails when both vmcluster and vmdistributed are enabled
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+      vmdistributed:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .Values.vmsingle.enabled, .Values.vmdistributed.enabled and .Values.vmcluster.enabled can be true"
+
+  - it: CR name is derived from release name
+    set:
+      vmsingle:
+        enabled: false
+      vmdistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: zoneCommon vmcluster clusterVersion is auto-computed from appVersion
+    set:
+      vmsingle:
+        enabled: false
+      vmdistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.zoneCommon.vmcluster.spec.clusterVersion
+          value: 0.1.0-cluster
+
+  - it: zoneCommon vmagent image tag is injected from appVersion
+    set:
+      vmsingle:
+        enabled: false
+      vmdistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.zoneCommon.vmagent.spec.image.tag
+          value: 0.1.0
+
+  - it: vmalert proxyURL is injected into vmselect extraArgs
+    set:
+      vmsingle:
+        enabled: false
+      vmdistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.zoneCommon.vmcluster.spec.vmselect.extraArgs["vmalert.proxyURL"]
+          value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8080
+
+  - it: zones are passed through to spec
+    set:
+      vmsingle:
+        enabled: false
+      vmdistributed:
+        enabled: true
+        spec:
+          zones:
+            - name: us-east-1
+            - name: eu-west-1
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - lengthEqual:
+          path: spec.zones
+          count: 2
+      - equal:
+          path: spec.zones[1].name
+          value: eu-west-1

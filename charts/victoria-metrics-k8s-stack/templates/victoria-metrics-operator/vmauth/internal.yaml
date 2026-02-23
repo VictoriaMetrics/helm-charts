@@ -1,0 +1,23 @@
+{{- $app := .Values.vmalert }}
+{{- if $app.enabled }}
+{{- $ctx := dict "helm" . "appKey" (list "internal" "vmauth" "spec") }}
+{{- $_ := set $ctx "fullname" (include "vm.fullname" $ctx) }}
+{{- $vmReadEndpoint := include "vm.prometheus.read" $ctx | fromYaml }}
+{{- $vlReadEndpoint := include "vl.read.endpoint" $ctx | fromYaml }}
+{{- if and $vmReadEndpoint.url $vlReadEndpoint.url }}
+{{- $_ := set $ctx "appKey" (list "internal" "vmauth" "spec") -}}
+{{- $_ := set $ctx "style" "managed" -}}
+{{- $fullname := include "vm.cr.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+  {{- $labels := include "vm.labels" $ctx | fromYaml }}
+  {{- $_ := set $labels "app.kubernetes.io/component" "vmauth" }}
+  labels: {{ toYaml $labels | nindent 4 }}
+spec: {{ include "vm.auth.internal.spec" $ctx | nindent 2 }}
+{{- end }}
+{{- end }}

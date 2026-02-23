@@ -6,6 +6,8 @@
 
 **Update note 3**: Helm-rendered dashboard ConfigMaps and VMRules are removed. Dashboards and rules are now fetched and applied at deploy time by the sync-job (`syncJob.enabled: true` by default). Disable `syncJob.enabled` only if managing dashboards and rules externally.
 
+- add traces storage support: `vtsingle` and `vtcluster` deploy operator-managed `VTSingle`/`VTCluster` CRs; ports follow the `10xxx` scheme (single `10428`, insert `10481`, select `10471`, storage `10491`); Grafana Jaeger datasource is auto-provisioned pointing at `<endpoint>/select/jaeger`; dashboard sync entries for single-node and cluster views are included
+- add logs collection and storage support: VLSingle, VLCluster, VLAgent with `k8sCollector` for automatic Kubernetes logs collection, Grafana datasource integration, and internal VMAuth routing when both metrics and logs backends are configured. See [#1910](https://github.com/VictoriaMetrics/helm-charts/issues/1910) and [#1909](https://github.com/VictoriaMetrics/helm-charts/issues/1909)
 - introduce sync-job config with `common` section (`clusterLabel`, `multicluster`) shared across dashboards and rules; Grafana-specific settings (`labelName`, `labelValue`, `datasource`, `operator`) live under `dashboards.common.grafana`
 - add `defaultRules.rules` global per-rule overrides map to patch spec or enable/disable individual rules across all groups
 - add per-group `spec:` support in `defaultRules.groups` for VMRule group-level properties (e.g. `interval`, `params`)

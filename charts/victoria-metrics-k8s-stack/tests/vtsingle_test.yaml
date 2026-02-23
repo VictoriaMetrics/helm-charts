@@ -1,0 +1,62 @@
+suite: vtsingle tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vtsingle/vtsingle.yaml
+tests:
+  - it: renders VTSingle CR when enabled
+    set:
+      vtsingle:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VTSingle
+      - isAPIVersion:
+          of: operator.victoriametrics.com/v1
+
+  - it: does not render when disabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both vtsingle and vtcluster are enabled
+    set:
+      vtsingle:
+        enabled: true
+      vtcluster:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .vtsingle.enabled and .vtcluster.enabled can be true"
+
+  - it: CR name is derived from release name
+    set:
+      vtsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: retentionPeriod is passed through to spec
+    set:
+      vtsingle:
+        enabled: true
+        spec:
+          retentionPeriod: 30d
+    asserts:
+      - equal:
+          path: spec.retentionPeriod
+          value: 30d
+
+  - it: port is passed through to spec
+    set:
+      vtsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.port
+          value: "10428"
