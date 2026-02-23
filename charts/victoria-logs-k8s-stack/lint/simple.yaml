@@ -1,0 +1,34 @@
+fullnameOverride: test
+grafanaOperatorDashboardsFormat:
+  enabled: true
+extraRules:
+  rule-name:
+    groups:
+    - name: my_group
+      rules:
+      - record: my_record
+        expr: 100 * my_record
+vmalertmanager:
+  enabled: true
+  spec:
+    selectAllByDefault: true
+    externalURL: https://monitoring.example.com/alertmanager
+    routePrefix: "/alertmanager/"
+  monzoTemplate:
+    enabled: true
+  ingress:
+    enabled: true
+    annotations:
+      annotationName: annotationValue
+    labels: {}
+    path: /alertmanager/
+    pathType: Prefix
+    hosts:
+      - monitoring.example.com
+    tls:
+      - secretName: alertmanager-ingress-tls
+        hosts:
+          - monitoring.example.com
+vmalert:
+  ingress:
+    enabled: true
