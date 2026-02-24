@@ -1,12 +1,21 @@
 {{- $ns := include "vm.namespace" . }}
 {{- range $name, $config := .Values }}
   {{- if and (kindIs "map" $config) (hasKey $config "route") ($config.enabled) (empty (index $.Subcharts $name)) }}
-    {{- $routes := ternary (dict $name $config.route) $config.route (hasKey $config.route "enabled") }}
+    {{- $routes := $config.route }}
+    {{- $appKey := list }}
+    {{- $spec := $.Values }}
+    {{- if hasKey $routes "enabled" }}
+      {{- $routes = dict $name $routes }}
+    {{- else }}
+      {{- $appKey = concat $appKey (list $name "spec") }}
+      {{- $spec = dig $name "spec" (dict) ($spec | merge (dict)) }}
+    {{- end }}
     {{- range $routeName, $route := $routes }}
       {{- if $route.enabled }}
-        {{- $routeName = ternary $routeName (printf "vm%s" $routeName) (or (hasPrefix "vm" $routeName) (not (hasPrefix "vm" $name))) }}
-        {{- $appKey := ternary $name (list $name "spec" $routeName) (eq $name $routeName) -}}
-        {{- $ctx := dict "helm" $ "appKey" $appKey -}}
+        {{- if not (hasKey $spec $routeName) }}
+          {{- $routeName = printf "vm%s" $routeName }}
+        {{- end }}
+        {{- $ctx := dict "helm" $ "appKey" (append $appKey $routeName) -}}
         {{- $fullname := include "vm.managed.fullname" $ctx }}
 ---
 apiVersion: {{ $route.apiVersion | default "gateway.networking.k8s.io/v1" }}

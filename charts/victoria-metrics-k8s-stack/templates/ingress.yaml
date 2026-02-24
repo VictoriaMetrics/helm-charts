@@ -1,12 +1,21 @@
 {{- $ns := include "vm.namespace" . }}
 {{- range $name, $config := .Values }}
   {{- if and (kindIs "map" $config) (hasKey $config "ingress") ($config.enabled) (empty (index $.Subcharts $name)) }}
-    {{- $ingresses := ternary (dict $name $config.ingress) $config.ingress (hasKey $config.ingress "enabled") }}
+    {{- $ingresses := $config.ingress }}
+    {{- $appKey := list }}
+    {{- $spec := $.Values }}
+    {{- if hasKey $ingresses "enabled" }}
+      {{- $ingresses = dict $name $ingresses }}
+    {{- else }}
+      {{- $appKey = concat $appKey (list $name "spec") }}
+      {{- $spec = dig $name "spec" (dict) ($spec | merge (dict)) }}
+    {{- end }}
     {{- range $ingName, $ingress := $ingresses }}
       {{- if $ingress.enabled }}
-        {{- $ingName = ternary $ingName (printf "vm%s" $ingName) (or (hasPrefix "vm" $ingName) (not (hasPrefix "vm" $name))) }}
-        {{- $appKey := ternary $name (list $name "spec" $ingName) (eq $name $ingName) -}}
-        {{- $ctx := dict "helm" $ "appKey" $appKey -}}
+        {{- if not (hasKey $spec $ingName) }}
+          {{- $ingName = printf "vm%s" $ingName }}
+        {{- end }}
+        {{- $ctx := dict "helm" $ "appKey" (append $appKey $ingName) -}}
         {{- $fullname := include "vm.managed.fullname" $ctx }}
 ---
 apiVersion: networking.k8s.io/v1
