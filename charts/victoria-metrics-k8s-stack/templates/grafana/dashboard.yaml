@@ -24,10 +24,8 @@ Get dashboard data from file
 {{- /*
 Save condition for a dashboard from file
 */}}
-{{- $dashboardCondition := $dashboardData.condition }}
-{{- if hasKey (index ((($.Values).defaultDashboards).dashboards) $dashboardName) "enabled" }}
-  {{- $dashboardCondition = index $.Values.defaultDashboards.dashboards $dashboardName "enabled" }}
-{{- end }}
+{{- $dashboard := index ((($.Values).defaultDashboards).dashboards | default dict) $dashboardName | default dict }}
+{{- $dashboardCondition := ternary $dashboard.enabled $dashboardData.condition (hasKey $dashboard "enabled") }}
 
 {{- /*
 Delete condition from dashboard

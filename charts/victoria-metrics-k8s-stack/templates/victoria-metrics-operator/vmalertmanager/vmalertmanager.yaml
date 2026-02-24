@@ -25,9 +25,9 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 stringData:
-  alertmanager.yaml: |{{ toYaml .Values.alertmanager.config | nindent 4 }}
-    templates:
-      - "/etc/vm/configs/**/*.tmpl"
+  {{- $config := (.Values.vmalertmanager).config | default dict }}
+  {{- $_ := set $config "templates" (list "/etc/vm/configs/**/*.tmpl") }}
+  alertmanager.yaml: |{{ toYaml $config | nindent 4 }}
   {{- end }}
   {{- end }}
 ---
