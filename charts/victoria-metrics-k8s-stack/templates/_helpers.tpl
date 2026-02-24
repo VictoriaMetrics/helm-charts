@@ -411,7 +411,11 @@
   {{- end -}}
   {{- if ($Values.grafana).enabled -}}
     {{- $grafanaScheme := ternary "https" "http" (gt (len (($Values.grafana).ingress).tls) 0) -}}
-    {{- $grafanaAddr = printf "%s://%s" $grafanaScheme (index (($Values.grafana).ingress).hosts 0) -}}
+    {{- $grafanaHosts := (($Values.grafana).ingress).hosts | default list }}
+    {{- if eq (len $grafanaHosts) 0 }}
+      {{- fail ".Values.grafana.ingress.hosts should not be empty if .Values.grafana.enabled is true" }}
+    {{- end }}
+    {{- $grafanaAddr = printf "%s://%s" $grafanaScheme (index $grafanaHosts 0) -}}
   {{- end -}}
   {{- $grafanaAddr -}}
 {{- end -}}
