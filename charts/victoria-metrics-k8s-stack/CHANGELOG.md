@@ -8,7 +8,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.136.0](https://img.shields.io/badge/v1.136.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11360)
 
-- updates operator to [v0.67.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.67.0) version
+- updates operator to [v0.68.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.0) version
 - bump grafana dependency chart to version 11.1.8
 - removed .Values.defaultDatasources.*.perReplica options
 - fixed potential `templates` section collision in alertmanager config
