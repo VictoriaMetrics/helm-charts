@@ -61,7 +61,7 @@ ct-local:
 		$(CMD)
 
 helm-plugins:
-	CMD="plugin install https://github.com/helm-unittest/helm-unittest.git" $(MAKE) $(HELM)
+	CMD="plugin install https://github.com/helm-unittest/helm-unittest.git --verify=false" $(MAKE) $(HELM)
 
 helm-repo-update:
 	CMD="repo update" $(MAKE) $(HELM)
