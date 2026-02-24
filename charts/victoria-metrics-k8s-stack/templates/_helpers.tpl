@@ -77,6 +77,7 @@
     {{- range until $alertManagerReplicas -}}
       {{- $_ := set $ctx "appIdx" . -}}
       {{- $notifiers = append $notifiers (dict "url" (include "vm.url" $ctx)) -}}
+      {{- $_ := unset $ctx "appIdx" }}
     {{- end }}
     {{- $_ := set $remotes "notifiers" $notifiers -}}
   {{- end -}}
@@ -177,7 +178,7 @@
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
   {{- $_ := set $spec "image" $image -}}
-  {{- tpl (mergeOverwrite (deepCopy $spec) (deepCopy $Values.vmagent.spec) | toYaml) . -}}
+  {{- tpl (mergeOverwrite (deepCopy $Values.vmagent.spec) (deepCopy $spec) | toYaml) . -}}
 {{- end }}
 
 {{- /* VMAuth spec */ -}}
@@ -218,7 +219,7 @@
     {{- end -}}
   {{- end -}}
   {{- $_ := set . "vm" $vm -}}
-  {{- $spec := $Values.vmauth.spec }}
+  {{- $spec := deepCopy $Values.vmauth.spec }}
   {{- if $spec.unauthorizedUserAccessSpec }}
     {{- if $spec.unauthorizedUserAccessSpec.disabled }}
       {{- $_ := unset $spec "unauthorizedUserAccessSpec" }}
@@ -323,7 +324,7 @@
   {{- $grafana := $Values.grafana -}}
   {{- $installed := list }}
   {{- range $plugin := ($grafana.plugins | default list) -}}
-    {{- $plugin = splitList ";" $plugin | reverse | first }}
+    {{- $plugin = splitList "@" $plugin | first }}
     {{- $installed = append $installed $plugin }}
   {{- end -}}
   {{- $ds := .ds -}}
@@ -355,6 +356,7 @@
           {{- $_ := set $ds "isDefault" false -}}
           {{- $datasources = append $datasources $ds -}}
         {{- end -}}
+        {{- $_ := unset $ctx "appIdx" -}}
       {{- end -}}
     {{- end -}}
   {{- end -}}
