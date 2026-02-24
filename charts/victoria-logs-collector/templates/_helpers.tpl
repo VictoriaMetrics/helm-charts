@@ -10,7 +10,7 @@
   {{- with $Values.ignoreFields }}
     {{- $_ := set $headers "VL-Ignore-Fields" . }}
   {{- end }}
-  {{- $output := default dict }}
+  {{- $output := dict }}
   {{- range $hk, $hv := $headers }}
     {{- $vs := "" }}
     {{- if kindIs "slice" $hv }}
@@ -32,7 +32,7 @@
 {{- define "victoria-logs-collector.tls" }}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $rw := .rw }}
-  {{- $config := default dict }}
+  {{- $config := dict }}
   {{- with index $rw "tlsCAFile" }}
     {{- $_ := set $config "tlsCAFile" . }}
   {{- end }}
@@ -58,7 +58,7 @@
     {{- fail "at least one remoteWrite configuration must be provided" }}
   {{- end }}
 
-  {{- $args := default dict }}
+  {{- $args := dict }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) }}
 
   {{- $collector := $Values.collector | default dict }}

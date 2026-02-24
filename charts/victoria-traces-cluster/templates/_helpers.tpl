@@ -1,13 +1,13 @@
 {{- define "vtinsert.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vtinsert -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vtstorage" }}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
-    {{- $storageNodes := default list }}
+    {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vtstorage.extraArgs.httpListenAddr "default" "10491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
@@ -29,7 +29,7 @@
 {{- define "vmauth.args" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.vmauth -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
@@ -38,13 +38,13 @@
 {{- define "vtselect.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vtselect -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vtstorage" }}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
-    {{- $storageNodes := default list }}
+    {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vtstorage.extraArgs.httpListenAddr "default" "10491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
@@ -66,7 +66,7 @@
 {{- define "vtstorage.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vtstorage -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- if and (empty $app.retentionPeriod) (empty $app.retentionDiskSpaceUsage) -}}
     {{- fail "either .Values.server.retentionPeriod or .Values.server.retentionDiskSpaceUsage should be defined" -}}
   {{- end -}}

@@ -14,7 +14,7 @@ stringData:
   {{- if (.Values.alertmanager).enabled }}
     {{- $replicas := ((.Values.alertmanager).spec).replicaCount | int -}}
     {{- if gt $replicas 0 }}
-      {{- $targets := default list -}}
+      {{- $targets := list -}}
       {{- $ctx := dict "helm" . "appKey" "alertmanager" }}
       {{- $_ := set $ctx "appSecure" (not (empty (((.Values.alertmanager).spec).webConfig).tls_server_config)) -}}
       {{- $_ := set $ctx "appKey" (list "alertmanager" "spec") -}}

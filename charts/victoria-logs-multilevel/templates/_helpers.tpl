@@ -1,7 +1,7 @@
 {{- define "vmauth.args" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.vmauth -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
@@ -11,7 +11,7 @@
 {{- define "vlselect.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vlselect -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storageNodes := $args.storageNodes | default list }}

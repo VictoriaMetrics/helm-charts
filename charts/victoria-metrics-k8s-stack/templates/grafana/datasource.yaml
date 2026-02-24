@@ -28,7 +28,7 @@ metadata:
 spec: {{ toYaml $spec | nindent 2 }}
 {{- end }}
 {{- else }}
-  {{- $datasources := default list }}
+  {{- $datasources := list }}
   {{- range $ds := $output.datasources }}
     {{- $_ := set $ctx "ds" $ds }}
     {{- if eq (include "vm.data.source.enabled" $ctx) "true" -}}
@@ -43,7 +43,7 @@ metadata:
   name: {{ $fullname }}-grafana-ds
   namespace: {{ include "vm.namespace" $ }}
   {{- with $.Values.grafana.sidecar.datasources.annotations }}
-  annotations: {{ toYaml $ | nindent 4 }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
   labels:
     {{ $.Values.grafana.sidecar.datasources.label }}: {{ $.Values.grafana.sidecar.datasources.labelValue | quote }}

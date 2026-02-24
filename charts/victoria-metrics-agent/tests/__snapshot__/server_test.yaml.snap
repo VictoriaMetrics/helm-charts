@@ -32,13 +32,6 @@ deployment should match snapshot:
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - replacement: kubernetes.default.svc:443
-            target_label: __address__
-          - regex: (.+)
-            replacement: /api/v1/nodes/$1/proxy/metrics
-            source_labels:
-            - __meta_kubernetes_node_name
-            target_label: __metrics_path__
           scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -48,16 +41,10 @@ deployment should match snapshot:
           job_name: kubernetes-nodes-cadvisor
           kubernetes_sd_configs:
           - role: node
+          metrics_path: /metrics/cadvisor
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - replacement: kubernetes.default.svc:443
-            target_label: __address__
-          - regex: (.+)
-            replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-            source_labels:
-            - __meta_kubernetes_node_name
-            target_label: __metrics_path__
           scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -290,7 +277,7 @@ deployment should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: 4285fd05b44c50eee29ccc4a47f3e28a97f7f65aa4e75241d72b0eee8bc02247
+            checksum/config: a12af7657b10525f4ee5a56c56d444490009e14fd95d9714e7a646917bc663a1
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -384,13 +371,6 @@ deployment with volume should match snapshot:
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - replacement: kubernetes.default.svc:443
-            target_label: __address__
-          - regex: (.+)
-            replacement: /api/v1/nodes/$1/proxy/metrics
-            source_labels:
-            - __meta_kubernetes_node_name
-            target_label: __metrics_path__
           scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -400,16 +380,10 @@ deployment with volume should match snapshot:
           job_name: kubernetes-nodes-cadvisor
           kubernetes_sd_configs:
           - role: node
+          metrics_path: /metrics/cadvisor
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - replacement: kubernetes.default.svc:443
-            target_label: __address__
-          - regex: (.+)
-            replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-            source_labels:
-            - __meta_kubernetes_node_name
-            target_label: __metrics_path__
           scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -642,7 +616,7 @@ deployment with volume should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: 4285fd05b44c50eee29ccc4a47f3e28a97f7f65aa4e75241d72b0eee8bc02247
+            checksum/config: a12af7657b10525f4ee5a56c56d444490009e14fd95d9714e7a646917bc663a1
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -737,13 +711,6 @@ statefulset should match snapshot:
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - replacement: kubernetes.default.svc:443
-            target_label: __address__
-          - regex: (.+)
-            replacement: /api/v1/nodes/$1/proxy/metrics
-            source_labels:
-            - __meta_kubernetes_node_name
-            target_label: __metrics_path__
           scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -753,16 +720,10 @@ statefulset should match snapshot:
           job_name: kubernetes-nodes-cadvisor
           kubernetes_sd_configs:
           - role: node
+          metrics_path: /metrics/cadvisor
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - replacement: kubernetes.default.svc:443
-            target_label: __address__
-          - regex: (.+)
-            replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-            source_labels:
-            - __meta_kubernetes_node_name
-            target_label: __metrics_path__
           scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -995,7 +956,7 @@ statefulset should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: 4285fd05b44c50eee29ccc4a47f3e28a97f7f65aa4e75241d72b0eee8bc02247
+            checksum/config: a12af7657b10525f4ee5a56c56d444490009e14fd95d9714e7a646917bc663a1
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -1090,13 +1051,6 @@ statefulset with volume should match snapshot:
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - replacement: kubernetes.default.svc:443
-            target_label: __address__
-          - regex: (.+)
-            replacement: /api/v1/nodes/$1/proxy/metrics
-            source_labels:
-            - __meta_kubernetes_node_name
-            target_label: __metrics_path__
           scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -1106,16 +1060,10 @@ statefulset with volume should match snapshot:
           job_name: kubernetes-nodes-cadvisor
           kubernetes_sd_configs:
           - role: node
+          metrics_path: /metrics/cadvisor
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - replacement: kubernetes.default.svc:443
-            target_label: __address__
-          - regex: (.+)
-            replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-            source_labels:
-            - __meta_kubernetes_node_name
-            target_label: __metrics_path__
           scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -1348,7 +1296,7 @@ statefulset with volume should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: 4285fd05b44c50eee29ccc4a47f3e28a97f7f65aa4e75241d72b0eee8bc02247
+            checksum/config: a12af7657b10525f4ee5a56c56d444490009e14fd95d9714e7a646917bc663a1
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm

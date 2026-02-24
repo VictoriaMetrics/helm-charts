@@ -1,6 +1,6 @@
 {{- define "vm.read.endpoint" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $endpoint := default dict -}}
+  {{- $endpoint := dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
@@ -20,7 +20,7 @@
 
 {{- define "vm.write.endpoint" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $endpoint := default dict -}}
+  {{- $endpoint := dict -}}
   {{- $_ := set . "style" "managed" -}}
   {{- if $Values.vmsingle.enabled -}}
     {{- $_ := set . "appKey" (list "vmsingle" "spec") -}}
@@ -43,7 +43,7 @@
 {{- define "vm.alert.remotes" -}}
   {{- $ctx := . -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $remotes := default dict -}}
+  {{- $remotes := dict -}}
   {{- $fullname := include "vm.managed.fullname" . -}}
   {{- $_ := set $ctx "style" "managed" -}}
   {{- $remoteWrite := include "vm.write.endpoint" $ctx | fromYaml -}}
@@ -198,7 +198,7 @@
       {{- $_ := set $writeURL "path" (printf "%s/insert" $writeURL.path) -}}
       {{- $_ := set $vm "write" $writeURL }}
     {{- else if $Values.external.vm.write.url -}}
-      {{- $_ := set $vm (urlParse $Values.external.vm.write.url) -}}
+      {{- $_ := set $vm "write" (urlParse $Values.external.vm.write.url) -}}
     {{- end -}}
     {{- if $Values.vmcluster.spec.vmselect.enabled -}}
       {{- $_ := set . "appKey" (list "vmcluster" "spec" "vmselect") -}}
@@ -206,7 +206,7 @@
       {{- $_ := set $readURL "path" (printf "%s/select" $readURL.path) -}}
       {{- $_ := set $vm "read" $readURL }}
     {{- else if $Values.external.vm.read.url -}}
-      {{- $_ := set $vm (urlParse $Values.external.vm.read.url) -}}
+      {{- $_ := set $vm "read" (urlParse $Values.external.vm.read.url) -}}
     {{- end -}}
     {{- $_ := set . "vm" $vm -}}
   {{- else if or $Values.external.vm.read.url $Values.external.vm.write.url -}}

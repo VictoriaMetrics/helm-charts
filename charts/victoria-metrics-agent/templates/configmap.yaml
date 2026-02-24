@@ -20,7 +20,7 @@ metadata:
 data:
   scrape.yml: |{{ $data | nindent 4 }}
 {{- end }}
-{{- $rwcm := default dict }}
+{{- $rwcm := dict }}
 {{- range $i, $rw := .Values.remoteWrite }}
   {{- range $rwKey, $rwValue := $rw }}
     {{- if or (kindIs "slice" $rwValue) (kindIs "map" $rwValue) }}

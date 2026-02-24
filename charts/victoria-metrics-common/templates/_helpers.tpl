@@ -125,8 +125,8 @@ If release name contains chart name it will be used as a full name.
     {{- $ctx := . -}}
     {{- $values := $Values -}}
     {{- range $ak := $appKey }}
-      {{- $values = ternary (default dict) (index $values $ak | default dict) (empty $values) -}}
-      {{- $ctx = ternary (default dict) (index $ctx $ak | default dict) (empty $ctx) -}}
+      {{- $values = ternary (dict) (index $values $ak | default dict) (empty $values) -}}
+      {{- $ctx = ternary (dict) (index $ctx $ak | default dict) (empty $ctx) -}}
       {{- if and (empty $values) (empty $ctx) -}}
         {{- fail (printf "No data for appKey %s" (join "->" $appKey)) -}}
       {{- end -}}

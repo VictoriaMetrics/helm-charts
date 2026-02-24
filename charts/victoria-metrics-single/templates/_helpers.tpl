@@ -13,7 +13,7 @@
 {{- define "vmsingle.args" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.server -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "retentionPeriod" $app.retentionPeriod -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- if $app.scrape.enabled -}}
@@ -31,7 +31,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.server -}}
   {{- $manager := $app.vmbackupmanager -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "disableHourly" $manager.disableHourly -}}
   {{- $_ := set $args "disableDaily" $manager.disableDaily -}}
   {{- $_ := set $args "disableWeekly" $manager.disableWeekly -}}
@@ -53,7 +53,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.server -}}
   {{- $manager := $app.vmbackupmanager -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $manager.extraArgs -}}

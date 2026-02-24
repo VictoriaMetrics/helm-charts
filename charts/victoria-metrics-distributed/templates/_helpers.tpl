@@ -4,11 +4,11 @@ Creates vmcluster spec map, insert zone's nodeselector and topologySpreadConstra
 {{- define "vm.per-zone.cluster.spec" -}}
   {{- $ctx := (.helm) | default . }}
   {{- $Values := $ctx.Values }}
-  {{- $zones := (dict) -}}
-  {{- $components := default dict }}
-  {{- $_ := set $components "vmstorage" (default list) }}
-  {{- $_ := set $components "vmselect" (default list) }}
-  {{- $_ := set $components "vminsert" (default list) }}
+  {{- $zones := dict -}}
+  {{- $components := dict }}
+  {{- $_ := set $components "vmstorage" list }}
+  {{- $_ := set $components "vmselect" list }}
+  {{- $_ := set $components "vminsert" list }}
   {{- $_ := set $components "requestsLoadBalancer" (list "spec") }}
   {{- $commonClusterSpec := ((($Values.common).vmcluster).spec) | default dict -}}
   {{- range $idx, $z := $Values.availabilityZones -}}

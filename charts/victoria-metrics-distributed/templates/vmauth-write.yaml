@@ -20,7 +20,7 @@ metadata:
   {{- end  }}
 
   {{- $_ := set $urlCtx "style" "managed" }}
-  {{- $urls := default list }}
+  {{- $urls := list }}
   {{- $commonAgentSpec := (((.Values).common).vmagent).spec | default dict }}
   {{- range $i, $z := $.Values.availabilityZones }}
     {{- $zone := mergeOverwrite (deepCopy $.Values.zoneTpl) $z }}
@@ -40,7 +40,7 @@ metadata:
   {{- $defaultUrlMapItem := dict "src_paths" $defaultPaths "url_prefix" $urls }}
   {{- $spec := deepCopy $auth.spec | default dict -}}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
-  {{- $urlMap := $accessSpec.url_map | default (list (default dict))  }}
+  {{- $urlMap := $accessSpec.url_map | default (list (dict))  }}
   {{- $firstUrlMapItem := mergeOverwrite $defaultUrlMapItem (deepCopy (index $urlMap 0)) }}
   {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}

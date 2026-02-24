@@ -2,7 +2,7 @@
 Create base alertmanager url for notifers
 */}}
 {{- define "vmalert.alertmanager.urls" -}}
-  {{- $urls := default list }}
+  {{- $urls := list }}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.alertmanager }}
   {{- if $app.enabled -}}
@@ -121,7 +121,7 @@ Create base alertmanager url for notifers
 {{- define "alertmanager.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.alertmanager -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "config.file" "/config/alertmanager.yaml" -}}
   {{- $_ := set $args "storage.path" (ternary $app.persistentVolume.mountPath "/data" $app.persistentVolume.enabled) -}}
   {{- $_ := set $args "data.retention" $app.retention -}}
@@ -162,7 +162,7 @@ Create base alertmanager url for notifers
     {{- $_ := set $ctx "headless" (dict "alertmanager" $alertmanager) }}
     {{- $_ := set $ctx "appKey" (list "headless" "alertmanager") }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") -}}
-    {{- $peers := default list }}
+    {{- $peers := list }}
     {{- range $idx := (until (int $replicaCount)) }}
       {{- $_ := set $ctx "appIdx" $idx }}
       {{- $peers = append $peers (printf "%s:%s" (include "vm.fqdn" $ctx) $port) -}}
@@ -177,7 +177,7 @@ Create base alertmanager url for notifers
 {{- define "vmalert.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.server -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "datasource.url" $app.datasource.url -}}
   {{- if or $app.datasource.basicAuth.password $app.datasource.basicAuth.username -}}
     {{- $_ := set $args "datasource.basicAuth.password" $app.datasource.basicAuth.password -}}

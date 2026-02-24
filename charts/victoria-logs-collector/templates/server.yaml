@@ -57,7 +57,7 @@ spec:
           {{- $args := (include "victoria-logs-collector.args" . | fromYaml) }}
           {{- include "vm.args" $args | nindent 10 }}
           {{- with .Values.env }}
-          env: {{ tpl (toYaml .) $ | nindent 12 }}
+          env: {{ tpl (toYaml .) $ctx | nindent 12 }}
           {{- end }}
           volumeMounts:
             {{- with .Values.extraVolumeMounts }}
@@ -78,7 +78,7 @@ spec:
         {{- end }}
         - name: vl-collector-data
           {{- if .Values.persistence.volume }}
-          {{- tpl (toYaml .Values.persistence.volume | nindent 10) . }}
+          {{- tpl (toYaml .Values.persistence.volume | nindent 10) $ctx }}
           {{- else }}
           hostPath:
             path: {{ .Values.extraArgs.tmpDataPath }}

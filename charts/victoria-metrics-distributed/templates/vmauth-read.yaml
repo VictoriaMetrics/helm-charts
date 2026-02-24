@@ -22,7 +22,7 @@ metadata:
   {{- end  }}
 
   {{- $_ := set $urlCtx "style" "managed" }}
-  {{- $urls := dict "cluster" (default list) "single" (default list) }}
+  {{- $urls := dict "cluster" (list) "single" (list) }}
   {{- range $i, $z := .Values.availabilityZones }}
     {{- $zone := mergeOverwrite (deepCopy $zoneTpl) $z }}
     {{- if $zone.read.vmauth.enabled -}}
@@ -53,7 +53,7 @@ metadata:
   {{- $dropPrefixParts := dict "cluster" 0 "single" 2 }}
   {{- $spec := deepCopy $auth.spec | default dict -}}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
-  {{- $urlMap := $accessSpec.url_map | default (list (default dict)) }}
+  {{- $urlMap := $accessSpec.url_map | default (list (dict)) }}
   {{- $firstItem := index $urlMap 0 }}
   {{- $urlMap = slice $urlMap 1 }}
   {{- range $kind, $backends := $urls }}

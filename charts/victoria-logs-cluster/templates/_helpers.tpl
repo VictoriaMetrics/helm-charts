@@ -8,7 +8,7 @@
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
-    {{- $storageNodes := default list }}
+    {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vlstorage.extraArgs.httpListenAddr "default" "9491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
@@ -30,7 +30,7 @@
 {{- define "vmauth.args" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.vmauth -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
@@ -47,7 +47,7 @@
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
-    {{- $storageNodes := default list }}
+    {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vlstorage.extraArgs.httpListenAddr "default" "9491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
@@ -69,7 +69,7 @@
 {{- define "vlstorage.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vlstorage -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- if and (empty $app.retentionPeriod) (empty $app.retentionDiskSpaceUsage) (empty $app.retentionMaxDiskUsagePercent) -}}
     {{- fail "either .Values.server.retentionPeriod, .Values.server.retentionDiskSpaceUsage or .Values.server.retentionMaxDiskUsagePercent should be defined" -}}
   {{- end -}}

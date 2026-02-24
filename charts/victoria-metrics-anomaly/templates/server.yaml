@@ -71,7 +71,7 @@ spec:
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- $env := default list }}
+          {{- $env := list }}
           {{- if and $pvc.enabled $pvc.dumpModels }}
           {{- $env = append $env (dict "name" "VMANOMALY_MODEL_DUMPS_DIR" "value" (printf "%s/models" $pvc.mountPath)) }}
           {{- end }}

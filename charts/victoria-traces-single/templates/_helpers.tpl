@@ -1,7 +1,7 @@
 {{- define "vtraces.args" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.server -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- if and (empty $app.retentionPeriod) (empty $app.retentionDiskSpaceUsage) -}}
     {{- fail "either .Values.server.retentionPeriod or .Values.server.retentionDiskSpaceUsage should be defined" -}}
   {{- end -}}

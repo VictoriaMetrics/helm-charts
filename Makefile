@@ -1,6 +1,6 @@
-HELM_IMAGE = alpine/helm:3.16.2
+HELM_IMAGE = alpine/helm:4.1.1
 HELM_DOCS_IMAGE = local/helm-docs:v1.14.2
-CT_IMAGE = quay.io/helmpack/chart-testing:v3.11.0
+CT_IMAGE = quay.io/helmpack/chart-testing:v3.14.0
 HELM?=helm-docker
 CT?=ct-docker
 CONTAINER_TOOL ?= docker

@@ -8,14 +8,14 @@
 {{- define "vminsert.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vminsert -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vmstorage" }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vmstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
-    {{- $storageNodes := default list }}
+    {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- if $Values.autoDiscovery }}
       {{- if eq (include "vm.enterprise.disabled" . ) "true" }}
@@ -48,7 +48,7 @@
 {{- define "vmauth.args" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.vmauth -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
@@ -58,7 +58,7 @@
 {{- define "vmselect.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vmselect -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set . "style" "plain" }}
   {{- $_ := set . "appKey" "vmstorage" }}
   {{- $_ := set $args "cacheDataPath" $app.cacheMountPath -}}
@@ -66,7 +66,7 @@
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vmstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
-    {{- $storageNodes := default list }}
+    {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- if $Values.autoDiscovery }}
       {{- if eq (include "vm.enterprise.disabled" . ) "true" }}
@@ -87,7 +87,7 @@
   {{- end }}
   {{- $mode := $app.mode }}
   {{- if and $mode (eq $mode "statefulSet") $app.enabled $app.replicaCount }}
-    {{- $selectNodes := default list }}
+    {{- $selectNodes := list }}
     {{- $_ := set . "appKey" "vmselect" }}
     {{- $fqdn := include "vm.fqdn" . }}
     {{- $port := "8481" }}
@@ -113,7 +113,7 @@
 {{- define "vmstorage.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vmstorage -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "retentionPeriod" (toString $app.retentionPeriod) -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
@@ -125,7 +125,7 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vmstorage -}}
   {{- $manager := $app.vmbackupmanager -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "disableHourly" $manager.disableHourly -}}
   {{- $_ := set $args "disableDaily" $manager.disableDaily -}}
   {{- $_ := set $args "disableWeekly" $manager.disableWeekly -}}
@@ -147,7 +147,7 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vmstorage -}}
   {{- $manager := $app.vmbackupmanager -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $manager.extraArgs -}}

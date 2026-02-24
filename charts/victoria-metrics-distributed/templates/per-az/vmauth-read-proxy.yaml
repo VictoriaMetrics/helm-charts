@@ -27,7 +27,7 @@ metadata:
 
   {{- $spec := mergeOverwrite (deepCopy $.Values.common.vmauth.spec) (deepCopy (($zone.common).spec)) (deepCopy ((($zone.read).vmauth).spec)) }}
   {{- $_ := set $urlCtx "style" "managed" }}
-  {{- $urls := dict "cluster" (default list) "single" (default list) }}
+  {{- $urls := dict "cluster" (list) "single" (list) }}
   {{- if $zone.read.allow }}
     {{- if ($zone.vmcluster).enabled }}
       {{- $_ := set $urlCtx "appKey" (list "zone" "vmcluster" "spec" "vmselect") }}
@@ -61,7 +61,7 @@ metadata:
   {{- $paths := dict "cluster" (list "/select/.+" "/admin/tenants") "single" (list "/select/.+") }}
   {{- $dropPrefixParts := dict "cluster" 0 "single" 2 }}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
-  {{- $urlMap := $accessSpec.url_map | default (list (default dict)) }}
+  {{- $urlMap := $accessSpec.url_map | default (list (dict)) }}
   {{- $firstItem := index $urlMap 0 }}
   {{- $urlMap = slice $urlMap 1 }}
   {{- range $kind, $backends := $urls }}

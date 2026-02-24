@@ -23,7 +23,7 @@ metadata:
   {{- end  }}
   name: {{ include "vm.cr.fullname" $ctx }}
   namespace: {{ include "vm.namespace" $ }}
-{{- $remoteWrites := default list }}
+{{- $remoteWrites := list }}
 {{- range $rwz := $.Values.availabilityZones }}
   {{- $rwZone := mergeOverwrite (deepCopy $.Values.zoneTpl) $rwz }}
   {{- if $rwZone.write.allow }}

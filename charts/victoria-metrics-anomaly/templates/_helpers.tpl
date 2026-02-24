@@ -1,6 +1,6 @@
 {{- define "vmanomaly.args" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set . "flagStyle" "kebab" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $Values.extraArgs -}}

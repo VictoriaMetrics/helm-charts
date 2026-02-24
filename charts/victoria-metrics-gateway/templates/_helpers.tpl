@@ -1,6 +1,6 @@
 {{- define "vmgateway.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $_ := set $args "clusterMode" $Values.clusterMode -}}
   {{- if hasKey $Values.rateLimiter "enable" }}
     {{- fail "`rateLimiter.enable` is deprecated. Use `rateLimiter.enabled` instead" }}

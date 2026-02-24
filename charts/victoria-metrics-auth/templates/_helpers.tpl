@@ -1,5 +1,5 @@
 {{- define "vmauth.args" -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}

@@ -1,5 +1,5 @@
 {{- define "vmagent.args" -}}
-  {{- $args := default dict -}}
+  {{- $args := dict -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- if empty $Values.remoteWrite -}}
     {{- fail "Please define at least one remoteWrite" -}}
@@ -36,7 +36,7 @@
 
 {{- define "vmagent.rw.config" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $rwcm := default dict }}
+  {{- $rwcm := dict }}
   {{- range $i, $rw := $Values.remoteWrite }}
     {{- range $rwKey, $rwValue := $rw }}
       {{- if or (kindIs "slice" $rwValue) (kindIs "map" $rwValue) }}
