@@ -1,6 +1,10 @@
 ## Next release
 
-- TODO
+- updates operator to [v0.67.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.67.0) version
+- bump grafana dependency chart to version 11.1.8
+- removed .Values.defaultDatasources.*.perReplica options
+- fixed potential `templates` section collision in alertmanager config
+- updated dashboards and rules
 
 ## 0.71.1
 
