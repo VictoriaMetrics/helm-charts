@@ -1,6 +1,7 @@
 ## Next release
 
 - added .Values.shareProcessNamespace
+- updates operator to [v0.68.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.0) version
 
 ## 0.58.1
 
