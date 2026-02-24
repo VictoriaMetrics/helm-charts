@@ -345,20 +345,6 @@
       {{- $defaultDatasources = append $defaultDatasources $ds -}}
     {{- end }}
     {{- $datasources = concat $datasources $defaultDatasources -}}
-    {{- if and $Values.defaultDatasources.victoriametrics.perReplica $defaultDatasources -}}
-      {{- range $id := until (int $Values.vmsingle.spec.replicaCount) -}}
-        {{- $_ := set $ctx "appIdx" $id -}}
-        {{- $readEndpoint := include "vm.read.endpoint" $ctx | fromYaml -}}
-        {{- range $ds := $defaultDatasources -}}
-          {{- $ds = deepCopy $ds -}}
-          {{- $_ := set $ds "url" $readEndpoint.url -}}
-          {{- $_ := set $ds "name" (printf "%s-%d" $ds.name $id) -}}
-          {{- $_ := set $ds "isDefault" false -}}
-          {{- $datasources = append $datasources $ds -}}
-        {{- end -}}
-        {{- $_ := unset $ctx "appIdx" -}}
-      {{- end -}}
-    {{- end -}}
   {{- end -}}
   {{- if $Values.alertmanager.enabled -}}
     {{- range $ds := $Values.defaultDatasources.alertmanager.datasources }}
