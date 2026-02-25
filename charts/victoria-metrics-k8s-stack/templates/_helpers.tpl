@@ -160,11 +160,15 @@
 {{- define "vm.agent.remote.write" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list }}
+  {{- $rws := $Values.vmagent.spec.remoteWrite | default (list (dict)) }}
   {{- with include "vm.write.endpoint" . -}}
-    {{- $rws := $Values.vmagent.spec.remoteWrite | default (list (dict)) }}
-    {{- $rw := fromYaml . }}
-    {{- $remoteWrites = append $remoteWrites (mergeOverwrite $rw (deepCopy (first $rws))) }}
+    {{- $rws = prepend (slice $rws 1) (mergeOverwrite (deepCopy (first $rws)) (fromYaml .)) }}
   {{- end -}}
+  {{- range $rw := $rws }}
+    {{- if $rw.url }}
+      {{- $remoteWrites = append $remoteWrites $rw }}
+    {{- end }}
+  {{- end }}
   {{- toYaml (dict "remoteWrite" $remoteWrites) -}}
 {{- end -}}
 
@@ -173,12 +177,12 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
   {{- $image := dict "tag" (include "vm.image.tag" .) }}
-  {{- $spec := include "vm.agent.remote.write" . | fromYaml -}}
+  {{- $spec := mergeOverwrite (deepCopy $Values.vmagent.spec) (include "vm.agent.remote.write" . | fromYaml) }}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
   {{- $_ := set $spec "image" $image -}}
-  {{- tpl (mergeOverwrite (deepCopy $Values.vmagent.spec) (deepCopy $spec) | toYaml) . -}}
+  {{- tpl (toYaml $spec) . -}}
 {{- end }}
 
 {{- /* VMAuth spec */ -}}

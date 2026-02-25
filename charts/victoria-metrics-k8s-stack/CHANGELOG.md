@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed template for vmagent remoteWrite configuration
 
 ## 0.72.1
 
