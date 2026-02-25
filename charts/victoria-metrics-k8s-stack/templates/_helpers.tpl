@@ -177,12 +177,12 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $Chart := (.helm).Chart | default .Chart }}
   {{- $image := dict "tag" (include "vm.image.tag" .) }}
-  {{- $spec := mergeOverwrite (deepCopy $Values.vmagent.spec) (include "vm.agent.remote.write" . | fromYaml) }}
+  {{- $spec := include "vm.agent.remote.write" . | fromYaml -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
   {{- $_ := set $spec "image" $image -}}
-  {{- tpl (toYaml $spec) . -}}
+  {{- tpl (mergeOverwrite (deepCopy $Values.vmagent.spec) (deepCopy $spec) | toYaml) . -}}
 {{- end }}
 
 {{- /* VMAuth spec */ -}}
