@@ -160,15 +160,15 @@
 {{- define "vm.agent.remote.write" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $remoteWrites := $Values.vmagent.additionalRemoteWrites | default list }}
-  {{- $rws := $Values.vmagent.spec.remoteWrite | default (list (dict)) }}
+  {{- $rws := $Values.vmagent.spec.remoteWrite | default list }}
   {{- with include "vm.write.endpoint" . -}}
-    {{- $rws = prepend (slice $rws 1) (mergeOverwrite (deepCopy (first $rws)) (fromYaml .)) }}
+    {{- if $rws -}}
+      {{- $rws = prepend (slice $rws 1) (mergeOverwrite (deepCopy (first $rws)) (fromYaml .)) -}}
+    {{- else -}}
+      {{- $rws = append $rws (fromYaml .) -}}
+    {{- end -}}
   {{- end -}}
-  {{- range $rw := $rws }}
-    {{- if $rw.url }}
-      {{- $remoteWrites = append $remoteWrites $rw }}
-    {{- end }}
-  {{- end }}
+  {{- $remoteWrites = concat $remoteWrites $rws }}
   {{- toYaml (dict "remoteWrite" $remoteWrites) -}}
 {{- end -}}
 
