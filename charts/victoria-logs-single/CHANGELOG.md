@@ -1,5 +1,6 @@
 ## Next release
 
+- bump VictoriaLogs version to [v1.47.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.47.0).
 - feature: support `tpl` in `basicAuth` on `VMServiceScrape` and `ServiceMonitor`
 
 ## 0.11.27

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump vlagent version to [v1.47.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.47.0).
 
 ## 0.0.11
 
