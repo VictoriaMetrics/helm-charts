@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.137.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.137.0)
 - support vertical pod autoscaler
 
 ## 0.35.0
