@@ -163,7 +163,7 @@
   {{- $rws := $Values.vmagent.spec.remoteWrite | default list }}
   {{- with include "vm.write.endpoint" . -}}
     {{- if $rws -}}
-      {{- $rws = prepend (slice $rws 1) (mergeOverwrite (deepCopy (first $rws)) (fromYaml .)) -}}
+      {{- $rws = prepend (slice $rws 1) (mergeOverwrite (fromYaml .) (deepCopy (first $rws))) -}}
     {{- else -}}
       {{- $rws = append $rws (fromYaml .) -}}
     {{- end -}}

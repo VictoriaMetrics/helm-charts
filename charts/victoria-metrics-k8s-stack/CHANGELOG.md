@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VM components to [v1.137.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.137.0)
+- allow overwrite default VMAgent's `spec.remoteWrite.url`. See [#2733](https://github.com/VictoriaMetrics/helm-charts/issues/2723).
 
 ## 0.72.2
 
