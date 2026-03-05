@@ -1,0 +1,94 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "commitMessagePrefix": "charts: ",
+  "enabledManagers": [
+    "helmv3",
+    "helm-values",
+    "github-actions",
+    "custom.regex"
+  ],
+  "helmv3": {
+    "fileMatch": ["charts/[^/]+/Chart\\.yaml$"]
+  },
+  "helm-values": {
+    "fileMatch": ["charts/[^/]+/values\\.yaml$"]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["charts/[^/]+/Chart\\.yaml$"],
+      "matchStrings": [
+        "# renovate: image=(?<depName>[^\\s]+)\\nappVersion: (?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["\\.github/workflows/run-testing\\.yaml$"],
+      "matchStrings": [
+        "# renovate: image=(?<depName>[^\\s]+)\\n\\s+- \"(?<currentValue>v[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Disable updates for internal VictoriaMetrics Helm chart",
+      "matchManagers": ["helmv3"],
+      "matchPackageNames": [
+        "victoria-metrics-common"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Disable updates for victoriametrics images tracked via appVersion",
+      "matchManagers": ["helm-values"],
+      "matchPackagePatterns": ["^victoriametrics/"],
+      "enabled": false
+    },
+    {
+      "description": "Only track plain vX.Y.Z releases, exclude enterprise/scratch variants",
+      "matchManagers": ["custom.regex"],
+      "allowedVersions": "/^v[0-9]+\\.[0-9]+\\.[0-9]+$/"
+    },
+    {
+      "description": "Bump minor Kubernetes versions",
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["kindest/node"],
+      "matchUpdateTypes": ["minor"]
+    },
+    {
+      "description": "Group VictoriaMetrics appVersion updates",
+      "matchManagers": ["custom.regex"],
+      "matchPackagePatterns": ["^victoriametrics/(vmagent|vmalert|vmauth|vmselect|victoria-metrics|vmgateway)$"],
+      "groupName": "VictoriaMetrics"
+    },
+    {
+      "description": "Group VictoriaLogs appVersion updates",
+      "matchManagers": ["custom.regex"],
+      "matchPackagePatterns": ["^victoriametrics/(victoria-logs|vlagent)$"],
+      "groupName": "VictoriaLogs"
+    },
+    {
+      "description": "Group VictoriaTraces appVersion updates",
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["victoriametrics/victoria-traces"],
+      "groupName": "VictoriaTraces"
+    },
+    {
+      "description": "Group VictoriaMetrics operator appVersion updates",
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["victoriametrics/operator"],
+      "groupName": "VictoriaMetrics Operator"
+    },
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "automerge": false
+    }
+  ]
+}
