@@ -10,6 +10,11 @@
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
     {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
+  {{- else if $Values.vmdistributed.enabled }}
+    {{- $_ := set . "appKey" (list "vmdistributed" "spec" "vmauth" "spec") -}}
+    {{- $baseURL := include "vm.url" . -}}
+    {{- $tenant := $Values.tenant | default 0 -}}
+    {{- $_ := set $endpoint "url" (printf "%s/select/%d/prometheus" $baseURL (int $tenant)) -}}
   {{- else if $Values.external.vm.read.url -}}
     {{- $endpoint = $Values.external.vm.read -}}
   {{- end -}}
@@ -28,6 +33,11 @@
     {{- $_ := set $endpoint "url" (printf "%s/api/v1/write" $baseURL) -}}
   {{- else if and $Values.vmcluster.enabled $Values.vmcluster.spec.vminsert.enabled -}}
     {{- $_ := set . "appKey" (list "vmcluster" "spec" "vminsert") -}}
+    {{- $baseURL := include "vm.url" . -}}
+    {{- $tenant := $Values.tenant | default 0 -}}
+    {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
+  {{- else if $Values.vmdistributed.enabled }}
+    {{- $_ := set . "appKey" (list "vmdistributed" "spec" "vmauth" "spec") -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $tenant := $Values.tenant | default 0 -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/%d/prometheus/api/v1/write" $baseURL (int $tenant)) -}}
@@ -321,6 +331,31 @@
     {{- $_ := unset $clusterSpec.vminsert "enabled" -}}
   {{- end -}}
   {{- tpl (toYaml $clusterSpec) . -}}
+{{- end -}}
+
+{{- define "vm.distributed.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $Chart := (.helm).Chart | default .Chart }}
+  {{- $selectSpec := include "vm.select.spec" . | fromYaml -}}
+  {{- $distributedSpec := deepCopy (($Values.vmdistributed).spec | default dict) -}}
+  {{- $clusterSpec := deepCopy ((($distributedSpec.zoneCommon).vmcluster).spec | default dict) -}}
+  {{- $clusterSpec = mergeOverwrite (dict "clusterVersion" (printf "%s-cluster" (include "vm.image.tag" .))) $clusterSpec -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $distributedSpec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- if ($clusterSpec.requestsLoadBalancer).enabled }}
+    {{- $balancerSpec := $clusterSpec.requestsLoadBalancer.spec | default dict }}
+    {{- $authImage := dict "image" (dict "tag" (include "vm.image.tag" .)) }}
+    {{- $_ := set $clusterSpec.requestsLoadBalancer "spec" (mergeOverwrite $authImage $balancerSpec) }}
+  {{- end }}
+  {{- $clusterSpec = mergeOverwrite (dict "vmselect" $selectSpec) $clusterSpec }}
+  {{- $distributedSpec = mergeOverwrite (dict "zoneCommon" (dict "vmcluster" (dict "spec" $clusterSpec))) $distributedSpec }}
+
+  {{- $agentSpec := deepCopy ((($distributedSpec.zoneCommon).vmagent).spec | default dict) }}
+  {{- $image := dict "tag" (include "vm.image.tag" .) }}
+  {{- $_ := set $agentSpec "image" $image -}}
+  {{- $distributedSpec = mergeOverwrite (dict "zoneCommon" (dict "vmagent" (dict "spec" $agentSpec))) $distributedSpec }}
+  {{- tpl (toYaml $distributedSpec) . -}}
 {{- end -}}
 
 {{- define "vm.data.source.enabled" -}}

@@ -366,6 +366,45 @@ vmsingle:
       - path:
           type: PathPrefix
           value: '{{ dig "spec" "extraArgs" "http.pathPrefix" "/" .Values.vmsingle }}'
+
+vmdistributed:
+  # -- Create VMDistributed CR
+  enabled: false
+  # -- VMDistributed labels
+  labels: {}
+  # -- VMDistributed annotations
+  annotations: {}
+  # -- Full spec for VMDistributed CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vmdistributedspec)
+  spec:
+    vmauth:
+      spec:
+        port: 8427
+    zoneCommon:
+      vmcluster:
+        spec:
+          vmstorage:
+            replicaCount: 2
+            storageDataPath: /vm-data
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 10Gi
+          vmselect:
+            replicaCount: 2
+            cacheMountPath: /select-cache
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 2Gi
+          vminsert:
+            replicaCount: 2
+    zones:
+      - name: us-east-1
+
 vmcluster:
   # -- Create VMCluster CR
   enabled: false
