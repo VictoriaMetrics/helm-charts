@@ -1,7 +1,7 @@
 {{- $app := .Values.vmcluster }}
 {{- if $app.enabled }}
-{{- if .Values.vmsingle.enabled }}
-  {{- fail "Only one of .vmsingle.enabled and .vmcluster.enabled can be true"}}
+{{- if or .Values.vmsingle.enabled .Values.vmdistributed.enabled }}
+  {{- fail "Only one of .Values.vmsingle.enabled, .Values.vmdistributed.enabled and .Values.vmcluster.enabled can be true" }}
 {{- end }}
 {{- $ctx := dict "helm" . "appKey" (list "vmcluster" "spec") }}
 {{- $fullname := include "vm.cr.fullname" $ctx }}
