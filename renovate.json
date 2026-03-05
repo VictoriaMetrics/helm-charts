@@ -24,6 +24,14 @@
         "# renovate: image=(?<depName>[^\\s]+)\\nappVersion: (?<currentValue>\\S+)"
       ],
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["\\.github/workflows/run-testing\\.yaml$"],
+      "matchStrings": [
+        "# renovate: image=(?<depName>[^\\s]+)\\n\\s+- \"(?<currentValue>v[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
@@ -45,6 +53,12 @@
       "description": "Only track plain vX.Y.Z releases, exclude enterprise/scratch variants",
       "matchManagers": ["custom.regex"],
       "allowedVersions": "/^v[0-9]+\\.[0-9]+\\.[0-9]+$/"
+    },
+    {
+      "description": "Bump minor Kubernetes versions",
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["kindest/node"],
+      "matchUpdateTypes": ["minor"]
     },
     {
       "description": "Group VictoriaMetrics appVersion updates",
