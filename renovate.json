@@ -36,9 +36,10 @@
   ],
   "postUpgradeTasks": {
     "commands": [
-      "python3 hack/scripts/bump-chart-version.py {{{packageFileDir}}}/Chart.yaml"
+      "python3 hack/scripts/bump-chart-version.py {{{packageFileDir}}}/Chart.yaml",
+      "python3 hack/scripts/update-changelog.py {{{packageFileDir}}}/CHANGELOG.md {{{depName}}} {{{currentVersion}}} {{{newVersion}}}"
     ],
-    "fileFilters": ["charts/*/Chart.yaml"],
+    "fileFilters": ["charts/*/Chart.yaml", "charts/*/CHANGELOG.md"],
     "executionMode": "update"
   },
   "packageRules": [
