@@ -31,7 +31,8 @@
       "matchStrings": [
         "# renovate: image=(?<depName>[^\\s]+)\\n\\s+- \"(?<currentValue>v[^\"]+)\""
       ],
-      "datasourceTemplate": "docker"
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "semver"
     }
   ],
   "postUpgradeTasks": {
@@ -63,10 +64,10 @@
       "allowedVersions": "/^v[0-9]+\\.[0-9]+\\.[0-9]+$/"
     },
     {
-      "description": "Bump minor Kubernetes versions",
+      "description": "Bump patch Kubernetes versions, keeping each minor pinned",
       "matchManagers": ["custom.regex"],
       "matchPackageNames": ["kindest/node"],
-      "matchUpdateTypes": ["minor"]
+      "matchUpdateTypes": ["patch"]
     },
     {
       "description": "Group VictoriaMetrics appVersion updates",
