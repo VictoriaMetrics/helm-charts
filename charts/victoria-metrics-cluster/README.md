@@ -1,3 +1,4 @@
 # VictoriaMetrics Cluster Helm chart
 
-Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-cluster/)
+Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-cluster/).
+Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-cluster/changelog/).
