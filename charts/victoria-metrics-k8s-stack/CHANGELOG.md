@@ -2,6 +2,7 @@
 
 - bump node-exporter dependency chart to version 4.52.0
 - bump kube-state-metrics dependency chart to version 7.2.0
+- added vmdistributed support as alternative to vmsingle and vmcluster
 
 ## 0.72.4
 
