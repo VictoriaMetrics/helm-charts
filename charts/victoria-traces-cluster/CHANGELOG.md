@@ -1,6 +1,7 @@
 ## Next release
 
 - support vertical pod autoscaler
+- bump version of VictoriaTraces components to [v0.8.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.8.0)
 
 ## 0.0.6
 
