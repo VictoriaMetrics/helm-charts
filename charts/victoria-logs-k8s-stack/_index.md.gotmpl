@@ -1,0 +1,307 @@
+---
+weight: 20
+title: VictoriaLogs K8s Stack
+menu:
+  docs:
+    parent: helm
+    weight: 20
+    identifier: helm-victoria-logs-k8s-stack
+url: /helm/victoria-logs-k8s-stack/
+aliases:
+  - /helm/victorialogs-k8s-stack/
+tags:
+  - logs
+  - kubernetes
+---
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+* [Overview](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#overview)
+* [Configuration](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#configuration)
+* [Prerequisites](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#prerequisites)
+* [Dependencies](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#dependencies)
+* [Quick Start](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#how-to-install)
+* [Uninstall](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#how-to-uninstall)
+* [Version Upgrade](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#upgrade-guide)
+* [Troubleshooting](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#troubleshooting)
+* [Values](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#parameters)
+
+## Overview
+
+This chart is an All-in-one solution to start collecting logs from kubernetes cluster.
+It installs [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator) dependency charts.
+Also it installs Custom Resources like [VLSingle](https://docs.victoriametrics.com/operator/resources/vlsingle/), [VLCluster](https://docs.victoriametrics.com/operator/resources/vlcluster/), [VLAgent](https://docs.victoriametrics.com/operator/resources/vlagent/), [VMAlert](https://docs.victoriametrics.com/operator/resources/vmalert/).
+
+![Overview](img/k8s-stack-overview.webp)
+
+## Configuration
+
+Configuration of this chart is done through helm values.
+
+### Dependencies
+
+Dependencies can be enabled or disabled by setting `enabled` to `true` or `false` in `values.yaml` file.
+
+**!Important:** for dependency charts anything that you can find in values.yaml of dependency chart can be configured in this chart under key for that dependency. For example if you want to configure `grafana` you can find all possible configuration options in [values.yaml](https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml) and you should set them in values for this chart under grafana: key. For example if you want to configure `grafana.persistence.enabled` you should set it in values.yaml like this:
+```yaml
+#################################################
+###              dependencies               #####
+#################################################
+# Grafana dependency chart configuration. For possible values refer to https://github.com/grafana/helm-charts/tree/main/charts/grafana#configuration
+grafana:
+  enabled: true
+  persistence:
+    type: pvc
+    enabled: false
+```
+
+### VictoriaLogs components
+
+This chart installs multiple VictoriaLogs components using Custom Resources that are managed by [victoria-metrics-operator](https://docs.victoriametrics.com/operator/resources/)
+Each resource can be configured using `spec` of that resource from API docs of [victoria-metrics-operator](https://docs.victoriametrics.com/operator/api/). For example if you want to configure `VLAgent` you can find all possible configuration options in [API docs](https://docs.victoriametrics.com/operator/api/#vlagent) and you should set them in values for this chart under `vlagent.spec` key. For example if you want to configure `remoteWrite.url` you should set it in values.yaml like this:
+```yaml
+vlagent:
+  spec:
+    remoteWrite:
+      - url: https://insert.vlcluster.domain.com/insert/native
+```
+
+### ArgoCD issues
+
+#### Operator self signed certificates
+When deploying K8s stack using ArgoCD without Cert Manager (`.Values.victoria-metrics-operator.admissionWebhooks.certManager.enabled: false`)
+it will rerender operator's webhook certificates on each sync since Helm `lookup` function is not respected by ArgoCD.
+To prevent this please update you K8s stack Application `spec.syncPolicy` and `spec.ignoreDifferences` with a following:
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+...
+spec:
+  ...
+  destination:
+    ...
+    namespace: <k8s-stack-namespace>
+  ...
+  syncPolicy:
+    syncOptions:
+    # https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/#respect-ignore-difference-configs
+    # argocd must also ignore difference during apply stage
+    # otherwise it ll silently override changes and cause a problem
+    - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: <fullname>-validation
+      namespace: <k8s-stack-namespace>
+      jsonPointers:
+        - /data
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      name: <fullname>-admission
+      jqPathExpressions:
+      - '.webhooks[]?.clientConfig.caBundle'
+```
+where `<fullname>` is output of `{{"{{"}} include "vm-operator.fullname" {{"}}"}}` for your setup
+
+#### `metadata.annotations: Too long: must have at most 262144 bytes` on dashboards
+
+If one of dashboards ConfigMap is failing with error `Too long: must have at most 262144 bytes`, please make sure you've added `argocd.argoproj.io/sync-options: ServerSideApply=true` annotation to your dashboards:
+
+```yaml
+defaultDashboards:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+```
+
+#### Resources are not completely removed after chart uninstallation
+
+This chart uses `pre-delete` Helm hook to cleanup resources managed by operator, but it's not supported in ArgoCD and this hook is ignored.
+To have a control over resources removal please consider using either [ArgoCD sync phases and waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/) or [installing operator chart separately](https://docs.victoriametrics.com/helm/victoria-logs-k8s-stack/#install-operator-separately)
+
+
+### Rules and dashboards
+
+This chart by default install multiple dashboards and recording rules from [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
+you can disable dashboards with `defaultDashboards.enabled: false` and `experimentalDashboardsEnabled: false`
+and rules can be configured under `defaultRules`
+
+### Adding external dashboards
+
+By default, this chart uses sidecar in order to provision default dashboards. If you want to add you own dashboards there are two ways to do it:
+
+- Add dashboards by creating a ConfigMap. An example ConfigMap:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    grafana_dashboard: "1"
+  name: grafana-dashboard
+data:
+  dashboard.json: |-
+      {...}
+```
+
+- Use init container provisioning. Note that this option requires disabling sidecar and will remove all default dashboards provided with this chart. An example configuration:
+```yaml
+grafana:
+  sidecar:
+    dashboards:
+      enabled: false
+  dashboards:
+    default:
+      vmcluster:
+        gnetId: 11176
+        revision: 45
+        datasource: VictoriaMetrics
+```
+When using this approach, you can find dashboards for VictoriaMetrics components published [here](https://grafana.com/orgs/victoriametrics).
+
+### Using externally managed Grafana
+
+If you want to use an externally managed Grafana instance but still want to use the dashboards provided by this chart you can set
+ `.Values.grafana.enabled` to `false` and set `.Values.defaultDashboards.enabled` to `true`. This will install the dashboards
+ but will not install Grafana.
+
+For example:
+```yaml
+defaultDashboards:
+  enabled: true
+
+grafana:
+  enabled: false
+```
+
+This will create ConfigMaps with dashboards to be imported into Grafana.
+
+If additional configuration for labels or annotations is needed in order to import dashboard to an existing Grafana you can
+set `.Values.grafana.sidecar.dashboards.additionalDashboardLabels` or `.Values.grafana.sidecar.dashboards.additionalDashboardAnnotations` in `values.yaml`:
+
+For example:
+```yaml
+defaultDashboards:
+  enabled: true
+  labels:
+    key: value
+  annotations:
+    key: value
+```
+
+### Using additional Grafana datasources
+
+To add additional datasources set them using `.Values.defaultDatasources.extra` list property.
+If datasource type is not `prometheus` or `alertmanager` please also add it to `.Values.grafana.plugins` list (even if it belongs to a [list of Grafana built-in datasources](https://grafana.com/docs/grafana/latest/datasources/#built-in-core-data-sources)):
+
+```yaml
+defaultDatasources:
+  extra:
+    - name: Loki
+      type: loki
+      url: http://loki-gateway.loki.svc.cluster.local
+      uid: Loki
+      access: proxy
+      version: 1
+      orgId: 1
+      isDefault: false
+      editable: false
+      jsonData:
+        httpMethod: GET
+grafana:
+  plugins:
+    - loki
+```
+
+### Using alternative image registry
+
+All images of VictoriaMetrics components are available on [Docker Hub](https://hub.docker.com/u/victoriametrics) and [Quay](https://quay.io/organization/victoriametrics).
+It is possible to override default image registry for all components deployed by operator and operator itself by using the following values:
+```yaml
+victoria-metrics-operator:
+  image:
+    registry: quay.io
+  env:
+    - name: VM_CONTAINERREGISTRY
+      value: quay.io
+```
+
+{{ template "chart.prerequisites" . }}
+
+{{ include "chart.installSection" . }}
+
+### Install operator separately
+
+To have control over an order of managed resources removal or to be able to remove a whole namespace with managed resources it's recommended to disable operator in k8s-stack chart (`victoria-metrics-operator.enabled: false`) and [install it](https://docs.victoriametrics.com/helm/victoria-metrics-operator/) separately. To move operator from existing k8s-stack release to a separate one please follow the steps below:
+
+- disable cleanup webhook (`victoria-metrics-operator.crds.cleanup.enabled: false`) and apply changes
+- disable operator (`victoria-metrics-operator.enabled: false`) and apply changes
+- [deploy operator](https://docs.victoriametrics.com/helm/victoria-metrics-operator/) separately with `crds.plain: true`
+
+If you're planning to delete k8s-stack by a whole namespace removal please consider deploying operator in a separate namespace as due to uncontrollable removal order process can hang if operator is removed before at least one resource it manages.
+
+### Install locally (Minikube)
+
+To run VictoriaLogs stack locally it's possible to use [Minikube](https://github.com/kubernetes/minikube). To avoid dashboards and alert rules issues please follow the steps below:
+
+Run Minikube cluster
+
+```shell
+minikube start --container-runtime=containerd --extra-config=scheduler.bind-address=0.0.0.0 --extra-config=controller-manager.bind-address=0.0.0.0 --extra-config=etcd.listen-metrics-urls=http://0.0.0.0:2381
+```
+
+Install helm chart
+
+```shell
+helm install [RELEASE_NAME] vm/victoria-logs-k8s-stack -f values.yaml -n NAMESPACE --debug --dry-run
+```
+
+{{ include "chart.uninstallSection" . }}
+
+CRDs created by this chart are not removed by default and should be manually cleaned up:
+
+```shell
+kubectl get crd | grep victoriametrics.com | awk '{print $1 }' | xargs -i kubectl delete crd {}
+```
+
+## Troubleshooting
+
+- If you cannot install helm chart with error `configmap already exist`. It could happen because of name collisions, if you set too long release name.
+  Kubernetes by default, allows only 63 symbols at resource names and all resource names are trimmed by helm to 63 symbols.
+  To mitigate it, use shorter name for helm chart release name, like:
+```shell
+# stack - is short enough
+helm upgrade -i stack vm/victoria-logs-k8s-stack
+```
+  Or use override for helm chart release name:
+```shell
+helm upgrade -i some-very-long-name vm/victoria-logs-k8s-stack --set fullnameOverride=stack
+```
+
+
+## Upgrade guide
+
+Usually, helm upgrade doesn't requires manual actions. Just execute command:
+
+```shell
+$ helm upgrade [RELEASE_NAME] vm/victoria-logs-k8s-stack
+```
+
+But release with CRD update can only be patched manually with kubectl.
+Since helm does not perform a CRD update, we recommend that you always perform this when updating the helm-charts version:
+
+```shell
+# 1. check the changes in CRD
+$ helm show crds vm/victoria-logs-k8s-stack --version [YOUR_CHART_VERSION] | kubectl diff -f -
+
+# 2. apply the changes (update CRD)
+$ helm show crds vm/victoria-logs-k8s-stack --version [YOUR_CHART_VERSION] | kubectl apply -f - --server-side
+```
+
+## Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-logs-k8s-stack/values.yaml`` file.
+
+{{ template "chart.valuesTableHtml" . }}
