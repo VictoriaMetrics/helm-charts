@@ -53,7 +53,7 @@ The default topology tolerates zone outages by deploying components in every ava
 One of the best practice of running production kubernetes cluster is running with [multiple availability zones](https://kubernetes.io/docs/setup/best-practices/multiple-zones/). And apart from kubernetes control plane components, we also want to spread our application pods on multiple zones, to continue serving even if zone outage happens. 
 
 VictoriaMetrics supports [data replication](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#replication-and-data-safety) natively which can guarantees data availability when part of the vmstorage instances failed. But it doesn't works well if vmstorage instances are spread on multiple availability zones, since data replication could be stored on single availability zone, which will be lost when zone outage happens.
-To avoid this, database(such as vmcluster or vmsingle) must be deployed across multiple zones, with each zone containing a full copy of the data. As long as one zone remains available, both global write and read entrypoints should operate without interruption.
+To avoid this, database (such as vmcluster or vmsingle) must be deployed across multiple zones, with each zone containing a full copy of the data. As long as one zone remains available, both global write and read entrypoints should operate without interruption.
 
 ### How to write data?
 
