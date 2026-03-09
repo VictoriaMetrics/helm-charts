@@ -1,3 +1,4 @@
 # VictoriaMetrics Alert Helm chart
 
-Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-alert/)
+Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-alert/).
+Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-alert/changelog/).

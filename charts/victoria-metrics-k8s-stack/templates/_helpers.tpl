@@ -120,7 +120,9 @@
   {{- else -}}
     {{- $license = dict -}}
   {{- end -}}
-  {{- toYaml $license -}}
+  {{- with $license -}}
+    {{- toYaml . -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /* VMAlert spec */ -}}

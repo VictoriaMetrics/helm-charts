@@ -119,6 +119,253 @@ Example command using vmagent:
 /path/to/vmagent -remoteWrite.url=http://vmauth-vmauth-global-write-$ReleaseName-vm-distributed:8427/prometheus/api/v1/write -remoteWrite.basicAuth.username=tenant-1088 -remoteWrite.basicAuth.password=secret
 ```
 
+## Migration to k8s-stack chart
+
+Starting with [v0.73.0](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/changelog/#id-0730), the k8s-stack chart supports [VMDistributed CR](https://docs.victoriametrics.com/operator/resources/vmdistributed/), an evolution of the distributed chart. It provides an automatic upgrade procedure that sequentially rolls out new changes to each zone. 
+
+### Limitations
+
+- VMDistributed CR currently doesn't support VMSingle as a backend.
+- VMDistributed CR's VMAgents do not support relabelling, scraping, or stream aggregation. It needs to happen on a level above, before writing them in separate zones
+- VMDistributed CR creates a single global VMAuth for both read and write operations, whereas the distributed chart uses separate balancers for read and write traffic. It's advised to let the operator create a new VMAuth, switch both read and write traffic to the new balancer, and then delete the old VMAuth instances.
+- VMDistributed CR has no proxy VMAuth, the existing one should be removed manually after migration.
+
+### Preparation
+
+Migration to the k8s-stack chart requires converting all necessary distributed chart properties to their corresponding VMDistributed CR properties.
+Please migrate only custom properties, do not migrate [chart defaults](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-distributed/values.yaml):
+
+- remove `.Values.zoneTpl.write` and `.Values.availabilityZones[*].write` sections
+- remove `.Values.zoneTpl.read` and `.Values.availabilityZones[*].read` sections
+- remove `.Values.zoneTpl.vmsingle` and `.Values.availabilityZones[*].vmsingle` sections
+- remove all `.Values.zoneTpl.vmagent.spec.*` and `.Values.availabilityZones[*].vmagent.spec.*` properties not listed [here](https://docs.victoriametrics.com/operator/api/#vmdistributedzoneagentspec).
+- remove `.Values.zoneTpl.*.allow` and `.Values.availabilityZones[*].*.allow` properties
+- remove `.Values.zoneTpl.*.enabled` and `.Values.availabilityZones.*.enabled` properties
+- move `.Values.availabilityZones` to `.Values.vmdistributed.zones`
+- move `.Values.zoneTpl` to `.Values.vmdistributed.zoneCommon`
+- replace `{{ (.zone).name }}` with `%ZONE%` placeholder
+- `.Values.*.common` sections are not supported by the distributed chart. Move properties to each component where they are required.
+- If `.Values.extra.vmagent.enabled` is `true`, move `.Values.extra.vmagent.spec` properties to `.Values.vmagent.spec`
+- by default k8s-stack chart configures vmsingle as a storage, to switch it to vmdistributed set `.Values.vmsingle.enabled: false` and `.Values.vmdistributed.enabled: true`
+- If no `.Values.*.nodeSelector` is set, the current setup uses the default node selector `{topology.kubernetes.io/zone: '{{ (.zone).name }}'}`, added by distributed chart templates to vmagent and vmcluster. Add this nodeSelector to the distributed chart values.
+
+Example:
+
+Given the distributed chart configuration:
+
+```
+zoneTpl:
+  common:
+    spec:
+      affinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+         - weight: 1
+           preference:
+             matchExpressions:
+             - key: topology.kubernetes.io/zone
+               operator: In
+               values:
+               - us-central1-b
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+  write:
+    allow: true
+  read:
+    allow: true
+    vmauth:
+      enabled: true
+      name: "vmauth-read-proxy-{{ (.zone).name }}"
+      spec:
+        unauthorizedUserAccessSpec:
+          url_map:
+            - load_balancing_policy: first_available
+              retry_status_codes: [500, 502, 503]
+  vmagent:
+    enabled: true
+    name: "vmagent-{{ (.zone).name }}"
+    annotations: {}
+    spec:
+      ingestOnlyMode: true
+  vmcluster:
+    enabled: true
+    name: "vmcluster-{{ (.zone).name }}"
+    spec:
+      retentionPeriod: "14"
+      replicationFactor: 2
+      requestsLoadBalancer:
+        enabled: true
+        spec:
+          replicaCount: 2
+      vmstorage:
+        replicaCount: 2
+        storageDataPath: "/vm-data"
+      vmselect:
+        replicaCount: 2
+      vminsert:
+        replicaCount: 2
+availabilityZones:
+  - name: zone-eu-1
+    write:
+      allow: false
+  - name: zone-us-1
+    write:
+      allow: false
+extra:
+  vmagent:
+    enabled: true
+    name: test-vmagent
+    spec:
+      selectAllByDefault: true
+```
+
+should be converted to a given below k8s-stack chart configuration:
+
+```
+vmsingle:
+  enabled: false
+vmagent:
+  enabled: true
+vmdistributed:
+  enabled: true
+  spec:
+    zoneCommon:
+      vmagent:
+        name: "vmagent-%ZONE%"
+        spec:
+          nodeSelector:
+            topology.kubernetes.io/zone: '%ZONE%'
+          affinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                - key: topology.kubernetes.io/zone
+                  operator: In
+                  values:
+                  - us-central1-b
+          topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+      vmcluster:
+        name: "vmcluster-%ZONE%"
+        spec:
+          retentionPeriod: "14"
+          replicationFactor: 2
+          requestsLoadBalancer:
+            enabled: true
+            spec:
+              replicaCount: 2
+              nodeSelector:
+                topology.kubernetes.io/zone: '%ZONE%'
+              affinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 1
+                  preference:
+                    matchExpressions:
+                    - key: topology.kubernetes.io/zone
+                      operator: In
+                      values:
+                      - us-central1-b
+            topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+          vmstorage:
+            replicaCount: 2
+            storageDataPath: "/vm-data"
+            nodeSelector:
+              topology.kubernetes.io/zone: '%ZONE%'
+            affinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values:
+                    - us-central1-b
+            topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+          vmselect:
+            replicaCount: 2
+            nodeSelector:
+              topology.kubernetes.io/zone: '%ZONE%'
+            affinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values:
+                    - us-central1-b
+            topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+          vminsert:
+            replicaCount: 2
+            nodeSelector:
+              topology.kubernetes.io/zone: '%ZONE%'
+            affinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values:
+                    - us-central1-b
+            topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+    zones:
+    - name: zone-eu-1
+    - name: zone-us-1
+```
+
+With a given configuration, VMDistributed CR will import existing VMAgent and VMCluster resources and create a new global VMAuth for read and write traffic.
+Next steps depend on the tool used for chart management.
+
+### Helm
+
+When using plain Helm for chart management, follow these steps to migrate from the distributed chart to k8s-stack:
+
+1. Remove Helm release secrets
+
+```
+kubectl -n <release-namespace> delete secrets -l name=<release-name>,owner=helm
+```
+
+where:
+- `<release-namespace>` is the namespace where the chart was installed
+- `<release-name>` is the name of the Helm release
+
+2. Install k8s-stack chart
+
+```
+helm install <release-name> vm/victoria-metrics-k8s-stack --namespace <release-namespace> --values <custom-chart-values-file>
+```
+
+where:
+- `<release-namespace>` is a namespace of a new release, should be the same as namespace of removed release
+- `<release-name>` name of Helm release, use same release if it's possible, it allows to reuse resources installed by distributed chart
+- `<custom-chart-values-file>` is the path to the chart values file containing converted values from the [preparation step](#preparation)
+
+### ArgoCD
+
+When using ArgoCD for chart management, follow these steps to migrate from the distributed chart to k8s-stack:
+
+1. Perform a non-cascading deletion of the ArgoCD Application for the distributed chart.
+
+2. Create a new application for k8s-stack using values from the [preparation step](http://#preparation).
+
 {{ include "chart.installSection" . }}
 
 ## How to upgrade
