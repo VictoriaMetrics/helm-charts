@@ -143,11 +143,11 @@ Please migrate only custom properties, do not migrate [chart defaults](https://g
 - remove `.Values.zoneTpl.*.enabled` and `.Values.availabilityZones.*.enabled` properties
 - move `.Values.availabilityZones` to `.Values.vmdistributed.zones`
 - move `.Values.zoneTpl` to `.Values.vmdistributed.zoneCommon`
-- replace `{{ (.zone).name }}` with `%ZONE%` placeholder
+- replace `{{`{{ (.zone).name }}`}}` with `%ZONE%` placeholder
 - `.Values.*.common` sections are not supported by the distributed chart. Move properties to each component where they are required.
 - If `.Values.extra.vmagent.enabled` is `true`, move `.Values.extra.vmagent.spec` properties to `.Values.vmagent.spec`
 - by default k8s-stack chart configures vmsingle as a storage, to switch it to vmdistributed set `.Values.vmsingle.enabled: false` and `.Values.vmdistributed.enabled: true`
-- If no `.Values.*.nodeSelector` is set, the current setup uses the default node selector `{topology.kubernetes.io/zone: '{{ (.zone).name }}'}`, added by distributed chart templates to vmagent and vmcluster. Add this nodeSelector to the distributed chart values.
+- If no `.Values.*.nodeSelector` is set, the current setup uses the default node selector `{topology.kubernetes.io/zone: '{{`{{ (.zone).name }}`}}'}`, added by distributed chart templates to vmagent and vmcluster. Add this nodeSelector to the distributed chart values.
 
 Example:
 
@@ -176,7 +176,7 @@ zoneTpl:
     allow: true
     vmauth:
       enabled: true
-      name: "vmauth-read-proxy-{{ (.zone).name }}"
+      name: "vmauth-read-proxy-{{`{{ (.zone).name }}`}}"
       spec:
         unauthorizedUserAccessSpec:
           url_map:
@@ -184,13 +184,13 @@ zoneTpl:
               retry_status_codes: [500, 502, 503]
   vmagent:
     enabled: true
-    name: "vmagent-{{ (.zone).name }}"
+    name: "vmagent-{{`{{ (.zone).name }}`}}"
     annotations: {}
     spec:
       ingestOnlyMode: true
   vmcluster:
     enabled: true
-    name: "vmcluster-{{ (.zone).name }}"
+    name: "vmcluster-{{`{{ (.zone).name }}`}}"
     spec:
       retentionPeriod: "14"
       replicationFactor: 2
