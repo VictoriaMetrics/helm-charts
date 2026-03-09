@@ -121,37 +121,37 @@ Example command using vmagent:
 
 ## Migration to k8s-stack chart
 
-Starting [v0.73.0](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/changelog/#id-0730) k8s-stack chart supports [VMDistributed CR](https://docs.victoriametrics.com/operator/resources/vmdistributed/), which is an evolution of distributed chart. It provides automatic upgrade procedure sequentially rolling out new changes to each zone. Below described migration procedures for different setups
+Starting with [v0.73.0](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/changelog/#id-0730), the k8s-stack chart supports [VMDistributed CR](https://docs.victoriametrics.com/operator/resources/vmdistributed/), an evolution of the distributed chart. It provides an automatic upgrade procedure that sequentially rolls out new changes to each zone. 
 
 ### Limitations
 
 - VMDistributed CR currently doesn't support VMSingle as a backend.
-- VMDistributed CR's VMAgents do not support relabelling, scraping or stream aggregation
-- VMDistributed CR supports a single global VMAuth for both read and write operations comparing to distributed chart with separate balancers for read and write traffic. It's suggested to let operator create a new VMAuth, switch both read and write traffic to a new balancer and then delete old VMAuth instances.
-- VMDistributed CR has no proxy VMAuth, existing one should be removed manually after migration
+- VMDistributed CR's VMAgents do not support relabelling, scraping, or stream aggregation. It needs to happen on a level above, before writing them in separate zones
+VMDistributed CR creates a single global VMAuth for both read and write operations, whereas the distributed chart uses separate balancers for read and write traffic. It's advised to let the operator create a new VMAuth, switch both read and write traffic to the new balancer, and then delete the old VMAuth instances.
+- VMDistributed CR has no proxy VMAuth, the existing one should be removed manually after migration.
 
 ### Preparation
 
-Migration to k8s-stack chart requires converting all needed distributed chart properties to respective VMDistributed CR properties.
+Migration to the k8s-stack chart requires converting all necessary distributed chart properties to their corresponding VMDistributed CR properties.
 Please migrate only custom properties, do not migrate [chart defaults](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-distributed/values.yaml):
 
 - remove `.Values.zoneTpl.write` and `.Values.availabilityZones[*].write` sections
 - remove `.Values.zoneTpl.read` and `.Values.availabilityZones[*].read` sections
 - remove `.Values.zoneTpl.vmsingle` and `.Values.availabilityZones[*].vmsingle` sections
-- remove all `.Values.zoneTpl.vmagent.spec.*` and `.Values.availabilityZones[*].vmagent.spec.*` properties that are not listed [here](https://docs.victoriametrics.com/operator/api/#vmdistributedzoneagentspec).
+- remove all `.Values.zoneTpl.vmagent.spec.*` and `.Values.availabilityZones[*].vmagent.spec.*` properties not listed [here](https://docs.victoriametrics.com/operator/api/#vmdistributedzoneagentspec).
 - remove `.Values.zoneTpl.*.allow` and `.Values.availabilityZones[*].*.allow` properties
 - remove `.Values.zoneTpl.*.enabled` and `.Values.availabilityZones.*.enabled` properties
 - move `.Values.availabilityZones` to `.Values.vmdistributed.zones`
 - move `.Values.zoneTpl` to `.Values.vmdistributed.zoneCommon`
 - replace `{{ (.zone).name }}` with `%ZONE%` placeholder
-- `.Values.*.common` sections are not supported by distributed chart, properties should be moved to each component where they are expected
-- if `.Values.extra.vmagent.enabled` is set to `true`, then move `.Values.extra.vmagent.spec` properties to `.Values.vmagent.spec`
+- `.Values.*.common` sections are not supported by the distributed chart. Move properties to each component where they are required.
+- If `.Values.extra.vmagent.enabled` is `true`, move `.Values.extra.vmagent.spec` properties to `.Values.vmagent.spec`
 - by default k8s-stack chart configures vmsingle as a storage, to switch it to vmdistributed set `.Values.vmsingle.enabled: false` and `.Values.vmdistributed.enabled: true`
-- if you have no `.Values.*.nodeSelector` set it means current setup uses default node selector `{topology.kubernetes.io/zone: '{{ (.zone).name }}'}` that is added by distributed chart templates to vmagent and vmcluster, add this `nodeSelector` to distributed chart values
+- If no `.Values.*.nodeSelector` is set, the current setup uses the default node selector `{topology.kubernetes.io/zone: '{{ (.zone).name }}'}`, added by distributed chart templates to vmagent and vmcluster. Add this nodeSelector to the distributed chart values.
 
 Example:
 
-Given distributed chart configuration:
+Given the distributed chart configuration:
 
 ```
 zoneTpl:
@@ -330,12 +330,12 @@ vmdistributed:
     - name: zone-us-1
 ```
 
-With a given configuration VMDistributed CR will import existing VMAgent and VMCluster resources and create a new global VMAuth for read and write traffic.
-Next steps depend on tool that is used for chart management
+With a given configuration, VMDistributed CR will import existing VMAgent and VMCluster resources and create a new global VMAuth for read and write traffic.
+Next steps depend on the tool used for chart management.
 
 ### Helm
 
-While using plain Helm for chart management please follow steps below to migrate from distributed chart to k8s-stack:
+When using plain Helm for chart management, follow these steps to migrate from the distributed chart to k8s-stack:
 
 1. Remove Helm release secrets
 
@@ -344,8 +344,8 @@ kubectl -n <release-namespace> delete secrets -l name=<release-name>,owner=helm
 ```
 
 where:
-- `<release-namespace>` is a namespace where chart was installed
-- `<release-name>` name of Helm release
+- `<release-namespace>` is the namespace where the chart was installed
+- `<release-name>` is the name of the Helm release
 
 2. Install k8s-stack chart
 
@@ -356,15 +356,15 @@ helm install <release-name> vm/victoria-metrics-k8s-stack --namespace <release-n
 where:
 - `<release-namespace>` is a namespace of a new release, should be the same as namespace of removed release
 - `<release-name>` name of Helm release, use same release if it's possible, it allows to reuse resources installed by distributed chart
-- `<custom-chart-values-file>` path to chart values file, that should contain converted values from [preparation step](#preparation)
+- `<custom-chart-values-file>` is the path to the chart values file containing converted values from the [preparation step](http://#preparation)
 
 ### ArgoCD
 
-While using ArgoCD for chart management please follow steps below to migrate from distributed chart to k8s-stack:
+When using ArgoCD for chart management, follow these steps to migrate from the distributed chart to k8s-stack:
 
-1. Perform non-cascading deletion of ArgoCD Application for distributed chart
+1. Perform a non-cascading deletion of the ArgoCD Application for the distributed chart.
 
-2. Create new application for k8s-stack with values from [preparation step](#preparation)
+2. Create a new application for k8s-stack using values from the [preparation step](http://#preparation).
 
 {{ include "chart.installSection" . }}
 
