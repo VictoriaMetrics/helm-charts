@@ -37,7 +37,7 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Install tools
-        uses: yokawasa/action-setup-kube-tools@v0.11.1
+        uses: yokawasa/action-setup-kube-tools@v0.13.1
         with:
           setup-tools: |
             helmv3
@@ -111,7 +111,7 @@ jobs:
 
       - name: Release
         if: ${{ hashFiles('charts/*/RELEASE_NOTES') != '' }}
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
         with:
