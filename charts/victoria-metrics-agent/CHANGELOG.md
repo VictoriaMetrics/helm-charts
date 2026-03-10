@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
 
 ## 0.33.0
 

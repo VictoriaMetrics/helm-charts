@@ -1,6 +1,7 @@
 ## Next release
 
 - support ingress and httproute. See [#2705](https://github.com/VictoriaMetrics/helm-charts/issues/2705).
+- support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
 
 ## 1.12.10
 

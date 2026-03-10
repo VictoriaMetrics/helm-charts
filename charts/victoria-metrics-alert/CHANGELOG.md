@@ -1,6 +1,7 @@
 ## Next release
 
 - Alertmanager 0.27.0 -> 0.31.1
+- support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
 
 ## 0.33.0
 

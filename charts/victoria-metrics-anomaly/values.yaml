@@ -47,7 +47,12 @@ serviceAccount:
 # -- See `kubectl explain poddisruptionbudget.spec` for more. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
   enabled: false
+  # -- min number or percentage of pods that can be unavailable
   minAvailable: 1
+  # -- max number or percentage of pods that can be unavailable
+  maxUnavailable: 0
+  # -- Defines criteria when unhealthy pods should be considered for eviction
+  unhealthyPodEvictionPolicy:
   labels: {}
 
 # -- Extra command line arguments for container of component

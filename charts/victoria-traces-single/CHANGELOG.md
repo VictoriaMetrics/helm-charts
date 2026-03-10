@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VictoriaTraces components to [v0.8.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.8.0)
+- support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
 
 ## 0.0.6
 
