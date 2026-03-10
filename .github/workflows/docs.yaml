@@ -25,12 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout charts repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: __vm-helm-charts
 
       - name: Checkout docs repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: VictoriaMetrics/vmdocs
           ref: main
@@ -39,7 +39,7 @@ jobs:
 
       - name: Import GPG key
         id: import-gpg
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@v7
         with:
           gpg_private_key: ${{ secrets.VM_BOT_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.VM_BOT_PASSPHRASE }}
@@ -88,7 +88,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
 
       - name: Checkout to pages
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: gh-pages
           path: __vm-helm-charts
