@@ -1,6 +1,7 @@
 ## Next release
 
 - support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
+- removed quotes from url_prefix values in VMAuth configuration. See [#2753](https://github.com/VictoriaMetrics/helm-charts/issues/2753).
 
 ## 0.36.0
 
