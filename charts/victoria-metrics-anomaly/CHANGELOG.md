@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 1.12.11
+
+**Release date:** 11 Mar 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.29.0](https://img.shields.io/badge/v1.29.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1290)
+
 - upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.29.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1290)
 - support ingress and httproute. See [#2705](https://github.com/VictoriaMetrics/helm-charts/issues/2705).
 - support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
