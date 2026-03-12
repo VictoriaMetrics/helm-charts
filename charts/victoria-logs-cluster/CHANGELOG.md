@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- updated vector dependency 0.46.0 -> 0.51.0
 
 ## 0.0.30
 
