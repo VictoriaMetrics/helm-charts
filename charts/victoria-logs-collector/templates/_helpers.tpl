@@ -65,10 +65,9 @@
   {{- with $collector }}
     {{- $_ := set $args "kubernetesCollector" true }}
 
-    {{- $collectorProps := list "msgField" "timeField" "excludeFilter" "includePodLabels" "includePodAnnotations" "includeNodeLabels" "includeNodeAnnotations" }}
-    {{- range $prop := $collectorProps }}
-      {{- $value := index $collector $prop }}
-      {{- if hasKey $Values $prop }}
+    {{- $legacyProps := list "msgField" "timeField" "excludeFilter" "includePodLabels" "includePodAnnotations" "includeNodeLabels" "includeNodeAnnotations" }}
+    {{- range $prop, $value := $collector }}
+      {{- if and (has $prop $legacyProps) (hasKey $Values $prop) }}
         {{- $value = index $Values $prop }}
       {{- end }}
       {{- if or (kindIs "bool" $value) $value }}
