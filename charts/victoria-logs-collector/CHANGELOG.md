@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add an ability to configure `-kubernetesCollector.*` flags using the `collector` object
 
 ## 0.2.12
 
