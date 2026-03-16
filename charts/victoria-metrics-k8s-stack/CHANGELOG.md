@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.72.5
+
+**Release date:** 16 Mar 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.138.0](https://img.shields.io/badge/v1.138.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11380)
+
 - bump node-exporter dependency chart to version 4.52.0
 - bump kube-state-metrics dependency chart to version 7.2.1
 - added vmdistributed support as alternative to vmsingle and vmcluster
