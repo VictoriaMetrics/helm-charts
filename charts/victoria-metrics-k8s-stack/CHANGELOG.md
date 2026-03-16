@@ -3,6 +3,7 @@
 - bump node-exporter dependency chart to version 4.52.0
 - bump kube-state-metrics dependency chart to version 7.2.0
 - added vmdistributed support as alternative to vmsingle and vmcluster
+- bump version of VM components to [v1.138.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.138.0)
 
 ## 0.72.4
 
