@@ -32,7 +32,7 @@ rules:
   labels:
     severity: none
 - alert: InfoInhibitor
-  expr: {{ printf "(ALERTS{severity=\"info\"} == 1) unless on(namespace,%s) (ALERTS{alertname!=\"InfoInhibitor\",severity=~\"warning|critical\",alertstate=\"firing\"} == 1)" $groupLabels }}
+  expr: {{ printf "group(ALERTS{severity=\"info\"} == 1) by(namespace,%s) unless on(namespace,%s) group(ALERTS{alertname!=\"InfoInhibitor\",alertstate=\"firing\",severity=~\"warning|critical\"} == 1) by(namespace,%s)" $groupLabels $groupLabels $groupLabels }}
   annotations:
     description: |
       This is an alert that is used to inhibit info alerts.
