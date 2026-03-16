@@ -115,72 +115,51 @@ server:
   # MetricsQL or PromQL.
   datasource:
     url: ""
-    # -- Basic auth for datasource
-    basicAuth:
-      username: ""
-      password: ""
-      # -- Auth based on Bearer token for datasource
-    bearer:
-      # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
-      token: ""
-      # -- Token Auth file with Bearer token. You can use one of token or tokenFile
-      tokenFile: ""
+    # -- Basic auth username for remote write
+    basicAuth.username: ""
+    # -- Basic auth password for remote write
+    basicAuth.password: ""
+    # -- Auth based on Bearer token for remote write
+    bearerToken: ""
+    # -- Auth based on Bearer token file path for remote write
+    bearerTokenFile: ""
+    # -- HTTP headers for remote write
+    headers: {}
 
-  remote:
-    write:
-      # -- VMAlert remote write URL
-      url: ""
-      # -- Basic auth for remote write
-      basicAuth:
-        username: ""
-        password: ""
-      # -- Auth based on Bearer token for remote write
-      bearer:
-        # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
-        token: ""
-        # -- Token Auth file with Bearer token. You can use one of token or tokenFile
-        tokenFile: ""
-    read:
-      # -- VMAlert remote read URL
-      url: ""
-      # -- Basic auth for remote read
-      basicAuth:
-        username: ""
-        password: ""
-      # -- Auth based on Bearer token for remote read
-      bearer:
-        # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
-        token: ""
-        # -- Token Auth file with Bearer token. You can use one of token or tokenFile
-        tokenFile: ""
+  # -- VMAlert remote write configuration
+  remoteWrite: {}
+    # url: ""
+    # basicAuth.username: ""
+    # basicAuth.password: ""
+    # bearerToken: ""
+    # bearerTokenFile: ""
+    # headers: {}
 
-  # -- Notifier to use for alerts.
-  # Multiple notifiers can be enabled by using `notifiers` section
-  notifier:
-    alertmanager:
-      url: ""
-      # -- Basic auth for alertmanager
-      basicAuth:
-        username: ""
-        password: ""
-        # -- Auth based on Bearer token for alertmanager
-      bearer:
-        # -- Token with Bearer token. You can use one of token or tokenFile. You don't need to add "Bearer" prefix string
-        token: ""
-        # -- Token Auth file with Bearer token. You can use one of token or tokenFile
-        tokenFile: ""
+  # -- VMAlert remote read configuration
+  remoteRead: {}
+    # url: ""
+    # basicAuth.username: ""
+    # basicAuth.password: ""
+    # bearerToken: ""
+    # bearerTokenFile: ""
+    # headers: {}
+
+  # -- Default VMAlertmanager notifier configuration.
+  notifier: {}
+    # url: ""
+    # basicAuth.username: ""
+    # basicAuth.password: ""
+    # bearerToken: ""
+    # bearerTokenFile: ""
 
   # -- Additional notifiers to use for alerts
-  notifiers:
-    []
-    # - alertmanager:
-    #    url: ""
-    #    basicAuth:
-    #      username: ""
-    #      password: ""
-    #    bearer:
-    #      token: ""
-    #      tokenFile: ""
+  notifiers: []
+    # - url: ""
+    #   basicAuth.username: ""
+    #   basicAuth.password: ""
+    #   bearerToken: ""
+    #   bearerTokenFile: ""
+
 
   # -- Extra command line arguments for container of component
   extraArgs:

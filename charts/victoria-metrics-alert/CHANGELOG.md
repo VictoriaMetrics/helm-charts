@@ -1,6 +1,17 @@
 ## Next release
 
-- TODO
+**Update note 1**: `.Values.remote.read` was moved to `.Values.remoteRead`. Legacy property is also supported.
+**Update note 2**: `.Values.remote.write` was moved to `.Values.remoteWrite`. Legacy property is also supported.
+**Update note 3**: `.Values.notifier.alertmanager` was moved to `.Values.notifier`. Legacy property is also supported.
+**Update note 4**: `.Values.notifiers[*].alertmanager` was moved to `.Values.notifiers[*]`. Legacy property is also supported.
+**Update note 5**: `*.basicAuth.username` was moved to `*."basicAuth.username"`. Legacy property is also supported.
+**Update note 6**: `*.basicAuth.password` was moved to `*."basicAuth.password"`. Legacy property is also supported.
+**Update note 7**: `*.bearer.token` was moved to `*.bearerToken`. Legacy property is also supported.
+**Update note 8**: `*.bearer.tokenFile` was moved to `*.bearerTokenFile`. Legacy property is also supported.
+
+All resources that are managed by chart will be recreated due to changes in naming and labels.
+
+- support setting HTTP headers for remoteWrite, remoteRead, notifiers and datasource. See [#2754](https://github.com/VictoriaMetrics/helm-charts/issues/2754).
 
 ## 0.34.0
 
