@@ -6,6 +6,7 @@
 - updates operator to [v0.68.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.2) version
 - bump version of VM components to [v1.138.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.138.0)
 - bump grafana dependency chart to version 11.3.2
+- synced dashboards and rules
 
 ## 0.72.4
 

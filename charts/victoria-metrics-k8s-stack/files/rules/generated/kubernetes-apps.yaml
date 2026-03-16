@@ -157,7 +157,7 @@ rules:
   labels:
     severity: warning
 - alert: KubeHpaMaxedOut
-  expr: {{ printf "kube_horizontalpodautoscaler_status_current_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} == kube_horizontalpodautoscaler_spec_max_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"}" .targetNamespace .targetNamespace }}
+  expr: {{ printf "(kube_horizontalpodautoscaler_status_current_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} == kube_horizontalpodautoscaler_spec_max_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"}) and on(namespace,horizontalpodautoscaler,%s) (kube_horizontalpodautoscaler_spec_max_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"} != kube_horizontalpodautoscaler_spec_min_replicas{namespace=~\"%s\",job=\"kube-state-metrics\"})" .targetNamespace .targetNamespace $groupLabels .targetNamespace .targetNamespace }}
   annotations:
     description: HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has been running at max replicas for longer than 15 minutes on cluster {{`{{`}} $labels.{{ $clusterLabel }} {{`}}`}}.
     runbook_url: {{ $runbookUrl }}/kubernetes/kubehpamaxedout

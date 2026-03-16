@@ -1220,7 +1220,7 @@ panels:
       links:
       - targetBlank: true
         title: Drilldown
-        url: /d/wNf0q_kZk?viewPanel=154&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+        url: /d/wNf0q_kZk?viewPanel=154&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
       mappings: []
       thresholds:
         mode: absolute
@@ -1311,10 +1311,10 @@ panels:
         links:
         - targetBlank: true
           title: Drilldown - RSS memory usage
-          url: /d/wNf0q_kZk?viewPanel=148&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          url: /d/wNf0q_kZk?viewPanel=148&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
         - targetBlank: true
           title: Drilldown - Memory usage breakdown
-          url: /d/wNf0q_kZk?viewPanel=141&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          url: /d/wNf0q_kZk?viewPanel=141&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
         mappings: []
         min: 0
         thresholds:
@@ -1402,7 +1402,7 @@ panels:
         links:
         - targetBlank: true
           title: Drilldown
-          url: /d/wNf0q_kZk?viewPanel=151&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          url: /d/wNf0q_kZk?viewPanel=151&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
         mappings: []
         min: 0
         thresholds:
@@ -1491,7 +1491,7 @@ panels:
         links:
         - targetBlank: true
           title: Drilldown
-          url: /d/wNf0q_kZk?viewPanel=149&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          url: /d/wNf0q_kZk?viewPanel=149&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
         mappings: []
         min: 0
         thresholds:
@@ -3936,7 +3936,7 @@ panels:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: ${ds}
-      expr: {{ printf "sum(rate(process_major_pagefaults_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      expr: {{ printf "sum(rate(process_major_pagefaults_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       legendFormat: __auto
       range: true
@@ -3991,7 +3991,7 @@ panels:
         links:
         - targetBlank: true
           title: Drilldown
-          url: /d/wNf0q_kZk?viewPanel=140&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          url: /d/wNf0q_kZk?viewPanel=140&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
         mappings: []
         thresholds:
           mode: absolute
@@ -4173,7 +4173,7 @@ panels:
         links:
         - targetBlank: true
           title: Drilldown
-          url: /d/wNf0q_kZk?viewPanel=150&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          url: /d/wNf0q_kZk?viewPanel=150&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
         mappings: []
         min: 0
         thresholds:
@@ -4650,7 +4650,7 @@ panels:
         links:
         - targetBlank: true
           title: Drilldown
-          url: /d/wNf0q_kZk?viewPanel=153&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          url: /d/wNf0q_kZk?viewPanel=153&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
         mappings: []
         min: 0
         thresholds:
@@ -4848,7 +4848,7 @@ panels:
         links:
         - targetBlank: true
           title: Drilldown
-          url: /d/wNf0q_kZk?viewPanel=152&var-job=${__field.labels.job}&var-ds=$ds&var-instance=$instance&${__url_time_range}
+          url: /d/wNf0q_kZk?viewPanel=152&var-job=${__field.labels.job}&var-ds=$ds&${__url_time_range}
         mappings: []
         min: 0
         thresholds:
@@ -5842,7 +5842,7 @@ panels:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: ${ds}
-      expr: {{ printf "sum(rate(process_major_pagefaults_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,instance,%s)" $clusterLabel $clusterLabel }}
+      expr: {{ printf "sum(rate(process_major_pagefaults_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,instance,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       legendFormat: '{{`{{`}}instance{{`}}`}} ({{`{{`}}job{{`}}`}})'
       range: true
