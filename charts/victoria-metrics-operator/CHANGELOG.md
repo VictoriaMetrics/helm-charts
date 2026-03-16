@@ -1,6 +1,7 @@
 ## Next release
 
 - support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
+- updates operator to [v0.68.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.3) version
 
 ## 0.59.2
 
