@@ -114,6 +114,12 @@
   protocol: {{ .protocol | default "TCP" }}
   targetPort: {{ .targetPort }}
 {{- end }}
+{{- with $extraArgs.otlpGRPCListenAddr }}
+- name: otlpgrpc-tcp
+  protocol: TCP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: otlpgrpc-tcp
+{{- end }}
 {{- end -}}
 
 {{- define "vtstorage.ports" -}}

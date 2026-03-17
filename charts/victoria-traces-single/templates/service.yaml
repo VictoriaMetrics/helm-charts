@@ -61,6 +61,12 @@ spec:
       {{- with $service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
+    {{- with $app.extraArgs.otlpGRPCListenAddr }}
+    - name: otlpgrpc-tcp
+      protocol: TCP
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+      targetPort: otlpgrpc-tcp
+    {{- end }}
     {{- range $service.extraPorts }}
     - name: {{ .name }}
       port: {{ .port }}
