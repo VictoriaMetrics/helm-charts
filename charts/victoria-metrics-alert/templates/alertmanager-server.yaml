@@ -9,7 +9,7 @@
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $sa := include "vm.fullname" . }}
 {{- if and (ne $mode "statefulSet") (gt (int $app.replicaCount) 1) }}
-  {{- fail "Alertmanager HA mode is not supported for Deployment. Consider switching to statefulset instead using `server.mode: statefulSet: true`" -}}
+  {{- fail "Alertmanager HA mode is not supported for Deployment. Consider switching to statefulset instead using `alertmanager.mode: statefulSet`" -}}
 {{- end }}
 apiVersion: apps/v1
 kind: {{ title $mode }}
