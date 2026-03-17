@@ -1,0 +1,115 @@
+{{- if eq .Values.mcp.mode "stdio" }}
+{{- fail "mcp.mode=stdio is not supported in Kubernetes deployments. Use 'sse' or 'http' instead." }}
+{{- end }}
+{{- $isCloud := gt (len .Values.vm.cloudAPIKey) 0 }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mcp-victoriametrics.fullname" . }}
+  labels: {{ include "mcp-victoriametrics.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: {{ include "mcp-victoriametrics.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mcp-victoriametrics.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mcp-victoriametrics.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- $repo := .Values.image.repository }}
+          {{- with .Values.image.registry }}
+            {{- $repo = printf "%s/%s" . $repo }}
+          {{- end }}
+          image: "{{ $repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: MCP_LISTEN_ADDR
+              value: "0.0.0.0:{{  .Values.service.port }}"
+            - name: MCP_SERVER_MODE
+              value: "{{ .Values.mcp.mode }}"
+            {{- if $isCloud }}
+            - name: VMC_API_KEY
+              value: "{{ .Values.vm.cloudAPIKey }}"
+            {{- else }}
+            - name: VM_INSTANCE_ENTRYPOINT
+              value: "{{ required "either .Values.vm.cloudAPIKey or .Values.vm.entrypoint should be set" .Values.vm.entrypoint }}"
+            - name: VM_INSTANCE_TYPE
+              value: "{{ .Values.vm.type }}"
+            {{- with .Values.vm.bearerToken }}
+            - name: VM_INSTANCE_BEARER_TOKEN
+              {{- if kindIs "map" . }}
+              valueFrom: {{ toYaml . | nindent 16 }}
+              {{- else }}
+              value: "{{ . }}"
+              {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- with .Values.vm.headers }}
+            - name: VM_INSTANCE_HEADERS
+              value: "{{ join "," . }}"
+            {{- end }}
+            {{- with .Values.mcp.passthroughHeaders }}
+            - name: MCP_PASSTHROUGH_HEADERS
+              value: "{{ join "," . }}"
+            {{- end }}
+            {{- with .Values.mcp.disable.resources }}
+            - name: MCP_DISABLE_RESOURCES
+              value: "{{ . }}"
+            {{- end }}
+            {{- with .Values.mcp.disable.tools }}
+            - name: MCP_DISABLED_TOOLS
+              value: "{{ join "," . }}"
+            {{- end }}
+            {{- with .Values.mcp.heartbeatInterval }}
+            - name: MCP_HEARTBEAT_INTERVAL
+              value: "{{ . }}"
+            {{- end }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts: {{ toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
