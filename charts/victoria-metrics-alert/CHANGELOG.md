@@ -12,6 +12,7 @@
 All resources that are managed by chart will be recreated due to changes in naming and labels.
 
 - support setting HTTP headers for remoteWrite, remoteRead, notifiers and datasource. See [#2754](https://github.com/VictoriaMetrics/helm-charts/issues/2754).
+- fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template
 
 ## 0.34.0
 
