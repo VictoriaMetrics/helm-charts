@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix: rename `server.route.labels` to `server.route.extraLabels` in values.yaml as the route template uses extraLabels
 
 ## 0.33.0
 
