@@ -1,8 +1,12 @@
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "mcp-victoriametrics.fullname" . }}
-  labels: {{ include "mcp-victoriametrics.labels" . | nindent 4 }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -10,4 +14,4 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-  selector: {{ include "mcp-victoriametrics.selectorLabels" . | nindent 4 }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}

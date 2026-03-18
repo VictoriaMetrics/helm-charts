@@ -1,9 +1,12 @@
 {{- if .Values.ingress.enabled -}}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "mcp-victoriametrics.fullname" . }}
-  labels: {{ include "mcp-victoriametrics.labels" . | nindent 4 }}
+  name: {{ $fullname }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -33,7 +36,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ include "mcp-victoriametrics.fullname" $ }}
+                name: {{ $fullname }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}

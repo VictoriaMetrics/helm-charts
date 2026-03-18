@@ -2,22 +2,27 @@
 {{- fail "mcp.mode=stdio is not supported in Kubernetes deployments. Use 'sse' or 'http' instead." }}
 {{- end }}
 {{- $isCloud := gt (len .Values.vm.cloudAPIKey) 0 }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $sa := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "mcp-victoriametrics.fullname" . }}
-  labels: {{ include "mcp-victoriametrics.labels" . | nindent 4 }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels: {{ include "mcp-victoriametrics.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "mcp-victoriametrics.labels" . | nindent 8 }}
+        {{- include "vm.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -25,7 +30,10 @@ spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "mcp-victoriametrics.serviceAccountName" . }}
+      {{- if (.Values.serviceAccount).create }}
+      serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
+      {{- end }}
       {{- with .Values.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}

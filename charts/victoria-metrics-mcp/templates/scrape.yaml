@@ -1,17 +1,21 @@
 {{- if .Values.scrape.enabled }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  labels: {{ include "mcp-victoriametrics.labels" . | nindent 4 }}
-  name: {{ include "mcp-victoriametrics.fullname" . }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
 spec:
   endpoints:
     - path: /metrics
       port: http
   namespaceSelector:
     matchNames:
-      - {{ .Release.Namespace }}
+      - {{ include "vm.release" $ctx }}
   selector:
-    matchLabels: {{ include "mcp-victoriametrics.labels" . | nindent 6 }}
+    matchLabels: {{ include "vm.labels" $ctx | nindent 6 }}
 {{- end }}
