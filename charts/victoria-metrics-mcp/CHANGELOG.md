@@ -1,0 +1,12 @@
+## Next release
+
+- move helm chart from mcp-victoriametrics repo to helm-charts repo
+- add new `mcp.passthroughHeaders` param
+
+## 0.1.0
+
+**Release date:** 27 Oct 2025
+
+![AppVersion: v1.19.0](https://img.shields.io/badge/v1.19.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Fmcp-victoriametrics%2Freleases%2Ftag%2Fv1.19.0)
+
+- initial release
