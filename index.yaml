@@ -13376,6 +13376,66 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '**Update note 1**: `.Values.remote.read` was moved to `.Values.remoteRead`. Legacy property is also supported.'
+        - '**Update note 2**: `.Values.remote.write` was moved to `.Values.remoteWrite`. Legacy property is also supported.'
+        - '**Update note 3**: `.Values.notifier.alertmanager` was moved to `.Values.notifier`. Legacy property is also supported.'
+        - '**Update note 4**: `.Values.notifiers[*].alertmanager` was moved to `.Values.notifiers[*]`. Legacy property is also supported.'
+        - '**Update note 5**: `*.basicAuth.username` was moved to `*."basicAuth.username"`. Legacy property is also supported.'
+        - '**Update note 6**: `*.basicAuth.password` was moved to `*."basicAuth.password"`. Legacy property is also supported.'
+        - '**Update note 7**: `*.bearer.token` was moved to `*.bearerToken`. Legacy property is also supported.'
+        - '**Update note 8**: `*.bearer.tokenFile` was moved to `*.bearerTokenFile`. Legacy property is also supported.'
+        - All resources that are managed by chart will be recreated due to changes in naming and labels.
+        - support setting HTTP headers for remoteWrite, remoteRead, notifiers and datasource. See [#2754](https://github.com/VictoriaMetrics/helm-charts/issues/2754).
+        - 'fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-alert
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victoriametrics/vmalert/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/victoriametrics/changelog/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Alert Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-alert/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-alert/changelog/).
+    apiVersion: v2
+    appVersion: v1.138.0
+    created: "2026-03-18T07:23:43.212843757Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.*
+    description: VictoriaMetrics Alert - executes a list of given MetricsQL expressions
+      (rules) and sends alerts to Alert Manager.
+    digest: 97a95f2b4c0745edf32b7076ee423ab20baebfc27381861b368a0162d9548103
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmalert
+    - alerting
+    - alerts
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    - rules
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-alert
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-alert-0.35.0/victoria-metrics-alert-0.35.0.tgz
+    version: 0.35.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - Alertmanager 0.27.0 -> 0.31.1
         - support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
         - bump version of VM components to [v1.138.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.138.0)
@@ -69286,4 +69346,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-03-17T10:58:26.957206706Z"
+generated: "2026-03-18T07:23:44.286229442Z"
