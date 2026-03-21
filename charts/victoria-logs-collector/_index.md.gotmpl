@@ -54,9 +54,179 @@ If multiple `remoteWrite` entries are defined, logs are replicated to all the sp
 
 See [victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/#how-to-install) and [victoria-logs-cluster](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#how-to-install) documentation for details how to determine remote write URL for each installation type.
 
+### On-disk buffer
+
+If the remote VictoriaLogs instance is temporarily unavailable, vlagent buffers collected logs on disk
+and sends them as soon as the connection is restored.
+By default, the buffer is unlimited in size and uses the entire disk space.
+
+To cap how much disk space the buffer can use per destination, set `maxDiskUsagePerURL`:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    maxDiskUsagePerURL: 10GB
+```
+
+When the limit is reached, the oldest buffered logs are dropped to make room for new ones.
+See [replication and high availability docs](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability) for more details.
+
+### Kubernetes metadata
+
+By default, vlagent attaches Pod labels to every log entry.
+You can control which metadata fields are included using the following settings:
+
+```yaml
+collector:
+  includePodLabels: true              # default: true
+  includePodAnnotations: false        # default: false
+  includeNodeLabels: false            # default: false
+  includeNodeAnnotations: false       # default: false
+  includeNamespaceLabels: false       # default: false
+  includeNamespaceAnnotations: false  # default: false
+```
+
+Note that even when a metadata field is excluded from log entries, it is still available for filtering via `collector.excludeFilter`.
+For example, you can filter by Pod annotations without storing them in every log entry:
+
+```yaml
+collector:
+  includePodAnnotations: false
+  excludeFilter: "kubernetes.pod_annotations.victoriametrics.com/vlagent/exclude:=true"
+```
+
+Note that vlagent does not update Node, Pod, and Namespace metadata during runtime.
+If Node, Pod, or Namespace labels change, you must restart vlagent to apply those changes.
+
+### Ignore fields
+
+VictoriaLogs efficiently compresses repeated values, such as Pod and Node labels.
+However, if you prefer not to store certain fields, you have two options.
+
+Use `collector.ignoreFields` to drop fields on the vlagent side before sending to any destination:
+
+```yaml
+collector:
+  ignoreFields:
+    - request.payload*
+    - password
+    - token
+```
+
+Use the `VL-Ignore-Fields` header to drop fields for a specific destination only.
+In this case, the fields are still sent over the network but ignored by VictoriaLogs on ingestion:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    headers:
+      VL-Ignore-Fields:
+        - kubernetes.namespace_labels*
+        - kubernetes.pod_labels*
+```
+
+This allows you to exclude unnecessary or sensitive fields from being ingested.
+If sensitive data has already been ingested, see how to
+[exclude logs from search result](https://docs.victoriametrics.com/victorialogs/security-and-lb/#access-control-inside-a-single-tenant).
+
+### Extra fields
+
+You have two options to attach additional fields to log entries.
+
+Use `collector.extraFields` to add fields on the vlagent side for all destinations:
+
+```yaml
+collector:
+  extraFields: '{"env":"production","cluster":"us-east1"}'
+```
+
+Use the `VL-Extra-Fields` header to add fields for a specific destination only:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    headers:
+      VL-Extra-Fields:
+        zone: us-east1-c
+        source: victoria-logs-collector
+```
+
+This feature lets you attach metadata to every log entry,
+making it easier to filter, group, or analyze logs based on these additional attributes.
+
+### Filtering Kubernetes logs
+
+To skip logs from specific containers before reading them, use `collector.excludeFilter`.
+The filter is applied to container metadata fields before reading the log files,
+which significantly reduces CPU and I/O usage compared to filtering after ingestion.
+
+The filter supports any [LogsQL filter expression](https://docs.victoriametrics.com/victorialogs/logsql/#filters).
+See the full list of supported metadata fields in [vlagent filtering docs](https://docs.victoriametrics.com/victorialogs/vlagent/#filtering-kubernetes-logs).
+
+Exclude vlagent's own logs:
+
+```yaml
+collector:
+  excludeFilter: "kubernetes.pod_name:=%{HOSTNAME}"
+```
+
+Exclude all logs from specific namespaces:
+
+```yaml
+collector:
+  excludeFilter: "kubernetes.pod_namespace:in(kube-system, monitoring)"
+```
+
+Exclude logs from specific containers:
+
+```yaml
+collector:
+  excludeFilter: "kubernetes.container_name:in(config-reloader, prometheus-config-reloader) and kubernetes.pod_namespace:=monitoring"
+```
+
+Exclude Pods by annotation - add `victoriametrics.com/vlagent/exclude: "true"` to a Pod and it will be skipped:
+
+```yaml
+collector:
+  excludeFilter: "kubernetes.pod_annotations.victoriametrics.com/vlagent/exclude:=true"
+```
+
+### Multitenancy
+
+To define [tenant](https://docs.victoriametrics.com/victorialogs/#multitenancy), set `ProjectID` and `AccountID` headers as shown below:
+
+```yaml
+remoteWrite:
+  - url: http://localhost:9428
+    headers:
+      ProjectID: 12
+      AccountID: 42
+```
+
 ### Basic auth
 
-If you need to use basic auth, define the secrets via environment variables as shown below:
+To authenticate against VictoriaLogs using basic auth, store the password in a Kubernetes Secret
+and reference it via `passwordFile` to avoid exposing credentials in values:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    basicAuth:
+      username: vlagent
+      passwordFile: /etc/vlagent/password.txt
+
+extraVolumes:
+  - name: auth-secret
+    secret:
+      secretName: vlagent-auth
+
+extraVolumeMounts:
+  - name: auth-secret
+    mountPath: /etc/vlagent
+    readOnly: true
+```
+
+Alternatively, pass credentials via environment variables:
 
 ```yaml
 remoteWrite:
@@ -75,16 +245,25 @@ env:
         key: VL_USERNAME
 ```
 
-### Multitenancy
+### Bearer token auth
 
-To define [tenant](https://docs.victoriametrics.com/victorialogs/#multitenancy), set `ProjectID` and `AccountID` headers as shown below:
+To authenticate using a bearer token, store the token in a Kubernetes Secret
+and reference it via `bearerTokenFile`. The token file is reloaded automatically when it changes:
 
 ```yaml
 remoteWrite:
-  - url: http://localhost:9428
-    headers:
-      ProjectID: 12
-      AccountID: 42
+  - url: http://victoria-logs:9428
+    bearerTokenFile: /etc/vlagent/token.txt
+
+extraVolumes:
+  - name: auth-token
+    secret:
+      secretName: vlagent-token
+
+extraVolumeMounts:
+  - name: auth-token
+    mountPath: /etc/vlagent
+    readOnly: true
 ```
 
 ### TLS
@@ -110,55 +289,23 @@ extraVolumeMounts:
     readOnly: true
 ```
 
-If you want to disable TLS certificate verification (not recommended in production), you can set `tlsInsecureSkipVerify` to true.
+For mutual TLS (mTLS), additionally specify the client certificate and key:
 
-This will skip verification of the server's certificate and allow connecting to targets with self-signed or invalid certificates.
+```yaml
+remoteWrite:
+  - url: https://victoria-logs:9428
+    tlsCAFile: /etc/tls/ca.crt
+    tlsCertFile: /etc/tls/client.crt
+    tlsKeyFile: /etc/tls/client.key
+```
+
+If you want to disable TLS certificate verification (not recommended in production), you can set `tlsInsecureSkipVerify` to true:
 
 ```yaml
 remoteWrite:
   - url: https://victoria-logs:9428
     tlsInsecureSkipVerify: true
 ```
-
-### Ignore fields
-
-VictoriaLogs efficiently compresses repeated values, such as pod and node labels.
-However, if you prefer not to store certain fields, you can ignore them using the `VL-Ignore-Fields` header.
-For example:
-
-```yaml
-remoteWrite:
-  - url: http://victoria-logs:9428
-    headers:
-      VL-Ignore-Fields:
-        - file
-        - kubernetes.container_id
-        - kubernetes.pod_annotations*
-        - kubernetes.node_labels*
-        - kubernetes.namespace_labels*
-        - kubernetes.pod_labels*
-```
-
-This allows you to exclude unnecessary or sensitive fields from being ingested.
-If sensitive data has already been ingested, see how to
-[exclude logs from search result](https://docs.victoriametrics.com/victorialogs/security-and-lb/#access-control-inside-a-single-tenant).
-
-### Extra fields
-
-You can add custom fields to your logs by setting the `VL-Extra-Fields` header in your configuration.
-For example:
-
-```yaml
-remoteWrite:
-  - url: http://victoria-logs:9428/
-    headers:
-      VL-Extra-Fields:
-        zone: us-east1-c
-        source: victoria-logs-collector
-```
-
-This feature lets you attach metadata to every log entry,
-making it easier to filter, group, or analyze logs based on these additional attributes.
 
 {{ include "chart.installSection" . }}
 
