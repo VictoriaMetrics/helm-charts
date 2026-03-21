@@ -21,7 +21,7 @@ func TestVictoriaMetricsMCPInstallDefault(t *testing.T) {
 	o := cp.opts
 
 	// Verify the Deployment was created and is ready using manual polling
-	vmMCPName := fmt.Sprintf("%s-mcp-victoriametrics", releaseName)
+	vmMCPName := fmt.Sprintf("%s-victoria-metrics-mcp", releaseName)
 	k8s.WaitUntilDeploymentAvailable(t, o.KubectlOptions, vmMCPName, retries, pollingInterval)
 	k8s.WaitUntilServiceAvailable(t, o.KubectlOptions, vmMCPName, retries, pollingInterval)
 }

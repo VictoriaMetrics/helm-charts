@@ -191,6 +191,64 @@ collector:
   excludeFilter: "kubernetes.pod_annotations.victoriametrics.com/vlagent/exclude:=true"
 ```
 
+### Sending logs to external systems
+
+By default, vlagent uses the native VictoriaLogs protocol.
+To send logs to external systems, set `format: jsonline` on the corresponding `remoteWrite` entry.
+
+You can mix destinations with different formats in the same configuration:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-logs:9428
+    format: native
+  - url: http://vector:8080
+    format: jsonline
+```
+
+See [vlagent remote write format docs](https://docs.victoriametrics.com/victorialogs/vlagent/#remote-write-format) for more details.
+
+#### Fluent Bit
+
+Start Fluent Bit with an HTTP input on port `8080`, then configure the collector to forward logs to it.
+Fluent Bit requires the `Content-Type: application/json` header:
+
+```yaml
+remoteWrite:
+  - url: http://fluent-bit:8080
+    format: jsonline
+    headers:
+      Content-Type: application/json
+```
+
+#### Vector
+
+Start Vector with an `http_server` source listening on port `8080` with `codec: json`, then point the collector at it:
+
+```yaml
+remoteWrite:
+  - url: http://vector:8080
+    format: jsonline
+```
+
+#### ClickHouse
+
+To send logs to ClickHouse, include the `INSERT` statement as the `query` HTTP parameter in the URL.
+Choose the `FORMAT` clause based on your table schema:
+
+- `JSONAsObject` - table with a single `JSON` column.
+- `JSONAsString` - table with a single `String` column.
+- `JSONEachRow` - table with multiple columns, each JSON field maps to a column.
+
+```yaml
+remoteWrite:
+  - url: "http://clickhouse:8123?query=INSERT%20INTO%20default.logs%20FORMAT%20JSONAsObject"
+    format: jsonline
+    basicAuth:
+      username: clickhouse-user
+      passwordFile: /etc/vlagent/ch-password.txt
+```
+
 ### Multitenancy
 
 To define [tenant](https://docs.victoriametrics.com/victorialogs/#multitenancy), set `ProjectID` and `AccountID` headers as shown below:
