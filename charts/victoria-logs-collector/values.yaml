@@ -2,47 +2,45 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Important helm-chart settings below, modify them with your own settings
+# Important helm-chart settings below, modify them with your own settings.
 
 image:
-    # -- Image registry
+    # -- Image registry.
     registry: ""
-    # -- Image repository
+    # -- Image repository.
     repository: victoriametrics/vlagent
-    # -- Image tag
+    # -- Image tag.
     tag: ""
-    # -- Image tag suffix, which is appended to `Chart.AppVersion` if no `server.image.tag` is defined
+    # -- Image tag suffix, which is appended to `Chart.AppVersion` if no `server.image.tag` is defined.
     variant: ""
-    # -- Image pull policy
+    # -- Image pull policy.
     pullPolicy: IfNotPresent
 
 # -- List of log destinations. Logs will be replicated to all listed destinations.
 #
 # If the url path is not specified, the logs will be sent to the /insert/native endpoint.
 remoteWrite: []
+  # See more examples with explanation at https://docs.victoriametrics.com/helm/victoria-logs-collector/#chart-configuration
   # - url: http://victoria-logs:9428
-
+  # - url: http://victoria-logs:9428
+  #   maxDiskUsagePerURL: 100G
   # - url: http://victoria-logs:9428
   #   headers:
   #     ProjectID: 0
   #     AccountID: 0
-  #     VL-Extra-Fields:
-  #       zone: us-east1-c
-  #       source: victoria-logs-collector
-  #     VL-Ignore-Fields:
-  #       - kubernetes.node_labels*
-  #       - kubernetes.pod_annotations*
-
   # - url: https://victoria-logs:9428
   #   tlsCAFile: "/etc/tls/ca.crt"
   # - url: https://victoria-logs:9428
   #   tlsInsecureSkipVerify: true
+  # - url: http://vector:8080
+  #   format: jsonline
 
-# -- List of collector specific properties
+# List of collector-specific properties.
 collector:
 
   # -- List of fields to be used as `_time` field. The first found field will be used.
   # See https://docs.victoriametrics.com/victorialogs/keyconcepts/#time-field for more details.
+  # If you set an empty list, then the default time fields will be used.
   timeField:
     - time
     - ts
@@ -50,33 +48,58 @@ collector:
 
   # -- List of fields to be used as `_msg` field. The first found field will be used.
   # See https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field for more details.
+  # Add more fields if you see the 'missing _msg field' message in VictoriaLogs.
+  # If you set an empty list, then the default message fields will be used.
   msgField:
     - message
     - msg
+    - log
+
+  # -- List of fields to be used as `_stream` field.
+  # See https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields for more details.
+  # It is recommended to leave this with default values.
+  # If you set an empty list, then the default stream fields will be used.
+  streamFields:
+    - kubernetes.container_name
+    - kubernetes.pod_name
+    - kubernetes.pod_namespace
 
   # -- LogsQL filter for excluding container logs.
   # The filter is applied to container metadata fields (e.g., kubernetes.namespace_name, kubernetes.container_name) before reading the log files.
   # This significantly reduces CPU and I/O usage by skipping logs from unwanted containers.
   # See https://docs.victoriametrics.com/victorialogs/vlagent/#filtering-kubernetes-logs
   excludeFilter: ""
-  # -- Example: excluding vlagent's own logs
+  # Example: excluding vlagent's own logs.
   # excludeFilter: kubernetes.pod_name:=%{HOSTNAME}
 
   # -- Include Pod labels as additional fields in the log entries.
-  # Even this setting is disabled, Pod labels are available for filtering via .Values.excludeFilter parameter
+  # Even this setting is disabled, Pod labels are available for filtering via .Values.excludeFilter parameter.
   includePodLabels: true
 
   # -- Include Pod annotations as additional fields in the log entries.
-  # Even this setting is disabled, Pod annotations are available for filtering via .Values.excludeFilter parameter
+  # Even this setting is disabled, Pod annotations are available for filtering via .Values.excludeFilter parameter.
   includePodAnnotations: false
 
   # -- Include Node labels as additional fields in the log entries.
-  # Even this setting is disabled, Node labels are available for filtering via .Values.excludeFilter parameter
+  # Even this setting is disabled, Node labels are available for filtering via .Values.excludeFilter parameter.
   includeNodeLabels: false
 
   # -- Include Node annotations as additional fields in the log entries.
-  # Even this setting is disabled, Node annotations are available for filtering via .Values.excludeFilter parameter
+  # Even this setting is disabled, Node annotations are available for filtering via .Values.excludeFilter parameter.
   includeNodeAnnotations: false
+
+  # -- Add additional fields to the log entries.
+  # If you want to add a field per remoteWrite destination, set the VL-Extra-Fields header instead.
+  extraFields: ""
+  # Example: adding a field with the current collector name
+  # '{"collector":"vlagent"}'
+
+  # -- List of fields to be ignored.
+  # A field can be ended with '*' to ignore all fields starting with the specified prefix.
+  # If you want to exclude Kubernetes metadata fields, use includePodLabels/includePodAnnotations/includeNodeLabels/includeNodeAnnotations instead.
+  ignoreFields: []
+  # Example: ignoring fields starting with request.payload.*
+  # ignoreFields: [request.payload.*]
 
 # -- Environment variables (ex.: secret tokens).
 env: []
@@ -94,12 +117,12 @@ resources:
   #   cpu: 100m
   #   memory: 128Mi
 
-# Advanced helm-chart configuration below, it is recommended to pass default parameters
+# Advanced helm-chart configuration below, it is recommended to pass default parameters.
 
-# -- Override chart name
+# -- Override chart name.
 nameOverride: ""
 
-# -- Override resources fullname
+# -- Override resources fullname.
 fullnameOverride: ""
 
 global:
@@ -113,28 +136,28 @@ global:
     openshift:
       adaptSecurityContext: "auto"
   cluster:
-    # -- K8s cluster domain suffix, used for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+    # -- K8s cluster domain suffix, used for building storage Pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/).
     dnsDomain: cluster.local.
 
-# -- Service account is needed to enrich logs with pod metadata using Kubernetes API
+# -- Service account is needed to enrich logs with Pod metadata using Kubernetes API.
 serviceAccount:
   # Automatically mount a ServiceAccount's API credentials?
   automount: true
-  # Annotations to add to the service account
+  # Annotations to add to the service account.
   annotations: {}
   # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # If not set and create is true, a name is generated using the fullname template.
   name: ""
 
-# -- Extra labels for Pods only
+# -- Extra labels for Pods only.
 podLabels: {}
 
-# -- Security context to be added to pod
+# -- Security context to be added to Pod.
 podSecurityContext:
   enabled: true
   # fsGroup: 2000
 
-# -- Security context to be added to pod's containers
+# -- Security context to be added to Pod's containers.
 securityContext:
   enabled: true
   # capabilities:
@@ -144,46 +167,46 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
-# -- Extra Volumes for the pod
+# -- Extra Volumes for the Pod.
 extraVolumes: []
   # - name: tls-certs
   #   secret:
   #     secretName: mtls-secret
 
-# -- Extra Volume Mounts for the container
+# -- Extra Volume Mounts for the container.
 extraVolumeMounts: []
   # - name: tls-certs
   #   mountPath: /etc/mtls
   #   readOnly: true
 
-# -- Annotations to be added to the deployment
+# -- Annotations to be added to the deployment.
 annotations: {}
 
-# -- Annotations to be added to pod
+# -- Annotations to be added to Pod.
 podAnnotations: {}
 
-# -- DaemonSet update strategy
+# -- DaemonSet update strategy.
 updateStrategy: {}
 #   type: RollingUpdate
 #   rollingUpdate:
 #     maxUnavailable: 1
 
-# -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+# -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
 nodeSelector: {}
 
-# -- Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+# -- Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/).
 tolerations: []
 
-# -- Pod topologySpreadConstraints
+# -- Pod topologySpreadConstraints.
 topologySpreadConstraints: # []
   # - maxSkew: 1
   #   topologyKey: topology.kubernetes.io/zone
   #   whenUnsatisfiable: DoNotSchedule
 
-# -- Pod affinity
+# -- Pod affinity.
 affinity: {}
 
-# -- Priority class to be assigned to the pod(s)
+# -- Priority class to be assigned to the Pod(s).
 priorityClassName: ""
 
 podMonitor:
@@ -193,34 +216,35 @@ podMonitor:
   extraLabels: {}
   # -- PodMonitor annotations
   annotations: {}
-  # -- Whether to use [VMPodScrape](https://docs.victoriametrics.com/operator/resources/vmpodscrape/) from VM operator instead of PodMonitor
+  # -- Whether to use [VMPodScrape](https://docs.victoriametrics.com/operator/resources/vmpodscrape/) from VM operator instead of PodMonitor.
   vm: false
 
-# -- VLAgent extra command line arguments
+# -- vlagent extra command line arguments.
 extraArgs:
   envflag.enable: true
   envflag.prefix: VL_
   loggerFormat: json
+  # Path to the directory on the host where the collector stores temporary data.
   tmpDataPath: /var/lib/vl-collector
 
 # -- Enterprise license key configuration for VictoriaLogs enterprise.
 # Required only for VictoriaLogs enterprise. Check docs [here](https://docs.victoriametrics.com/victoriametrics/enterprise/#victorialogs-enterprise-features),
-# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/)
+# Request a trial license [here](https://victoriametrics.com/products/enterprise/trial/).
 license:
-  # -- License key
+  # -- License key.
   key: ""
 
-  # -- Use existing secret with license key
+  # -- Use existing secret with license key.
   secret:
-    # -- Existing secret name
+    # -- Existing secret name.
     name: ""
-    # -- Key in secret with license key
+    # -- Key in secret with license key.
     key: ""
 
 persistence:
   volume: {}
 
-# -- Default volumes that are mounted into pods. In most cases, these should not be changed.
+# -- Default volumes that are mounted into Pods. In most cases, these should not be changed.
 # Use `extraVolumes`/`extraVolumeMounts` for additional custom volumes.
 defaultVolumes:
   - name: varlog
@@ -230,7 +254,7 @@ defaultVolumes:
     hostPath:
       path: /var/lib
 
-# -- Mounts for defaultVolumes
+# -- Mounts for defaultVolumes.
 defaultVolumeMounts:
   - name: varlog
     mountPath: /var/log
