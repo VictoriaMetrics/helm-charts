@@ -95,10 +95,6 @@
     {{- $rw = mergeOverwrite $rw (fromYaml (include "victoria-logs-collector.tls" $)) }}
     {{- $_ := unset $rw "tls"}}
 
-    {{- if hasKey $rw "basicAuth" }}
-      {{- fail "set VL_remoteWrite_basicAuth_username and VL_remoteWrite_basicAuth_password env vars instead" }}
-    {{- end }}
-
     {{- range $rwKey, $rwValue := $rw }}
       {{- if has $rwKey $requiredParams }}
         {{- if empty $rw }}
@@ -114,7 +110,9 @@
       {{- $value := $rwValue }}
       {{- if eq $rwKey "url" }}
         {{- $url := urlParse $rwValue }}
-        {{- $_ = set $url "path" (ternary "/insert/native" $url.path (empty (trimPrefix "/" $url.path))) }}
+        {{- $isEmptyPath := empty (trimPrefix "/" $url.path) }}
+        {{- $isNativeFormat := or (empty $rw.format) (eq $rw.format "native") }}
+        {{- $_ = set $url "path" (ternary "/insert/native" $url.path (and $isEmptyPath $isNativeFormat)) }}
         {{- $value = urlJoin $url }}
       {{- else if eq $rwKey "headers" }}
         {{- $headers := list }}
