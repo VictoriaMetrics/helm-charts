@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added ability to configure operator deployment strategy. See [#2778](https://github.com/VictoriaMetrics/helm-charts/issues/2778).
 
 ## 0.59.3
 
