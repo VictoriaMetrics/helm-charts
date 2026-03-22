@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- URL with format=jsonline no longer incorrectly routes to /insert/native
 
 ## 0.2.13
 

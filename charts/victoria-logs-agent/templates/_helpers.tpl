@@ -26,7 +26,9 @@
       {{- $value := $rwValue }}
       {{- if eq $rwKey "url" }}
         {{- $url := urlParse $rwValue }}
-        {{- $_ = set $url "path" (ternary "/insert/native" $url.path (empty (trimPrefix "/" $url.path))) }}
+        {{- $isEmptyPath := empty (trimPrefix "/" $url.path) }}
+        {{- $isNativeFormat := or (empty $rw.format) (eq $rw.format "native") }}
+        {{- $_ = set $url "path" (ternary "/insert/native" $url.path (and $isEmptyPath $isNativeFormat)) }}
         {{- $value = urlJoin $url }}
       {{- else if eq $rwKey "headers" }}
         {{- $headers := list }}
