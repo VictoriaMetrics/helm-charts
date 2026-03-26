@@ -1,6 +1,7 @@
 ## Next release
 
 - fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template
+- feat: add `timeouts` support for HTTPRoute in vmselect, vminsert, and vmauth components
 
 ## 0.37.0
 
