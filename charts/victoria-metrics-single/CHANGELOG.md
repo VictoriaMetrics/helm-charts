@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.139.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.139.0)
 - fix: rename `server.route.labels` to `server.route.extraLabels` in values.yaml as the route template uses extraLabels
 
 ## 0.33.0
