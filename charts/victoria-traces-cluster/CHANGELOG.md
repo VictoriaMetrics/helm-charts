@@ -1,6 +1,7 @@
 ## Next release
 
 - fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template
+- support volumeAttributesClassName PVC attribute. See [#2782](https://github.com/VictoriaMetrics/helm-charts/issues/2782).
 
 ## 0.0.7
 

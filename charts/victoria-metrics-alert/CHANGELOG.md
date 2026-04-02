@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VM components to [v1.139.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.139.0)
+- support volumeAttributesClassName PVC attribute. See [#2782](https://github.com/VictoriaMetrics/helm-charts/issues/2782).
 
 ## 0.35.0
 

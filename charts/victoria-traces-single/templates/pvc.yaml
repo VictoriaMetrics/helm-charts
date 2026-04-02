@@ -20,6 +20,9 @@ spec:
   {{- with $pvc.accessModes }}
   accessModes: {{ toYaml . | nindent 4 }}
   {{- end }}
+  {{- with $pvc.volumeAttributeClassName }}
+  volumeAttributesClassName: {{ . }}
+  {{- end }}
   resources:
     requests:
       storage: {{ $pvc.size }}

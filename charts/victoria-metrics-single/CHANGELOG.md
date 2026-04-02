@@ -2,6 +2,7 @@
 
 - bump version of VM components to [v1.139.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.139.0)
 - fix: rename `server.route.labels` to `server.route.extraLabels` in values.yaml as the route template uses extraLabels
+- support volumeAttributesClassName PVC attribute. See [#2782](https://github.com/VictoriaMetrics/helm-charts/issues/2782).
 
 ## 0.33.0
 
