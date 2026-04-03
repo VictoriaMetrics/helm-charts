@@ -1,5 +1,6 @@
 ## Next release
 
+- bump VictoriaLogs version to [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0).
 - fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template
 
 ## 0.0.12
