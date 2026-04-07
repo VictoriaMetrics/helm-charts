@@ -30,15 +30,6 @@ spec:
   clusterIP: {{. }}
   {{- end }}
   {{- end }}
-  {{- if eq $type "NodePort" }}
-    {{- with $service.nodePort }}
-      {{- if and (ge . 30000) (le . 31999) }}
-  nodePort: {{ . }}
-      {{- else }}
-        {{- fail (printf "nodePort %d is out of valid range (30000-31999)" .) }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
   {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -63,6 +54,9 @@ spec:
   {{- $portsTpl := printf "%s.ports" $name }}
   {{- with include $portsTpl $app }}
   ports: {{ . | nindent 4 }}
+      {{- if eq $type "NodePort" }}
+      nodePort: {{ $service.nodePort }}
+      {{- end }}
   {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}
