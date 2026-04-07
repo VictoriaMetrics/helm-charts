@@ -54,7 +54,7 @@ spec:
   {{- $portsTpl := printf "%s.ports" $name }}
   {{- with include $portsTpl $app }}
   ports: {{ . | nindent 4 }}
-  {{- if eq $type "NodePort" }}
+  {{- if and (eq $type "NodePort") $service.nodePort }}
   nodePort: {{ $service.nodePort }}
   {{- end }}
   {{- end }}
