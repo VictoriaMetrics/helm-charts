@@ -104,7 +104,7 @@ panels:
   type: row
 - title: Pressure
   targets:
-  - expr: {{ printf "irate(node_pressure_cpu_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+  - expr: {{ printf "rate(node_pressure_cpu_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: false
     format: time_series
@@ -113,7 +113,7 @@ panels:
     range: false
     refId: A
     step: 240
-  - expr: {{ printf "irate(node_pressure_memory_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+  - expr: {{ printf "rate(node_pressure_memory_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: false
     format: time_series
@@ -122,7 +122,7 @@ panels:
     range: false
     refId: B
     step: 240
-  - expr: {{ printf "irate(node_pressure_io_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+  - expr: {{ printf "rate(node_pressure_io_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: false
     format: time_series
@@ -131,7 +131,7 @@ panels:
     range: false
     refId: C
     step: 240
-  - expr: {{ printf "irate(node_pressure_irq_stalled_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+  - expr: {{ printf "rate(node_pressure_irq_stalled_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
     editorMode: code
     exemplar: false
     format: time_series
@@ -757,7 +757,7 @@ panels:
   type: row
 - title: CPU Basic
   targets:
-  - expr: {{ printf "sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=\"system\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+  - expr: {{ printf "avg(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=\"system\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     exemplar: false
     format: time_series
@@ -766,35 +766,35 @@ panels:
     range: true
     refId: A
     step: 240
-  - expr: {{ printf "sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=\"user\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+  - expr: {{ printf "avg(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=\"user\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     legendFormat: Busy User
     range: true
     refId: B
     step: 240
-  - expr: {{ printf "sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=\"iowait\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+  - expr: {{ printf "avg(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=\"iowait\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     legendFormat: Busy Iowait
     range: true
     refId: C
     step: 240
-  - expr: {{ printf "sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=~\".*irq\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+  - expr: {{ printf "sum(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=~\".*irq\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     legendFormat: Busy IRQs
     range: true
     refId: D
     step: 240
-  - expr: {{ printf "sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode!=\"idle\",mode!=\"user\",mode!=\"system\",mode!=\"iowait\",mode!=\"irq\",mode!=\"softirq\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+  - expr: {{ printf "avg(sum(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode!=\"idle\",mode!=\"user\",mode!=\"system\",mode!=\"iowait\",mode!=\"irq\",mode!=\"softirq\",%s=~\"$cluster\"}[$__rate_interval])) without(mode)) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     legendFormat: Busy Other
     range: true
     refId: E
     step: 240
-  - expr: {{ printf "sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=\"idle\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+  - expr: {{ printf "avg(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=\"idle\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     legendFormat: Idle
@@ -1205,7 +1205,7 @@ panels:
   panels:
   - title: CPU
     targets:
-    - expr: {{ printf "sum(irate(node_cpu_seconds_total{mode=\"system\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode=\"system\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -1213,56 +1213,56 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "sum(irate(node_cpu_seconds_total{mode=\"user\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode=\"user\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: User - Normal processes executing in user mode
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "sum(irate(node_cpu_seconds_total{mode=\"nice\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode=\"nice\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Nice - Niced processes executing in user mode
       range: true
       refId: C
       step: 240
-    - expr: {{ printf "sum(irate(node_cpu_seconds_total{mode=\"iowait\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode=\"iowait\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Iowait - Waiting for I/O to complete
       range: true
       refId: D
       step: 240
-    - expr: {{ printf "sum(irate(node_cpu_seconds_total{mode=\"irq\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode=\"irq\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Irq - Servicing interrupts
       range: true
       refId: E
       step: 240
-    - expr: {{ printf "sum(irate(node_cpu_seconds_total{mode=\"softirq\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode=\"softirq\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Softirq - Servicing softirqs
       range: true
       refId: F
       step: 240
-    - expr: {{ printf "sum(irate(node_cpu_seconds_total{mode=\"steal\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode=\"steal\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Steal - Time spent in other operating systems when running in a virtualized environment
       range: true
       refId: G
       step: 240
-    - expr: {{ printf "sum(irate(node_cpu_seconds_total{mode=\"idle\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "sum(rate(node_cpu_seconds_total{mode=\"idle\",instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) / scalar(count(count(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}) by(cpu,%s)) by(%s))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Idle - Waiting for something to happen
       range: true
       refId: H
       step: 240
-    - expr: {{ printf "(sum(irate(node_cpu_guest_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / on(instance,%s) group_left() sum(irate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)) > 0" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(sum(rate(node_cpu_guest_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s) / on(instance,%s) group_left() sum(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)) > 0" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Guest CPU usage
@@ -1884,13 +1884,13 @@ panels:
     type: timeseries
   - title: Disk IOps
     targets:
-    - expr: {{ printf "irate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       legendFormat: '{{`{{`}}device{{`}}`}} - Read'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       legendFormat: '{{`{{`}}device{{`}}`}} - Write'
       range: true
@@ -1969,14 +1969,14 @@ panels:
     type: timeseries
   - title: Disk Throughput
     targets:
-    - expr: {{ printf "irate(node_disk_read_bytes_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_read_bytes_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: '{{`{{`}}device{{`}}`}} - Read'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_disk_written_bytes_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_written_bytes_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: '{{`{{`}}device{{`}}`}} - Write'
@@ -2223,7 +2223,7 @@ panels:
     type: timeseries
   - title: Disk I/O Utilization
     targets:
-    - expr: {{ printf "irate(node_disk_io_time_seconds_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_io_time_seconds_total{instance=\"$node\",job=\"$job\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -3711,14 +3711,14 @@ panels:
   panels:
   - title: Memory Pages In / Out
     targets:
-    - expr: {{ printf "irate(node_vmstat_pgpgin{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_vmstat_pgpgin{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Pagesin - Page in ops
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_vmstat_pgpgout{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_vmstat_pgpgout{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Pagesout - Page out ops
@@ -3798,14 +3798,14 @@ panels:
     type: timeseries
   - title: Memory Pages Swap In / Out
     targets:
-    - expr: {{ printf "irate(node_vmstat_pswpin{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_vmstat_pswpin{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Pswpin - Pages swapped in
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_vmstat_pswpout{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_vmstat_pswpout{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Pswpout - Pages swapped out
@@ -3885,21 +3885,21 @@ panels:
     type: timeseries
   - title: Memory Page Faults
     targets:
-    - expr: {{ printf "irate(node_vmstat_pgfault{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_vmstat_pgfault{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Pgfault - Page major and minor fault ops
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_vmstat_pgmajfault{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_vmstat_pgmajfault{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Pgmajfault - Major page fault ops
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "irate(node_vmstat_pgfault{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) - irate(node_vmstat_pgmajfault{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel $clusterLabel }}
+    - expr: {{ printf "rate(node_vmstat_pgfault{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) - rate(node_vmstat_pgmajfault{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Pgminfault - Minor page fault ops
@@ -3995,7 +3995,7 @@ panels:
     type: timeseries
   - title: OOM Killer
     targets:
-    - expr: {{ printf "irate(node_vmstat_oom_kill{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_vmstat_oom_kill{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -4522,7 +4522,7 @@ panels:
     type: timeseries
   - title: PPS Sync Events
     targets:
-    - expr: {{ printf "irate(node_timex_pps_calibration_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_timex_pps_calibration_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -4530,7 +4530,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_timex_pps_error_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_timex_pps_error_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -4538,7 +4538,7 @@ panels:
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "irate(node_timex_pps_stability_exceeded_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_timex_pps_stability_exceeded_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -4546,7 +4546,7 @@ panels:
       range: true
       refId: C
       step: 240
-    - expr: {{ printf "irate(node_timex_pps_jitter_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_timex_pps_jitter_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -4835,7 +4835,7 @@ panels:
     type: timeseries
   - title: Processes Forks
     targets:
-    - expr: {{ printf "irate(node_forks_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_forks_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Process Forks per second
@@ -4910,7 +4910,7 @@ panels:
     type: timeseries
   - title: CPU Saturation per Core
     targets:
-    - expr: {{ printf "irate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       hide: true
@@ -4919,7 +4919,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       hide: true
@@ -4928,7 +4928,7 @@ panels:
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "((irate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) + irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) >bool 0) * (irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / (irate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) + irate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "((rate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) + rate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])) >bool 0) * (rate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / (rate(node_schedstat_running_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) + rate(node_schedstat_waiting_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])))" $clusterLabel $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -5221,14 +5221,14 @@ panels:
   panels:
   - title: Context Switches / Interrupts
     targets:
-    - expr: {{ printf "irate(node_context_switches_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_context_switches_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Context switches
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_intr_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_intr_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: Interrupts
@@ -5544,7 +5544,7 @@ panels:
     type: timeseries
   - title: CPU Schedule Timeslices
     targets:
-    - expr: {{ printf "irate(node_schedstat_timeslices_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_schedstat_timeslices_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -5619,7 +5619,7 @@ panels:
     type: timeseries
   - title: IRQ Detail
     targets:
-    - expr: {{ printf "irate(node_interrupts_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_interrupts_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -6398,7 +6398,7 @@ panels:
     type: timeseries
   - title: Systemd Sockets Accepted
     targets:
-    - expr: {{ printf "irate(node_systemd_socket_accepted_connections_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_systemd_socket_accepted_connections_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -6474,7 +6474,7 @@ panels:
     type: timeseries
   - title: Systemd Sockets Refused
     targets:
-    - expr: {{ printf "irate(node_systemd_socket_refused_connections_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_systemd_socket_refused_connections_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -6560,13 +6560,13 @@ panels:
   panels:
   - title: Disk Read/Write IOps
     targets:
-    - expr: {{ printf "irate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       legendFormat: '{{`{{`}}device{{`}}`}} - Read'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       legendFormat: '{{`{{`}}device{{`}}`}} - Write'
       range: true
@@ -6653,14 +6653,14 @@ panels:
     type: timeseries
   - title: Disk Read/Write Data
     targets:
-    - expr: {{ printf "irate(node_disk_read_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_read_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: '{{`{{`}}device{{`}}`}} - Read'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_disk_written_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_written_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       exemplar: false
       format: time_series
@@ -6750,14 +6750,14 @@ panels:
     type: timeseries
   - title: Disk Average Wait Time
     targets:
-    - expr: {{ printf "(irate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) >bool 0) * (irate(node_disk_read_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / irate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]))" $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(rate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) >bool 0) * (rate(node_disk_read_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / rate(node_disk_reads_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]))" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Read'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "(irate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) >bool 0) * (irate(node_disk_write_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / irate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]))" $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(rate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) >bool 0) * (rate(node_disk_write_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / rate(node_disk_writes_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]))" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Write'
@@ -6845,7 +6845,7 @@ panels:
     type: timeseries
   - title: Average Queue Size
     targets:
-    - expr: {{ printf "irate(node_disk_io_time_weighted_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_io_time_weighted_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}}'
@@ -6928,13 +6928,13 @@ panels:
     type: timeseries
   - title: Disk R/W Merged
     targets:
-    - expr: {{ printf "irate(node_disk_reads_merged_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_reads_merged_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       legendFormat: '{{`{{`}}device{{`}}`}} - Read'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_disk_writes_merged_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_writes_merged_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       legendFormat: '{{`{{`}}device{{`}}`}} - Write'
       range: true
@@ -7021,21 +7021,21 @@ panels:
     type: timeseries
   - title: Time Spent Doing I/Os
     targets:
-    - expr: {{ printf "irate(node_disk_io_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_io_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - General IO'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_disk_discard_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_discard_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Discard/TRIM'
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "irate(node_disk_flush_requests_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_flush_requests_time_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Flush (write cache)'
@@ -7118,21 +7118,21 @@ panels:
     type: timeseries
   - title: Disk Ops Discards / Flush
     targets:
-    - expr: {{ printf "irate(node_disk_discards_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_discards_completed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Discards completed'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_disk_discards_merged_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_discards_merged_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Discards merged'
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "irate(node_disk_flush_requests_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_flush_requests_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}} - Flush'
@@ -7214,7 +7214,7 @@ panels:
     type: timeseries
   - title: Disk Sectors Discarded Successfully
     targets:
-    - expr: {{ printf "irate(node_disk_discarded_sectors_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_disk_discarded_sectors_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: '{{`{{`}}device{{`}}`}}'
@@ -9557,7 +9557,7 @@ panels:
     type: timeseries
   - title: Softnet Packets
     targets:
-    - expr: {{ printf "irate(node_softnet_processed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_softnet_processed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -9565,7 +9565,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_softnet_dropped_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_softnet_dropped_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -9647,7 +9647,7 @@ panels:
     type: timeseries
   - title: Softnet Out of Quota
     targets:
-    - expr: {{ printf "irate(node_softnet_times_squeezed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_softnet_times_squeezed_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -9725,7 +9725,7 @@ panels:
     type: timeseries
   - title: Softnet RPS
     targets:
-    - expr: {{ printf "irate(node_softnet_received_rps_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_softnet_received_rps_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -9733,7 +9733,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_softnet_flow_limit_count_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_softnet_flow_limit_count_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -9829,7 +9829,7 @@ panels:
   panels:
   - title: Netstat IP In / Out Octets
     targets:
-    - expr: {{ printf "irate(node_netstat_IpExt_InOctets{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_IpExt_InOctets{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -9837,7 +9837,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_netstat_IpExt_OutOctets{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_IpExt_OutOctets{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: IP Tx out
@@ -9918,7 +9918,7 @@ panels:
     type: timeseries
   - title: TCP In / Out
     targets:
-    - expr: {{ printf "irate(node_netstat_Tcp_InSegs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Tcp_InSegs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       instant: false
@@ -9926,7 +9926,7 @@ panels:
       legendFormat: TCP Rx in
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_netstat_Tcp_OutSegs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Tcp_OutSegs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10013,7 +10013,7 @@ panels:
     type: timeseries
   - title: UDP In / Out
     targets:
-    - expr: {{ printf "irate(node_netstat_Udp_InDatagrams{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Udp_InDatagrams{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10021,7 +10021,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_netstat_Udp_OutDatagrams{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Udp_OutDatagrams{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10102,7 +10102,7 @@ panels:
     type: timeseries
   - title: ICMP In / Out
     targets:
-    - expr: {{ printf "irate(node_netstat_Icmp_InMsgs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Icmp_InMsgs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10110,7 +10110,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_netstat_Icmp_OutMsgs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Icmp_OutMsgs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10193,7 +10193,7 @@ panels:
     type: timeseries
   - title: TCP Errors
     targets:
-    - expr: {{ printf "irate(node_netstat_TcpExt_ListenOverflows{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_ListenOverflows{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10201,7 +10201,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_netstat_TcpExt_ListenDrops{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_ListenDrops{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10209,7 +10209,7 @@ panels:
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "irate(node_netstat_TcpExt_TCPSynRetrans{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_TCPSynRetrans{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10217,37 +10217,37 @@ panels:
       range: true
       refId: C
       step: 240
-    - expr: {{ printf "irate(node_netstat_Tcp_RetransSegs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Tcp_RetransSegs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: Segment Retransmits
       range: true
       refId: D
-    - expr: {{ printf "irate(node_netstat_Tcp_InErrs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Tcp_InErrs{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: Receive Errors
       range: true
       refId: E
-    - expr: {{ printf "irate(node_netstat_Tcp_OutRsts{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Tcp_OutRsts{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: RST Sent
       range: true
       refId: F
-    - expr: {{ printf "irate(node_netstat_TcpExt_TCPRcvQDrop{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_TCPRcvQDrop{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: Receive Queue Drops
       range: true
       refId: G
-    - expr: {{ printf "irate(node_netstat_TcpExt_TCPOFOQueue{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_TCPOFOQueue{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: Out-of-order Queued
       range: true
       refId: H
-    - expr: {{ printf "irate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_TCPTimeouts{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: TCP Timeouts
@@ -10321,7 +10321,7 @@ panels:
     type: timeseries
   - title: UDP Errors
     targets:
-    - expr: {{ printf "irate(node_netstat_Udp_InErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Udp_InErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10329,7 +10329,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_netstat_Udp_NoPorts{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Udp_NoPorts{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10337,13 +10337,13 @@ panels:
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "irate(node_netstat_UdpLite_InErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_UdpLite_InErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       interval: ""
       legendFormat: UDPLite Rx in Errors
       range: true
       refId: C
-    - expr: {{ printf "irate(node_netstat_Udp_RcvbufErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Udp_RcvbufErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10351,7 +10351,7 @@ panels:
       range: true
       refId: D
       step: 240
-    - expr: {{ printf "irate(node_netstat_Udp_SndbufErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Udp_SndbufErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10428,7 +10428,7 @@ panels:
     type: timeseries
   - title: ICMP Errors
     targets:
-    - expr: {{ printf "irate(node_netstat_Icmp_InErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Icmp_InErrors{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10509,7 +10509,7 @@ panels:
     type: timeseries
   - title: TCP SynCookie
     targets:
-    - expr: {{ printf "irate(node_netstat_TcpExt_SyncookiesFailed{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_SyncookiesFailed{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10517,7 +10517,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_netstat_TcpExt_SyncookiesRecv{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_SyncookiesRecv{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10525,7 +10525,7 @@ panels:
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "irate(node_netstat_TcpExt_SyncookiesSent{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_TcpExt_SyncookiesSent{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10791,7 +10791,7 @@ panels:
     type: timeseries
   - title: TCP Direct Transition
     targets:
-    - expr: {{ printf "irate(node_netstat_Tcp_ActiveOpens{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Tcp_ActiveOpens{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -10799,7 +10799,7 @@ panels:
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "irate(node_netstat_Tcp_PassiveOpens{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(node_netstat_Tcp_PassiveOpens{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -11264,7 +11264,7 @@ panels:
     type: timeseries
   - title: Exporter Process CPU Usage
     targets:
-    - expr: {{ printf "irate(process_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
+    - expr: {{ printf "rate(process_cpu_seconds_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval])" $clusterLabel }}
       editorMode: code
       format: time_series
       interval: ""
@@ -11686,5 +11686,5 @@ time:
   to: now
 timepicker: {}
 uid: rYdddlPWk
-version: 99
+version: 100
 weekStart: ""

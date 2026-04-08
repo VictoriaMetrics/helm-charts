@@ -574,7 +574,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s) / sum(rate(apiserver_request_total{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s) / (sum(rate(apiserver_request_total{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s) > 0)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
@@ -643,7 +643,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(verb,%s) / sum(rate(apiserver_request_total{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(verb,%s)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(apiserver_request_total{code=~\"5..\",%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(verb,%s) / (sum(rate(apiserver_request_total{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(verb,%s) > 0)" $clusterLabel $clusterLabel $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} verb {{`}}`}}'
@@ -781,7 +781,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(rate(workqueue_depth{%s=~\"$cluster\",job=~\"$job\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(workqueue_depth{%s=~\"$cluster\",job=~\"$job\"}) by(instance,%s)" $clusterLabel $clusterLabel }}
     exemplar: true
     interval: $resolution
     legendFormat: '{{`{{`}} instance {{`}}`}}'
@@ -1023,5 +1023,5 @@ time:
   to: now
 timepicker: {}
 uid: k8s_system_apisrv
-version: 20
+version: 21
 weekStart: ""
