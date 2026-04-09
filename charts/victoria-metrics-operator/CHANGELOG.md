@@ -1,6 +1,7 @@
 ## Next release
 
 - added ability to configure operator deployment strategy. See [#2778](https://github.com/VictoriaMetrics/helm-charts/issues/2778).
+- updates operator to [v0.68.4](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.4) version
 
 ## 0.59.3
 
