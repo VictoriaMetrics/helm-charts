@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.59.4
+
+**Release date:** 09 Apr 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0684)
+
 - added ability to configure operator deployment strategy. See [#2778](https://github.com/VictoriaMetrics/helm-charts/issues/2778).
 - updates operator to [v0.68.4](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.4) version
 
