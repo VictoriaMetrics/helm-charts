@@ -1,0 +1,39 @@
+
+{{- $Values := (.helm).Values | default .Values }}
+{{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
+{{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
+{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
+{{- $groupLabels := join "," (uniq $additionalGroupByLabels) }}
+{{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
+name: vlogs
+rules:
+- alert: DiskRunsOutOfSpace
+  expr: {{ printf "(sum(vl_data_size_bytes) by(job,instance,%s) / (sum(vl_free_disk_space_bytes) by(job,instance,%s) + sum(vl_data_size_bytes) by(job,instance,%s))) > 0.8" $groupLabels $groupLabels $groupLabels }}
+  annotations:
+    description: |-
+      Disk utilisation on instance {{`{{`}} $labels.instance {{`}}`}} is more than 80%.
+       Having less than 20% of free disk space could cripple merge processes and overall performance. Consider to limit the ingestion rate, decrease retention or scale the disk space if possible.
+    summary: Instance {{`{{`}} $labels.instance {{`}}`}} (job={{`{{`}} $labels.job {{`}}`}}) will run out of disk space soon
+  condition: true
+  for: 30m
+  labels:
+    severity: critical
+- alert: RequestErrorsToAPI
+  expr: increase(vl_http_errors_total[5m]) > 0
+  annotations:
+    description: Requests to path {{`{{`}} $labels.path {{`}}`}} are receiving errors. Please verify if clients are sending correct requests.
+    summary: Too many errors served for path {{`{{`}} $labels.path {{`}}`}} (instance {{`{{`}} $labels.instance {{`}}`}})
+  condition: true
+  for: 15m
+  labels:
+    severity: warning
+- alert: RowsRejectedOnIngestion
+  expr: rate(vl_rows_dropped_total[5m]) > 0
+  annotations:
+    description: 'VictoriaLogs is rejecting to ingest rows on "{{`{{`}} $labels.instance {{`}}`}}" due to the following reason: "{{`{{`}} $labels.reason {{`}}`}}"'
+    summary: Some rows are rejected on "{{`{{`}} $labels.instance {{`}}`}}" on ingestion attempt
+  condition: true
+  for: 15m
+  labels:
+    severity: warning
+condition: true

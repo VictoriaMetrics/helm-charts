@@ -91,7 +91,9 @@ var alertsMap = map[string]string{
 // Dashboards map
 var dashboardsMap = map[string]string{
 	"vector-k8s-monitoring":         "",
-	"victorialogs-single-node":      "($Values.vlogs).enabled",
+	"victorialogs-single-node":      "or ($Values.vlogs).enabled ($Values.vlsingle).enabled",
+	"victorialogs-cluster":          "($Values.vlcluster).enabled",
+	"victorialogs-vlagent":          "($Values.vlagent).enabled",
 	"alertmanager-overview":         "($Values.alertmanager).enabled",
 	"kubernetes-system-api-server":  "($Values.kubeApiServer).enabled",
 	"kubernetes-controller-manager": "($Values.kubeControllerManager).enabled",
@@ -124,6 +126,8 @@ var dashboardClusterMetric = map[string]string{
 	"victoriametrics-vmalert":       "vm_app_version",
 	"victoriametrics-vmagent":       "vm_app_version",
 	"victorialogs-single-node":      "vm_app_version",
+	"victorialogs-cluster":          "vm_app_version",
+	"victorialogs-vlagent":          "vm_app_version",
 	"grafana-overview":              "grafana_build_info",
 	"alertmanager-overview":         "alertmanager_alerts",
 	"node-exporter-full":            "node_uname_info",
@@ -251,6 +255,42 @@ var sources = []source{
 		kind: "dashboards",
 		charts: []string{
 			"victoria-logs-single",
+			"victoria-logs-k8s-stack",
+		},
+	},
+	{
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/dashboards/victorialogs-cluster.json",
+		kind: "dashboards",
+		charts: []string{
+			"victoria-logs-k8s-stack",
+		},
+	},
+	{
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/dashboards/vlagent.json",
+		kind: "dashboards",
+		charts: []string{
+			"victoria-logs-k8s-stack",
+		},
+	},
+	{
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/deployment/docker/rules/alerts-vlogs.yml",
+		kind: "rules",
+		charts: []string{
+			"victoria-logs-k8s-stack",
+		},
+	},
+	{
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/deployment/docker/rules/alerts-vlagent.yml",
+		kind: "rules",
+		charts: []string{
+			"victoria-logs-k8s-stack",
+		},
+	},
+	{
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/deployment/docker/rules/alerts-health.yml",
+		kind: "rules",
+		charts: []string{
+			"victoria-logs-k8s-stack",
 		},
 	},
 	{
@@ -1014,6 +1054,8 @@ func patchDashboard(d *dashboard, name string) {
 							if len(args) > 0 {
 								rawQuery = fmt.Sprintf(`(printf %q %s)`, rawQuery, args)
 								expr = fmt.Sprintf(`<< ternary (printf %q %s) ".*" $multicluster >>`, expr, args)
+							} else {
+								rawQuery = fmt.Sprintf("%q", rawQuery)
 							}
 							t.Query.StrVal = fmt.Sprintf(`<< ternary %s ".*" $multicluster >>`, rawQuery)
 						} else {

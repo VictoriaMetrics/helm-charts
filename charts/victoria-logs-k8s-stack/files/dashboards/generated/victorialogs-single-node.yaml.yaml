@@ -1617,7 +1617,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $DS_PROMETHEUS
-    expr: {{ printf "max(rate(process_pressure_memory_waiting_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(rate(process_pressure_memory_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     hide: false
@@ -1629,7 +1629,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $DS_PROMETHEUS
-    expr: {{ printf "sum(rate(process_pressure_memory_stalled_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(rate(process_pressure_memory_stalled_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     hide: false
@@ -2252,7 +2252,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $DS_PROMETHEUS
-    expr: {{ printf "max(rate(process_pressure_io_waiting_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(rate(process_pressure_io_waiting_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     interval: ""
@@ -2263,7 +2263,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $DS_PROMETHEUS
-    expr: {{ printf "max(rate(process_pressure_io_stalled_seconds_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "max(rate(process_pressure_io_stalled_seconds_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     hide: false
@@ -2791,7 +2791,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: $DS_PROMETHEUS
-    expr: {{ printf "sum(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,le,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(histogram_quantile(0.99, sum(rate(go_sched_latencies_seconds_bucket{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,le,%s))) by(instance,%s)" $clusterLabel $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     interval: ""
