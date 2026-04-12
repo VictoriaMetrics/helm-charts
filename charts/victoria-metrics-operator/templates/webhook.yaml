@@ -21,6 +21,9 @@ metadata:
     certmanager.k8s.io/inject-ca-from: {{ printf "%s/%s-validation" $ns $fullname | quote }}
     cert-manager.io/inject-ca-from: {{ printf "%s/%s-validation" $ns $fullname | quote }}
     {{- end }}
+    {{- with $certManager.annotations }}
+    {{- nindent . }}
+    {{- end }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 webhooks:
 {{- range $crds }}
