@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- replace custom `app` label with a well known `app.kubernetes.io/component`
 
 ## 0.0.46
 
