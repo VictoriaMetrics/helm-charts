@@ -4,7 +4,7 @@ deployment should match snapshot:
     kind: Deployment
     metadata:
       labels:
-        app: vminsert
+        app.kubernetes.io/component: vminsert
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-metrics-cluster
@@ -16,13 +16,13 @@ deployment should match snapshot:
       replicas: 2
       selector:
         matchLabels:
-          app: vminsert
+          app.kubernetes.io/component: vminsert
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-cluster
       template:
         metadata:
           labels:
-            app: vminsert
+            app.kubernetes.io/component: vminsert
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: victoria-metrics-cluster
@@ -66,7 +66,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
     kind: Deployment
     metadata:
       labels:
-        app: insert
+        app.kubernetes.io/component: insert
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-metrics-cluster
@@ -79,13 +79,13 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
       replicas: 2
       selector:
         matchLabels:
-          app: insert
+          app.kubernetes.io/component: insert
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-cluster
       template:
         metadata:
           labels:
-            app: insert
+            app.kubernetes.io/component: insert
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: victoria-metrics-cluster

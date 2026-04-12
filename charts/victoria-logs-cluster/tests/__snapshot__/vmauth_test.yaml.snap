@@ -7,7 +7,7 @@ deployment should match snapshot:
     kind: Secret
     metadata:
       labels:
-        app: vmauth
+        app.kubernetes.io/component: vmauth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-logs-cluster
@@ -21,7 +21,7 @@ deployment should match snapshot:
     kind: Deployment
     metadata:
       labels:
-        app: vmauth
+        app.kubernetes.io/component: vmauth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-logs-cluster
@@ -33,15 +33,15 @@ deployment should match snapshot:
       replicas: 2
       selector:
         matchLabels:
-          app: vmauth
+          app.kubernetes.io/component: vmauth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-cluster
       template:
         metadata:
           annotations:
-            checksum/config: f321b46b76cdf488b571082e5c986345d95c4cda2a9cbc6d744f6d822f3f7f3a
+            checksum/config: 0965fdbaa20de3aaef7cf3475ffc3334e383be2a8307e4b5ad8f1a653f479eb2
           labels:
-            app: vmauth
+            app.kubernetes.io/component: vmauth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: victoria-logs-cluster
@@ -97,7 +97,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
     kind: Secret
     metadata:
       labels:
-        app: auth
+        app.kubernetes.io/component: auth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-logs-cluster
@@ -111,7 +111,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
     kind: Deployment
     metadata:
       labels:
-        app: auth
+        app.kubernetes.io/component: auth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: victoria-logs-cluster
@@ -124,15 +124,15 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
       replicas: 2
       selector:
         matchLabels:
-          app: auth
+          app.kubernetes.io/component: auth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-cluster
       template:
         metadata:
           annotations:
-            checksum/config: 3f6c2eab9dd05270bf389345b95195e2e43da2b7589bcef4f505fc117b7b087e
+            checksum/config: 15c02bc9ec3b4d856d0e64b544136a5ee34099b581e15b2b83cb334e7567ff1f
           labels:
-            app: auth
+            app.kubernetes.io/component: auth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: victoria-logs-cluster
