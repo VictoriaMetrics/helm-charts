@@ -112,6 +112,37 @@ spec:
 ```
 where `<fullname>` is output of `{{"{{"}} include "vm-operator.fullname" {{"}}"}}` for your setup
 
+#### Grafana password changes constantly
+
+When deploying K8s stack using ArgoCD with Grafana subchart enabled it will update Grafana password on each sync since Helm `lookup` function is not respected by ArgoCD.
+To prevent this please update you K8s stack Application `spec.syncPolicy` and `spec.ignoreDifferences` with a following:
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+...
+spec:
+  ...
+  destination:
+    ...
+    namespace: <k8s-stack-namespace>
+  ...
+  syncPolicy:
+    syncOptions:
+    # https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/#respect-ignore-difference-configs
+    # argocd must also ignore difference during apply stage
+    # otherwise it ll silently override changes and cause a problem
+    - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - kind: "Secret"
+      jsonPointers:
+        - /data/admin-password
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/template/metadata/annotations/checksum~1secret
+```
+
 #### `metadata.annotations: Too long: must have at most 262144 bytes` on dashboards
 
 If one of dashboards ConfigMap is failing with error `Too long: must have at most 262144 bytes`, please make sure you've added `argocd.argoproj.io/sync-options: ServerSideApply=true` annotation to your dashboards:
