@@ -13,11 +13,14 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name:  {{ $fullname }}-admission
-  {{- if $certManager.enabled }}
   annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "5"
+    helm.sh/hook-delete-policy: before-hook-creation
+    {{- if $certManager.enabled }}
     certmanager.k8s.io/inject-ca-from: {{ printf "%s/%s-validation" $ns $fullname | quote }}
     cert-manager.io/inject-ca-from: {{ printf "%s/%s-validation" $ns $fullname | quote }}
-  {{- end }}
+    {{- end }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 webhooks:
 {{- range $crds }}

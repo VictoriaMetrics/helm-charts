@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added helm post-install and post-upgrade hooks for validatingwebhookconfiguration
 
 ## 0.59.4
 
