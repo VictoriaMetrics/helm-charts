@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+**Update node 1**: due to change in label name pods will be restarted.
+
+- replace custom app label with app.kubernetes.io/component. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 
 ## 0.29.0
 
