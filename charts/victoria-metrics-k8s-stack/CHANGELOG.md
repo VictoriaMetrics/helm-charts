@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add ability to set custom labels for scrape configs. See [#2810](https://github.com/VictoriaMetrics/helm-charts/issues/2810).
 
 ## 0.73.0
 

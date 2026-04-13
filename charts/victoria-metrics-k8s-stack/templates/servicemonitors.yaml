@@ -57,7 +57,9 @@ kind: Service
 metadata:
   name: {{ $fullname }}
   namespace: {{ $config.service.namespace }}
+  {{- $_ := set $ctx "extraLabels" $config.service.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
 spec:
   clusterIP: None
   {{- if $ports }}
