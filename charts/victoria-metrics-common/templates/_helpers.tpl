@@ -231,11 +231,7 @@ If release name contains chart name it will be used as a full name.
   {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.name" .) -}}
   {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
   {{- with (include "vm.app.name" .) -}}
-    {{- $name := . }}
-    {{- if eq $.style "managed" -}}
-      {{- $name = printf "%s-%s" (include "vm.name" $) $name -}}
-    {{- end }}
-    {{- $_ := set $labels "app.kubernetes.io/component" $name -}}
+    {{- $_ := set $labels "app.kubernetes.io/component" . -}}
   {{- end -}}
   {{- toYaml $labels -}}
 {{- end }}
