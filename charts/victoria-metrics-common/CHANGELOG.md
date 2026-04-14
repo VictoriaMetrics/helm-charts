@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- remove chart name prefix from app.kubernetes.io/component label value
 
 ## 0.1.0
 
