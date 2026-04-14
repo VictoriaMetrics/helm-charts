@@ -43,8 +43,7 @@ Check if dashboard is enabled
 {{- if $dashboardCondition }}
 
 {{- $dashboardResult := toRawJson $dashboardData -}}
-{{- $app := ((printf "%s-grafana" (include "vm.name" $)) | trunc 63 | trimSuffix "-") }}
-{{- $_ := set $ctx "extraLabels" (dict "app" $app) }}
+{{- $_ := set $ctx "extraLabels" (dict "app.kubernetes.io/component" "grafana") }}
 {{- if $.Values.defaultDashboards.grafanaOperator.enabled }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1

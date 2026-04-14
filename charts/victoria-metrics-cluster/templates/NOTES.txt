@@ -25,7 +25,7 @@ Get the Victoria Metrics insert service URL by running these commands in the sam
   export SERVICE_IP=$(kubectl get svc --namespace {{ $ns }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   echo http://$SERVICE_IP:{{ .Values.vminsert.service.servicePort }}
 {{- else if contains "ClusterIP"  .Values.vminsert.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app={{ include "vm.app.name" $ctx }}" -l "app.kubernetes.io/instance={{ include "vm.release" $ctx }}" -o jsonpath="{.items[0].metadata.name}")
+  export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app.kubernetes.io/component={{ include "vm.app.name" $ctx }}" -l "app.kubernetes.io/instance={{ include "vm.release" $ctx }}" -o jsonpath="{.items[0].metadata.name}")
   kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.vminsert.service.servicePort }}
 {{- end }}
 
@@ -67,7 +67,7 @@ Get the VictoriaMetrics select service URL by running these commands in the same
   export SERVICE_IP=$(kubectl get svc --namespace {{ $ns }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   echo http://$SERVICE_IP:{{ .Values.vmselect.service.servicePort }}
 {{- else if contains "ClusterIP"  .Values.vmselect.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app={{ include "vm.app.name" $ctx }}" -l "app.kubernetes.io/instance={{ include "vm.release" $ctx }}" -o jsonpath="{.items[0].metadata.name}")
+  export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app.kubernetes.io/component={{ include "vm.app.name" $ctx }}" -l "app.kubernetes.io/instance={{ include "vm.release" $ctx }}" -o jsonpath="{.items[0].metadata.name}")
   kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.vmselect.service.servicePort }}
 {{- end }}
 

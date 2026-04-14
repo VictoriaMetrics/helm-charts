@@ -18,7 +18,7 @@ items:
       name: {{ $fullname }}
       namespace: {{ include "vm.namespace" $ }}
       {{- $extraLabels := mergeOverwrite (deepCopy ($spec.labels | default dict)) (deepCopy ($spec.additionalLabels | default dict)) -}}
-      {{- $_ := set $extraLabels "app" $prefix }}
+      {{- $_ := set $extraLabels "app.kubernetes.io/component" "vmalert" }}
       {{- $_ := set $ctx "extraLabels" $extraLabels }}
       labels: {{ include "vm.labels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}

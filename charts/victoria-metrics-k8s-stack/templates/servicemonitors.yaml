@@ -6,7 +6,6 @@
   {{- if and (kindIs "map" $config) $config.enabled (hasKey $config "vmScrape") }}
     {{- $svc := kebabcase $name }}
     {{- $fullname := printf "%s-%s" $prefix $svc }}
-    {{- $fullnameLabel := $fullname | trunc 63 | trimSuffix "-" }}
     {{- $ports := ($config.service).ports | default dict }}
     {{- if $config.service }}
       {{- if $config.service.port }}
@@ -23,7 +22,7 @@ kind: Endpoints
 metadata:
   name: {{ $fullname }}
   namespace: {{ $config.service.namespace }}
-  {{- $extraLabels := dict "app" $fullnameLabel "k8s-app" $svc }}
+  {{- $extraLabels := dict "app.kubernetes.io/component" $svc "k8s-app" $svc }}
   {{- $_ := set $ctx "extraLabels" $extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 subsets:
@@ -47,7 +46,7 @@ subsets:
     {{- end }}
     {{- $selector := dict }}
     {{- if and ($config.service).enabled (empty (index $.Subcharts $name)) }}
-      {{- $extraLabels := dict "app" $fullnameLabel "jobLabel" $svc }}
+      {{- $extraLabels := dict "app.kubernetes.io/component" $svc }}
       {{- $extraLabels = mergeOverwrite $extraLabels (deepCopy ($config.service.labels | default dict)) }}
       {{- $_ := set $ctx "extraLabels" $extraLabels }}
       {{- $selector = dict "matchLabels" (fromYaml (include "vm.selectorLabels" $ctx)) }}
@@ -57,7 +56,8 @@ kind: Service
 metadata:
   name: {{ $fullname }}
   namespace: {{ $config.service.namespace }}
-  {{- $_ := set $ctx "extraLabels" $config.service.labels }}
+  {{- $extraLabels := mergeOverwrite (dict "app.kubernetes.io/component" $svc) $config.service.labels }}
+  {{- $_ := set $ctx "extraLabels" $extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
 spec:
