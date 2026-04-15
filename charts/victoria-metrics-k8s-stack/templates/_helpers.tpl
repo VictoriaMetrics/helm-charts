@@ -410,7 +410,7 @@
 {{- define "vm-k8s-stack.rulegroup.labels" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $labels := fromYaml (include "vm.labels" .) -}}
-  {{- $_ := set $labels "app" (include "vm.name" .) -}}
+  {{- $_ := set $labels "app.kubernetes.io/component" "vmalert" -}}
   {{- $labels = mergeOverwrite $labels (deepCopy $Values.defaultRules.labels) -}}
   {{- toYaml $labels -}}
 {{- end }}

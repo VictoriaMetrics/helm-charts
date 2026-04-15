@@ -1,6 +1,9 @@
 ## Next release
 
+**Update note 1**: In this release custom `app` labels were replaced by well-known `app.kubernetes.io/component`. Additionally chart name prefix was removed.
+
 - add ability to set custom labels for scrape configs. See [#2810](https://github.com/VictoriaMetrics/helm-charts/issues/2810).
+- replaced custom `app` label with `app.kubernetes.io/component`. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 - delegate [relabeling-debug](https://docs.victoriametrics.com/victoria-metrics/relabeling/#relabel-debugging) configuration to the vmagent defaults, by removing `promscrape.dropOriginalLabels` from extraArgs.
 
 ## 0.73.0
