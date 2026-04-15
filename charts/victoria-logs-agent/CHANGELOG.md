@@ -1,8 +1,17 @@
 ## Next release
 
-**Update node 1**: due to change in label name pods will be restarted.
+- TODO
+
+## 0.0.16
+
+**Release date:** 14 Apr 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.50.0](https://img.shields.io/badge/v1.50.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fchangelog%2F%23v1500)
+
+**Update node 1**: due to change in label name pods will be restarted. Please delete old StatefulSet with `--cascade=orphan`.
 
 - replace custom app label with app.kubernetes.io/component. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
+- bump vlagent version to [v1.50.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.50.0).
 
 ## 0.0.15
 
