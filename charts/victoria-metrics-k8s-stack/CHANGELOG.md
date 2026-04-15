@@ -1,6 +1,7 @@
 ## Next release
 
 - add ability to set custom labels for scrape configs. See [#2810](https://github.com/VictoriaMetrics/helm-charts/issues/2810).
+- delegate [relabeling-debug](https://docs.victoriametrics.com/victoria-metrics/relabeling/#relabel-debugging) configuration to the vmagent defaults, by removing `promscrape.dropOriginalLabels` from extraArgs.
 
 ## 0.73.0
 
