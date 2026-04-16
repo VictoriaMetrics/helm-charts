@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- revert prometheus-node-exporter service `jobLabel: node-exporter`
 
 ## 0.74.0
 

@@ -1185,9 +1185,8 @@ prometheus-node-exporter:
 
   # all values for prometheus-node-exporter helm chart can be specified here
   service:
-    # Add the 'node-exporter' label to be used by serviceMonitor to match standard common usage in rules and grafana dashboards
-    #
-    labels: {}
+    labels:
+      jobLabel: node-exporter
   extraArgs:
     - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
     - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
@@ -1198,7 +1197,7 @@ prometheus-node-exporter:
 
     # -- [Scrape configuration](https://docs.victoriametrics.com/operator/api/#vmservicescrapespec) for Node Exporter
     spec:
-      jobLabel: app.kubernetes.io/name
+      jobLabel: jobLabel
       selector:
         matchLabels:
           app.kubernetes.io/name: '{{ include "prometheus-node-exporter.name" (index .Subcharts "prometheus-node-exporter") }}'
