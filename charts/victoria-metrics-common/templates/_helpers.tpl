@@ -187,6 +187,9 @@ If release name contains chart name it will be used as a full name.
   {{- include "vm.validate.args" . -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
+  {{- with $labels.app -}}
+    {{- $_ := set $labels "app.kubernetes.io/component" . -}}
+  {{- end -}}
   {{- $labels = mergeOverwrite $labels (.extraLabels | default dict) -}}
   {{- $_ := set $labels "app.kubernetes.io/managed-by" $Release.Service -}}
   {{- toYaml $labels -}}
@@ -197,7 +200,7 @@ If release name contains chart name it will be used as a full name.
   {{- include "vm.validate.args" . -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $globalLabels := deepCopy (($Values.global).extraLabels | default dict) -}}
-  {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
+  {{- $labels := fromYaml (include "vm.commonLabels" .) -}}
   {{- $labels = mergeOverwrite $globalLabels $labels (fromYaml (include "vm.metaLabels" .)) -}}
   {{- with (include "vm.image.tag" .) }}
     {{- $_ := set $labels "app.kubernetes.io/version" (regexReplaceAll "(.*)(@sha.*)" . "${1}") -}}
@@ -231,7 +234,16 @@ If release name contains chart name it will be used as a full name.
   {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.name" .) -}}
   {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
   {{- with (include "vm.app.name" .) -}}
-    {{- $_ := set $labels "app.kubernetes.io/component" . -}}
+    {{- $_ := set $labels "app" . -}}
   {{- end -}}
   {{- toYaml $labels -}}
 {{- end }}
+
+{{- define "vm.commonLabels" -}}
+  {{- $labels := fromYaml (include "vm.selectorLabels" . ) -}}
+  {{- with $labels.app -}}
+    {{- $_ := set $labels "app.kubernetes.io/component" . -}}
+    {{- $_ := unset $labels "app" -}}
+  {{- end -}}
+  {{- toYaml $labels -}}
+{{- end -}}

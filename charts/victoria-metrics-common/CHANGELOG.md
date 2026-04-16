@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- reverted usage of `app` label in `vm.selectorLabels`
 
 ## 0.2.0
 
