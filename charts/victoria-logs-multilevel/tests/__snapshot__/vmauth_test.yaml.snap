@@ -33,7 +33,7 @@ deployment should match empty snapshot:
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: vmauth
+          app: vmauth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-multilevel
       template:
@@ -41,6 +41,7 @@ deployment should match empty snapshot:
           annotations:
             checksum/config: 2fb16488ef03445c6b3ca1a47e1871ad81c19453b3ff0a1cf42ef02d0bd97d7a
           labels:
+            app: vmauth
             app.kubernetes.io/component: vmauth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -123,7 +124,7 @@ deployment should match snapshot:
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: vmauth
+          app: vmauth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-multilevel
       template:
@@ -131,6 +132,7 @@ deployment should match snapshot:
           annotations:
             checksum/config: 2fb16488ef03445c6b3ca1a47e1871ad81c19453b3ff0a1cf42ef02d0bd97d7a
           labels:
+            app: vmauth
             app.kubernetes.io/component: vmauth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -201,6 +203,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
     kind: Deployment
     metadata:
       labels:
+        app: auth
         app.kubernetes.io/component: auth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -214,7 +217,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: auth
+          app: auth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-multilevel
       template:
@@ -222,6 +225,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
           annotations:
             checksum/config: 4d9b35efb1512df5ff19438e8307ca81a0ca465f9ffe4bc212f64cbed12d1025
           labels:
+            app: auth
             app.kubernetes.io/component: auth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm

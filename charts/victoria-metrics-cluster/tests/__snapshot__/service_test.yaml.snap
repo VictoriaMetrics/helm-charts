@@ -19,7 +19,7 @@ service should match snapshot:
           protocol: TCP
           targetPort: http
       selector:
-        app.kubernetes.io/component: vmauth
+        app: vmauth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: victoria-metrics-cluster
       type: ClusterIP
@@ -43,7 +43,7 @@ service should match snapshot:
           protocol: TCP
           targetPort: http
       selector:
-        app.kubernetes.io/component: vminsert
+        app: vminsert
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: victoria-metrics-cluster
       type: ClusterIP
@@ -67,7 +67,7 @@ service should match snapshot:
           protocol: TCP
           targetPort: http
       selector:
-        app.kubernetes.io/component: vmselect
+        app: vmselect
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: victoria-metrics-cluster
       type: ClusterIP
@@ -100,7 +100,7 @@ service should match snapshot:
           protocol: TCP
           targetPort: vminsert
       selector:
-        app.kubernetes.io/component: vmstorage
+        app: vmstorage
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: victoria-metrics-cluster
       type: ClusterIP
@@ -110,6 +110,7 @@ service should match snapshot with fullnameOverride and extraLabels:
     kind: Service
     metadata:
       labels:
+        app: auth
         app.kubernetes.io/component: auth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -126,7 +127,7 @@ service should match snapshot with fullnameOverride and extraLabels:
           protocol: TCP
           targetPort: http
       selector:
-        app.kubernetes.io/component: auth
+        app: auth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: victoria-metrics-cluster
       type: ClusterIP
@@ -135,6 +136,7 @@ service should match snapshot with fullnameOverride and extraLabels:
     kind: Service
     metadata:
       labels:
+        app: insert
         app.kubernetes.io/component: insert
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -151,7 +153,7 @@ service should match snapshot with fullnameOverride and extraLabels:
           protocol: TCP
           targetPort: http
       selector:
-        app.kubernetes.io/component: insert
+        app: insert
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: victoria-metrics-cluster
       type: ClusterIP
@@ -160,6 +162,7 @@ service should match snapshot with fullnameOverride and extraLabels:
     kind: Service
     metadata:
       labels:
+        app: select
         app.kubernetes.io/component: select
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -176,7 +179,7 @@ service should match snapshot with fullnameOverride and extraLabels:
           protocol: TCP
           targetPort: http
       selector:
-        app.kubernetes.io/component: select
+        app: select
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: victoria-metrics-cluster
       type: ClusterIP
@@ -185,6 +188,7 @@ service should match snapshot with fullnameOverride and extraLabels:
     kind: Service
     metadata:
       labels:
+        app: storage
         app.kubernetes.io/component: storage
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -210,7 +214,7 @@ service should match snapshot with fullnameOverride and extraLabels:
           protocol: TCP
           targetPort: vminsert
       selector:
-        app.kubernetes.io/component: storage
+        app: storage
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: victoria-metrics-cluster
       type: ClusterIP

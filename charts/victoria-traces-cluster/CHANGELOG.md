@@ -1,8 +1,8 @@
 ## Next release
 
-**Update node 1**: due to change in label name pods will be restarted. Please delete old StatefulSet with `--cascade=orphan`.
+**Update node 1**: due to change in label name pods will be restarted.
 
-- replace custom app label with app.kubernetes.io/component. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
+- added `app.kubernetes.io/component` with value from custom `app` label. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 - fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template
 - support volumeAttributesClassName PVC attribute. See [#2782](https://github.com/VictoriaMetrics/helm-charts/issues/2782).
 
