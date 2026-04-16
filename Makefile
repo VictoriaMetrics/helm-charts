@@ -75,7 +75,7 @@ lint: helm-repo-update
 	)
 
 update: helm-repo-update
-	$(foreach values,$(wildcard charts/*/lint/*.yaml), \
+	$(foreach values,$(wildcard charts/*/Chart.yaml), \
 		$(eval chart := $(word 2, $(subst /, ,$(values)))) \
 		CMD="dep update charts/$(chart)" $(MAKE) $(HELM) || exit 1; \
         )

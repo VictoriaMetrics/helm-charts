@@ -16,12 +16,13 @@ deployment should match snapshot:
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: vmauth
+          app: vmauth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-cluster
       template:
         metadata:
           labels:
+            app: vmauth
             app.kubernetes.io/component: vmauth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -71,6 +72,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
     kind: Deployment
     metadata:
       labels:
+        app: auth
         app.kubernetes.io/component: auth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -84,12 +86,13 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: auth
+          app: auth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-metrics-cluster
       template:
         metadata:
           labels:
+            app: auth
             app.kubernetes.io/component: auth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm

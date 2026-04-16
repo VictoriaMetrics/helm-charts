@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- revert change in Deployment's matchLabels, that was introduced in release 0.60.0
 
 ## 0.60.0
 
@@ -8,7 +8,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0684)
 
-**Update node 1**: due to change in label name pods will be restarted. Please delete old Deployment with `--cascade=orphan`.
+**Known issue:** this release contains changes in Deployment matchLabels, which requires Deployment recreation. Skip this release to avoid disruption.
 
 - replace custom app label with app.kubernetes.io/component. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 - revert default helm hooks for validatingwebhookconfiguration due to ArgoCD issues

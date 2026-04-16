@@ -16,12 +16,13 @@ deployment should match snapshot:
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: vlselect
+          app: vlselect
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-multilevel
       template:
         metadata:
           labels:
+            app: vlselect
             app.kubernetes.io/component: vlselect
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -69,6 +70,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
     kind: Deployment
     metadata:
       labels:
+        app: select
         app.kubernetes.io/component: select
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -82,12 +84,13 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: select
+          app: select
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-multilevel
       template:
         metadata:
           labels:
+            app: select
             app.kubernetes.io/component: select
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm

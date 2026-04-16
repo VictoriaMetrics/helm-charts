@@ -33,7 +33,7 @@ deployment should match snapshot:
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: vmauth
+          app: vmauth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-cluster
       template:
@@ -41,6 +41,7 @@ deployment should match snapshot:
           annotations:
             checksum/config: 0965fdbaa20de3aaef7cf3475ffc3334e383be2a8307e4b5ad8f1a653f479eb2
           labels:
+            app: vmauth
             app.kubernetes.io/component: vmauth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -111,6 +112,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
     kind: Deployment
     metadata:
       labels:
+        app: auth
         app.kubernetes.io/component: auth
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
@@ -124,7 +126,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
       replicas: 2
       selector:
         matchLabels:
-          app.kubernetes.io/component: auth
+          app: auth
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: victoria-logs-cluster
       template:
@@ -132,6 +134,7 @@ deployment should match snapshot with fullnameOverride, extraLabels and podLabel
           annotations:
             checksum/config: 15c02bc9ec3b4d856d0e64b544136a5ee34099b581e15b2b83cb334e7567ff1f
           labels:
+            app: auth
             app.kubernetes.io/component: auth
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
