@@ -1,12 +1,14 @@
 ## Next release
 
-- TODO
+- bump victoria-metrics-operator dependency chart to version 0.61.0
 
 ## 0.74.1
 
 **Release date:** 16 Apr 2026
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.140.0](https://img.shields.io/badge/v1.140.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11400)
+
+**Known issue:** this release contains changes in operator Deployment matchLabels, which requires Deployment recreation. Skip this release to avoid disruption.
 
 - revert prometheus-node-exporter service `jobLabel: node-exporter`
 
@@ -16,6 +18,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.140.0](https://img.shields.io/badge/v1.140.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11400)
 
+**Known issue:** this release contains changes in operator Deployment matchLabels, which requires Deployment recreation. Skip this release to avoid disruption.
 **Update note 1**: In this release custom `app` labels were replaced by well-known `app.kubernetes.io/component`. Additionally chart name prefix was removed.
 
 - add ability to set custom labels for scrape configs. See [#2810](https://github.com/VictoriaMetrics/helm-charts/issues/2810).
