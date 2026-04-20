@@ -35,7 +35,7 @@ spec:
   selector: {{ toYaml . | nindent 4 }}
   {{- else }}
   selector:
-    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+    matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}
   {{- end }}
   {{- with omit $app.vmServiceScrape.spec "selector" "namespaceSelector"}}
   {{ toYaml . | nindent 2 }}
