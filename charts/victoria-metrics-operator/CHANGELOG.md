@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed selector for scrape objects. See [#2827](https://github.com/VictoriaMetrics/helm-charts/issues/2827).
 
 ## 0.61.0
 
