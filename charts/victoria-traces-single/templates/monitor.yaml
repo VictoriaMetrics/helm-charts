@@ -23,7 +23,7 @@ spec:
     matchNames:
       - {{ $ns }}
   selector:
-    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+    matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}
   endpoints:
     -
       {{- with $app.serviceMonitor.targetPort }}
@@ -74,7 +74,7 @@ spec:
     matchNames:
       - {{ $ns }}
   selector:
-    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+    matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}
   endpoints:
     -
       {{- with $app.vmServiceScrape.targetPort }}
