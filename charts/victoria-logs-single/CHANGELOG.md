@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed selector for ServiceMonitor. See [#2827](https://github.com/VictoriaMetrics/helm-charts/issues/2827).
 
 ## 0.12.1
 
