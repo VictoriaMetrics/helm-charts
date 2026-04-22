@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Release CRDs for operator v0.69.0
 
 ## 0.9.0
 
