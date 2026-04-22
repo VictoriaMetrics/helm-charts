@@ -1,6 +1,7 @@
 ## Next release
 
-- bump victoria-metrics-operator dependency chart to version 0.61.0
+- bump victoria-metrics-operator dependency chart to version 0.62.0
+- updates operator to [v0.69.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.69.0) version
 
 ## 0.74.1
 
