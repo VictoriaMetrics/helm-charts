@@ -3085,6 +3085,100 @@ panels:
         sort: desc
     pluginVersion: 12.2.0
     type: timeseries
+  - title: Remote write queue size ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vmalert_remotewrite_queue_size_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(%s) > 1" $clusterLabel $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: current
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "min(vmalert_remotewrite_queue_capacity{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}) by(%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      hide: false
+      instant: false
+      legendFormat: max
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: "Displays the maximum 99th percentile of the number of time series pending in the remote write queue.\n\nThe maximum queue size is configured by remoteWrite.maxQueueSize. \nvmalert will begin dropping data if the queue has no room for newly generated data.\nThe queue can fill rapidly when heavy rules generate millions of series, or when remote write requests are unable to send data to the destination in a timely manner, causing data to accumulate in the queue. Consider tuning -remoteWrite.maxQueueSize or -remoteWrite.concurrency.\n\nSee also the Rows per request panel."
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: auto
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+      overrides:
+      - matcher:
+          id: byName
+          options: max
+        properties:
+        - id: color
+          value:
+            fixedColor: red
+            mode: fixed
+        - id: custom.fillOpacity
+          value: 0
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 38
+    id: 68
+    options:
+      legend:
+        calcs: []
+        displayMode: list
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.2.0
+    type: timeseries
   - title: Rows per request ($instance)
     targets:
     - datasource:
@@ -3092,7 +3186,7 @@ panels:
         uid: $ds
       expr: {{ printf "max(histogram_quantile(0.99, sum(increase(vmalert_remotewrite_sent_rows_bucket{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(instance,vmrange,%s))) by(%s)" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
-      legendFormat: __auto
+      legendFormat: max
       range: true
       refId: A
     datasource:
@@ -3149,9 +3243,9 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 12
-      "y": 38
-    id: 68
+      x: 0
+      "y": 46
+    id: 69
     options:
       legend:
         calcs: []
@@ -3230,7 +3324,7 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 0
+      x: 12
       "y": 46
     id: 54
     options:

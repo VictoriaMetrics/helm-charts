@@ -427,7 +427,7 @@ panels:
   datasource:
     type: {{ $defaultDatasource }}
     uid: ${ds_prometheus}
-  description: Used Root FS
+  description: Percentage of root filesystem space currently used
   fieldConfig:
     defaults:
       color:
@@ -780,7 +780,7 @@ panels:
     range: true
     refId: C
     step: 240
-  - expr: {{ printf "sum(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=~\".*irq\",%s=~\"$cluster\"}[$__rate_interval])) by(%s)" $clusterLabel $clusterLabel }}
+  - expr: {{ printf "avg(sum(rate(node_cpu_seconds_total{instance=\"$node\",job=\"$job\",mode=~\".*irq\",%s=~\"$cluster\"}[$__rate_interval])) without(mode)) by(%s)" $clusterLabel $clusterLabel }}
     editorMode: code
     format: time_series
     legendFormat: Busy IRQs
@@ -1552,22 +1552,6 @@ panels:
             mode: fixed
       - matcher:
           id: byName
-          options: Cached
-        properties:
-        - id: color
-          value:
-            fixedColor: '#511749'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Committed
-        properties:
-        - id: color
-          value:
-            fixedColor: '#508642'
-            mode: fixed
-      - matcher:
-          id: byName
           options: Free
         properties:
         - id: color
@@ -1584,35 +1568,11 @@ panels:
             mode: fixed
       - matcher:
           id: byName
-          options: Inactive
-        properties:
-        - id: color
-          value:
-            fixedColor: '#584477'
-            mode: fixed
-      - matcher:
-          id: byName
           options: PageTables
         properties:
         - id: color
           value:
             fixedColor: '#0A50A1'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Page_Tables
-        properties:
-        - id: color
-          value:
-            fixedColor: '#0A50A1'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: RAM_Free
-        properties:
-        - id: color
-          value:
-            fixedColor: '#E0F9D7'
             mode: fixed
       - matcher:
           id: byName
@@ -1624,43 +1584,11 @@ panels:
             mode: fixed
       - matcher:
           id: byName
-          options: Slab_Cache
-        properties:
-        - id: color
-          value:
-            fixedColor: '#E0752D'
-            mode: fixed
-      - matcher:
-          id: byName
           options: Swap
         properties:
         - id: color
           value:
             fixedColor: '#BF1B00'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Swap - Swap memory usage
-        properties:
-        - id: color
-          value:
-            fixedColor: '#BF1B00'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Swap_Cache
-        properties:
-        - id: color
-          value:
-            fixedColor: '#C15C17'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Swap_Free
-        properties:
-        - id: color
-          value:
-            fixedColor: '#2F575E'
             mode: fixed
       - matcher:
           id: byName
@@ -1797,14 +1725,14 @@ panels:
     type: timeseries
   - title: Network Saturation
     targets:
-    - expr: {{ printf "(node_network_speed_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * (rate(node_network_receive_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / ignoring(speed) node_network_speed_bytes{instance=\"$node\",job=\"$job\",speed!=\"-1\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(node_network_speed_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * (rate(node_network_receive_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / node_network_speed_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: '{{`{{`}}device{{`}}`}} - Rx in'
       range: true
       refId: A
       step: 240
-    - expr: {{ printf "(node_network_speed_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * (rate(node_network_transmit_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / ignoring(speed) node_network_speed_bytes{instance=\"$node\",job=\"$job\",speed!=\"-1\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
+    - expr: {{ printf "(node_network_speed_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} >bool 0) * (rate(node_network_transmit_bytes_total{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}[$__rate_interval]) / node_network_speed_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"})" $clusterLabel $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
       legendFormat: '{{`{{`}}device{{`}}`}} - Tx out'
@@ -1908,7 +1836,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: read (-) / write (+)
+          axisLabel: write (–) / read (+)
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -1942,7 +1870,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Read.*/
+          options: /.*Write.*/
         properties:
         - id: custom.transform
           value: negative-Y
@@ -1963,7 +1891,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -1995,7 +1923,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: read (-) / write (+)
+          axisLabel: write (–) / read (+)
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -2029,7 +1957,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Read*./
+          options: /.*Write.*/
         properties:
         - id: custom.transform
           value: negative-Y
@@ -2996,7 +2924,7 @@ panels:
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
-  - title: Memory Kernel / CPU / IO
+  - title: Memory Kernel / CPU
     targets:
     - expr: {{ printf "node_memory_KernelStack_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
       editorMode: code
@@ -3013,18 +2941,10 @@ panels:
       range: true
       refId: B
       step: 240
-    - expr: {{ printf "node_memory_Bounce_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
-      editorMode: code
-      format: time_series
-      interval: ""
-      legendFormat: Bounce Memory – I/O buffer for DMA-limited devices
-      range: true
-      refId: C
-      step: 240
     datasource:
       type: {{ $defaultDatasource }}
       uid: ${ds_prometheus}
-    description: Tracks kernel memory used for CPU-local structures, per-thread stacks, and bounce buffers used for I/O on DMA-limited devices. These areas are typically small but critical for low-level operations
+    description: Tracks kernel memory used for CPU-local structures and per-thread stacks. These areas are typically small but critical for low-level operations
     fieldConfig:
       defaults:
         color:
@@ -3335,15 +3255,7 @@ panels:
           steps:
           - color: green
         unit: bytes
-      overrides:
-      - matcher:
-          id: byName
-          options: Hardware Corrupted - Amount of RAM that the kernel identified as corrupted / not working
-        properties:
-        - id: color
-          value:
-            fixedColor: '#CFFAFF'
-            mode: fixed
+      overrides: []
     gridPos:
       h: 10
       w: 12
@@ -3437,151 +3349,7 @@ panels:
           - color: red
             value: 80
         unit: bytes
-      overrides:
-      - matcher:
-          id: byName
-          options: Active
-        properties:
-        - id: color
-          value:
-            fixedColor: '#99440A'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Buffers
-        properties:
-        - id: color
-          value:
-            fixedColor: '#58140C'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Cache
-        properties:
-        - id: color
-          value:
-            fixedColor: '#6D1F62'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Cached
-        properties:
-        - id: color
-          value:
-            fixedColor: '#511749'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Committed
-        properties:
-        - id: color
-          value:
-            fixedColor: '#508642'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Dirty
-        properties:
-        - id: color
-          value:
-            fixedColor: '#6ED0E0'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Free
-        properties:
-        - id: color
-          value:
-            fixedColor: '#B7DBAB'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Inactive
-        properties:
-        - id: color
-          value:
-            fixedColor: '#EA6460'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Mapped
-        properties:
-        - id: color
-          value:
-            fixedColor: '#052B51'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: PageTables
-        properties:
-        - id: color
-          value:
-            fixedColor: '#0A50A1'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Page_Tables
-        properties:
-        - id: color
-          value:
-            fixedColor: '#0A50A1'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Slab_Cache
-        properties:
-        - id: color
-          value:
-            fixedColor: '#EAB839'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Swap
-        properties:
-        - id: color
-          value:
-            fixedColor: '#BF1B00'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Swap_Cache
-        properties:
-        - id: color
-          value:
-            fixedColor: '#C15C17'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Total
-        properties:
-        - id: color
-          value:
-            fixedColor: '#511749'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Total RAM
-        properties:
-        - id: color
-          value:
-            fixedColor: '#052B51'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: Total RAM + Swap
-        properties:
-        - id: color
-          value:
-            fixedColor: '#052B51'
-            mode: fixed
-      - matcher:
-          id: byName
-          options: VmallocUsed
-        properties:
-        - id: color
-          value:
-            fixedColor: '#EA6460'
-            mode: fixed
+      overrides: []
     gridPos:
       h: 10
       w: 12
@@ -3698,6 +3466,87 @@ panels:
         mode: multi
         sort: none
     pluginVersion: 11.6.1
+    type: timeseries
+  - title: Memory Zswap
+    targets:
+    - expr: {{ printf "node_memory_Zswap_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: Zswap – Compressed pool size in RAM
+      range: true
+      refId: A
+      step: 240
+    - expr: {{ printf "node_memory_Zswapped_bytes{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: Zswapped – Original data size before compression
+      range: true
+      refId: B
+      step: 240
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: ${ds_prometheus}
+    description: Zswap is a compressed RAM cache for swap pages. Zswap stores compressed pages that would otherwise be written to swap, reducing disk I/O. Zswapped shows the amount of data stored in the Zswap pool before compression
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 20
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+        unit: bytes
+      overrides: []
+    gridPos:
+      h: 10
+      w: 12
+      x: 0
+      "y": 982
+    id: 342
+    options:
+      legend:
+        calcs:
+        - min
+        - mean
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
     type: timeseries
   collapsed: true
   gridPos:
@@ -4414,7 +4263,7 @@ panels:
           mode: absolute
           steps:
           - color: green
-        unit: rothz
+        unit: hertz
       overrides: []
     gridPos:
       h: 10
@@ -4647,10 +4496,17 @@ panels:
       range: true
       refId: B
       step: 240
+    - expr: {{ printf "node_kernel_hung_tasks{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      legendFormat: Hung Tasks (D state > timeout)
+      range: true
+      refId: C
+      step: 240
     datasource:
       type: {{ $defaultDatasource }}
       uid: ${ds_prometheus}
-    description: Processes currently in runnable or blocked states. Helps identify CPU contention or I/O wait bottlenecks.
+    description: Running and blocked processes, plus kernel hung tasks (processes stuck in uninterruptible D state beyond the kernel timeout threshold)
     fieldConfig:
       defaults:
         color:
@@ -5830,7 +5686,7 @@ panels:
       format: time_series
       hide: true
       interval: ""
-      legendFormat: '{{`{{`}} chip_name {{`}}`}} {{`{{`}} sensor {{`}}`}} Critical Historical'
+      legendFormat: '{{`{{`}} chip_name {{`}}`}} {{`{{`}} sensor {{`}}`}} Critical Hysteresis'
       refId: D
       step: 240
     - expr: {{ printf "node_hwmon_temp_max_celsius{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"} * on(chip,%s) group_left(chip_name) node_hwmon_chip_names{instance=\"$node\",job=\"$job\",%s=~\"$cluster\"}" $clusterLabel $clusterLabel $clusterLabel }}
@@ -5887,7 +5743,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Critical*./
+          options: /.*Critical.*/
         properties:
         - id: color
           value:
@@ -5972,7 +5828,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Max*./
+          options: /.*Max.*/
         properties:
         - id: color
           value:
@@ -6584,7 +6440,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: read (–) / write (+)
+          axisLabel: write (–) / read (+)
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -6618,7 +6474,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Read.*/
+          options: /.*Write.*/
         properties:
         - id: custom.transform
           value: negative-Y
@@ -6647,7 +6503,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -6681,7 +6537,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: read (–) / write (+)
+          axisLabel: write (–) / read (+)
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -6715,7 +6571,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Read.*/
+          options: /.*Write.*/
         properties:
         - id: custom.transform
           value: negative-Y
@@ -6744,7 +6600,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -6776,7 +6632,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: read (–) / write (+)
+          axisLabel: write (–) / read (+)
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -6810,7 +6666,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Read.*/
+          options: /.*Write.*/
         properties:
         - id: custom.transform
           value: negative-Y
@@ -6839,7 +6695,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -6922,7 +6778,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -6952,7 +6808,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: read (–) / write (+)
+          axisLabel: write (–) / read (+)
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -6986,7 +6842,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Read.*/
+          options: /.*Write.*/
         properties:
         - id: custom.transform
           value: negative-Y
@@ -7015,7 +6871,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -7112,7 +6968,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -7208,7 +7064,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -7290,7 +7146,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -7373,7 +7229,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -7481,7 +7337,7 @@ panels:
         showLegend: true
       tooltip:
         hideZeros: false
-        mode: single
+        mode: multi
         sort: none
     pluginVersion: 11.6.1
     type: timeseries
@@ -8104,7 +7960,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: out (-) / in (+)
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -8135,13 +7991,7 @@ panels:
           steps:
           - color: green
         unit: pps
-      overrides:
-      - matcher:
-          id: byRegexp
-          options: /.*out.*/
-        properties:
-        - id: custom.transform
-          value: negative-Y
+      overrides: []
     gridPos:
       h: 10
       w: 12
@@ -8185,7 +8035,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: out (-) / in (+)
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -8216,13 +8066,7 @@ panels:
           steps:
           - color: green
         unit: pps
-      overrides:
-      - matcher:
-          id: byRegexp
-          options: /.*out.*/
-        properties:
-        - id: custom.transform
-          value: negative-Y
+      overrides: []
     gridPos:
       h: 10
       w: 12
@@ -8266,7 +8110,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: out (-) / in (+)
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -8297,13 +8141,7 @@ panels:
           steps:
           - color: green
         unit: pps
-      overrides:
-      - matcher:
-          id: byRegexp
-          options: /.*out.*/
-        properties:
-        - id: custom.transform
-          value: negative-Y
+      overrides: []
     gridPos:
       h: 10
       w: 12
@@ -9986,10 +9824,6 @@ panels:
         properties:
         - id: custom.transform
           value: negative-Y
-      - matcher:
-          id: byRegexp
-          options: /.*Snd.*/
-        properties: []
     gridPos:
       h: 10
       w: 12
@@ -10448,7 +10282,7 @@ panels:
           axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
-          axisLabel: out (-) / in (+)
+          axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
           barWidthFactor: 0.6
@@ -10479,13 +10313,7 @@ panels:
           steps:
           - color: green
         unit: pps
-      overrides:
-      - matcher:
-          id: byRegexp
-          options: /.*out.*/
-        properties:
-        - id: custom.transform
-          value: negative-Y
+      overrides: []
     gridPos:
       h: 10
       w: 12
@@ -10671,7 +10499,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Max*./
+          options: /.*Max.*/
         properties:
         - id: color
           value:
@@ -11077,7 +10905,7 @@ panels:
       w: 12
       x: 0
       "y": 243
-    id: 339
+    id: 341
     options:
       legend:
         calcs:
@@ -11513,7 +11341,7 @@ panels:
       overrides:
       - matcher:
           id: byRegexp
-          options: /.*Max*./
+          options: /.*Max.*/
         properties:
         - id: color
           value:
@@ -11686,5 +11514,5 @@ time:
   to: now
 timepicker: {}
 uid: rYdddlPWk
-version: 100
+version: 102
 weekStart: ""
