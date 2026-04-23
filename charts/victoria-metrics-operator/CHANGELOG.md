@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- include prometheus scrapeconfig controller to a list of controllers that should be disabled by .Values.operator.disable_prometheus_converter. See [#2838](https://github.com/VictoriaMetrics/helm-charts/issues/2838).
 
 ## 0.62.0
 
