@@ -13,8 +13,14 @@
   "helmv3": {
     "fileMatch": ["charts/[^/]+/Chart\\.yaml$"]
   },
-  "helm-values": {
-    "fileMatch": ["charts/[^/]+/values\\.yaml$"]
+  "vt-helm-values": {
+    "fileMatch": ["charts/victoria-traces-[^/]+/values\\.yaml$"]
+  },
+  "vm-helm-values": {
+    "fileMatch": ["charts/victoria-metrics-[^/]+/values\\.yaml$"]
+  },
+  "vl-helm-values": {
+    "fileMatch": ["charts/victoria-logs-[^/]+/values\\.yaml$"]
   },
   "customManagers": [
     {
@@ -45,8 +51,20 @@
     },
     {
       "description": "Disable updates for victoriametrics images tracked via appVersion",
-      "matchManagers": ["helm-values"],
-      "matchPackagePatterns": ["^victoriametrics/"],
+      "matchManagers": ["vm-helm-values"],
+      "matchPackagePatterns": ["^victoriametrics/vm"],
+      "enabled": false
+    },
+    {
+      "description": "Disable updates for victorialogs images tracked via appVersion",
+      "matchManagers": ["vl-helm-values"],
+      "matchPackagePatterns": ["^victoriametrics/vl"],
+      "enabled": false
+    },
+    {
+      "description": "Disable updates for victoriatraces images tracked via appVersion",
+      "matchManagers": ["vt-helm-values"],
+      "matchPackagePatterns": ["^victoriametrics/vt"],
       "enabled": false
     },
     {
