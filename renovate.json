@@ -6,28 +6,17 @@
   "commitMessagePrefix": "charts: ",
   "enabledManagers": [
     "helmv3",
-    "vm-helm-values",
-    "vl-helm-values",
-    "vt-helm-values",
+    "helm-values",
     "github-actions",
     "custom.regex"
   ],
   "helmv3": {
     "managerFilePatterns": ["charts/[^/]+/Chart\\.yaml$"]
   },
+  "helm-values": {
+    "managerFilePatterns": ["charts/[^/]+/values\\.yaml$"]
+  },
   "customManagers": [
-    {
-      "name": "vt-helm-values",
-      "managerFilePatterns": ["charts/victoria-traces-[^/]+/values\\.yaml$"]
-    },
-    {
-      "name": "vm-helm-values",
-      "managerFilePatterns": ["charts/victoria-metrics-[^/]+/values\\.yaml$"]
-    },
-    {
-      "name": "vl-helm-values",
-      "managerFilePatterns": ["charts/victoria-logs-[^/]+/values\\.yaml$"]
-    },
     {
       "customType": "regex",
       "managerFilePatterns": ["charts/[^/]+/Chart\\.yaml$"],
@@ -56,19 +45,22 @@
     },
     {
       "description": "Disable updates for victoriametrics images tracked via appVersion",
-      "matchManagers": ["vm-helm-values"],
+      "matchManagers": ["helm-values"],
+      "matchFileNames": ["*/victoria-metrics-*/Dockerfile"],
       "matchPackagePatterns": ["^victoriametrics/vm"],
       "enabled": false
     },
     {
       "description": "Disable updates for victorialogs images tracked via appVersion",
-      "matchManagers": ["vl-helm-values"],
+      "matchManagers": ["helm-values"],
+      "matchFileNames": ["*/victoria-logs-*/Dockerfile"],
       "matchPackagePatterns": ["^victoriametrics/vl"],
       "enabled": false
     },
     {
       "description": "Disable updates for victoriatraces images tracked via appVersion",
-      "matchManagers": ["vt-helm-values"],
+      "matchManagers": ["helm-values"],
+      "matchFileNames": ["*/victoria-traces-*/Dockerfile"],
       "matchPackagePatterns": ["^victoriametrics/vt"],
       "enabled": false
     },
