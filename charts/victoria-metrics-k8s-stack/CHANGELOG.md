@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.141.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.141.0)
 - bump victoria-metrics-operator dependency chart to version 0.62.0
 - updates operator to [v0.69.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.69.0) version
 - Upgraded default Alertmanager tag 0.28.1 -> 0.32.0
