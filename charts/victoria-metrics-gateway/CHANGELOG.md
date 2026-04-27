@@ -2,6 +2,7 @@
 
 **Update node 1**: due to change in label name pods will be restarted.
 
+- bump version of VM components to [v1.141.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.141.0)
 - added `app.kubernetes.io/component` with value from custom `app` label. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 
 ## 0.27.0
