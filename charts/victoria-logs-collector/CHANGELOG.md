@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support .Values.extraObjects. See [#2848](https://github.com/VictoriaMetrics/helm-charts/issues/2848).
 
 ## 0.3.1
 
