@@ -1,6 +1,6 @@
 ## Next release
 
-- bump version of VM components to [v1.141.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.141.0)
+- bump version of VM components to [v1.142.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.142.0)
 
 ## 0.35.0
 
