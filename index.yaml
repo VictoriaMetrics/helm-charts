@@ -2517,6 +2517,50 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - support .Values.extraObjects. See [#2848](https://github.com/VictoriaMetrics/helm-charts/issues/2848).
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-logs-collector
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/changelog/
+      artifacthub.io/readme: |
+        # VictoriaLogs Collector Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-logs-collector/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-logs-collector/changelog/).
+    apiVersion: v2
+    appVersion: v1.50.0
+    created: "2026-04-28T09:03:16.219276911Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    description: VictoriaLogs Collector - collects logs from Kubernetes containers
+      and stores them to VictoriaLogs
+    digest: faf22c8e2c4e8df2737a7f28b04bd0c2823447e73d60aba39047caacac3ae094
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victorialogs
+    - logs
+    - agent
+    - collector
+    - kubernetes
+    - observability
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-collector
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-collector-0.3.2/victoria-logs-collector-0.3.2.tgz
+    version: 0.3.2
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - fixed selector for scrape objects. See [#2827](https://github.com/VictoriaMetrics/helm-charts/issues/2827).
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -42677,6 +42721,76 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - bump version of VM components to [v1.141.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.141.0)
+        - bump victoria-metrics-operator dependency chart to version 0.62.0
+        - updates operator to [v0.69.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.69.0) version
+        - Upgraded default Alertmanager tag 0.28.1 -> 0.32.0
+        - use OCI registries for all chart dependencies
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victoriametrics/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/victoriametrics/changelog/
+      artifacthub.io/operator: "true"
+      artifacthub.io/readme: |
+        # VictoriaMetrics K8s Stack Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/changelog/).
+    apiVersion: v2
+    appVersion: v1.141.0
+    created: "2026-04-28T09:03:17.14451151Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    - condition: victoria-metrics-operator.enabled
+      name: victoria-metrics-operator
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.62.*
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: oci://ghcr.io/prometheus-community/charts
+      version: 7.3.*
+    - condition: prometheus-node-exporter.enabled
+      name: prometheus-node-exporter
+      repository: oci://ghcr.io/prometheus-community/charts
+      version: 4.53.*
+    - condition: grafana.enabled
+      name: grafana
+      repository: oci://ghcr.io/grafana-community/helm-charts
+      version: 12.2.*
+    description: Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics
+      Operator, Grafana dashboards, ServiceScrapes and VMRules
+    digest: 140ce917f39dbf4483448c69876796c57ba6ac84bb4225c034997fda19bfa5c0
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-k8s-stack
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-k8s-stack-0.75.0/victoria-metrics-k8s-stack-0.75.0.tgz
+    version: 0.75.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - 'revert prometheus-node-exporter service `jobLabel: node-exporter`'
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -72397,4 +72511,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-04-28T08:49:12.562351907Z"
+generated: "2026-04-28T09:03:17.457580198Z"
