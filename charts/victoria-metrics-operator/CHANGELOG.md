@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.62.1
+
+**Release date:** 28 Apr 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.69.0](https://img.shields.io/badge/v0.69.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0690)
+
 - include prometheus scrapeconfig controller to a list of controllers that should be disabled by .Values.operator.disable_prometheus_converter. See [#2838](https://github.com/VictoriaMetrics/helm-charts/issues/2838).
 
 ## 0.62.0
