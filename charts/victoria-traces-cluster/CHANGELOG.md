@@ -5,6 +5,7 @@
 - added `app.kubernetes.io/component` with value from custom `app` label. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 - fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template
 - support volumeAttributesClassName PVC attribute. See [#2782](https://github.com/VictoriaMetrics/helm-charts/issues/2782).
+- properly render topologySpreadConstraints for vminsert pods. See [#2861](https://github.com/VictoriaMetrics/helm-charts/issues/2861).
 
 ## 0.0.7
 
