@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- set default securityContext for Alertmanager to prevent from permissions issues with persistence enabled. See [#2846](https://github.com/VictoriaMetrics/helm-charts/issues/2846).
 
 ## 0.76.0
 
