@@ -24,6 +24,8 @@
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vlstorage.enabled to true or add nodes to vlinsert.extraArgs.storageNode"}}
   {{- end }}
+  {{- $_ := unset . "style" }}
+  {{- $_ := unset . "appKey" }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
