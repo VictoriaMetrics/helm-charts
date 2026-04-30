@@ -670,6 +670,13 @@ alertmanager:
     image:
       # renovate: image=prom/alertmanager
       tag: v0.32.1
+    securityContext:
+      runAsGroup: 2000
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 2000
+      seccompProfile:
+        type: RuntimeDefault
     externalURL: ""
     routePrefix: /
 
