@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.1.1
+
+**Release date:** 30 Apr 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.8.1](https://img.shields.io/badge/v0.8.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriatraces%2Fchangelog%2F%23v081)
+
 - properly render topologySpreadConstraints for vlinsert pods. See [#2861](https://github.com/VictoriaMetrics/helm-charts/issues/2861).
 
 ## 0.1.0
