@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed rendering of `.Values.topologySpreadConstraints` in the pod spec.
 
 ## 0.3.2
 
