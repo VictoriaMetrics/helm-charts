@@ -9,16 +9,15 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vminsert -}}
   {{- $args := dict -}}
-  {{- $_ := set . "style" "plain" }}
-  {{- $_ := set . "appKey" "vmstorage" }}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $ctx := dict "style" "plain" "appKey" "vmstorage" "helm" .helm }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" $ctx)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vmstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
-    {{- $fqdn := include "vm.fqdn" . }}
+    {{- $fqdn := include "vm.fqdn" $ctx }}
     {{- if $Values.autoDiscovery }}
-      {{- if eq (include "vm.enterprise.disabled" . ) "true" }}
+      {{- if eq (include "vm.enterprise.disabled" $ctx ) "true" }}
         {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
       {{- end }}
       {{- $storageNode := printf "srv+_vminsert._tcp.%s" $fqdn }}
@@ -27,12 +26,12 @@
       {{- $port := "8400" }}
       {{- range $i := until ($storage.replicaCount | int) -}}
         {{- if not (has (float64 $i) $app.excludeStorageIDs) -}}
-          {{- $_ := set $ "appIdx" $i }}
-          {{- $storageNode := include "vm.fqdn" $ -}}
+          {{- $_ := set $ctx "appIdx" $i }}
+          {{- $storageNode := include "vm.fqdn" $ctx -}}
           {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
         {{- end -}}
       {{- end -}}
-      {{- $_ := unset $ "appIdx" }}
+      {{- $_ := unset $ctx "appIdx" }}
     {{- end }}
     {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
   {{- end -}}
@@ -42,8 +41,6 @@
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vmstorage.enabled to true or add nodes to vminsert.extraArgs.storageNode"}}
   {{- end }}
-  {{- $_ := unset . "style" }}
-  {{- $_ := unset . "appKey" }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
@@ -61,17 +58,16 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vmselect -}}
   {{- $args := dict -}}
-  {{- $_ := set . "style" "plain" }}
-  {{- $_ := set . "appKey" "vmstorage" }}
+  {{- $ctx := dict "style" "plain" "appKey" "vmstorage" "helm" .helm }}
   {{- $_ := set $args "cacheDataPath" $app.cacheMountPath -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" $ctx)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vmstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
-    {{- $fqdn := include "vm.fqdn" . }}
+    {{- $fqdn := include "vm.fqdn" $ctx }}
     {{- if $Values.autoDiscovery }}
-      {{- if eq (include "vm.enterprise.disabled" . ) "true" }}
+      {{- if eq (include "vm.enterprise.disabled" $ctx) "true" }}
         {{- fail "SRV autodiscovery is only supported in enterprise. Either define license or set `autoDiscovery` to `false`" }}
       {{- end }}
       {{- $storageNode := printf "srv+_vmselect._tcp.%s" $fqdn }}
@@ -79,36 +75,34 @@
     {{- else }}
       {{- $port := "8401" }}
       {{- range $i := until ($storage.replicaCount | int) -}}
-        {{- $_ := set $ "appIdx" $i }}
-        {{- $storageNode := include "vm.fqdn" $ -}}
+        {{- $_ := set $ctx "appIdx" $i }}
+        {{- $storageNode := include "vm.fqdn" $ctx -}}
         {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
       {{- end -}}
-      {{- $_ := unset . "appIdx" }}
+      {{- $_ := unset $ctx "appIdx" }}
     {{- end }}
     {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
   {{- end }}
   {{- $mode := $app.mode }}
   {{- if and $mode (eq $mode "statefulSet") $app.enabled $app.replicaCount }}
     {{- $selectNodes := list }}
-    {{- $_ := set . "appKey" "vmselect" }}
-    {{- $fqdn := include "vm.fqdn" . }}
+    {{- $_ := set $ctx "appKey" "vmselect" }}
+    {{- $fqdn := include "vm.fqdn" $ctx }}
     {{- $port := "8481" }}
     {{- with $app.extraArgs.httpListenAddr }}
       {{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" }}
     {{- end -}}
     {{- range $i := until ($app.replicaCount | int) -}}
-      {{- $_ := set $ "appIdx" $i }}
-      {{- $selectNode := include "vm.fqdn" $ -}}
+      {{- $_ := set $ctx "appIdx" $i }}
+      {{- $selectNode := include "vm.fqdn" $ctx -}}
       {{- $selectNodes = append $selectNodes (printf "%s:%s" $selectNode $port) -}}
     {{- end -}}
-    {{- $_ := unset $ "appIdx" }}
+    {{- $_ := unset $ctx "appIdx" }}
     {{- $_ := set $args "selectNode" (concat ($args.selectNode | default list) $selectNodes) }}
   {{- end -}}
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vmstorage.enabled to true or add nodes to vmselect.extraArgs.storageNode"}}
   {{- end }}
-  {{- $_ := unset . "style" }}
-  {{- $_ := unset . "appKey" }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 

@@ -2,30 +2,27 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vlinsert -}}
   {{- $args := dict "select.disable" "true" -}}
-  {{- $_ := set . "style" "plain" }}
-  {{- $_ := set . "appKey" "vlstorage" }}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $ctx := dict "style" "plain" "appKey" "vlstorage" "helm" .helm }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" $ctx)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
-    {{- $fqdn := include "vm.fqdn" . }}
+    {{- $fqdn := include "vm.fqdn" $ctx }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vlstorage.extraArgs.httpListenAddr "default" "9491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
       {{- if not (has (float64 $i) $app.excludeStorageIDs) -}}
-        {{- $_ := set $ "appIdx" $i }}
-        {{- $storageNode := include "vm.fqdn" $ -}}
+        {{- $_ := set $ctx "appIdx" $i }}
+        {{- $storageNode := include "vm.fqdn" $ctx -}}
         {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
       {{- end -}}
     {{- end -}}
-    {{- $_ := unset $ "appIdx" }}
+    {{- $_ := unset $ctx "appIdx" }}
     {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
   {{- end -}}
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vlstorage.enabled to true or add nodes to vlinsert.extraArgs.storageNode"}}
   {{- end }}
-  {{- $_ := unset . "style" }}
-  {{- $_ := unset . "appKey" }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
@@ -43,28 +40,25 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vlselect -}}
   {{- $args := dict "insert.disable" "true" -}}
-  {{- $_ := set . "style" "plain" }}
-  {{- $_ := set . "appKey" "vlstorage" }}
+  {{- $ctx := dict "style" "plain" "appKey" "vlstorage" "helm" .helm }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
-    {{- $fqdn := include "vm.fqdn" . }}
+    {{- $fqdn := include "vm.fqdn" $ctx }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vlstorage.extraArgs.httpListenAddr "default" "9491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
-      {{- $_ := set $ "appIdx" $i }}
-      {{- $storageNode := include "vm.fqdn" $ -}}
+      {{- $_ := set $ctx "appIdx" $i }}
+      {{- $storageNode := include "vm.fqdn" $ctx -}}
       {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
     {{- end -}}
-    {{- $_ := unset . "appIdx" }}
+    {{- $_ := unset $ctx "appIdx" }}
     {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
   {{- end }}
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vlstorage.enabled to true or add nodes to vlselect.extraArgs.storageNode"}}
   {{- end }}
-  {{- $_ := unset . "style" }}
-  {{- $_ := unset . "appKey" }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
