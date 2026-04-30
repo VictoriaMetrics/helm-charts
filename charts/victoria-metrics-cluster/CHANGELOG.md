@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- properly render topologySpreadConstraints for vlinsert pods. See [#2861](https://github.com/VictoriaMetrics/helm-charts/issues/2861).
 
 ## 0.41.1
 

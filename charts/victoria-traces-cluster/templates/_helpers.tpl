@@ -2,29 +2,26 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vtinsert -}}
   {{- $args := dict -}}
-  {{- $_ := set . "style" "plain" }}
-  {{- $_ := set . "appKey" "vtstorage" }}
+  {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
-    {{- $fqdn := include "vm.fqdn" . }}
+    {{- $fqdn := include "vm.fqdn" $ctx }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vtstorage.extraArgs.httpListenAddr "default" "10491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
       {{- if not (has (float64 $i) $app.excludeStorageIDs) -}}
-        {{- $_ := set $ "appIdx" $i }}
-        {{- $storageNode := include "vm.fqdn" $ -}}
+        {{- $_ := set $ctx "appIdx" $i }}
+        {{- $storageNode := include "vm.fqdn" $ctx -}}
         {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
       {{- end -}}
     {{- end -}}
-    {{- $_ := unset $ "appIdx" }}
+    {{- $_ := unset $ctx "appIdx" }}
     {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
   {{- end -}}
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vtstorage.enabled to true or add nodes to vtinsert.extraArgs.storageNode"}}
   {{- end }}
-  {{- $_ := unset . "style" }}
-  {{- $_ := unset . "appKey" }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
@@ -41,27 +38,24 @@
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vtselect -}}
   {{- $args := dict -}}
-  {{- $_ := set . "style" "plain" }}
-  {{- $_ := set . "appKey" "vtstorage" }}
+  {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
-    {{- $fqdn := include "vm.fqdn" . }}
+    {{- $fqdn := include "vm.fqdn" $ctx }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vtstorage.extraArgs.httpListenAddr "default" "10491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
-      {{- $_ := set $ "appIdx" $i }}
-      {{- $storageNode := include "vm.fqdn" $ -}}
+      {{- $_ := set $ctx "appIdx" $i }}
+      {{- $storageNode := include "vm.fqdn" $ctx -}}
       {{- $storageNodes = append $storageNodes (printf "%s:%s" $storageNode $port) -}}
     {{- end -}}
-    {{- $_ := unset . "appIdx" }}
+    {{- $_ := unset $ctx "appIdx" }}
     {{- $_ := set $args "storageNode" (concat ($args.storageNode | default list) $storageNodes) }}
   {{- end }}
   {{- if empty $args.storageNode }}
     {{- fail "no storageNodes found. Either set vtstorage.enabled to true or add nodes to vtselect.extraArgs.storageNode"}}
   {{- end }}
-  {{- $_ := unset . "style" }}
-  {{- $_ := unset . "appKey" }}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
