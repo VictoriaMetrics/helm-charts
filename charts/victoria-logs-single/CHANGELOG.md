@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- removed vector playground property, which is not supported anymore
 
 ## 0.12.2
 
