@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support `IgnoreOnInstallOnly` value for `admissionWebhooks.policy` which sets the validating webhook `failurePolicy` to `Ignore` on first install and `Fail` on subsequent upgrades. See [#2874](https://github.com/VictoriaMetrics/helm-charts/issues/2874).
 
 ## 0.62.1
 

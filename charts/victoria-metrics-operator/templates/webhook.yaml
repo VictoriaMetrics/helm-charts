@@ -43,7 +43,13 @@ webhooks:
       {{- if not $certManager.enabled }}
       caBundle: {{ $tls.caCert }}
       {{- end }}
+    {{- if eq $webhooks.policy "IgnoreOnInstallOnly" }}
+    failurePolicy: {{ $.Release.IsInstall | ternary "Ignore" "Fail" }}
+    {{- else if $webhooks.policy }}
     failurePolicy: {{ $webhooks.policy }}
+    {{- else }}
+    failurePolicy: Fail
+    {{- end }}
     name: '{{ $crd.metadata.name }}'
     admissionReviewVersions:
       - v1
