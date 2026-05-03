@@ -271,6 +271,11 @@
   {{- if and ($app.useManagedConfig) (not (hasKey $spec "disableNamespaceMatcher")) }}
     {{- $_ := set $spec "disableNamespaceMatcher" true }}
   {{- end }}
+  {{- if (($spec).storage).volumeClaimTemplate -}}
+    {{- if not $spec.securityContext }}
+      {{- $_ := set $spec "securityContext" (dict "runAsUser" 1000 "runAsGroup" 1000 "fsGroup" 1000) }}
+    {{- end -}}
+  {{- end }}
   {{- $_ := set $spec "templates" $templates -}}
   {{- toYaml $spec -}}
 {{- end -}}
