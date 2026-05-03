@@ -1,7 +1,7 @@
 ## Next release
 
 - set default securityContext for Alertmanager to prevent from permissions issues with persistence enabled. See [#2846](https://github.com/VictoriaMetrics/helm-charts/issues/2846).
-- set default operator `admissionWebhooks.policy` to `IgnoreOnInstallOnly` so the validating webhook `failurePolicy` is `Ignore` on first install and `Fail` on subsequent upgrades, allowing the stack to be installed in a single pass. See [#2874](https://github.com/VictoriaMetrics/helm-charts/issues/2874).
+- default operator `admissionWebhooks.policy` to `Ignore` so the stack can be installed and upgraded in a single pass without races against the operator's webhook server. Override to `Fail` for strict validation. See [#2874](https://github.com/VictoriaMetrics/helm-charts/issues/2874).
 
 ## 0.76.0
 

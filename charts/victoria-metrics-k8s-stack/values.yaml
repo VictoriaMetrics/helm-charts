@@ -35,8 +35,8 @@ victoria-metrics-operator:
   serviceMonitor:
     enabled: true
   admissionWebhooks:
-    # -- Set webhook `failurePolicy` to `Ignore` on first install and `Fail` on subsequent upgrades, so the chart can be installed in a single pass even before the operator is reachable. Override to `Fail` if you want strict validation from the very first install.
-    policy: IgnoreOnInstallOnly
+    # -- Default the validating webhook `failurePolicy` to `Ignore` so the stack can be installed/upgraded in a single pass without races against the operator's webhook server. Override to `Fail` for strict validation once the operator is in steady state.
+    policy: Ignore
   operator:
     # -- By default, operator converts prometheus-operator objects.
     disable_prometheus_converter: false
