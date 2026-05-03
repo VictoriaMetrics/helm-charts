@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.77.0
+
+**Release date:** 03 May 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.142.0](https://img.shields.io/badge/v1.142.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11420)
+
 - set default securityContext for Alertmanager, when persistence is enabled to prevent from permissions issues. See [#2846](https://github.com/VictoriaMetrics/helm-charts/issues/2846).
 - default operator `admissionWebhooks.policy` to `Ignore` so the stack can be installed and upgraded in a single pass without races against the operator's webhook server. Override to `Fail` for strict validation. See [#2874](https://github.com/VictoriaMetrics/helm-charts/issues/2874).
 
