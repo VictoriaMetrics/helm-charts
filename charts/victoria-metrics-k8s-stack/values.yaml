@@ -34,6 +34,9 @@ victoria-metrics-operator:
         pullPolicy: IfNotPresent
   serviceMonitor:
     enabled: true
+  admissionWebhooks:
+    # -- Default the validating webhook `failurePolicy` to `Ignore` so the stack can be installed/upgraded in a single pass without races against the operator's webhook server. Override to `Fail` for strict validation once the operator is in steady state.
+    policy: Ignore
   operator:
     # -- By default, operator converts prometheus-operator objects.
     disable_prometheus_converter: false
