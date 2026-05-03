@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- **BREAKING**: rename `verticalPodAutoscaling` to `verticalPodAutoscaler` in `vmselect`, `vminsert`, `vmauth` and `vmstorage` to match the template, which previously read `verticalPodAutoscaler` and silently ignored the documented field. Users who set `<component>.verticalPodAutoscaling.*` must rename it to `<component>.verticalPodAutoscaler.*`.
 
 ## 0.41.2
 
