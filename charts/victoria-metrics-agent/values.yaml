@@ -415,10 +415,10 @@ persistentVolume:
   # -- Bind Persistent Volume by labels. Must match all labels of targeted PV.
   matchLabels: {}
 
-# -- Horizontal Pod Autoscaling.
+# -- Horizontal Pod Autoscaler.
 # Note that it is not intended to be used for vmagents which perform scraping.
 # In order to scale scraping vmagents check [here](https://docs.victoriametrics.com/victoriametrics/vmagent/#scraping-big-number-of-targets)
-horizontalPodAutoscaling:
+horizontalPodAutoscaler:
   # -- Use HPA for vmagent
   enabled: false
   # -- Maximum replicas for HPA to use to to scale vmagent
@@ -428,10 +428,10 @@ horizontalPodAutoscaling:
   # -- Metric for HPA to use to scale vmagent
   metrics: []
 
-# -- Vertical Pod Autoscaling.
+# -- Vertical Pod Autoscaler.
 # Requires VPA CRD (`autoscaling.k8s.io/v1`) to be installed in the cluster.
 # Note that VPA should not be used together with HPA on the same resource metrics (CPU/memory).
-verticalPodAutoscaling:
+verticalPodAutoscaler:
   # -- Use VPA for vmagent
   enabled: false
   # -- List of custom recommenders to use
