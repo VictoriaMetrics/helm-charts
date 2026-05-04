@@ -1,22 +1,52 @@
-{{ define "chart.valueDefaultColumnRender" }}
-{{- $defaultValue := (default .Default .AutoDefault)  -}}
-{{- $notationType := .NotationType }}
-{{- if and (hasPrefix "`" $defaultValue) (hasSuffix "`" $defaultValue) -}}
-{{- $defaultValue = (toYaml (fromJson (trimAll "`" (default .Default .AutoDefault) ) ) ) -}}
-{{- if has .Type (list "list" "object" "map") -}}
-{{- $notationType = "plaintext" }}
-{{- end -}}
-{{- end -}}
-<pre class="helm-vars-default-value language-yaml" lang="{{ $notationType }}">
-<code class="language-yaml">
-{{- if (eq $notationType "tpl" ) -}}
-{{ .Key }}: |
-{{- $defaultValue | nindent 2 }}
-{{- else -}}
-{{ $defaultValue }}
+{{- define "chart.valueKeyColumnRender" -}}
+  {{- $defaultValue := (default .row.Default .row.AutoDefault) -}}
+  {{- $notationType := .row.NotationType -}}
+  {{- if and (hasPrefix "`" $defaultValue) (hasSuffix "`" $defaultValue) -}}
+    {{- $defaultValue = fromJson (trimAll "`" $defaultValue) -}}
+  {{- end -}}
+  {{- $output := dict .row.Key $defaultValue }}
+  {{- if (eq $notationType "tpl") -}}
+    {{- $_ := set $output .row.Key (toYaml $defaultValue) }}
+  {{- end }}
+  {{- highlight (toYaml $output) "yaml" "html-styleless" "" }}
+{{ end }}
+
+{{ define "chart.valueDescriptionColumnRender" -}}
+  <em><code>({{ .row.Type }})</code></em>
+  {{- default .row.AutoDescription .row.Description | toHTML -}}
 {{- end }}
-</code>
-</pre>
+
+{{ define "chart.valuesTableHtml" }}
+{{- $sections := default list }}
+{{- if .Sections.Sections -}}
+  {{- $sections = concat $sections .Sections.Sections -}}
+  {{- if .Sections.DefaultSection.SectionItems -}}
+    {{- $sections = append $sections .Sections.DefaultSection -}}
+  {{- end }}
+{{- else }}
+  {{- $sections = append $sections (dict "SectionItems" .Values) -}}
+{{- end }}
+{{- range $sections }}
+{{- with .SectionName}}
+<h3>{{- . }}</h3>
+{{- end }}
+<table class="helm-vars">
+  <thead>
+    <th class="helm-vars-key">Key</th>
+    <th class="helm-vars-description">Description</th>
+  </thead>
+  <tbody>
+    {{- range .SectionItems }}
+    {{- $id := regexReplaceAll "(\\.|_)" .Key "-" | lower -}}
+    {{- $ctx := dict "id" $id "row" . }}
+    <tr id="{{ $id }}">
+      <td><a href="#{{ $id }}">{{ template "chart.valueKeyColumnRender" $ctx }}</a></td>
+      <td>{{ template "chart.valueDescriptionColumnRender" $ctx }}</td>
+    </tr>
+    {{- end }}
+  </tbody>
+</table>
+{{- end }}
 {{ end }}
 
 {{ define "chart.badges" }}
