@@ -58,6 +58,7 @@ metadata:
     {{- fail (printf "No read backend urls defined for vmauth in AZ %s" $zone.name) -}}
   {{- end }}
 
+  {{- if $zone.read.vmauth.allowUnauthenticated }}
   {{- $paths := dict "cluster" (list "/select/.+" "/admin/tenants") "single" (list "/select/.+") }}
   {{- $dropPrefixParts := dict "cluster" 0 "single" 2 }}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
@@ -73,6 +74,9 @@ metadata:
   {{- end }}
   {{- $_ := set $accessSpec "url_map" $urlMap }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+  {{- else if and (empty $spec.users) (empty $spec.unauthorizedUserAccessSpec) (empty $spec.unauthorizedAccessConfig) }}
+  {{- fail (printf "zoneTpl.read.vmauth (%s): no auth configured. Either set read.vmauth.allowUnauthenticated=true (insecure: open read proxy across all tenants) or supply spec.users / spec.unauthorizedUserAccessSpec / spec.unauthorizedAccessConfig." $zone.name) }}
+  {{- end }}
   {{- if not $spec.nodeSelector }}
     {{- $_ := set $spec "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}
   {{- end }}

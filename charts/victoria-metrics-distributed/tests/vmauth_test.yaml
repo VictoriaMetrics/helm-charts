@@ -11,21 +11,32 @@ tests:
       write:
         global:
           vmauth:
+            allowUnauthenticated: true
             spec:
               image:
                 tag: v1.0.2
       read:
         global:
           vmauth:
+            allowUnauthenticated: true
             spec:
               image:
                 tag: v1.0.3
+              unauthorizedUserAccessSpec:
+                url_map:
+                  - load_balancing_policy: first_available
+                    retry_status_codes: [500, 502, 503]
       zoneTpl:
         read:
           vmauth:
+            allowUnauthenticated: true
             spec:
               image:
                 tag: v1.0.5
+              unauthorizedUserAccessSpec:
+                url_map:
+                  - load_balancing_policy: first_available
+                    retry_status_codes: [500, 502, 503]
         cluster:
           spec:
             image:

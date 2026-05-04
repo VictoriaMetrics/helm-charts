@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- **BREAKING**: secure-by-default for vmauth. The chart no longer ships an open `unauthorizedUserAccessSpec` proxy across all tenants. New `allowUnauthenticated` toggle (default `false`) gates the chart-injected anonymous routing for `write.global.vmauth`, `read.global.vmauth`, and `zoneTpl.read.vmauth`. When `false` and no auth is configured (`spec.users` / `spec.unauthorizedUserAccessSpec` / `spec.unauthorizedAccessConfig` all empty), the chart fails at template time with a helpful message. Existing installs that relied on anonymous access must either set `allowUnauthenticated: true` (insecure, original behavior) or supply `spec.users`.
 
 ## 0.36.0
 

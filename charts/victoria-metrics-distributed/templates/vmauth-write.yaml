@@ -36,13 +36,17 @@ metadata:
   {{- if empty $urls }}
     {{- fail "No global vmauth write backend urls defined" -}}
   {{- end }}
+  {{- $spec := deepCopy $auth.spec | default dict -}}
+  {{- if $auth.allowUnauthenticated }}
   {{- $defaultPaths := list "/api/v1/write" "/prometheus/api/v1/write" "/write" "/api/v1/import" "/api/v1/import/.+" "/opentelemetry/.+" "/insert/.+"}}
   {{- $defaultUrlMapItem := dict "src_paths" $defaultPaths "url_prefix" $urls }}
-  {{- $spec := deepCopy $auth.spec | default dict -}}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
   {{- $urlMap := $accessSpec.url_map | default (list (dict))  }}
   {{- $firstUrlMapItem := mergeOverwrite $defaultUrlMapItem (deepCopy (index $urlMap 0)) }}
   {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+  {{- else if and (empty $spec.users) (empty $spec.unauthorizedUserAccessSpec) (empty $spec.unauthorizedAccessConfig) }}
+  {{- fail "write.global.vmauth: no auth configured. Either set write.global.vmauth.allowUnauthenticated=true (insecure: open write proxy across all tenants) or supply spec.users / spec.unauthorizedUserAccessSpec / spec.unauthorizedAccessConfig." }}
+  {{- end }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
 {{- end }}

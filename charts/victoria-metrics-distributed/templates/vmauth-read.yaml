@@ -49,9 +49,10 @@ metadata:
   {{- if and (empty $urls.cluster) (empty $urls.single) }}
     {{- fail "No global vmauth read backend urls defined" -}}
   {{- end }}
+  {{- $spec := deepCopy $auth.spec | default dict -}}
+  {{- if $auth.allowUnauthenticated }}
   {{- $paths := dict "cluster" (list "/select/.+" "/admin/tenants") "single" (list "/select/.+") }}
   {{- $dropPrefixParts := dict "cluster" 0 "single" 2 }}
-  {{- $spec := deepCopy $auth.spec | default dict -}}
   {{- $accessSpec := $spec.unauthorizedUserAccessSpec | default dict }}
   {{- $urlMap := $accessSpec.url_map | default (list (dict)) }}
   {{- $firstItem := index $urlMap 0 }}
@@ -65,6 +66,9 @@ metadata:
   {{- end }}
   {{- $_ := set $accessSpec "url_map" $urlMap }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
+  {{- else if and (empty $spec.users) (empty $spec.unauthorizedUserAccessSpec) (empty $spec.unauthorizedAccessConfig) }}
+  {{- fail "read.global.vmauth: no auth configured. Either set read.global.vmauth.allowUnauthenticated=true (insecure: open read proxy across all tenants) or supply spec.users / spec.unauthorizedUserAccessSpec / spec.unauthorizedAccessConfig." }}
+  {{- end }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
 {{- end }}
 
