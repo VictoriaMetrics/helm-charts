@@ -45,8 +45,15 @@ metadata:
   {{- $firstUrlMapItem := mergeOverwrite $defaultUrlMapItem (deepCopy (index $urlMap 0)) }}
   {{- $_ := set $accessSpec "url_map" (prepend (slice $urlMap 1) $firstUrlMapItem) }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
-  {{- else if and (empty $spec.users) (empty $spec.unauthorizedUserAccessSpec) (empty $spec.unauthorizedAccessConfig) }}
-  {{- fail "write.global.vmauth: no auth configured. Either set write.global.vmauth.allowUnauthenticated=true (insecure: open write proxy across all tenants) or supply spec.users / spec.unauthorizedUserAccessSpec / spec.unauthorizedAccessConfig." }}
+  {{- else if and
+       (empty $spec.users)
+       (empty $spec.userSelector)
+       (empty $spec.userNamespaceSelector)
+       (not $spec.selectAllByDefault)
+       (empty $spec.configSecret)
+       (empty $spec.unauthorizedUserAccessSpec)
+       (empty $spec.unauthorizedAccessConfig) }}
+  {{- fail "write.global.vmauth: no auth configured. Either set write.global.vmauth.allowUnauthenticated=true (insecure: open write proxy across all tenants) or supply one of: spec.users, spec.userSelector / spec.userNamespaceSelector, spec.selectAllByDefault, spec.configSecret, spec.unauthorizedUserAccessSpec, spec.unauthorizedAccessConfig." }}
   {{- end }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
 {{- end }}

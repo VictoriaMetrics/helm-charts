@@ -66,8 +66,15 @@ metadata:
   {{- end }}
   {{- $_ := set $accessSpec "url_map" $urlMap }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
-  {{- else if and (empty $spec.users) (empty $spec.unauthorizedUserAccessSpec) (empty $spec.unauthorizedAccessConfig) }}
-  {{- fail "read.global.vmauth: no auth configured. Either set read.global.vmauth.allowUnauthenticated=true (insecure: open read proxy across all tenants) or supply spec.users / spec.unauthorizedUserAccessSpec / spec.unauthorizedAccessConfig." }}
+  {{- else if and
+       (empty $spec.users)
+       (empty $spec.userSelector)
+       (empty $spec.userNamespaceSelector)
+       (not $spec.selectAllByDefault)
+       (empty $spec.configSecret)
+       (empty $spec.unauthorizedUserAccessSpec)
+       (empty $spec.unauthorizedAccessConfig) }}
+  {{- fail "read.global.vmauth: no auth configured. Either set read.global.vmauth.allowUnauthenticated=true (insecure: open read proxy across all tenants) or supply one of: spec.users, spec.userSelector / spec.userNamespaceSelector, spec.selectAllByDefault, spec.configSecret, spec.unauthorizedUserAccessSpec, spec.unauthorizedAccessConfig." }}
   {{- end }}
 spec: {{ tpl (toYaml $spec) $ctx | nindent 2 }}
 {{- end }}

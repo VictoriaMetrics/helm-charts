@@ -74,8 +74,15 @@ metadata:
   {{- end }}
   {{- $_ := set $accessSpec "url_map" $urlMap }}
   {{- $_ := set $spec "unauthorizedUserAccessSpec" $accessSpec }}
-  {{- else if and (empty $spec.users) (empty $spec.unauthorizedUserAccessSpec) (empty $spec.unauthorizedAccessConfig) }}
-  {{- fail (printf "zoneTpl.read.vmauth (%s): no auth configured. Either set read.vmauth.allowUnauthenticated=true (insecure: open read proxy across all tenants) or supply spec.users / spec.unauthorizedUserAccessSpec / spec.unauthorizedAccessConfig." $zone.name) }}
+  {{- else if and
+       (empty $spec.users)
+       (empty $spec.userSelector)
+       (empty $spec.userNamespaceSelector)
+       (not $spec.selectAllByDefault)
+       (empty $spec.configSecret)
+       (empty $spec.unauthorizedUserAccessSpec)
+       (empty $spec.unauthorizedAccessConfig) }}
+  {{- fail (printf "zoneTpl.read.vmauth (%s): no auth configured. Either set read.vmauth.allowUnauthenticated=true (insecure: open read proxy across all tenants) or supply one of: spec.users, spec.userSelector / spec.userNamespaceSelector, spec.selectAllByDefault, spec.configSecret, spec.unauthorizedUserAccessSpec, spec.unauthorizedAccessConfig." $zone.name) }}
   {{- end }}
   {{- if not $spec.nodeSelector }}
     {{- $_ := set $spec "nodeSelector" (dict "topology.kubernetes.io/zone" "{{ (.zone).name }}") }}
