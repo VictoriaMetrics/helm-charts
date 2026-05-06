@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix Alertmanager templates path to match VM Operator mount. See [#2883](https://github.com/VictoriaMetrics/helm-charts/pull/2883).
 
 ## 0.77.0
 

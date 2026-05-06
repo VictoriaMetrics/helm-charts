@@ -26,7 +26,7 @@ metadata:
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 stringData:
   {{- $config := (.Values.alertmanager).config | default dict }}
-  {{- $_ := set $config "templates" (list "/etc/vm/configs/**/*.tmpl") }}
+  {{- $_ := set $config "templates" (list "/etc/vm/templates/**/*.tmpl") }}
   alertmanager.yaml: |{{ toYaml $config | nindent 4 }}
   {{- end }}
   {{- end }}
