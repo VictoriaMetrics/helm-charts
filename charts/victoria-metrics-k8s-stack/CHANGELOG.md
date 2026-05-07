@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support per-rule overrides in `defaultRules.groups.<group>.rules`
 
 ## 0.77.0
 
