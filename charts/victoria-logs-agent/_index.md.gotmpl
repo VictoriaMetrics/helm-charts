@@ -125,6 +125,16 @@ extraVolumeMounts:
     readOnly: true
 ```
 
+For mutual TLS (mTLS), additionally specify the client certificate and key:
+
+```yaml
+remoteWrite:
+  - url: https://victoria-logs:9428
+    tlsCAFile: "/etc/tls/ca.crt"
+    tlsCertFile: "/etc/tls/client.crt"
+    tlsKeyFile: "/etc/tls/client.key"
+```
+
 If you want to disable TLS certificate verification (not recommended in production), you can set `tlsInsecureSkipVerify` to true.
 
 This will skip verification of the server's certificate and allow connecting to targets with self-signed or invalid certificates.
