@@ -1,6 +1,20 @@
 ## Next release
 
-- TODO
+**Update note 1**: `defaultDashboards.defaultTimezone` is removed. Dashboard timezone is now managed exclusively by Grafana (e.g. `grafana.grafana\.ini.date_formats.default_timezone`).
+
+**Update note 2**: `defaultRules.groups[*].targetNamespace` is replaced by `defaultRules.groups[*].jobNamespaces`, a per-group map from scrape job name to namespace regex. A global `defaultRules.jobNamespaces` is also available and is merged with per-group values (per-group wins on conflict). The new defaults scope `kubernetesApps` to `kube-state-metrics` and `kubernetesStorage` to `kubelet`.
+
+**Update note 3**: Helm-rendered dashboard ConfigMaps and VMRules are removed. Dashboards and rules are now fetched and applied at deploy time by the sync-job (`syncJob.enabled: true` by default). Disable `syncJob.enabled` only if managing dashboards and rules externally.
+
+- introduce sync-job config with `common` section (`clusterLabel`, `multicluster`) shared across dashboards and rules; Grafana-specific settings (`labelName`, `labelValue`, `datasource`, `operator`) live under `dashboards.common.grafana`
+- add `defaultRules.rules` global per-rule overrides map to patch spec or enable/disable individual rules across all groups
+- add per-group `spec:` support in `defaultRules.groups` for VMRule group-level properties (e.g. `interval`, `params`)
+- add `defaultRules.jobNamespaces` (global) and `defaultRules.groups[*].jobNamespaces` (per-group, merged) to inject `namespace=~"<value>"` into metric selectors by scrape job name; replaces per-group `targetNamespace`
+- add `syncJob.multicluster` to override multicluster mode independently of `grafana.sidecar.dashboards.multicluster`
+- `multicluster: false` no longer injects `clusterLabel` into aggregation `by()` clauses in rule expressions; existing labels are still renamed to match the configured `clusterLabel`
+- rename `defaultRules.additionalGroupByLabels` to `defaultRules.extraGroupByLabels`; old key accepted as fallback; per-group `extraGroupByLabels: []` now explicitly clears the global value
+- remove `defaultDashboards.defaultTimezone`
+- add per-group `extraGroupByLabels` override that replaces the global `defaultRules.extraGroupByLabels` for that group. See [#2832](https://github.com/VictoriaMetrics/helm-charts/issues/2832).
 
 ## 0.84.0
 

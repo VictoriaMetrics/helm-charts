@@ -1,0 +1,53 @@
+{{- if .Values.syncJob.enabled }}
+{{- $ctx := dict "helm" . "appKey" "syncJob" }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- $hasDashboards := and .Values.defaultDashboards.enabled .Values.defaultDashboards.sources }}
+{{- $hasRules := and (or .Values.defaultRules.enabled .Values.defaultRules.create) .Values.defaultRules.sources }}
+{{- $grafanaOperator := .Values.defaultDashboards.grafanaOperator.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $fullname }}-sync-job
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ $fullname }}-sync-job
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+rules:
+  {{- if and $hasDashboards (not $grafanaOperator) }}
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create", "update", "delete"]
+  {{- end }}
+  {{- if $hasRules }}
+  - apiGroups: ["operator.victoriametrics.com"]
+    resources: ["vmrules"]
+    verbs: ["get", "list", "create", "update", "delete"]
+  {{- end }}
+  {{- if and $hasDashboards $grafanaOperator }}
+  - apiGroups: ["grafana.integreatly.org"]
+    resources: ["grafanadashboards"]
+    verbs: ["get", "list", "create", "update", "delete"]
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $fullname }}-sync-job
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $fullname }}-sync-job
+subjects:
+  - kind: ServiceAccount
+    name: {{ $fullname }}-sync-job
+    namespace: {{ $ns }}
+{{- end }}
