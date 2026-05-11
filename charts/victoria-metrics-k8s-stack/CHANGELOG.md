@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.143.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.143.0)
 - fix Alertmanager templates path to match VM Operator mount. See [#2883](https://github.com/VictoriaMetrics/helm-charts/pull/2883).
 
 ## 0.77.0
