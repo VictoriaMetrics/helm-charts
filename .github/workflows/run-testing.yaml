@@ -57,9 +57,9 @@ jobs:
           cache-dependency-path: test/go.sum
         id: go
 
-      - name: Install go-junit-report
+      - name: Install gotestsum
         run: |
-          go install github.com/joschi/go-junit-report/v2/cmd/go-junit-report@latest
+          go install gotest.tools/gotestsum@latest
 
       - name: Create Kind cluster
         uses: helm/kind-action@v1
@@ -71,7 +71,7 @@ jobs:
 
       - name: Run tests
         run: |
-          cd test && go test -json -p 4 ./... 2>&1 | go-junit-report -set-exit-code -parser gojson -iocopy -out ../report.xml
+          cd test && gotestsum --format testdox --junitfile ../report.xml -- -p 4 ./...
         env:
           LICENSE_KEY: ${{ secrets.ENTERPRISE_COMPONENTS_LICENSE_KEY }}
 
