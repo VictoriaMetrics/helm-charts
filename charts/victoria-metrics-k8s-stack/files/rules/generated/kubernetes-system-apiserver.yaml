@@ -57,6 +57,16 @@ rules:
   for: 15m
   labels:
     severity: critical
+- alert: KubeAPIInstanceUnreachable
+  expr: up{job="apiserver"} == 0
+  annotations:
+    description: A KubeAPI instance has been unreachable for more than 15 minutes.
+    runbook_url: {{ $runbookUrl }}/kubernetes/kubeapiinstanceunreachable
+    summary: KubeAPI instance is unreachable.
+  condition: true
+  for: 15m
+  labels:
+    severity: warning
 - alert: KubeAPITerminatedRequests
   expr: {{ printf "(sum(rate(apiserver_request_terminations_total{job=\"apiserver\"}[10m])) by(%s) / (sum(rate(apiserver_request_total{job=\"apiserver\"}[10m])) by(%s) + sum(rate(apiserver_request_terminations_total{job=\"apiserver\"}[10m])) by(%s))) > 0.20" $groupLabels $groupLabels $groupLabels }}
   annotations:

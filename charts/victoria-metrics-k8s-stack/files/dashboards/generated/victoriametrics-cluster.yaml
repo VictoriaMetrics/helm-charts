@@ -7055,39 +7055,46 @@ panels:
   type: row
 - title: vminsert ($instance)
   panels:
-  - title: Requests rate ($instance)
+  - title: Rows rate ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
         uid: $ds
-      expr: {{ printf "sum(rate(vm_http_requests_total{job=~\"$job_insert\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s) > 0" $clusterLabel $clusterLabel }}
+      expr: {{ printf "sum(rate(vm_rows_inserted_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
+      interval: ""
       intervalFactor: 1
-      legendFormat: __auto
+      legendFormat: 'sample: {{`{{`}}type{{`}}`}}'
       range: true
       refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "sum(rate(vm_metadata_rows_inserted_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(type,%s) > 0" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      interval: ""
+      intervalFactor: 1
+      legendFormat: 'metadata: {{`{{`}}type{{`}}`}}'
+      range: true
+      refId: B
     datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: |-
-      * `*` - unsupported query path
-      * `/write` - insert into VM
-      * `/metrics` - query VM system metrics
-      * `/query` - query instant values
-      * `/query_range` - query over a range of time
-      * `/series` - match a certain label set
-      * `/label/{}/values` - query a list of label values (variables mostly)
+    description: "Shows the rate of data rows ingested from write requests. There are two kinds of rows:\n1. Raw sample: each sample consists of a value and a timestamp, see https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples. \n2. Metric metadata: refers to descriptive information about metrics. It can be disabled by setting `-enableMetadata=false`, see https://docs.victoriametrics.com/victoriametrics/vmagent/#metric-metadata."
     fieldConfig:
       defaults:
         color:
           mode: palette-classic
         custom:
+          axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
           axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -7095,18 +7102,21 @@ panels:
             legend: false
             tooltip: false
             viz: false
+          insertNulls: false
           lineInterpolation: linear
           lineWidth: 1
           pointSize: 5
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
             mode: none
           thresholdsStyle:
             mode: "off"
+        decimals: 2
         links: []
         mappings: []
         min: 0
@@ -7114,6 +7124,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -7122,8 +7133,8 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 8385
-    id: 97
+      "y": 43
+    id: 227
     options:
       legend:
         calcs:
@@ -7136,9 +7147,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 12.4.3
     type: timeseries
   - title: Concurrent inserts ($instance)
     targets:
@@ -7179,11 +7191,13 @@ panels:
         color:
           mode: palette-classic
         custom:
+          axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
           axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 10
           gradientMode: none
@@ -7191,12 +7205,14 @@ panels:
             legend: false
             tooltip: false
             viz: false
+          insertNulls: false
           lineInterpolation: linear
           lineWidth: 1
           pointSize: 5
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -7211,6 +7227,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -7229,7 +7246,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 8385
+      "y": 43
     id: 99
     options:
       legend:
@@ -7243,9 +7260,101 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 12.4.3
+    type: timeseries
+  - title: Requests rate ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "sum(rate(vm_http_requests_total{job=~\"$job_insert\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(path,%s) > 0" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      intervalFactor: 1
+      legendFormat: __auto
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: |-
+      * `*` - unsupported query path
+      * `/write` - insert into VM
+      * `/metrics` - query VM system metrics
+      * `/query` - query instant values
+      * `/query_range` - query over a range of time
+      * `/series` - match a certain label set
+      * `/label/{}/values` - query a list of label values (variables mostly)
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 51
+    id: 97
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.4.3
     type: timeseries
   - title: CPU usage % ($instance)
     targets:
@@ -7268,7 +7377,6 @@ panels:
       editorMode: code
       exemplar: true
       format: time_series
-      hide: false
       interval: ""
       intervalFactor: 1
       legendFormat: min
@@ -7281,7 +7389,6 @@ panels:
       editorMode: code
       exemplar: true
       format: time_series
-      hide: false
       interval: ""
       intervalFactor: 1
       legendFormat: median
@@ -7295,11 +7402,13 @@ panels:
         color:
           mode: palette-classic
         custom:
+          axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
           axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -7307,12 +7416,14 @@ panels:
             legend: false
             tooltip: false
             viz: false
+          insertNulls: false
           lineInterpolation: linear
           lineWidth: 1
           pointSize: 5
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -7329,6 +7440,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 0.9
         unit: percentunit
@@ -7336,8 +7448,8 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 0
-      "y": 8393
+      x: 12
+      "y": 51
     id: 185
     options:
       legend:
@@ -7351,9 +7463,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 12.4.3
     type: timeseries
   - title: Memory (anon) usage % ($instance)
     targets:
@@ -7376,7 +7489,6 @@ panels:
       editorMode: code
       exemplar: true
       format: time_series
-      hide: false
       interval: ""
       intervalFactor: 1
       legendFormat: min
@@ -7389,7 +7501,6 @@ panels:
       editorMode: code
       exemplar: true
       format: time_series
-      hide: false
       interval: ""
       intervalFactor: 1
       legendFormat: median
@@ -7408,11 +7519,13 @@ panels:
         color:
           mode: palette-classic
         custom:
+          axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
           axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -7420,12 +7533,14 @@ panels:
             legend: false
             tooltip: false
             viz: false
+          insertNulls: false
           lineInterpolation: linear
           lineWidth: 1
           pointSize: 5
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -7442,6 +7557,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 0.9
         unit: percentunit
@@ -7449,8 +7565,8 @@ panels:
     gridPos:
       h: 8
       w: 12
-      x: 12
-      "y": 8393
+      x: 0
+      "y": 59
     id: 187
     options:
       legend:
@@ -7464,9 +7580,93 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: none
-    pluginVersion: 9.1.0
+    pluginVersion: 12.4.3
+    type: timeseries
+  - title: Storage reachability ($instance)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "vm_rpc_vmstorage_is_reachable{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"} != 1" $clusterLabel }}
+      editorMode: code
+      format: time_series
+      interval: ""
+      intervalFactor: 1
+      legendFormat: '{{`{{`}}instance{{`}}`}} => {{`{{`}}addr{{`}}`}}'
+      range: true
+      refId: A
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: Shows when vmstorage node is unreachable for vminsert.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        decimals: 0
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: short
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 59
+    id: 114
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.4.3
     type: timeseries
   - title: Storage connection saturation ($instance)
     targets:
@@ -7491,11 +7691,13 @@ panels:
         color:
           mode: palette-classic
         custom:
+          axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
           axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -7503,12 +7705,14 @@ panels:
             legend: false
             tooltip: false
             viz: false
+          insertNulls: false
           lineInterpolation: linear
           lineWidth: 1
           pointSize: 5
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -7523,6 +7727,7 @@ panels:
           mode: absolute
           steps:
           - color: transparent
+            value: 0
           - color: red
             value: 0.9
         unit: s
@@ -7531,7 +7736,7 @@ panels:
       h: 8
       w: 12
       x: 0
-      "y": 8401
+      "y": 67
     id: 139
     options:
       legend:
@@ -7544,179 +7749,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
-    type: timeseries
-  - title: Storage reachability ($instance)
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "vm_rpc_vmstorage_is_reachable{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"} != 1" $clusterLabel }}
-      editorMode: code
-      format: time_series
-      interval: ""
-      intervalFactor: 1
-      legendFormat: '{{`{{`}}instance{{`}}`}} => {{`{{`}}addr{{`}}`}}'
-      range: true
-      refId: A
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows when vmstorage node is unreachable for vminsert.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        decimals: 0
-        links: []
-        mappings: []
-        min: 0
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-          - color: red
-            value: 80
-        unit: short
-      overrides: []
-    gridPos:
-      h: 8
-      w: 12
-      x: 12
-      "y": 8401
-    id: 114
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        displayMode: table
-        placement: bottom
-        showLegend: true
-      tooltip:
-        mode: multi
-        sort: desc
-    pluginVersion: 9.1.0
-    type: timeseries
-  - title: 'Network usage: clients ($instance)'
-    targets:
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "(sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job_insert\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) * 8) > 0" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      intervalFactor: 1
-      legendFormat: read from client
-      range: true
-      refId: A
-    - datasource:
-        type: {{ $defaultDatasource }}
-        uid: $ds
-      expr: {{ printf "(sum(rate(vm_tcplistener_written_bytes_total{job=~\"$job_insert\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) * 8) > 0" $clusterLabel $clusterLabel }}
-      editorMode: code
-      format: time_series
-      hide: false
-      intervalFactor: 1
-      legendFormat: write to client
-      range: true
-      refId: B
-    datasource:
-      type: {{ $defaultDatasource }}
-      uid: $ds
-    description: Shows network usage between vminserts and clients, such as vmagent, Prometheus, or any other client pushing metrics to vminsert.
-    fieldConfig:
-      defaults:
-        color:
-          mode: palette-classic
-        custom:
-          axisCenteredZero: false
-          axisColorMode: text
-          axisLabel: ""
-          axisPlacement: auto
-          barAlignment: 0
-          drawStyle: line
-          fillOpacity: 0
-          gradientMode: none
-          hideFrom:
-            legend: false
-            tooltip: false
-            viz: false
-          lineInterpolation: linear
-          lineWidth: 1
-          pointSize: 5
-          scaleDistribution:
-            type: linear
-          showPoints: never
-          spanNulls: false
-          stacking:
-            group: A
-            mode: none
-          thresholdsStyle:
-            mode: "off"
-        links: []
-        mappings: []
-        thresholds:
-          mode: absolute
-          steps:
-          - color: green
-          - color: red
-            value: 80
-        unit: bps
-      overrides:
-      - matcher:
-          id: byRegexp
-          options: /read.*/
-        properties:
-        - id: custom.transform
-          value: negative-Y
-    gridPos:
-      h: 8
-      w: 12
-      x: 0
-      "y": 8409
-    id: 208
-    options:
-      legend:
-        calcs:
-        - mean
-        - lastNotNull
-        displayMode: table
-        placement: bottom
-        showLegend: true
-        sortBy: Last *
-        sortDesc: true
-      tooltip:
-        mode: multi
-        sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 12.4.3
     type: timeseries
   - title: 'Network usage: vmstorage ($instance)'
     targets:
@@ -7736,7 +7772,6 @@ panels:
       expr: {{ printf "(sum(rate(vm_tcpdialer_written_bytes_total{job=~\"$job_insert\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) * 8) > 0" $clusterLabel $clusterLabel }}
       editorMode: code
       format: time_series
-      hide: false
       intervalFactor: 1
       legendFormat: write to vmstorage
       range: true
@@ -7750,11 +7785,13 @@ panels:
         color:
           mode: palette-classic
         custom:
+          axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
           axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -7762,12 +7799,14 @@ panels:
             legend: false
             tooltip: false
             viz: false
+          insertNulls: false
           lineInterpolation: linear
           lineWidth: 1
           pointSize: 5
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -7780,6 +7819,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: bps
@@ -7794,7 +7834,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 8409
+      "y": 67
     id: 209
     options:
       legend:
@@ -7807,9 +7847,108 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 12.4.3
+    type: timeseries
+  - title: 'Network usage: clients ($instance)'
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "(sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job_insert\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) * 8) > 0" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      intervalFactor: 1
+      legendFormat: read from client
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "(sum(rate(vm_tcplistener_written_bytes_total{job=~\"$job_insert\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(%s) * 8) > 0" $clusterLabel $clusterLabel }}
+      editorMode: code
+      format: time_series
+      intervalFactor: 1
+      legendFormat: write to client
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: Shows network usage between vminserts and clients, such as vmagent, Prometheus, or any other client pushing metrics to vminsert.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: bps
+      overrides:
+      - matcher:
+          id: byRegexp
+          options: /read.*/
+        properties:
+        - id: custom.transform
+          value: negative-Y
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 75
+    id: 208
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        displayMode: table
+        placement: bottom
+        showLegend: true
+        sortBy: Last *
+        sortDesc: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: desc
+    pluginVersion: 12.4.3
     type: timeseries
   - title: Rows per insert ($instance)
     targets:
@@ -7827,17 +7966,18 @@ panels:
     datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: ""
     fieldConfig:
       defaults:
         color:
           mode: palette-classic
         custom:
+          axisBorderShow: false
           axisCenteredZero: false
           axisColorMode: text
           axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -7845,12 +7985,14 @@ panels:
             legend: false
             tooltip: false
             viz: false
+          insertNulls: false
           lineInterpolation: linear
           lineWidth: 1
           pointSize: 5
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -7865,6 +8007,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -7873,7 +8016,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 8417
+      "y": 75
     id: 88
     options:
       legend:
@@ -7887,9 +8030,10 @@ panels:
         sortBy: Last *
         sortDesc: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.1.0
+    pluginVersion: 12.4.3
     type: timeseries
   collapsed: true
   gridPos:

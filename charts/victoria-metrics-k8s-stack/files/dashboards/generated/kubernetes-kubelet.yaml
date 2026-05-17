@@ -98,7 +98,7 @@ panels:
   - datasource:
       type: {{ $defaultDatasource }}
       uid: ${datasource}
-    expr: {{ printf "sum(kubelet_running_containers{%s=~\"$cluster\",job=\"kubelet\",metrics_path=\"/metrics\",instance=~\"$instance\"}) by(%s)" $clusterLabel $clusterLabel }}
+    expr: {{ printf "sum(kubelet_running_containers{%s=~\"$cluster\",job=\"kubelet\",metrics_path=\"/metrics\",container_state=\"running\",instance=~\"$instance\"}) by(%s)" $clusterLabel $clusterLabel }}
     instant: true
   datasource:
     type: datasource

@@ -17,4 +17,14 @@ rules:
   for: 15m
   labels:
     severity: critical
+- alert: KubeControllerManagerInstanceUnreachable
+  expr: up{job="kube-controller-manager"} == 0
+  annotations:
+    description: A KubeControllerManager instance has been unreachable for more than 15 minutes.
+    runbook_url: {{ $runbookUrl }}/kubernetes/kubecontrollermanagerinstanceunreachable
+    summary: KubeControllerManager instance is unreachable.
+  condition: true
+  for: 15m
+  labels:
+    severity: warning
 condition: {{ ($Values.kubeControllerManager).enabled }}

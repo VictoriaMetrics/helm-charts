@@ -3082,7 +3082,7 @@ panels:
         sort: none
     pluginVersion: 12.2.0
     type: timeseries
-  - title: Datapoints rate ($instance)
+  - title: Rows rate ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -3091,13 +3091,22 @@ panels:
       editorMode: code
       exemplar: true
       interval: ""
-      legendFormat: '{{`{{`}} type {{`}}`}} ({{`{{`}}job{{`}}`}})'
+      legendFormat: 'sample: {{`{{`}} type {{`}}`}} ({{`{{`}}job{{`}}`}})'
       range: true
       refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "sum(rate(vm_protoparser_metadata_read_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,type,%s) > 0" $clusterLabel $clusterLabel }}
+      editorMode: code
+      instant: false
+      legendFormat: 'metadata: {{`{{`}} type {{`}}`}} ({{`{{`}}job{{`}}`}})'
+      range: true
+      refId: B
     datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: Shows the rate of parsed datapoints from write or scrape requests.
+    description: "Shows the rate of data rows parsed from write requests and scraping. \nThere are two kinds of rows:\n1. Raw sample: each sample consists of a value and a timestamp, see https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples \n2. Metric metadata: refers to descriptive information about metrics. It can be disabled by setting `-enableMetadata=false`, see https://docs.victoriametrics.com/victoriametrics/vmagent/#metric-metadata."
     fieldConfig:
       defaults:
         color:
@@ -3124,6 +3133,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -3137,6 +3147,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -3160,7 +3171,7 @@ panels:
         hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 11.5.0
+    pluginVersion: 12.4.3
     type: timeseries
   - title: Invalid datapoints rate ($instance)
     targets:
@@ -4350,7 +4361,7 @@ panels:
         sort: desc
     pluginVersion: 9.2.6
     type: timeseries
-  - title: Rows rate  ($instance)
+  - title: Rows rate ($instance)
     targets:
     - datasource:
         type: {{ $defaultDatasource }}
@@ -4359,13 +4370,22 @@ panels:
       editorMode: code
       exemplar: true
       interval: ""
-      legendFormat: '{{`{{`}} type {{`}}`}} ({{`{{`}}job{{`}}`}})'
+      legendFormat: 'sample: {{`{{`}} type {{`}}`}} ({{`{{`}}job{{`}}`}})'
       range: true
       refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: $ds
+      expr: {{ printf "sum(rate(vmagent_metadata_inserted_total{job=~\"$job\",instance=~\"$instance\",%s=~\"$cluster\"}[$__rate_interval])) by(job,type,%s) > 0" $clusterLabel $clusterLabel }}
+      editorMode: code
+      instant: false
+      legendFormat: metadata:{{`{{`}} type {{`}}`}} ({{`{{`}}job{{`}}`}})
+      range: true
+      refId: B
     datasource:
       type: {{ $defaultDatasource }}
       uid: $ds
-    description: Shows the rate of rows ingested in vmagent via push protocols.
+    description: "Shows the rate of data rows ingested from write requests. There are two kinds of rows:\n1. Raw sample: each sample consists of a value and a timestamp, see https://docs.victoriametrics.com/victoriametrics/keyconcepts/#raw-samples. \n2. Metric metadata: refers to descriptive information about metrics. It can be disabled by setting `-enableMetadata=false`, see https://docs.victoriametrics.com/victoriametrics/vmagent/#metric-metadata."
     fieldConfig:
       defaults:
         color:
@@ -4377,6 +4397,7 @@ panels:
           axisLabel: ""
           axisPlacement: auto
           barAlignment: 0
+          barWidthFactor: 0.6
           drawStyle: line
           fillOpacity: 0
           gradientMode: none
@@ -4391,6 +4412,7 @@ panels:
           scaleDistribution:
             type: linear
           showPoints: never
+          showValues: false
           spanNulls: false
           stacking:
             group: A
@@ -4404,6 +4426,7 @@ panels:
           mode: absolute
           steps:
           - color: green
+            value: 0
           - color: red
             value: 80
         unit: short
@@ -4412,7 +4435,7 @@ panels:
       h: 8
       w: 12
       x: 12
-      "y": 3931
+      "y": 41
     id: 131
     options:
       legend:
@@ -4424,9 +4447,10 @@ panels:
         placement: bottom
         showLegend: true
       tooltip:
+        hideZeros: false
         mode: multi
         sort: desc
-    pluginVersion: 9.2.6
+    pluginVersion: 12.4.3
     type: timeseries
   - title: Concurrent inserts ($instance)
     targets:
@@ -5768,6 +5792,392 @@ panels:
     "y": 42
   id: 58
   type: row
+- title: Kafka (Enterprise)
+  panels:
+  - title: Traffic (bytes)
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "sum(rate(vmagent_remotewrite_kafka_sent_bytes_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: Produced to Kafka
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "0 - sum(rate(vmagent_kafka_consumer_read_bytes_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: Consumed from Kafka
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: |-
+      Positive series show bytes written by vmagent producers into Kafka. Negative series show bytes read by vmagent consumers from Kafka. Read this together with Messages in / out: a stable byte rate with rising message rate usually means smaller Kafka payloads and higher per-message overhead. Producer Kafka metrics aggregate at job level because they do not expose the full remoteWrite URL label.
+
+      Docs: <a href="https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#estimating-message-size-and-rate" target="_blank">estimating message size and rate</a>. Kafka read docs: <a href="https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#reading-metrics" target="_blank">reading metrics</a>.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: true
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: Bps
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 44
+    id: 164
+    links:
+    - title: 'Docs: estimating size/rate'
+      url: https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#estimating-message-size-and-rate
+    - title: 'Docs: reading metrics'
+      url: https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#reading-metrics
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 12.2.0
+    type: timeseries
+  - title: Messages in / out
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "sum(rate(vmagent_remotewrite_kafka_messages_sent_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: Produced to Kafka
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "0 - sum(rate(vmagent_kafka_messages_read_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: Consumed from Kafka
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: |-
+      Positive series show Kafka messages produced by vmagent. Negative series show Kafka messages consumed by vmagent. Read this together with Traffic (bytes), because a stable byte rate with rising message rate usually means smaller Kafka messages and higher per-message overhead. Producer Kafka metrics aggregate at job level because they do not expose the full remoteWrite URL label.
+
+      Docs: <a href="https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#estimating-message-size-and-rate" target="_blank">estimating message size and rate</a>. Kafka read docs: <a href="https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#reading-metrics" target="_blank">reading metrics</a>.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: true
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: null
+        unit: ops
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 44
+    id: 165
+    links:
+    - title: 'Docs: estimating size/rate'
+      url: https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#estimating-message-size-and-rate
+    - title: 'Docs: reading metrics'
+      url: https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#reading-metrics
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 12.2.0
+    type: timeseries
+  - title: Producer errors
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "sum(rate(vmagent_remotewrite_kafka_messages_send_errors_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: Producer send errors
+      range: true
+      refId: A
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "sum(rate(vmagent_remotewrite_kafka_messages_delivery_errors_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: Producer delivery errors
+      range: true
+      refId: B
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: |-
+      Kafka producer-side errors from vmagent remote write. This panel shows send errors and delivery errors reported by Kafka producers.
+
+      Kafka write docs: <a href="https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#writing-metrics" target="_blank">writing metrics</a>.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: ops
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 0
+      "y": 52
+    id: 167
+    links:
+    - title: 'Docs: writing metrics'
+      url: https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#writing-metrics
+    - title: 'Docs: reading metrics'
+      url: https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#reading-metrics
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 12.2.0
+    type: timeseries
+  - title: Consumer errors
+    targets:
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "sum(rate(vmagent_kafka_client_errors_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: Consumer client errors
+      range: true
+      refId: C
+    - datasource:
+        type: {{ $defaultDatasource }}
+        uid: ${ds}
+      expr: {{ printf "sum(rate(vmagent_kafka_ingest_errors_total{job=~\"$job\",%s=~\"$cluster\"}[$__rate_interval])) by(job,%s)" $clusterLabel $clusterLabel }}
+      editorMode: code
+      legendFormat: Consumer ingest errors
+      range: true
+      refId: D
+    datasource:
+      type: {{ $defaultDatasource }}
+      uid: $ds
+    description: |-
+      Kafka consumer-side errors from vmagent. This panel shows client errors and ingest errors reported while reading from Kafka and passing data further downstream.
+
+      Kafka read docs: <a href="https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#reading-metrics" target="_blank">reading metrics</a>.
+    fieldConfig:
+      defaults:
+        color:
+          mode: palette-classic
+        custom:
+          axisBorderShow: false
+          axisCenteredZero: false
+          axisColorMode: text
+          axisLabel: ""
+          axisPlacement: auto
+          barAlignment: 0
+          barWidthFactor: 0.6
+          drawStyle: line
+          fillOpacity: 0
+          gradientMode: none
+          hideFrom:
+            legend: false
+            tooltip: false
+            viz: false
+          insertNulls: false
+          lineInterpolation: linear
+          lineWidth: 1
+          pointSize: 5
+          scaleDistribution:
+            type: linear
+          showPoints: never
+          showValues: false
+          spanNulls: false
+          stacking:
+            group: A
+            mode: none
+          thresholdsStyle:
+            mode: "off"
+        links: []
+        mappings: []
+        min: 0
+        thresholds:
+          mode: absolute
+          steps:
+          - color: green
+            value: 0
+          - color: red
+            value: 80
+        unit: ops
+      overrides: []
+    gridPos:
+      h: 8
+      w: 12
+      x: 12
+      "y": 52
+    id: 168
+    links:
+    - title: 'Docs: reading metrics'
+      url: https://docs.victoriametrics.com/victoriametrics/integrations/kafka/#reading-metrics
+    options:
+      legend:
+        calcs:
+        - mean
+        - lastNotNull
+        - max
+        displayMode: table
+        placement: bottom
+        showLegend: true
+      tooltip:
+        hideZeros: false
+        mode: multi
+        sort: none
+    pluginVersion: 12.2.0
+    type: timeseries
+  collapsed: true
+  gridPos:
+    h: 1
+    w: 24
+    x: 0
+    "y": 43
+  id: 163
+  type: row
 - title: Drilldown
   panels:
   - fieldConfig:
@@ -6431,7 +6841,7 @@ panels:
     h: 1
     w: 24
     x: 0
-    "y": 43
+    "y": 60
   id: 113
   type: row
 condition: {{ ($Values.vmagent).enabled }}
