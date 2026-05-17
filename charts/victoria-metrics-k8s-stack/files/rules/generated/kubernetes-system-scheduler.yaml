@@ -17,4 +17,14 @@ rules:
   for: 15m
   labels:
     severity: critical
+- alert: KubeSchedulerInstanceUnreachable
+  expr: up{job="kube-scheduler"} == 0
+  annotations:
+    description: A KubeScheduler instance has been unreachable for more than 15 minutes.
+    runbook_url: {{ $runbookUrl }}/kubernetes/kubeschedulerinstanceunreachable
+    summary: KubeScheduler instance is unreachable.
+  condition: true
+  for: 15m
+  labels:
+    severity: warning
 condition: {{ ($Values.kubeScheduler).enabled }}

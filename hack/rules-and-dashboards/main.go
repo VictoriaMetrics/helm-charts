@@ -90,7 +90,7 @@ var alertsMap = map[string]string{
 
 // Dashboards map
 var dashboardsMap = map[string]string{
-	"vector-k8s-monitoring":         "",
+	"vector-k8s-monitoring":         "($Values.vector).enabled",
 	"victorialogs-single-node":      "($Values.vlogs).enabled",
 	"alertmanager-overview":         "($Values.alertmanager).enabled",
 	"kubernetes-system-api-server":  "($Values.kubeApiServer).enabled",
