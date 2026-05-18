@@ -19,7 +19,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["charts/[^/]+/Chart\\.yaml$"],
+      "managerFilePatterns": ["/charts\\/[^/]+\\/Chart\\.yaml/"],
       "matchStrings": [
         "# renovate: image=(?<depName>[^\\s]+)\\nappVersion: (?<currentValue>\\S+)"
       ],
@@ -27,7 +27,7 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["\\.github/workflows/run-testing\\.yaml$"],
+      "managerFilePatterns": ["/\\.github\\/workflows\\/run-testing\\.yaml/"],
       "matchStrings": [
         "# renovate: image=(?<depName>[^\\s]+)\\n\\s+- \"(?<currentValue>v[^\"]+)\""
       ],
@@ -46,21 +46,18 @@
     {
       "description": "Disable updates for victoriametrics images tracked via appVersion",
       "matchManagers": ["helm-values"],
-      "matchFileNames": ["*/victoria-metrics-*/Dockerfile"],
       "matchPackagePatterns": ["^victoriametrics/vm"],
       "enabled": false
     },
     {
       "description": "Disable updates for victorialogs images tracked via appVersion",
       "matchManagers": ["helm-values"],
-      "matchFileNames": ["*/victoria-logs-*/Dockerfile"],
       "matchPackagePatterns": ["^victoriametrics/vl"],
       "enabled": false
     },
     {
       "description": "Disable updates for victoriatraces images tracked via appVersion",
       "matchManagers": ["helm-values"],
-      "matchFileNames": ["*/victoria-traces-*/Dockerfile"],
       "matchPackagePatterns": ["^victoriametrics/vt"],
       "enabled": false
     },
