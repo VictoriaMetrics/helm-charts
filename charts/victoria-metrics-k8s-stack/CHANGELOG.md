@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+- bump victoria-metrics-operator dependency chart to version 0.63.0
+- bump grafana dependency chart to version 12.3.3
+- bump node-exporter dependency chart to version 4.55.0
 
 ## 0.78.0
 
