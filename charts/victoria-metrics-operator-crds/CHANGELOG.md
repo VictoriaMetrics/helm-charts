@@ -1,6 +1,6 @@
 ## Next release
 
-- Release CRDs for operator v0.69.0
+- Release CRDs for operator [v0.70.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.70.0)
 
 ## 0.9.0
 
@@ -8,7 +8,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.69.0](https://img.shields.io/badge/v0.69.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0690)
 
-- TODO
+- Release CRDs for operator [v0.69.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.69.0)
 
 ## 0.8.0
 
@@ -16,7 +16,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.0](https://img.shields.io/badge/v0.68.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0680)
 
-- TODO
+- Release CRDs for operator [v0.68.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.0)
 
 ## 0.7.0
 
@@ -24,7 +24,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.67.0](https://img.shields.io/badge/v0.67.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0670)
 
-- TODO
+- Release CRDs for operator [v0.67.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.67.0)
 
 ## 0.6.1
 
@@ -32,7 +32,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.66.1](https://img.shields.io/badge/v0.66.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0661)
 
-- TODO
+- Release CRDs for operator [v0.66.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.66.1)
 
 ## 0.6.0
 
@@ -40,7 +40,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.64.0](https://img.shields.io/badge/v0.64.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0640)
 
-- TODO
+- Release CRDs for operator [v0.64.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.64.0)
 
 ## 0.5.1
 
@@ -56,7 +56,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.63.0](https://img.shields.io/badge/v0.63.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0630)
 
-- TODO
+- Release CRDs for operator [v0.63.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.63.0)
 
 ## 0.4.0
 
@@ -64,7 +64,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.61.0](https://img.shields.io/badge/v0.61.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0610)
 
-- TODO
+- Release CRDs for operator [v0.61.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.61.0)
 
 ## 0.3.0
 
@@ -72,7 +72,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.60.0](https://img.shields.io/badge/v0.60.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0600)
 
-- TODO
+- Release CRDs for operator [v0.60.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.60.0)
 
 ## 0.2.1
 
@@ -80,7 +80,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.59.2](https://img.shields.io/badge/v0.59.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0592)
 
-- TODO
+- Release CRDs for operator [v0.59.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.2)
 
 ## 0.2.0
 
@@ -88,7 +88,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.59.0](https://img.shields.io/badge/v0.59.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0590)
 
-- TODO
+- Release CRDs for operator [v0.59.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.0)
 
 ## 0.1.2
 
@@ -96,7 +96,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.58.0](https://img.shields.io/badge/v0.58.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0580)
 
-- TODO
+- Release CRDs for operator v0.58.0
 
 ## 0.1.1
 
@@ -104,7 +104,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.57.0](https://img.shields.io/badge/v0.57.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0570)
 
-- TODO- updates operator to [v0.57.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.57.0) version
+- Release CRDs for operator [v0.57.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.57.0)
 
 ## 0.1.0
 
@@ -112,7 +112,7 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.56.0](https://img.shields.io/badge/v0.56.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0560)
 
-- Updated CRDs
+- Release CRDs for operator [v0.56.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.56.0)
 
 ## 0.0.3
 
