@@ -13,12 +13,16 @@ tests:
     set:
       vmauth:
         enabled: true
+        image:
+          tag: v1.116.0
     asserts:
       - matchSnapshot: {}
   - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
     set:
       vmauth:
         enabled: true
+        image:
+          tag: v1.116.0
         name: auth
         fullnameOverride: vmauth-node
         extraLabels:
@@ -31,6 +35,8 @@ tests:
     set:
       vmauth:
         enabled: true
+        image:
+          tag: v1.116.0
         env:
           - name: INSTANCE_NAME
             value: "{{ .helm.Release.Name }}-vmauth"
