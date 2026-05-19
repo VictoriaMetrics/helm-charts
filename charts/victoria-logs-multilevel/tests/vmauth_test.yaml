@@ -7,18 +7,26 @@ templates:
   - vmauth-config.yaml
 tests:
   - it: deployment should match empty snapshot
+    set:
+      vmauth:
+        image:
+          tag: v1.116.0
     asserts:
       - matchSnapshot: {}
   - it: deployment should match snapshot
     set:
       vmauth:
         enabled: true
+        image:
+          tag: v1.116.0
     asserts:
       - matchSnapshot: {}
   - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
     set:
       vmauth:
         enabled: true
+        image:
+          tag: v1.116.0
         name: auth
         fullnameOverride: vmauth-node
         extraLabels:
