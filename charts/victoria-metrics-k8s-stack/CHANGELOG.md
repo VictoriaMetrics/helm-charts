@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- support Grafana HTTPRoute when resolving grafanaAddr
+- bump operator dependency chart to version 0.63.1
 
 ## 0.79.0
 
