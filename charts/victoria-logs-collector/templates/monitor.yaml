@@ -34,10 +34,19 @@ spec:
       {{- with $podMonitor.scrapeTimeout }}
       scrapeTimeout: {{ . }}
       {{- end }}
+      {{- if $podMonitor.vm }}
+      {{- with $podMonitor.relabelings }}
+      relabelConfigs: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $podMonitor.metricRelabelings }}
+      metricRelabelConfigs: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
       {{- with $podMonitor.relabelings }}
       relabelings: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $podMonitor.metricRelabelings }}
       metricRelabelings: {{ toYaml . | nindent 8 }}
+      {{- end }}
       {{- end }}
 {{- end }}
