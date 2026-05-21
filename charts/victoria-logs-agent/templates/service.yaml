@@ -64,6 +64,12 @@ spec:
       port: {{ include "vm.port.from.flag" (dict "flag" .) }}
       targetPort: syslog-tcp
     {{- end }}
+    {{- range $service.extraPorts }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: {{ .protocol | default "TCP" }}
+      targetPort: {{ .targetPort }}
+    {{- end }}
   {{- $_ := set $ctx "extraLabels" (mergeOverwrite (deepCopy (.Values.selectorLabels | default dict)) (deepCopy $service.selectorLabels)) }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Added ability to pass extra Service ports using service.extraPorts. See [#2922](https://github.com/VictoriaMetrics/helm-charts/issues/2922)
 
 ## 0.1.2
 
