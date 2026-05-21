@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- support vm.addr.primary template, that extracts item from `http` list with `primary: true`
 
 ## 0.3.0
 

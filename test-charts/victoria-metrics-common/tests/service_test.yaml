@@ -114,3 +114,19 @@ tests:
       - equal:
           path: vm.url
           value: http://vmserver-test.NAMESPACE.svc:4321
+  - it: with list of http addresses
+    set:
+      ctx:
+        style: plain
+        appKey: server
+      server:
+        http:
+          - name: test
+            value: :9090
+          - name: primary
+            value: :9191
+            primary: true
+    asserts:
+      - equal:
+          path: vm.host
+          value: RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:9191
