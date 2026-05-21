@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- render Vector dashboard only if subchart is enabled. See [#2896](https://github.com/VictoriaMetrics/helm-charts/issues/2896).
 
 ## 0.1.4
 
