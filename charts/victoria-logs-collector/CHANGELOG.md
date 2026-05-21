@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix VMPodMonitor relabelling configuration rendering. See [#2917](https://github.com/VictoriaMetrics/helm-charts/issues/2917).
 
 ## 0.3.3
 
