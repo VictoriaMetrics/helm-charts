@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+**Update note 1**: `.Values.server.extraArgs.httpListenAddr` was replaced by `.Values.server.http` array of HTTP listen address configuration.
+
+- added `.Values.server.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation.
 
 ## 0.0.9
 

@@ -1,14 +1,17 @@
+
 {{- define "vtinsert.args" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vtinsert -}}
   {{- $args := dict -}}
   {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" $ctx }}
-    {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vtstorage.extraArgs.httpListenAddr "default" "10491") }}
+    {{- $port := include "vm.port.from.flag" (dict "flag" (include "vm.addr.primary" $Values.vtstorage.http) "default" "10491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
       {{- if not (has (float64 $i) $app.excludeStorageIDs) -}}
         {{- $_ := set $ctx "appIdx" $i }}
@@ -30,6 +33,8 @@
   {{- $app := $Values.vmauth -}}
   {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
@@ -39,12 +44,14 @@
   {{- $app := $Values.vtselect -}}
   {{- $args := dict -}}
   {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" $ctx }}
-    {{- $port := include "vm.port.from.flag" (dict "flag" $Values.vtstorage.extraArgs.httpListenAddr "default" "10491") }}
+    {{- $port := include "vm.port.from.flag" (dict "flag" (include "vm.addr.primary" $Values.vtstorage.http) "default" "10491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
       {{- $_ := set $ctx "appIdx" $i }}
       {{- $storageNode := include "vm.fqdn" $ctx -}}
@@ -76,19 +83,23 @@
     {{- else -}}
       {{- $_ := set $args "retention.maxDiskSpaceUsageBytes" $app.retentionDiskSpaceUsage -}}
     {{- end -}}
-  {{- end -}}  
+  {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
 {{- define "vtselect.ports" -}}
-{{- $service := .service }}
-{{- $extraArgs := .extraArgs -}}
-- name: http
-  port: {{ $service.servicePort }}
+{{- $service := .service -}}
+{{- range .http }}
+- name: {{ .name }}
+  {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10471") }}
+  port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ $service.targetPort }}
+  targetPort: {{ .name }}
+{{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
@@ -98,32 +109,37 @@
 {{- end -}}
 
 {{- define "vtinsert.ports" -}}
-{{- $service := .service }}
-{{- $extraArgs := .extraArgs -}}
-- name: http
-  port: {{ $service.servicePort }}
+{{- $service := .service -}}
+{{- range .http }}
+- name: {{ .name }}
+  {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10481") }}
+  port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ $service.targetPort }}
+  targetPort: {{ .name }}
+{{- end }}
+{{- with .extraArgs.otlpGRPCListenAddr }}
+- name: otlpgrpc-tcp
+  protocol: TCP
+  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+  targetPort: otlpgrpc-tcp
+{{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
   protocol: {{ .protocol | default "TCP" }}
   targetPort: {{ .targetPort }}
 {{- end }}
-{{- with $extraArgs.otlpGRPCListenAddr }}
-- name: otlpgrpc-tcp
-  protocol: TCP
-  port: {{ include "vm.port.from.flag" (dict "flag" .) }}
-  targetPort: otlpgrpc-tcp
-{{- end }}
 {{- end -}}
 
 {{- define "vtstorage.ports" -}}
 {{- $service := .service -}}
-- port: {{ $service.servicePort }}
-  targetPort: http
+{{- range .http }}
+- name: {{ .name }}
+  {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10491") }}
+  port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
   protocol: TCP
-  name: http
+  targetPort: {{ .name }}
+{{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
@@ -134,10 +150,13 @@
 
 {{- define "vmauth.ports" -}}
 {{- $service := .service -}}
-- port: {{ $service.servicePort }}
-  targetPort: http
-  protocol: TCP 
-  name: http 
+{{- range .http }}
+- name: {{ .name }}
+  {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "8427") }}
+  port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
+  targetPort: {{ .name }}
+  protocol: TCP
+{{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}

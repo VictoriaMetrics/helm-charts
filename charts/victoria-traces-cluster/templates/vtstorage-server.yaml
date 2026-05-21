@@ -56,8 +56,10 @@ spec:
           {{- end }}
           args: {{ include "vtstorage.args" $ctx | nindent 12 }}
           ports:
-            - name: {{ $app.ports.name | default "http" }}
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "10491") }}
+            {{- range $app.http }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "10491") }}
+            {{- end }}
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}

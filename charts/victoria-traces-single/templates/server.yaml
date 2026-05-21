@@ -80,9 +80,11 @@ spec:
           env: {{ toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: http
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "10428") }}
-          {{- with $app.extraArgs.otlpGRPCListenAddr }}
+            {{- range $app.http }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "10428") }}
+            {{- end }}
+            {{- with $app.extraArgs.otlpGRPCListenAddr }}
             - name: otlpgrpc-tcp
               protocol: TCP
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}

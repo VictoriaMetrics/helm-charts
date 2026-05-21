@@ -4,6 +4,8 @@
   {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
@@ -13,6 +15,8 @@
   {{- $app := $Values.vlselect -}}
   {{- $args := dict -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storageNodes := $args.storageNodes | default list }}
   {{- with $Values.storageNodes }}
@@ -26,12 +30,14 @@
 {{- end -}}
 
 {{- define "vlselect.ports" -}}
-{{- $service := .service }}
-{{- $extraArgs := .extraArgs -}}
-- name: http
-  port: {{ $service.servicePort }}
+{{- $service := .service -}}
+{{- range .http }}
+- name: {{ .name }}
+  {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9471") }}
+  port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ $service.targetPort }}
+  targetPort: {{ .name }}
+{{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
   port: {{ .port }}
@@ -42,11 +48,14 @@
 
 {{- define "vmauth.ports" -}}
 {{- $service := .service -}}
-- port: {{ $service.servicePort }}
-  targetPort: http
-  protocol: TCP 
-  name: http 
-{{- range $service.extraPorts }}
+{{- range .http }}
+- name: {{ .name }}
+  {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "8427") }}
+  port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
+  protocol: TCP
+  targetPort: {{ .name }}
+{{- end }}
+{{- range $service.extraPorts }} 
 - name: {{ .name }}
   port: {{ .port }}
   protocol: TCP
