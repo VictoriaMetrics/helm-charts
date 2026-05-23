@@ -72,6 +72,9 @@ spec:
           {{- with $app.containerWorkingDir }}
           workingDir: {{ . }}
           {{- end }}
+          {{- with $app.command }}
+          command: {{ toYaml . | nindent 12 }}
+          {{- end }}
           args: {{ include "vlogs.args" $ctx | nindent 12 }}
           {{- with $app.envFrom }}
           envFrom: {{ tpl (toYaml .) $ctx | nindent 12 }}
