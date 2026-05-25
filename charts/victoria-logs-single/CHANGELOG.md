@@ -4,6 +4,7 @@
 
 - added `.Values.server.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation.
 - support `.Values.server.syslog.tcp` and `.Values.server.syslog.udp` lists for configuring syslog TCP/UDP listen addresses with optional TLS settings.
+- add ability to override VictoriaLogs container command.
 
 ## 0.12.5
 

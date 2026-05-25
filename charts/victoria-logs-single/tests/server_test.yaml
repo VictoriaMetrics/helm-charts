@@ -51,3 +51,13 @@ tests:
           content:
             configMapRef:
               name: RELEASE-NAME-config
+  - it: should render custom command
+    set:
+      server:
+        command:
+          - /custom/bin/victorialogs
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - /custom/bin/victorialogs
