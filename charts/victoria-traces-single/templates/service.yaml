@@ -54,13 +54,16 @@ spec:
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
-    - name: http
-      port: {{ $service.servicePort }}
+    {{- range $app.http }}
+    - name: {{ .name }}
+      {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10428") }}
+      port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
       protocol: TCP
-      targetPort: {{ $service.targetPort }}
-      {{- with $service.nodePort }}
-      nodePort: {{ . }}
+      targetPort: {{ .name }}
+      {{- if and .primary $service.nodePort }}
+      nodePort: {{ $service.nodePort }}
       {{- end }}
+    {{- end }}
     {{- with $app.extraArgs.otlpGRPCListenAddr }}
     - name: otlpgrpc-tcp
       protocol: TCP

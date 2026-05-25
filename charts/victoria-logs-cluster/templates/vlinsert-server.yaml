@@ -63,8 +63,19 @@ spec:
           env: {{ tpl (toYaml .) $ctx | nindent 12 }}
           {{- end }}
           ports:
-            - name: {{ $app.ports.name  | default "http" }}
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "9481") }}
+            {{- range $app.http }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "9481") }}
+            {{- end }}
+            {{- range $app.syslog.tcp }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "514") }}
+            {{- end }}
+            {{- range $app.syslog.udp }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "514") }}
+              protocol: UDP
+            {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
