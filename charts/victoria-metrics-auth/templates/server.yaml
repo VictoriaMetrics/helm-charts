@@ -63,6 +63,9 @@ spec:
           {{- if $app.containerWorkingDir }}
           workingDir: {{ $app.containerWorkingDir }}
           {{- end }}
+          {{- with $app.command }}
+          command: {{ toYaml . | nindent 12 }}
+          {{- end }}
           args: {{ include "vmauth.args" $ctx | nindent 12 }}
           {{- with $app.lifecycle }}
           lifecycle: {{ . | toYaml | nindent 12 }}

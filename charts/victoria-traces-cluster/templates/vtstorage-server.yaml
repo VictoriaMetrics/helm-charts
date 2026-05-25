@@ -54,6 +54,9 @@ spec:
           {{- with $app.lifecycle }}
           lifecycle: {{ . | toYaml | nindent 12 }}
           {{- end }}
+          {{- with $app.command }}
+          command: {{ toYaml . | nindent 12 }}
+          {{- end }}
           args: {{ include "vtstorage.args" $ctx | nindent 12 }}
           ports:
             {{- range $app.http }}

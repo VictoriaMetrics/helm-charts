@@ -30,3 +30,14 @@ tests:
           podLabelName: podLabelValue
     asserts:
       - matchSnapshot: {}
+  - it: should render custom command
+    set:
+      vmauth:
+        enabled: true
+        command:
+          - /custom/bin/vmauth
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - /custom/bin/vmauth

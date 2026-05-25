@@ -56,6 +56,9 @@ spec:
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 12 }}
           {{- end }}
           image: {{ include "vm.image" $ctx }}
+          {{- with $app.command }}
+          command: {{ toYaml . | nindent 12 }}
+          {{- end }}
           args: {{ include "vmalert.args" $ctx | nindent 12 }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
           {{- with $app.envFrom }}

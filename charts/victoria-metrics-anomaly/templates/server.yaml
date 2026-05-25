@@ -67,6 +67,9 @@ spec:
               name: http
             {{- end }}
           {{- end }}
+          {{- with .Values.command }}
+          command: {{ toYaml . | nindent 12 }}
+          {{- end }}
           args: {{ include "vmanomaly.args" $ctx | nindent 12 }}
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}

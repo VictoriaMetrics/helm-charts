@@ -30,3 +30,13 @@ tests:
           enabled: true
     asserts:
       - matchSnapshot: {}
+  - it: should render custom command
+    set:
+      server:
+        command:
+          - /custom/bin/vtraces
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - /custom/bin/vtraces
