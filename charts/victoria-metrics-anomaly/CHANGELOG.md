@@ -1,6 +1,7 @@
 ## Next release
 
 - fix VMPodMonitor relabelling configuration rendering. See [#2917](https://github.com/VictoriaMetrics/helm-charts/issues/2917).
+- add ability to override container command.
 
 ## 1.12.12
 

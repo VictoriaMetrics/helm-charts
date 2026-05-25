@@ -40,3 +40,16 @@ tests:
         - url: http://vm-insert:8480/insert/0/prometheus
     asserts:
       - matchSnapshot: {}
+  - it: should render custom command
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      command:
+        - /custom/bin/vmagent
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - /custom/bin/vmagent
+        template: server.yaml
+        documentIndex: 0

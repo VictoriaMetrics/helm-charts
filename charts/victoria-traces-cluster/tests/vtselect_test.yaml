@@ -31,4 +31,14 @@ tests:
             primary: true
     asserts:
       - matchSnapshot: {}
+  - it: should render custom command
+    set:
+      vtselect:
+        command:
+          - /custom/bin/vtselect
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - /custom/bin/vtselect
 

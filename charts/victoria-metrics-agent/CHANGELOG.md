@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add ability to override container command.
 
 ## 0.40.0
 
