@@ -2,8 +2,12 @@
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $additionalGroupByLabels := append $Values.defaultRules.additionalGroupByLabels $clusterLabel }}
-{{- $groupLabels := join "," (uniq $additionalGroupByLabels) }}
+{{- $additionalGroupByLabels := $Values.defaultRules.additionalGroupByLabels }}
+{{- if hasKey . "additionalGroupByLabels" }}
+  {{- $additionalGroupByLabels = .additionalGroupByLabels }}
+{{- end }}
+{{- $additionalGroupByLabels := uniq (append $additionalGroupByLabels $clusterLabel) }}
+{{- $groupLabels := join "," $additionalGroupByLabels }}
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 name: alertmanager.rules
 rules:
