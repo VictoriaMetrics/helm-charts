@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+**Update note 1**: `.Values.extraArgs.httpListenAddr` was replaced by `.Values.http` array of HTTP listen address configuration.
+
+- added `.Values.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation.
+- support `.Values.syslog.tcp` and `.Values.syslog.udp` lists for configuring syslog TCP/UDP listen addresses with optional TLS settings.
 
 ## 0.1.3
 

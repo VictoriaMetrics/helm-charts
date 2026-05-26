@@ -48,21 +48,27 @@ spec:
   trafficDistribution: {{ . }}
   {{- end }}
   ports:
-    - port: 9429
-      targetPort: http
+    {{- range .Values.http }}
+    - name: {{ .name }}
+      {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9429") }}
+      port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
       protocol: TCP
-      name: http
-    {{- with (index .Values.extraArgs "syslog.listenAddr.udp") }}
-    - name: syslog-udp
-      protocol: UDP
-      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
-      targetPort: syslog-udp
+      targetPort: {{ .name }}
+      {{- if and .primary $service.nodePort }}
+      nodePort: {{ $service.nodePort }}
+      {{- end }}
     {{- end }}
-    {{- with (index .Values.extraArgs "syslog.listenAddr.tcp") }}
-    - name: syslog-tcp
+    {{- range .Values.syslog.tcp }}
+    - name: {{ .name }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .value) }}
       protocol: TCP
-      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
-      targetPort: syslog-tcp
+      targetPort: {{ .name }}
+    {{- end }}
+    {{- range .Values.syslog.udp }}
+    - name: {{ .name }}
+      port: {{ include "vm.port.from.flag" (dict "flag" .value) }}
+      protocol: UDP
+      targetPort: {{ .name }}
     {{- end }}
     {{- range $service.extraPorts }}
     - name: {{ .name }}
