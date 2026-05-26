@@ -247,7 +247,7 @@ service:
   # -- Load balancer source range
   loadBalancerSourceRanges: []
   # -- Service port
-  servicePort: 8429
+  servicePort: ""
   # -- Target port
   targetPort: http
   # nodePort: 30000
@@ -272,6 +272,23 @@ service:
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []
+
+# -- HTTP listen addresses configuration.
+# Each item configures an HTTP listen address with optional TLS settings.
+# Items are used for Pod ports, command line arguments and Service port generation.
+http:
+  - name: http
+    value: :9429
+    primary: true
+
+# -- Syslog TCP listen addresses configuration.
+syslog:
+  tcp: []
+  # - name: syslog-tcp
+  #   value: :514
+  udp: []
+  # - name: syslog-udp
+  #   value: :514
 
 # -- VLAgent extra command line arguments
 extraArgs:
