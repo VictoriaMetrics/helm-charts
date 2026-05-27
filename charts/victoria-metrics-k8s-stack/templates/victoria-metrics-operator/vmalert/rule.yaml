@@ -46,6 +46,13 @@ Merge common group with a group data of a current iteration
 Get group data from file
 */}}
 {{- $groupCtx := mergeOverwrite $ctx $group }}
+
+{{- /*
+Resolve effectiveGroupByLabels: per-group additionalGroupByLabels overrides global if set
+*/}}
+{{- $additionalGroupByLabels := dig "additionalGroupByLabels" $defaultRules.additionalGroupByLabels $group }}
+{{- $_ := set $groupCtx "additionalGroupByLabels" $additionalGroupByLabels }}
+
 {{- $groupData := fromYaml (tpl ($.Files.Get $groupFile) $groupCtx) -}}
 
 {{- /*

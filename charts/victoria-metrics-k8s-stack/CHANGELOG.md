@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add per-group additionalGroupByLabels, that replace defaultRules.additionalGroupByLabels. See [#2382](https://github.com/VictoriaMetrics/helm-charts/issues/2832).
 
 ## 0.80.0
 
