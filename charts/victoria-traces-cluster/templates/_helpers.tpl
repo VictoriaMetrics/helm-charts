@@ -4,9 +4,9 @@
   {{- $app := $Values.vtinsert -}}
   {{- $args := dict -}}
   {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
@@ -33,9 +33,9 @@
   {{- $app := $Values.vmauth -}}
   {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
@@ -44,9 +44,9 @@
   {{- $app := $Values.vtselect -}}
   {{- $args := dict -}}
   {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
@@ -85,9 +85,9 @@
     {{- end -}}
   {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 

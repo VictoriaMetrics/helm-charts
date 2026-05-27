@@ -4,8 +4,8 @@
 
 **Update note 2**: `.Values.vlinsert.extraArgs["syslog.listenAddr.tcp"]` and `.Values.vlinsert.extraArgs["syslog.listenAddr.udp"]` were replaced by `.Values.vlinsert.syslog.tcp` and `.Values.vlinsert.syslog.udp` arrays of syslog listen address configuration.
 
-- added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Item with `primary: true` on `vlstorage` is used for storageNode address resolution.
-- support `.Values.vlinsert.syslog.tcp` and `.Values.vlinsert.syslog.udp` lists for configuring syslog TCP/UDP listen addresses with optional TLS settings.
+- added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Item with `primary: true` on `vlstorage` is used for storageNode address resolution. Has higher priority than `extraArgs`.
+- support `.Values.vlinsert.syslog.tcp` and `.Values.vlinsert.syslog.udp` lists for configuring syslog TCP/UDP listen addresses with optional TLS settings. Has higher priority than `extraArgs`.
 - add ability to override VictoriaLogs container command.
 
 ## 0.1.5
