@@ -31,7 +31,7 @@
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" $ctx)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $app.syslog)) -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
+  {{- include "vl.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}

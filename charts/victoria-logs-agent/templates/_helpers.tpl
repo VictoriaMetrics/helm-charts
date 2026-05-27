@@ -80,7 +80,7 @@
       {{- $_ := set $args $key $param }}
     {{- end }}
   {{- end }}
-  {{- include "vm.check.extraArgs" $Values.extraArgs -}}
+  {{- include "vl.check.extraArgs" $Values.extraArgs -}}
   {{- $args = mergeOverwrite $args $Values.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end }}
