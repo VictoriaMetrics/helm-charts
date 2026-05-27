@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- support vl.check.extraArgs template, that validates extra args for VictoriaLogs components.
 
 ## 0.3.1
 

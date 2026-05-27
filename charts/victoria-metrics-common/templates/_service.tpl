@@ -75,6 +75,16 @@
   {{- end -}}
 {{- end -}}
 
+{{- define "vl.check.extraArgs" -}}
+  {{- include "vm.check.extraArgs" . -}}
+  {{- if and . (index . "syslog.listenAddr.tcp") -}}
+    {{- fail "`extraArgs[\"syslog.listenAddr.tcp\"]` is no longer supported. Migrate to the `syslog.tcp` list:\nsyslog:\n  tcp:\n    - name: syslog-tcp\n      value: :PORT" -}}
+  {{- end -}}
+  {{- if and . (index . "syslog.listenAddr.udp") -}}
+    {{- fail "`extraArgs[\"syslog.listenAddr.udp\"]` is no longer supported. Migrate to the `syslog.udp` list:\nsyslog:\n  udp:\n    - name: syslog-udp\n      value: :PORT" -}}
+  {{- end -}}
+{{- end -}}
+
 {{- define "vm.host" -}}
   {{- $fqdn := (include "vm.fqdn" .) -}}
   {{- $port := 80 -}}
