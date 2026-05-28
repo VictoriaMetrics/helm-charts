@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix invalid YAML rendered by `templates/route.yaml` when route is enabled on `vtinsert`/`vtselect`/`vtstorage`/`vmauth`. The `$httpAddr` variable assignment was trimming the newline before `port:`, causing `helm template` to fail with `mapping values are not allowed in this context`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
 
 ## 0.2.0
 
