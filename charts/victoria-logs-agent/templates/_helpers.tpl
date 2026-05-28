@@ -78,7 +78,6 @@
       {{- $_ := set $args $key $param }}
     {{- end }}
   {{- end }}
-  {{- include "vl.check.extraArgs" $Values.extraArgs -}}
   {{- $args = mergeOverwrite $args $Values.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $Values.http)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $Values.syslog)) -}}

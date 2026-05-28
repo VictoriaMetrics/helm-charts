@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- removed vl.check.extraArgs and vm.check.extraArgs
 
 ## 0.3.2
 

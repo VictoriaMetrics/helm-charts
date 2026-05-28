@@ -4,7 +4,6 @@
   {{- $app := $Values.vtinsert -}}
   {{- $args := dict -}}
   {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $storage := $Values.vtstorage }}
@@ -33,7 +32,6 @@
   {{- $app := $Values.vmauth -}}
   {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
@@ -44,7 +42,6 @@
   {{- $app := $Values.vtselect -}}
   {{- $args := dict -}}
   {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $storage := $Values.vtstorage }}
@@ -85,7 +82,6 @@
     {{- end -}}
   {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}

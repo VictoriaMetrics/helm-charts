@@ -29,7 +29,6 @@
   {{- $args := dict "select.disable" "true" -}}
   {{- $ctx := dict "style" "plain" "appKey" "vlstorage" "helm" .helm }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" $ctx)) -}}
-  {{- include "vl.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $app.syslog)) -}}
@@ -60,7 +59,6 @@
   {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
@@ -72,7 +70,6 @@
   {{- $args := dict "insert.disable" "true" -}}
   {{- $ctx := dict "style" "plain" "appKey" "vlstorage" "helm" .helm }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $storage := $Values.vlstorage }}
@@ -117,7 +114,6 @@
   {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}

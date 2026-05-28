@@ -5,7 +5,6 @@
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
@@ -16,7 +15,6 @@
   {{- $args := dict -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storageNodes := $args.storageNodes | default list }}
   {{- with $Values.storageNodes }}
