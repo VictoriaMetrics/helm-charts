@@ -78,8 +78,13 @@
       {{- $_ := set $args $key $param }}
     {{- end }}
   {{- end }}
-  {{- $args = mergeOverwrite $args $Values.extraArgs -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $Values.http)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $Values.syslog)) -}}
+  {{- $extraArgs := $Values.extraArgs | default dict }}
+  {{- $args = mergeOverwrite $args $extraArgs -}}
+  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $Values.http)) -}}
+  {{- end -}}
+  {{- if not (or (hasKey $extraArgs "syslog.listenAddr.tcp") (hasKey $extraArgs "syslog.listenAddr.udp")) -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $Values.syslog)) -}}
+  {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end }}

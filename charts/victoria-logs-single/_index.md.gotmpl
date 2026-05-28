@@ -111,6 +111,68 @@ See also this [quick start guide](https://docs.victoriametrics.com/helm/victoria
 
 See also [victoria-logs-cluster](https://docs.victoriametrics.com/helm/victoria-logs-cluster/) and [victoria-logs-multilevel](https://docs.victoriametrics.com/helm/victoria-logs-multilevel/) charts.
 
+### HTTP listen address
+
+The chart configures the HTTP listen address via `.Values.server.http` list.
+Each entry in the list configures a separate HTTP listener.
+The primary listener (marked with `primary: true`) is used for Pod health checks and Service port generation.
+
+To enable TLS on the HTTP listener:
+
+```yaml
+server:
+  http:
+    - name: https
+      primary: true
+      value: :9428
+      tls: true
+      tlsCertFile: /path/to/tls.crt
+      tlsKeyFile: /path/to/tls.key
+```
+
+To expose an additional listener on a different port:
+
+```yaml
+server:
+  http:
+    - name: http
+      primary: true
+      value: :9428
+    - name: https
+      value: :9443
+      tls: true
+      tlsCertFile: /path/to/tls.crt
+      tlsKeyFile: /path/to/tls.key
+```
+
+### Syslog
+
+The chart supports accepting logs over syslog protocol via `.Values.server.syslog.tcp` and `.Values.server.syslog.udp` lists.
+Each entry configures a separate syslog listener on the given address.
+
+To accept syslog messages over TCP:
+
+```yaml
+server:
+  syslog:
+    tcp:
+      - name: syslog-tcp
+        value: :514
+```
+
+To enable TLS on the syslog TCP listener:
+
+```yaml
+server:
+  syslog:
+    tcp:
+      - name: syslog-tls
+        value: :6514
+        tls: true
+        tlsCertFile: /path/to/tls.crt
+        tlsKeyFile: /path/to/tls.key
+```
+
 {{ include "chart.installSection" . }}
 
 {{ include "chart.uninstallSection" . }}

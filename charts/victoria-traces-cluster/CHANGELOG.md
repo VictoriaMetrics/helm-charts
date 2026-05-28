@@ -1,6 +1,6 @@
 ## Next release
 
-**Update note 1**: `.Values.<component>.extraArgs.httpListenAddr` was replaced by `.Values.<component>.http` array of HTTP listen address configuration, where `<component>` is one of `vtinsert`, `vtselect`, `vtstorage`, `vmauth`.
+**Update note 1**: `.Values.<component>.extraArgs.httpListenAddr` was replaced by `.Values.<component>.http` array of HTTP listen address configuration, where `<component>` is one of `vtinsert`, `vtselect`, `vtstorage`, `vmauth`. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-traces-cluster/#http-listen-address) for details.
 
 - added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Item with `primary: true` on `vtstorage` is used for storageNode address resolution. Has higher priority than `extraArgs`.
 - add ability to override container command.

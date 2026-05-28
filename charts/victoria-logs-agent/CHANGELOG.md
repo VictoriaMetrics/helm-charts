@@ -1,8 +1,8 @@
 ## Next release
 
-**Update note 1**: `.Values.extraArgs.httpListenAddr` was replaced by `.Values.http` array of HTTP listen address configuration.
+**Update note 1**: `.Values.extraArgs.httpListenAddr` was replaced by `.Values.http` array of HTTP listen address configuration. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-logs-agent/#http-listen-address) for details.
 
-**Update note 2**: `.Values.extraArgs["syslog.listenAddr.tcp"]` and `.Values.extraArgs["syslog.listenAddr.udp"]` were replaced by `.Values.syslog.tcp` and `.Values.syslog.udp` arrays of syslog listen address configuration.
+**Update note 2**: `.Values.extraArgs["syslog.listenAddr.tcp"]` and `.Values.extraArgs["syslog.listenAddr.udp"]` were replaced by `.Values.syslog.tcp` and `.Values.syslog.udp` arrays of syslog listen address configuration. See [Syslog](https://docs.victoriametrics.com/helm/victoria-logs-agent/#syslog) for details.
 
 - added `.Values.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Has higher priority than `extraArgs`.
 - support `.Values.syslog.tcp` and `.Values.syslog.udp` lists for configuring syslog TCP/UDP listen addresses with optional TLS settings. Has higher priority than `extraArgs`.

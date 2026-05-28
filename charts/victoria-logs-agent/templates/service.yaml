@@ -48,7 +48,9 @@ spec:
   trafficDistribution: {{ . }}
   {{- end }}
   ports:
-    {{- range .Values.http }}
+    {{- $extraArgs := .Values.extraArgs | default dict }}
+    {{- $httpAddr := $extraArgs.httpListenAddr -}}
+    {{- range ternary .Values.http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
     - name: {{ .name }}
       {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9429") }}
       port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
@@ -58,13 +60,15 @@ spec:
       nodePort: {{ $service.nodePort }}
       {{- end }}
     {{- end }}
-    {{- range .Values.syslog.tcp }}
+    {{- $syslogTCPAddr := index $extraArgs "syslog.listenAddr.tcp" -}}
+    {{- range ternary .Values.syslog.tcp (list (dict "name" "syslog-tcp" "value" $syslogTCPAddr)) (empty $syslogTCPAddr) }}
     - name: {{ .name }}
       port: {{ include "vm.port.from.flag" (dict "flag" .value) }}
       protocol: TCP
       targetPort: {{ .name }}
     {{- end }}
-    {{- range .Values.syslog.udp }}
+    {{- $syslogUDPAddr := index $extraArgs "syslog.listenAddr.udp" -}}
+    {{- range ternary .Values.syslog.udp (list (dict "name" "syslog-udp" "value" $syslogUDPAddr)) (empty $syslogUDPAddr) }}
     - name: {{ .name }}
       port: {{ include "vm.port.from.flag" (dict "flag" .value) }}
       protocol: UDP

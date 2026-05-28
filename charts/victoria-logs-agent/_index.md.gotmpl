@@ -185,6 +185,53 @@ remoteWrite:
 This feature lets you attach metadata to every log entry,
 making it easier to filter, group, or analyze logs based on these additional attributes.
 
+### HTTP listen address
+
+The chart configures the HTTP listen address via `.Values.http` list.
+Each entry in the list configures a separate HTTP listener.
+The primary listener (marked with `primary: true`) is used for Pod health checks and Service port generation.
+
+To enable TLS on the HTTP listener:
+
+```yaml
+http:
+  - name: https
+    primary: true
+    value: :9429
+    tls: true
+    tlsCertFile: /path/to/tls.crt
+    tlsKeyFile: /path/to/tls.key
+```
+
+### Syslog
+
+The chart supports accepting logs over syslog protocol via `.Values.syslog.tcp` and `.Values.syslog.udp` lists.
+Each entry configures a separate syslog listener on the given address.
+
+To accept syslog messages over TCP and UDP:
+
+```yaml
+syslog:
+  tcp:
+    - name: syslog-tcp
+      value: :514
+  udp:
+    - name: syslog-udp
+      value: :514
+```
+
+To enable TLS on the syslog TCP listener:
+
+```yaml
+syslog:
+  tcp:
+    - name: syslog-tls
+      value: :6514
+      tls: true
+      tlsCertFile: /path/to/tls.crt
+      tlsKeyFile: /path/to/tls.key
+```
+
 {{ include "chart.installSection" . }}
 
 {{ include "chart.uninstallSection" . }}

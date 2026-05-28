@@ -99,6 +99,25 @@ values in a separate `values` file and use it during installation.
 See [how to install victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/#install-victoria-logs-single-chart) for an example.
 You can do this later if you want to configure more settings than shown in the default example.
 
+### HTTP listen address
+
+Both `vlselect` and `vmauth` configure their HTTP listen addresses via `.Values.<component>.http` lists.
+Each entry configures a separate HTTP listener.
+The primary listener (marked with `primary: true`) is used for Pod health checks and Service port generation.
+
+To enable TLS on the HTTP listener of a component:
+
+```yaml
+vmauth:
+  http:
+    - name: https
+      primary: true
+      value: :8427
+      tls: true
+      tlsCertFile: /path/to/tls.crt
+      tlsKeyFile: /path/to/tls.key
+```
+
 {{ include "chart.installSection" . }}
 
 {{ include "chart.uninstallSection" . }}

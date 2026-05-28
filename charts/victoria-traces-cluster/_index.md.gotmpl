@@ -116,6 +116,26 @@ graph LR
     VTQ2 <--> Users
 ```
 
+### HTTP listen address
+
+Each component (`vtinsert`, `vtselect`, `vtstorage`, `vmauth`) configures its HTTP listen address via a `.Values.<component>.http` list.
+Each entry in the list configures a separate HTTP listener.
+The primary listener (marked with `primary: true`) is used for Pod health checks, Service port generation,
+and — for `vtstorage` — as the address advertised to insert and select nodes.
+
+To enable TLS on the HTTP listener of a component:
+
+```yaml
+vtstorage:
+  http:
+    - name: https
+      primary: true
+      value: :10491
+      tls: true
+      tlsCertFile: /path/to/tls.crt
+      tlsKeyFile: /path/to/tls.key
+```
+
 {{ include "chart.installSection" . }}
 
 {{ include "chart.uninstallSection" . }}

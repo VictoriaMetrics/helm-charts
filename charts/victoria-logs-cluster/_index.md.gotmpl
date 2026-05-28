@@ -129,6 +129,54 @@ graph LR
     VLQ2 <--> Users
 ```
 
+### HTTP listen address
+
+Each component (`vlinsert`, `vlselect`, `vlstorage`, `vmauth`) configures its HTTP listen address via a `.Values.<component>.http` list.
+Each entry in the list configures a separate HTTP listener.
+The primary listener (marked with `primary: true`) is used for Pod health checks, Service port generation,
+and — for `vlstorage` — as the address advertised to insert and select nodes.
+
+To enable TLS on the HTTP listener of a component:
+
+```yaml
+vlstorage:
+  http:
+    - name: https
+      primary: true
+      value: :9491
+      tls: true
+      tlsCertFile: /path/to/tls.crt
+      tlsKeyFile: /path/to/tls.key
+```
+
+### Syslog
+
+`vlinsert` supports accepting logs over syslog protocol via `.Values.vlinsert.syslog.tcp` and `.Values.vlinsert.syslog.udp` lists.
+Each entry configures a separate syslog listener on the given address.
+
+To accept syslog messages over TCP:
+
+```yaml
+vlinsert:
+  syslog:
+    tcp:
+      - name: syslog-tcp
+        value: :514
+```
+
+To enable TLS on the syslog TCP listener:
+
+```yaml
+vlinsert:
+  syslog:
+    tcp:
+      - name: syslog-tls
+        value: :6514
+        tls: true
+        tlsCertFile: /path/to/tls.crt
+        tlsKeyFile: /path/to/tls.key
+```
+
 {{ include "chart.installSection" . }}
 
 {{ include "chart.uninstallSection" . }}

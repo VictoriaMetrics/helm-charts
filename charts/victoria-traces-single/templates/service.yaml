@@ -54,7 +54,8 @@ spec:
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
-    {{- range $app.http }}
+    {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr -}}
+    {{- range ternary $app.http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
     - name: {{ .name }}
       {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10428") }}
       port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}

@@ -3,6 +3,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.server -}}
   {{- $args := dict -}}
+  {{- $extraArgs := $app.extraArgs | default dict }}
   {{- if and (empty $app.retentionPeriod) (empty $app.retentionDiskSpaceUsage) -}}
     {{- fail "either .Values.server.retentionPeriod or .Values.server.retentionDiskSpaceUsage should be defined" -}}
   {{- end -}}
@@ -19,7 +20,9 @@
   {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args $app.extraArgs -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- $args = mergeOverwrite $args $extraArgs -}}
+  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}

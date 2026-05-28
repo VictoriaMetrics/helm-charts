@@ -1,6 +1,6 @@
 ## Next release
 
-**Update note 1**: `.Values.<component>.extraArgs.httpListenAddr` was replaced by `.Values.<component>.http` array of HTTP listen address configuration, where `<component>` is one of `vlselect`, `vmauth`.
+**Update note 1**: `.Values.<component>.extraArgs.httpListenAddr` was replaced by `.Values.<component>.http` array of HTTP listen address configuration, where `<component>` is one of `vlselect`, `vmauth`. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-logs-multilevel/#http-listen-address) for details.
 
 - added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation.
 - add ability to override VictoriaLogs container command.

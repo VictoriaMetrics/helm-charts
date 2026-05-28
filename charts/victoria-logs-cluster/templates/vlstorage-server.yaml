@@ -59,7 +59,8 @@ spec:
           {{- end }}
           args: {{ include "vlstorage.args" $ctx | nindent 12 }}
           ports:
-            {{- range $app.http }}
+            {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr -}}
+            {{- range ternary $app.http (list (dict "name" "http" "value" $httpAddr)) (empty $httpAddr) }}
             - name: {{ .name }}
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "9491") }}
             {{- end }}

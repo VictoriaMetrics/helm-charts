@@ -27,6 +27,7 @@
   {{- $Values := (.helm).Values | default .Values }}
   {{- $app := $Values.server -}}
   {{- $args := dict -}}
+  {{- $extraArgs := $app.extraArgs | default dict }}
   {{- if and (empty $app.retentionPeriod) (empty $app.retentionDiskSpaceUsage) (empty $app.retentionMaxDiskUsagePercent) -}}
     {{- fail "either .Values.server.retentionPeriod, .Values.server.retentionDiskSpaceUsage or .Values.server.retentionMaxDiskUsagePercent should be defined" -}}
   {{- end -}}
@@ -46,8 +47,12 @@
   {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args $app.extraArgs -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $app.syslog)) -}}
+  {{- $args = mergeOverwrite $args $extraArgs -}}
+  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- end -}}
+  {{- if not (or (hasKey $extraArgs "syslog.listenAddr.tcp") (hasKey $extraArgs "syslog.listenAddr.udp")) -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $app.syslog)) -}}
+  {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}

@@ -70,7 +70,8 @@ spec:
           env: {{ toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            {{- range $app.http }}
+            {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr -}}
+            {{- range ternary $app.http (list (dict "name" "http" "value" $httpAddr)) (empty $httpAddr) }}
             - name: {{ .name }}
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "8427") }}
             {{- end }}

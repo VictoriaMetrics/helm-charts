@@ -69,6 +69,25 @@ server:
     size: 20Gi
 ```
 
+### HTTP listen address
+
+The chart configures the HTTP listen address via `.Values.server.http` list.
+Each entry in the list configures a separate HTTP listener.
+The primary listener (marked with `primary: true`) is used for Pod health checks and Service port generation.
+
+To enable TLS on the HTTP listener:
+
+```yaml
+server:
+  http:
+    - name: https
+      primary: true
+      value: :10428
+      tls: true
+      tlsCertFile: /path/to/tls.crt
+      tlsKeyFile: /path/to/tls.key
+```
+
 {{ include "chart.installSection" . }}
 
 {{ include "chart.uninstallSection" . }}

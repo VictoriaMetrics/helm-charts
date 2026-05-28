@@ -66,17 +66,21 @@ spec:
           env: {{- toYaml . | nindent 12}}
           {{- end }}
           ports:
-            {{- range .Values.http }}
+            {{- $extraArgs := .Values.extraArgs | default dict }}
+            {{- $httpAddr := $extraArgs.httpListenAddr -}}
+            {{- range ternary .Values.http (list (dict "name" "http" "value" $httpAddr)) (empty $httpAddr) }}
             - name: {{ .name }}
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "9429") }}
               protocol: TCP
             {{- end }}
-            {{- range .Values.syslog.tcp }}
+            {{- $syslogTCPAddr := index $extraArgs "syslog.listenAddr.tcp" -}}
+            {{- range ternary .Values.syslog.tcp (list (dict "name" "syslog-tcp" "value" $syslogTCPAddr)) (empty $syslogTCPAddr) }}
             - name: {{ .name }}
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .value) }}
               protocol: TCP
             {{- end }}
-            {{- range .Values.syslog.udp }}
+            {{- $syslogUDPAddr := index $extraArgs "syslog.listenAddr.udp" -}}
+            {{- range ternary .Values.syslog.udp (list (dict "name" "syslog-udp" "value" $syslogUDPAddr)) (empty $syslogUDPAddr) }}
             - name: {{ .name }}
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .value) }}
               protocol: UDP
