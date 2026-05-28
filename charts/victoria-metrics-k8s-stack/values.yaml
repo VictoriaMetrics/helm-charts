@@ -69,8 +69,8 @@ defaultDashboards:
 # -- Create default rules for monitoring the cluster
 defaultRules:
   # -- Labels, which are used for grouping results of the queries. Note that these labels are joined with `.Values.global.clusterLabel`
-  additionalGroupByLabels: []
-  create: true
+  extraGroupByLabels: []
+  enabled: true
 
   # -- Common properties for VMRule groups
   group:
@@ -105,7 +105,7 @@ defaultRules:
   # -- Per rule properties
   rules: {}
     # CPUThrottlingHigh:
-    #   create: true
+    #   enabled: true
     #   spec:
     #     for: 15m
     #     labels:
@@ -113,9 +113,10 @@ defaultRules:
   # -- Rule group properties
   groups:
     etcd:
-      create: true
-      # -- Per-group override for additionalGroupByLabels. When set, replaces the global additionalGroupByLabels for this group only.
-      # additionalGroupByLabels: []
+      # -- Enable/disable rule group
+      enabled: true
+      # -- Per-group override for extraGroupByLabels. When set, replaces the global extraGroupByLabels for this group only.
+      # extraGroupByLabels: []
       # -- Common properties for all rules in a group
       rules: {}
       # spec:
@@ -132,120 +133,82 @@ defaultRules:
       #   annotations:
       #     dashboard: https://example.com/dashboard/1
     general:
-      create: true
       rules: {}
     k8sContainerCpuLimits:
-      create: true
       rules: {}
     k8sContainerCpuRequests:
-      create: true
       rules: {}
     k8sContainerCpuUsageSecondsTotal:
-      create: true
       rules: {}
     k8sContainerMemoryLimits:
-      create: true
       rules: {}
     k8sContainerMemoryRequests:
-      create: true
       rules: {}
     k8sContainerMemoryRss:
-      create: true
       rules: {}
     k8sContainerMemoryCache:
-      create: true
       rules: {}
     k8sContainerMemoryWorkingSetBytes:
-      create: true
       rules: {}
     k8sContainerMemorySwap:
-      create: true
       rules: {}
     k8sPodOwner:
-      create: true
       rules: {}
     k8sContainerResource:
-      create: true
       rules: {}
     kubeApiserver:
-      create: true
       rules: {}
     kubeApiserverAvailability:
-      create: true
       rules: {}
     kubeApiserverBurnrate:
-      create: true
       rules: {}
     kubeApiserverHistogram:
-      create: true
       rules: {}
     kubeApiserverSlos:
-      create: true
       rules: {}
     kubelet:
-      create: true
       rules: {}
     kubePrometheusGeneral:
-      create: true
       rules: {}
     kubePrometheusNodeRecording:
-      create: true
       rules: {}
     kubernetesApps:
-      create: true
       rules: {}
       targetNamespace: ".*"
     kubernetesResources:
-      create: true
       rules: {}
     kubernetesStorage:
-      create: true
       rules: {}
       targetNamespace: ".*"
     kubernetesSystem:
-      create: true
       rules: {}
     kubernetesSystemKubelet:
-      create: true
       rules: {}
     kubernetesSystemApiserver:
-      create: true
       rules: {}
     kubernetesSystemControllerManager:
-      create: true
       rules: {}
     kubeScheduler:
-      create: true
       rules: {}
     kubernetesSystemScheduler:
-      create: true
       rules: {}
     kubeStateMetrics:
-      create: true
       rules: {}
     nodeNetwork:
-      create: true
       rules: {}
     node:
-      create: true
       rules: {}
     vmagent:
-      create: true
       rules: {}
     vmsingle:
-      create: true
       rules: {}
     vmcluster:
-      create: true
       rules: {}
     vmHealth:
-      create: true
       rules: {}
     vmoperator:
-      create: true
       rules: {}
     alertmanager:
-      create: true
       rules: {}
 
   # -- Runbook url prefix for default rules
