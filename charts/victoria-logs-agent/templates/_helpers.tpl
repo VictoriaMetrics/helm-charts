@@ -32,8 +32,6 @@
   {{- $args := dict "tmpDataPath" "/vlagent-data" }}
   {{- $_ := set $args "remoteWrite.maxDiskUsagePerURL" $Values.maxDiskUsagePerURL -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $Values.http)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $Values.syslog)) -}}
 
   {{- $requiredParams := list "url" }}
 
@@ -80,7 +78,9 @@
       {{- $_ := set $args $key $param }}
     {{- end }}
   {{- end }}
-  {{- include "vm.check.extraArgs" $Values.extraArgs -}}
+  {{- include "vl.check.extraArgs" $Values.extraArgs -}}
   {{- $args = mergeOverwrite $args $Values.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $Values.http)) -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $Values.syslog)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end }}

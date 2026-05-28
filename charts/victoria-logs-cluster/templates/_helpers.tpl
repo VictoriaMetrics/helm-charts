@@ -29,10 +29,10 @@
   {{- $args := dict "select.disable" "true" -}}
   {{- $ctx := dict "style" "plain" "appKey" "vlstorage" "helm" .helm }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" $ctx)) -}}
+  {{- include "vl.check.extraArgs" $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $app.syslog)) -}}
-  {{- include "vm.check.extraArgs" $app.extraArgs -}}
-  {{- $args = mergeOverwrite $args $app.extraArgs -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
@@ -60,9 +60,9 @@
   {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
@@ -72,9 +72,9 @@
   {{- $args := dict "insert.disable" "true" -}}
   {{- $ctx := dict "style" "plain" "appKey" "vlstorage" "helm" .helm }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $storage := $Values.vlstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
@@ -117,9 +117,9 @@
   {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- include "vm.check.extraArgs" $app.extraArgs -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
