@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.2.0
+
+**Release date:** 28 May 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.50.0](https://img.shields.io/badge/v1.50.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v1500)
+
 **Update note 1**: `.Values.<component>.extraArgs.httpListenAddr` was replaced by `.Values.<component>.http` array of HTTP listen address configuration, where `<component>` is one of `vlinsert`, `vlselect`, `vlstorage`, `vmauth`. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#http-listen-address) for details.
 
 **Update note 2**: `.Values.vlinsert.extraArgs["syslog.listenAddr.tcp"]` and `.Values.vlinsert.extraArgs["syslog.listenAddr.udp"]` were replaced by `.Values.vlinsert.syslog.tcp` and `.Values.vlinsert.syslog.udp` arrays of syslog listen address configuration. See [Syslog](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#syslog) for details.
