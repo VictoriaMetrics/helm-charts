@@ -28,7 +28,7 @@ spec:
     {{- end }}
     - backendRefs:
         - name: {{ $fullname }}
-          {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr -}}
+          {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr }}
           port: {{ $route.port | default (include "vm.port.from.flag" (dict "flag" (ternary (include "vm.addr.primary" $app.http) $httpAddr (empty $httpAddr)))) }}
           group: ''
           kind: Service
