@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix invalid YAML rendered by `templates/route.yaml` when `vmauth.route.enabled=true` or `vlselect.route.enabled=true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
 
 ## 0.2.0
 

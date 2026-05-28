@@ -1,6 +1,6 @@
 ## Next release
 
-- fix invalid YAML rendered by `templates/route.yaml` when `server.route.enabled=true`. The `$httpAddr` variable assignment was trimming the newline before `port:`, causing `helm template` to fail with `mapping values are not allowed in this context`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
+- fix invalid YAML rendered by `templates/route.yaml` when `server.route.enabled=true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
 
 ## 0.13.0
 

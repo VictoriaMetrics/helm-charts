@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix invalid YAML rendered by `templates/route.yaml` when `.Values.server.route.enabled: true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
 
 ## 0.1.0
 
