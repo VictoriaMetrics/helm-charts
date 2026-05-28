@@ -966,6 +966,55 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - fix invalid YAML rendered by `templates/route.yaml` when `vlinsert.route.enabled=true` or `vlselect.route.enabled=true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-logs-cluster
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victorialogs/cluster/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/victorialogs/changelog/
+      artifacthub.io/readme: |
+        # VictoriaLogs Cluster Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-logs-cluster/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-logs-cluster/changelog/).
+    apiVersion: v2
+    appVersion: v1.50.0
+    created: "2026-05-28T16:25:28.938756677Z"
+    dependencies:
+    - condition: vector.enabled
+      name: vector
+      repository: https://helm.vector.dev
+      version: 0.52.*
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    description: The VictoriaLogs cluster Helm chart deploys VictoriaLogs cluster
+      database in Kubernetes.
+    digest: 52fa1071bd2015c7317a5e8f8240864667278be1aa7458130f05367c7dcb55a8
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victorialogs
+    - logs
+    - kubernetes
+    - observability
+    - logsql
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-cluster
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-cluster-0.2.1/victoria-logs-cluster-0.2.1.tgz
+    version: 0.2.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '**Update note 1**: `.Values.<component>.extraArgs.httpListenAddr` was replaced by `.Values.<component>.http` array of HTTP listen address configuration, where `<component>` is one of `vlinsert`, `vlselect`, `vlstorage`, `vmauth`. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#http-listen-address) for details.'
         - '**Update note 2**: `.Values.vlinsert.extraArgs["syslog.listenAddr.tcp"]` and `.Values.vlinsert.extraArgs["syslog.listenAddr.udp"]` were replaced by `.Values.vlinsert.syslog.tcp` and `.Values.vlinsert.syslog.udp` arrays of syslog listen address configuration. See [Syslog](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#syslog) for details.'
         - 'added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Item with `primary: true` on `vlstorage` is used for storageNode address resolution. Has higher priority than `extraArgs`.'
@@ -4455,6 +4504,51 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - fix invalid YAML rendered by `templates/route.yaml` when `vmauth.route.enabled=true` or `vlselect.route.enabled=true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-logs-multilevel
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victorialogs/cluster/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/victorialogs/changelog/
+      artifacthub.io/readme: |
+        # VictoriaLogs Multilevel Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-logs-multilevel/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-logs-multilevel/changelog/).
+    apiVersion: v2
+    appVersion: v1.50.0
+    created: "2026-05-28T16:25:29.162870108Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    description: The VictoriaLogs multilevel Helm chart deploys global read for multiple
+      storage groups.
+    digest: 8719b3a17be9aa9ad31881bb0db08c92d1af0fb0f2c1c70e479fd0efc61042c1
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victorialogs
+    - logs
+    - kubernetes
+    - observability
+    - logsql
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-multilevel
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-multilevel-0.2.1/victoria-logs-multilevel-0.2.1.tgz
+    version: 0.2.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '**Update note 1**: `.Values.<component>.extraArgs.httpListenAddr` was replaced by `.Values.<component>.http` array of HTTP listen address configuration, where `<component>` is one of `vlselect`, `vmauth`. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-logs-multilevel/#http-listen-address) for details.'
         - added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation.
         - add ability to override VictoriaLogs container command.
@@ -5213,6 +5307,56 @@ entries:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-multilevel-0.0.1/victoria-logs-multilevel-0.0.1.tgz
     version: 0.0.1
   victoria-logs-single:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - fix invalid YAML rendered by `templates/route.yaml` when `server.route.enabled=true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-logs-single
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victorialogs/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/victorialogs/changelog/
+      artifacthub.io/readme: |
+        # VictoriaLogs Single Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-logs-single/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-logs-single/changelog/).
+    apiVersion: v2
+    appVersion: v1.50.0
+    created: "2026-05-28T16:25:29.314561376Z"
+    dependencies:
+    - condition: vector.enabled
+      name: vector
+      repository: https://helm.vector.dev
+      version: 0.52.*
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    description: The VictoriaLogs single Helm chart deploys VictoriaLogs database
+      in Kubernetes.
+    digest: 96b882b1257bae9f957994af2894f6ce0affcae101ae3be60f3d73b34921e15a
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - victorialogs
+    - logs
+    - kubernetes
+    - observability
+    - logsql
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-single-0.13.1/victoria-logs-single-0.13.1.tgz
+    version: 0.13.1
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
@@ -74663,6 +74807,50 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - fix invalid YAML rendered by `templates/route.yaml` when route is enabled on `vtinsert`/`vtselect`/`vtstorage`/`vmauth`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-traces-cluster
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victoriatraces/cluster/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/victoriatraces/changelog/
+      artifacthub.io/readme: |
+        # VictoriaTraces Cluster Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-traces-cluster/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-traces-cluster/changelog/).
+    apiVersion: v2
+    appVersion: v0.9.0
+    created: "2026-05-28T16:25:29.681422436Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    description: The VictoriaTraces cluster Helm chart deploys VictoriaTraces cluster
+      database in Kubernetes.
+    digest: 4998efaea6a368849a8a946d8720e36b1c0fc47911c22545bbad71f6647ba25e
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriatraces
+    - traces
+    - kubernetes
+    - observability
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-traces-cluster
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-cluster-0.2.1/victoria-traces-cluster-0.2.1.tgz
+    version: 0.2.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '**Update note 1**: `.Values.<component>.extraArgs.httpListenAddr` was replaced by `.Values.<component>.http` array of HTTP listen address configuration, where `<component>` is one of `vtinsert`, `vtselect`, `vtstorage`, `vmauth`. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-traces-cluster/#http-listen-address) for details.'
         - 'added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Item with `primary: true` on `vtstorage` is used for storageNode address resolution. Has higher priority than `extraArgs`.'
         - add ability to override container command.
@@ -75197,6 +75385,51 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - 'fix invalid YAML rendered by `templates/route.yaml` when `.Values.server.route.enabled: true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-traces-single
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victoriatraces/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/victoriatraces/changelog/
+      artifacthub.io/readme: |
+        # VictoriaTraces Single Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-traces-single/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-traces-single/changelog/).
+    apiVersion: v2
+    appVersion: v0.9.0
+    created: "2026-05-28T16:25:29.848798036Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    description: The VictoriaTraces single Helm chart deploys VictoriaTraces database
+      in Kubernetes.
+    digest: ca1727549ed3b798f6dcbe2ea432bb324019abf0dfb1aa7268e91fa4c50b795e
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - victoriatraces
+    - traces
+    - kubernetes
+    - observability
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-traces-single
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.1.1/victoria-traces-single-0.1.1.tgz
+    version: 0.1.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '**Update note 1**: `.Values.server.extraArgs.httpListenAddr` was replaced by `.Values.server.http` array of HTTP listen address configuration. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-traces-single/#http-listen-address) for details.'
         - added `.Values.server.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Has higher priority than `extraArgs`.
         - add ability to override container command.
@@ -75648,4 +75881,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-05-28T15:14:24.82105991Z"
+generated: "2026-05-28T16:25:29.852342964Z"
