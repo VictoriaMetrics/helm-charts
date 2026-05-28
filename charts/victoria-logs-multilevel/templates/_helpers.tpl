@@ -4,8 +4,8 @@
   {{- $args := dict -}}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
@@ -14,8 +14,8 @@
   {{- $app := $Values.vlselect -}}
   {{- $args := dict -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- $storageNodes := $args.storageNodes | default list }}
   {{- with $Values.storageNodes }}
     {{- $storageNodes = concat $storageNodes . }}
