@@ -49,12 +49,8 @@ var headers = map[string]string{
 {{- $Values := (.helm).Values | default .Values }}
 {{- $runbookUrl := ($Values.defaultRules).runbookUrl | default "https://runbooks.prometheus-operator.dev/runbooks" }}
 {{- $clusterLabel := ($Values.global).clusterLabel | default "cluster" }}
-{{- $additionalGroupByLabels := $Values.defaultRules.additionalGroupByLabels }}
-{{- if hasKey . "additionalGroupByLabels" }}
-  {{- $additionalGroupByLabels = .additionalGroupByLabels }}
-{{- end }}
-{{- $additionalGroupByLabels := uniq (append $additionalGroupByLabels $clusterLabel) }}
-{{- $groupLabels := join "," $additionalGroupByLabels }}
+{{- $extraGroupByLabels := uniq (append .extraGroupByLabels $clusterLabel) }}
+{{- $groupLabels := join "," $extraGroupByLabels }}
 {{- $grafanaAddr := include "vm-k8s-stack.grafana.addr" . }}
 `,
 }
@@ -402,7 +398,7 @@ common.grafanaDashboards
 		},
 	},
 	{
-		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts.yml",
+		url:  "https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-single-node.yml",
 		kind: "rules",
 		charts: []string{
 			"victoria-metrics-k8s-stack",

@@ -1,6 +1,11 @@
 ## Next release
 
-- add per-group additionalGroupByLabels, that replace defaultRules.additionalGroupByLabels. See [#2382](https://github.com/VictoriaMetrics/helm-charts/issues/2832).
+**Update note 1**: `defaultRules.create` is renamed to `defaultRules.enabled`; per-group `create` is renamed to `enabled`. Old `create` key is still respected as a fallback if `enabled` is not set.
+
+**Update note 2**: `defaultRules.additionalGroupByLabels` is renamed to `defaultRules.extraGroupByLabels`. Old `additionalGroupByLabels` is still respected as a fallback if `extraGroupByLabels` is not set.
+
+- rename `defaultRules.create` and per-group `create` to `enabled`, with fallback to `create` for backward compatibility.
+- add per-group extraGroupByLabels, that replace defaultRules.extraGroupByLabels (if absent defaults to defaultRules.additionalGroupByLabels). See [#2832](https://github.com/VictoriaMetrics/helm-charts/issues/2832).
 
 ## 0.80.0
 

@@ -1,4 +1,4 @@
-{{- if .Values.defaultRules.create }}
+{{- if (dig "enabled" (dig "create" true .Values.defaultRules) .Values.defaultRules) }}
 
 {{- /*
 Default rules alias
@@ -48,10 +48,11 @@ Get group data from file
 {{- $groupCtx := mergeOverwrite $ctx $group }}
 
 {{- /*
-Resolve effectiveGroupByLabels: per-group additionalGroupByLabels overrides global if set
+Resolve extraGroupByLabels: per-group extraGroupByLabels overrides global if set
 */}}
-{{- $additionalGroupByLabels := dig "additionalGroupByLabels" $defaultRules.additionalGroupByLabels $group }}
-{{- $_ := set $groupCtx "additionalGroupByLabels" $additionalGroupByLabels }}
+{{- $globalExtraGroupByLabels := $defaultRules.extraGroupByLabels | default $defaultRules.additionalGroupByLabels | default list }}
+{{- $extraGroupByLabels := dig "extraGroupByLabels" $globalExtraGroupByLabels $group }}
+{{- $_ := set $groupCtx "extraGroupByLabels" $extraGroupByLabels }}
 
 {{- $groupData := fromYaml (tpl ($.Files.Get $groupFile) $groupCtx) -}}
 
@@ -95,7 +96,7 @@ Filter out ignore rules
   {{- $defaultRule := deepCopy (index $defaultRules $ruleKey) }}
   {{- $defaultInGroup := deepCopy (index $group $ruleKey | default dict) }}
   {{- $resultRule := mergeOverwrite (deepCopy $commonRule) $defaultRule $commonInGroupRule $defaultInGroup $exactRule }}
-  {{- if (and (dig "create" true $resultRule) $ruleCondition) }}
+  {{- if (and (dig "enabled" (dig "create" true $resultRule) $resultRule) $ruleCondition) }}
     {{- $ruleSpec := mergeOverwrite (deepCopy $ruleSpec) (dig "spec" (dict) $resultRule) }}
     {{- $filteredRulesSpec = append $filteredRulesSpec $ruleSpec }}
   {{- end }}
@@ -105,7 +106,7 @@ Filter out ignore rules
 {{- /*
 Check if group is enabled
 */}}
-{{- if (and $rulesSpec (dig "create" true $group) $groupCondition) }}
+{{- if (and $rulesSpec (dig "enabled" (dig "create" true $group) $group) $groupCondition) }}
 {{- $ruleName := (include "vm-k8s-stack.rulegroup.name" $ctx) }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
