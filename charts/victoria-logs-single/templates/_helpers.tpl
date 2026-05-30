@@ -48,10 +48,10 @@
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $extraArgs -}}
-  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- end -}}
-  {{- if not (or (hasKey $extraArgs "syslog.listenAddr.tcp") (hasKey $extraArgs "syslog.listenAddr.udp")) -}}
+  {{- if and (empty (index $extraArgs "syslog.listenAddr.tcp")) (empty (index $extraArgs "syslog.listenAddr.udp")) -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vl.syslog.args" $app.syslog)) -}}
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}

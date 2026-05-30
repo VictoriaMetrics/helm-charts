@@ -6,15 +6,18 @@
   {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
   {{- $extraArgs := $app.extraArgs | default dict }}
   {{- $args = mergeOverwrite $args $extraArgs -}}
-  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- end -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" $ctx }}
-    {{- $storageHttpAddr := ($Values.vtstorage.extraArgs | default dict).httpListenAddr -}}
-    {{- $port := include "vm.port.from.flag" (dict "flag" (ternary (include "vm.addr.primary" $Values.vtstorage.http) $storageHttpAddr (empty $storageHttpAddr)) "default" "10491") }}
+    {{- $addrFlag := ($Values.vtstorage.extraArgs | default dict).httpListenAddr -}}
+    {{- if empty $addrFlag -}}
+      {{- $addrFlag = include "vm.addr.primary" $Values.vtstorage.http -}}
+    {{- end -}}
+    {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" "10491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
       {{- if not (has (float64 $i) $app.excludeStorageIDs) -}}
         {{- $_ := set $ctx "appIdx" $i }}
@@ -38,7 +41,7 @@
   {{- $extraArgs := $app.extraArgs | default dict }}
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args $extraArgs -}}
-  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
@@ -51,15 +54,18 @@
   {{- $ctx := dict "style" "plain" "appKey" "vtstorage" "helm" .helm }}
   {{- $extraArgs := $app.extraArgs | default dict }}
   {{- $args = mergeOverwrite $args $extraArgs -}}
-  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- end -}}
   {{- $storage := $Values.vtstorage }}
   {{- if and (not $app.suppressStorageFQDNsRender) $storage.enabled $storage.replicaCount }}
     {{- $storageNodes := list }}
     {{- $fqdn := include "vm.fqdn" $ctx }}
-    {{- $storageHttpAddr := ($Values.vtstorage.extraArgs | default dict).httpListenAddr -}}
-    {{- $port := include "vm.port.from.flag" (dict "flag" (ternary (include "vm.addr.primary" $Values.vtstorage.http) $storageHttpAddr (empty $storageHttpAddr)) "default" "10491") }}
+    {{- $addrFlag := ($Values.vtstorage.extraArgs | default dict).httpListenAddr -}}
+    {{- if empty $addrFlag -}}
+      {{- $addrFlag = include "vm.addr.primary" $Values.vtstorage.http -}}
+    {{- end -}}
+    {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" "10491") }}
     {{- range $i := until ($storage.replicaCount | int) -}}
       {{- $_ := set $ctx "appIdx" $i }}
       {{- $storageNode := include "vm.fqdn" $ctx -}}
@@ -95,7 +101,7 @@
   {{- end -}}
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args $extraArgs -}}
-  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}

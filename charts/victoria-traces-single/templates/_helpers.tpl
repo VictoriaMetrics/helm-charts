@@ -21,7 +21,7 @@
   {{- $_ := set $args "storageDataPath" $app.persistentVolume.mountPath -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $extraArgs -}}
-  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
