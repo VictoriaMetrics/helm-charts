@@ -130,6 +130,22 @@ tests:
       - equal:
           path: vm.url
           value: https://RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:8443
+  - it: with http section and no tls falls back to extraArgs.tls
+    set:
+      ctx:
+        style: plain
+        appKey: server
+      server:
+        http:
+          - name: http
+            value: :8429
+            primary: true
+        extraArgs:
+          tls: "true"
+    asserts:
+      - equal:
+          path: vm.url
+          value: https://RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:8429
   - it: with no http section falls back to extraArgs.tls for https scheme
     set:
       ctx:
@@ -142,3 +158,37 @@ tests:
       - equal:
           path: vm.url
           value: https://RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:443
+  - it: with httpListenAddr set http item tls is ignored without extraArgs.tls
+    set:
+      ctx:
+        style: plain
+        appKey: server
+      server:
+        http:
+          - name: https
+            value: :8443
+            primary: true
+            tls: true
+        extraArgs:
+          httpListenAddr: :9000
+    asserts:
+      - equal:
+          path: vm.url
+          value: http://RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:8443
+  - it: with httpListenAddr and extraArgs.tls both set uses https
+    set:
+      ctx:
+        style: plain
+        appKey: server
+      server:
+        http:
+          - name: http
+            value: :8429
+            primary: true
+        extraArgs:
+          httpListenAddr: :9000
+          tls: "true"
+    asserts:
+      - equal:
+          path: vm.url
+          value: https://RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:8429

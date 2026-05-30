@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- `vm.probe` switches from `httpGet` to `tcpSocket` when TLS is enabled on the primary HTTP listener.
 
 ## 0.3.4
 
@@ -11,7 +11,7 @@
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
 
 - `vm.http.args` now requires each item to have not empty `name` property.
-- `vm.probe` switches from `httpGet` to `tcpSocket` when TLS is enabled on the primary HTTP listener.
+- `vm.probe` and `vm.url` now detect TLS from the primary http list item's `tls` field when `httpListenAddr` is not set in `extraArgs`; `extraArgs.tls` is used as a fallback in all other cases.
 - fixed nil panic in `vm.probe` when `app.probe` is not set.
 - removed unused `vm.sa.name` template.
 - removed `vm.service` template; its style dispatch is now inlined into `vm.fqdn`.

@@ -71,10 +71,49 @@ tests:
             tcpSocket:
               port: https
 
+  - it: httpGet probe falls back to extraArgs.tls when http section has no tls
+    set:
+      app:
+        http:
+          - name: http
+            value: :8429
+            primary: true
+        extraArgs:
+          tls: "true"
+        probe:
+          readiness:
+            httpGet: {}
+    asserts:
+      - equal:
+          path: probe.readiness
+          value:
+            tcpSocket:
+              port: http
+
   - it: httpGet probe falls back to extraArgs.tls when no http section
     set:
       app:
         extraArgs:
+          tls: "true"
+        probe:
+          readiness:
+            httpGet: {}
+    asserts:
+      - equal:
+          path: probe.readiness
+          value:
+            tcpSocket:
+              port: http
+
+  - it: httpGet probe uses extraArgs.tls when httpListenAddr overrides http section
+    set:
+      app:
+        http:
+          - name: http
+            value: :8429
+            primary: true
+        extraArgs:
+          httpListenAddr: :9000
           tls: "true"
         probe:
           readiness:

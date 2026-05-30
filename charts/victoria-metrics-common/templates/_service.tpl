@@ -84,13 +84,14 @@
       {{- $ctx = ternary (dict) (index $ctx $ak | default dict) (empty $ctx) -}}
     {{- end -}}
     {{- $spec := $values | default $ctx -}}
-    {{- if $spec.http -}}
+    {{- if and $spec.http (empty ($spec.extraArgs).httpListenAddr) -}}
       {{- range $spec.http -}}
         {{- if and .primary .tls -}}
           {{- $isSecure = true -}}
         {{- end -}}
       {{- end -}}
-    {{- else -}}
+    {{- end -}}
+    {{- if not $isSecure -}}
       {{- with ($spec.extraArgs).tls -}}
         {{- $isSecure = eq (toString .) "true" -}}
       {{- end -}}
