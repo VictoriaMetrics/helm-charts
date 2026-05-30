@@ -6,7 +6,7 @@
   {{- $_ := set $args "auth.config" "/config/auth.yml" -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $extraArgs -}}
-  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
@@ -19,7 +19,7 @@
   {{- $extraArgs := $app.extraArgs | default dict }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $extraArgs -}}
-  {{- if not (hasKey $extraArgs "httpListenAddr") -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
     {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
   {{- end -}}
   {{- $storageNodes := $args.storageNodes | default list }}
