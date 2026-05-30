@@ -48,13 +48,14 @@ Render probe
     {{- end -}}
   {{- end -}}
   {{- $isSecure := false -}}
-  {{- if (.app).http -}}
+  {{- if and (.app).http (empty ((.app).extraArgs | default dict).httpListenAddr) -}}
     {{- range (.app).http -}}
       {{- if and .primary .tls -}}
         {{- $isSecure = true -}}
       {{- end -}}
     {{- end -}}
-  {{- else -}}
+  {{- end -}}
+  {{- if not $isSecure -}}
     {{- with ((.app).extraArgs).tls -}}
       {{- $isSecure = eq (toString .) "true" -}}
     {{- end -}}
