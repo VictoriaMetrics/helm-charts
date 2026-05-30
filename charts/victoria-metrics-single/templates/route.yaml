@@ -29,7 +29,11 @@ spec:
     {{- end }}
     - backendRefs:
         - name: {{ $fullname }}
-          port: {{ $route.port | default (include "vm.port.from.flag" (dict "flag" ($app.extraArgs).httpListenAddr)) }}
+          {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr }}
+          {{- if empty $addrFlag }}
+            {{- $addrFlag = include "vm.addr.primary" $app.http }}
+          {{- end }}
+          port: {{ $route.port | default ($app.service.servicePort | default (include "vm.port.from.flag" (dict "flag" $addrFlag))) }}
           group: ''
           kind: Service
           weight: 1

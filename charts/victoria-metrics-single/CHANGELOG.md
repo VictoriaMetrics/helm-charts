@@ -1,5 +1,11 @@
 ## Next release
 
+**Update note 1**: `.Values.server.extraArgs.httpListenAddr` was replaced by `.Values.server.http` list for HTTP listen address configuration. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-metrics-single/#http-listen-address) for details.
+
+- `serviceMonitor` port now defaults to the primary `http` list item name; added explicit `port` field to override it without using `targetPort`.
+- fixed HTTPRoute backend `port` field being rendered on the same line as `name` due to incorrect whitespace trimming in the route template.
+
+- added `.Values.server.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Has higher priority than `extraArgs`.
 - add ability to override container command.
 
 ## 0.39.0

@@ -44,12 +44,16 @@ spec:
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
-    - name: http
-      port: {{ $service.servicePort }}
+    {{- $httpAddr := (.Values.extraArgs | default dict).httpListenAddr -}}
+    {{- range ternary .Values.http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
+    - name: {{ .name }}
+      {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "8427") }}
+      port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
       protocol: TCP
-      targetPort: http
-      {{- with $service.nodePort }}
-      nodePort: {{ . }}
+      targetPort: {{ .name }}
+      {{- if and .primary $service.nodePort }}
+      nodePort: {{ $service.nodePort }}
       {{- end }}
+    {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}
