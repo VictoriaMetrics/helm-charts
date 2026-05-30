@@ -35502,6 +35502,49 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '`vm.http.args` now requires each item to have not empty `name` property.'
+        - '`vm.probe` switches from `httpGet` to `tcpSocket` when TLS is enabled on the primary HTTP listener.'
+        - fixed nil panic in `vm.probe` when `app.probe` is not set.
+        - removed unused `vm.sa.name` template.
+        - removed `vm.service` template; its style dispatch is now inlined into `vm.fqdn`.
+        - removed `vm.host` template; inlined into `vm.url`, eliminating duplicate values resolution.
+        - removed `vm.probe.http.path`, `vm.probe.http.scheme`, and `vm.probe.port` templates; inlined into `vm.probe`.
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Common Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/changelog/).
+    apiVersion: v2
+    created: "2026-05-30T03:36:40.880563261Z"
+    description: VictoriaMetrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: 7e34e5bf35268bc0cb822e45ee35b4a9c904c9ff86c70f00908f84ad249cef87
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.3.4/victoria-metrics-common-0.3.4.tgz
+    version: 0.3.4
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - removed vl.check.extraArgs and vm.check.extraArgs
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -75881,4 +75924,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-05-28T16:25:29.852342964Z"
+generated: "2026-05-30T03:36:41.146411968Z"
