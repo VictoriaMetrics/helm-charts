@@ -13,8 +13,12 @@
   {{- $_ := set $args "enable.auth" $Values.auth.enabled -}}
   {{- $_ := set $args "read.url" $Values.read.url -}}
   {{- $_ := set $args "write.url" $Values.write.url -}}
+  {{- $extraArgs := $Values.extraArgs | default dict }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args $Values.extraArgs -}}
+  {{- $args = mergeOverwrite $args $extraArgs -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $Values.http)) -}}
+  {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 

@@ -90,8 +90,11 @@ spec:
             {{ toYaml .| nindent 12 }}
             {{- end }}
           ports:
-            - name: http
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8429") }}
+            {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr -}}
+            {{- range ternary $app.http (list (dict "name" "http" "value" $httpAddr)) (empty $httpAddr) }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "8429") }}
+            {{- end }}
             {{- with $app.extraArgs.graphiteListenAddr }}
             - name: graphite-tcp
               protocol: TCP

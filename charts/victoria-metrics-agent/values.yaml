@@ -135,12 +135,17 @@ remoteWrite: []
 #       regex: "dev"
 # - url: http://prometheus:8480/insert/0/prometheus
 
+# -- HTTP listen address configuration. See https://docs.victoriametrics.com/victoriametrics/#http-listen-address for details.
+http:
+  - name: http
+    value: :8429
+    primary: true
+
 # -- VMAgent extra command line arguments
 extraArgs:
   envflag.enable: true
   envflag.prefix: VM_
   loggerFormat: json
-  httpListenAddr: :8429
   # Enable IPv6 support. Useful for running in IPv6-only Kubernetes clusters
   # enableTCP6: true
   # promscrape.maxScrapeSize: "167772160"
@@ -240,9 +245,7 @@ service:
   # -- Load balancer source range
   loadBalancerSourceRanges: []
   # -- Service port
-  servicePort: 8429
-  # -- Target port
-  targetPort: http
+  servicePort: ""
   # nodePort: 30000
   # -- Service type
   type: ClusterIP
@@ -372,8 +375,10 @@ serviceMonitor:
   basicAuth: {}
   # -- Service Monitor metricRelabelings
   metricRelabelings: []
-  # -- Service Monitor targetPort
-  targetPort: http
+  # -- Service Monitor port. Uses primary http item name by default
+  port: ""
+  # -- Service Monitor target port. Overrides port when set
+  targetPort: ""
   # interval: 15s
   # scrapeTimeout: 5s
   # -- Commented. HTTP scheme to use for scraping.

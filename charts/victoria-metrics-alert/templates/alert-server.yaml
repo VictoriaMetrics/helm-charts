@@ -68,8 +68,11 @@ spec:
           env: {{ toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: http
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8880") }}
+            {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr -}}
+            {{- range ternary $app.http (list (dict "name" "http" "value" $httpAddr)) (empty $httpAddr) }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "8880") }}
+            {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
