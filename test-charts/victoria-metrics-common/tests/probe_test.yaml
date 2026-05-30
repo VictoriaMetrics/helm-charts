@@ -1,0 +1,104 @@
+suite: probe templates
+templates:
+  - probe.yaml
+tests:
+  - it: httpGet probe uses http port name by default
+    set:
+      app:
+        http:
+          - name: http
+            value: :8429
+            primary: true
+        probe:
+          readiness:
+            httpGet: {}
+    asserts:
+      - equal:
+          path: probe.readiness
+          value:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+
+  - it: httpGet probe uses port name from primary http item
+    set:
+      app:
+        http:
+          - name: metrics
+            value: :8429
+            primary: true
+        probe:
+          readiness:
+            httpGet: {}
+    asserts:
+      - equal:
+          path: probe.readiness.httpGet.port
+          value: metrics
+
+  - it: httpGet probe includes http.pathPrefix when set
+    set:
+      app:
+        http:
+          - name: http
+            value: :8429
+            primary: true
+        extraArgs:
+          http.pathPrefix: /vm
+        probe:
+          readiness:
+            httpGet: {}
+    asserts:
+      - equal:
+          path: probe.readiness.httpGet.path
+          value: /vm/health
+
+  - it: httpGet probe switches to tcpSocket when primary http item has tls
+    set:
+      app:
+        http:
+          - name: https
+            value: :8443
+            primary: true
+            tls: true
+        probe:
+          readiness:
+            httpGet: {}
+    asserts:
+      - equal:
+          path: probe.readiness
+          value:
+            tcpSocket:
+              port: https
+
+  - it: httpGet probe falls back to extraArgs.tls when no http section
+    set:
+      app:
+        extraArgs:
+          tls: "true"
+        probe:
+          readiness:
+            httpGet: {}
+    asserts:
+      - equal:
+          path: probe.readiness
+          value:
+            tcpSocket:
+              port: http
+
+  - it: tcpSocket probe passes through unchanged
+    set:
+      app:
+        http:
+          - name: http
+            value: :8429
+            primary: true
+        probe:
+          readiness:
+            tcpSocket: {}
+    asserts:
+      - equal:
+          path: probe.readiness
+          value:
+            tcpSocket:
+              port: http

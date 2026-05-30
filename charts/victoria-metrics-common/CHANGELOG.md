@@ -2,7 +2,13 @@
 
 ## Next release
 
-- TODO
+- `vm.http.args` now requires each item to have not empty `name` property.
+- `vm.probe` switches from `httpGet` to `tcpSocket` when TLS is enabled on the primary HTTP listener.
+- fixed nil panic in `vm.probe` when `app.probe` is not set.
+- removed unused `vm.sa.name` template.
+- removed `vm.service` template; its style dispatch is now inlined into `vm.fqdn`.
+- removed `vm.host` template; inlined into `vm.url`, eliminating duplicate values resolution.
+- removed `vm.probe.http.path`, `vm.probe.http.scheme`, and `vm.probe.port` templates; inlined into `vm.probe`.
 
 ## 0.3.3
 

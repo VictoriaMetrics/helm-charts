@@ -163,17 +163,6 @@ If release name contains chart name it will be used as a full name.
   {{- end }}
 {{- end }}
 
-{{- /* Create the name of the service account to use */ -}}
-{{- define "vm.sa.name" -}}
-  {{- include "vm.validate.args" . -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- if $Values.serviceAccount.create }}
-    {{- default (include "vm.fullname" .) $Values.serviceAccount.name }}
-  {{- else -}}
-    {{- default "default" $Values.serviceAccount.name -}}
-  {{- end }}
-{{- end }}
-
 {{- define "vm.metaLabels" -}}
   {{- include "vm.validate.args" . -}}
   {{- $Release := (.helm).Release | default .Release -}}

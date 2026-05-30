@@ -1,0 +1,3 @@
+{{- $app := .Values.app | default dict -}}
+probe:
+  readiness: {{ include "vm.probe" (dict "app" $app "type" "readiness") | fromYaml | toYaml | nindent 4 }}

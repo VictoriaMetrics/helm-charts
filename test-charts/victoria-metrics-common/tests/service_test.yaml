@@ -3,6 +3,9 @@ templates:
   - service.yaml
 tests:
   - it: with no style define
+    set:
+      ctx:
+        appKey: test
     asserts:
       - failedTemplate:
           errorMessage: .style argument should be either `plain` or `managed`
@@ -15,14 +18,8 @@ tests:
         name: ""
     asserts:
       - equal:
-          path: vm.service
-          value: RELEASE-NAME-victoria-metrics-common-test
-      - equal:
           path: vm.url
           value: http://RELEASE-NAME-victoria-metrics-common-test.NAMESPACE.svc:80
-      - equal:
-          path: vm.host
-          value: RELEASE-NAME-victoria-metrics-common-test.NAMESPACE.svc:80
       - equal:
           path: vm.fqdn
           value: RELEASE-NAME-victoria-metrics-common-test.NAMESPACE.svc
@@ -35,14 +32,8 @@ tests:
         name: ""
     asserts:
       - equal:
-          path: vm.service
-          value: vmtest-RELEASE-NAME-victoria-metrics-common
-      - equal:
           path: vm.url
           value: http://vmtest-RELEASE-NAME-victoria-metrics-common.NAMESPACE.svc:80
-      - equal:
-          path: vm.host
-          value: vmtest-RELEASE-NAME-victoria-metrics-common.NAMESPACE.svc:80
       - equal:
           path: vm.fqdn
           value: vmtest-RELEASE-NAME-victoria-metrics-common.NAMESPACE.svc
@@ -58,14 +49,8 @@ tests:
           name: test
     asserts:
       - equal:
-          path: vm.service
-          value: vmsingle-test
-      - equal:
           path: vm.url
           value: http://vmsingle-test.NAMESPACE.svc:80
-      - equal:
-          path: vm.host
-          value: vmsingle-test.NAMESPACE.svc:80
       - equal:
           path: vm.fqdn
           value: vmsingle-test.NAMESPACE.svc
@@ -81,12 +66,12 @@ tests:
           name: test
     asserts:
       - equal:
-          path: vm.service
-          value: RELEASE-NAME-victoria-metrics-common-server
+          path: vm.fqdn
+          value: RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc
   - it: with appKey, nested fullnameOverride and plain style
     set:
       ctx:
-        appKey: 
+        appKey:
           - managed
           - server
         style: plain
@@ -95,8 +80,8 @@ tests:
           fullnameOverride: test
     asserts:
       - equal:
-          path: vm.service
-          value: test
+          path: vm.fqdn
+          value: test.NAMESPACE.svc
   - it: with appKey, nested name and managed style with port
     set:
       ctx:
@@ -128,5 +113,32 @@ tests:
             primary: true
     asserts:
       - equal:
-          path: vm.host
-          value: RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:9191
+          path: vm.url
+          value: http://RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:9191
+  - it: with primary http item tls uses https scheme and port
+    set:
+      ctx:
+        style: plain
+        appKey: server
+      server:
+        http:
+          - name: https
+            value: :8443
+            primary: true
+            tls: true
+    asserts:
+      - equal:
+          path: vm.url
+          value: https://RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:8443
+  - it: with no http section falls back to extraArgs.tls for https scheme
+    set:
+      ctx:
+        style: plain
+        appKey: server
+      server:
+        extraArgs:
+          tls: "true"
+    asserts:
+      - equal:
+          path: vm.url
+          value: https://RELEASE-NAME-victoria-metrics-common-server.NAMESPACE.svc:443
