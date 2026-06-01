@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.6
+
+**Release date:** 01 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - `vm.probe` and `vm.url` now detect TLS from the primary http list item's `tls` field when `httpListenAddr` is not set in `extraArgs`; `extraArgs.tls` is used as fallback in all other cases.
 - `vm.http.args` now correctly includes boolean `false` values (e.g. `tls: false`, `mtls: false`); absent boolean fields at earlier indices are gap-filled with `false` instead of empty string.
 
