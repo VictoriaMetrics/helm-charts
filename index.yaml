@@ -35878,6 +35878,43 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '`vm.http.args` absent boolean fields at earlier indices are now gap-filled with `false` instead of empty string; keys where all values are falsy are dropped entirely to avoid passing disabled-feature flags (e.g. `--mtls=false` for enterprise-only features).'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Common Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/changelog/).
+    apiVersion: v2
+    created: "2026-06-01T12:23:09.465615857Z"
+    description: VictoriaMetrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: 6d7a9999b0aec4813d735765abea2a2f6c816388b20c0a36a5df2ebff25c10e2
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.3.7/victoria-metrics-common-0.3.7.tgz
+    version: 0.3.7
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '`vm.probe` and `vm.url` now detect TLS from the primary http list item''s `tls` field when `httpListenAddr` is not set in `extraArgs`; `extraArgs.tls` is used as fallback in all other cases.'
         - '`vm.http.args` now correctly includes boolean `false` values (e.g. `tls: false`, `mtls: false`); absent boolean fields at earlier indices are gap-filled with `false` instead of empty string.'
       artifacthub.io/license: Apache-2.0
@@ -76642,4 +76679,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-06-01T11:24:25.862229512Z"
+generated: "2026-06-01T12:23:09.787862675Z"
