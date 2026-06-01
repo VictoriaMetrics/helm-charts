@@ -6,24 +6,22 @@
   {{- end -}}
   {{- $_ := set $args "promscrape.config" "/config/scrape/scrape.yml" -}}
   {{- $_ := set $args "remoteWrite.tmpDataPath" "/tmpData" -}}
+  {{- $rwItems := list -}}
   {{- range $i, $rw := $Values.remoteWrite -}}
     {{- if not $rw.url -}}
       {{- fail (printf "`url` is not set for `remoteWrite` idx %d" $i) -}}
     {{- end -}}
+    {{- $item := dict -}}
     {{- range $rwKey, $rwValue := $rw -}}
-      {{- $key := printf "remoteWrite.%s" $rwKey -}}
-      {{- $param := index $args $key | default list -}}
-      {{- range until (int (sub $i (len $param))) }}
-        {{- $param = append $param "" }}
-      {{- end }}
       {{- if or (kindIs "slice" $rwValue) (kindIs "map" $rwValue) -}}
-        {{- $param = append $param (printf "/config/rw/%d-%s.yaml" $i $rwKey) }}
+        {{- $_ := set $item (printf "remoteWrite.%s" $rwKey) (printf "/config/rw/%d-%s.yaml" $i $rwKey) -}}
       {{- else -}}
-        {{- $param = append $param $rwValue }}
+        {{- $_ := set $item (printf "remoteWrite.%s" $rwKey) $rwValue -}}
       {{- end -}}
-      {{- $_ := set $args $key $param -}}
     {{- end -}}
+    {{- $rwItems = append $rwItems $item -}}
   {{- end -}}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.args.positional" $rwItems)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $Values.extraArgs -}}
   {{- if and (eq $Values.mode "statefulSet") $Values.statefulSet.clusterMode }}
