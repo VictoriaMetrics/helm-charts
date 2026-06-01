@@ -36076,6 +36076,45 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - 'added `vm.args.positional` template: builds positional CLI arg lists from a flat list of items with boolean tracking, boolean trailing padding, and all-false key dropping.'
+        - added `vl.syslog.args` template moved from victoria-logs charts; uses `vm.args.positional` internally.
+        - '`vm.http.args` refactored to use `vm.args.positional`.'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Common Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/changelog/).
+    apiVersion: v2
+    created: "2026-06-01T14:22:11.627486878Z"
+    description: VictoriaMetrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: 645c5596da75ecabdced73493dd0802a2dad54dba79988063a6c0753d16500c4
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.3.8/victoria-metrics-common-0.3.8.tgz
+    version: 0.3.8
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '`vm.http.args` absent boolean fields at earlier indices are now gap-filled with `false` instead of empty string; keys where all values are falsy are dropped entirely to avoid passing disabled-feature flags (e.g. `--mtls=false` for enterprise-only features).'
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -76970,4 +77009,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-06-01T12:45:50.108954981Z"
+generated: "2026-06-01T14:22:12.100901431Z"
