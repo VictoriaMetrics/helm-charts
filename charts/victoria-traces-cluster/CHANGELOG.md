@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.2.5
+
+**Release date:** 01 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.9.2](https://img.shields.io/badge/v0.9.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriatraces%2Fchangelog%2F%23v092)
+
 - fixed `HTTPRoute` backend template rendering where the `port` field was incorrectly joined onto the same line as `name`.
 - fixed rendering failure when an http list entry does not have the `primary` field set.
 - bump common chart version 0.3.5 -> 0.3.7
