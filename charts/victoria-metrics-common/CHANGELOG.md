@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- `vm.http.args` absent boolean fields at earlier indices are now gap-filled with `false` instead of empty string; keys where all values are falsy are dropped entirely to avoid passing disabled-feature flags (e.g. `--mtls=false` for enterprise-only features).
 
 ## 0.3.6
 

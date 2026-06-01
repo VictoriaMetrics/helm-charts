@@ -14,7 +14,7 @@ tests:
           value:
             - :8429
 
-  - it: boolean false is included not skipped
+  - it: all-false boolean key is dropped entirely
     set:
       http:
         - name: http
@@ -23,14 +23,10 @@ tests:
           tls: false
           mtls: false
     asserts:
-      - equal:
+      - notExists:
           path: args.tls
-          value:
-            - false
-      - equal:
+      - notExists:
           path: args.mtls
-          value:
-            - false
 
   - it: multi-item boolean gap fill uses false not empty string
     set:
