@@ -66,6 +66,21 @@
   {{- if not $hasPrimary -}}
     {{- fail "at least one item in `http` must have `primary: true`" -}}
   {{- end -}}
+  {{- $dropKeys := list -}}
+  {{- range $k, $v := $args -}}
+    {{- $hasValue := false -}}
+    {{- range $v -}}
+      {{- if . -}}
+        {{- $hasValue = true -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if not $hasValue -}}
+      {{- $dropKeys = append $dropKeys $k -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range $k := $dropKeys -}}
+    {{- $_ := unset $args $k -}}
+  {{- end -}}
   {{- toYaml $args -}}
 {{- end -}}
 
