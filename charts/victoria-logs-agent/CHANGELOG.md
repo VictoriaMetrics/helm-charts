@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- fixed rendering failure when an http list entry does not have the `primary` field set.
+- fixed `syslog` args rendering: boolean `false` values (e.g. `tls: false`, `useLocalTimestamp: false`) are now correctly included; absent boolean fields are gap-filled with `false` instead of empty string.
 
 ## 0.2.2
 

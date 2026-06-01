@@ -53,9 +53,10 @@
     {{- range $hlKey, $hlValue := (omit $hl "name" "primary") -}}
       {{- $key := ternary "httpListenAddr" $hlKey (eq $hlKey "value") -}}
       {{- $param := index $args $key | default list -}}
-      {{- if $hlValue -}}
+      {{- if or $hlValue (kindIs "bool" $hlValue) -}}
+        {{- $gapFill := ternary false "" (kindIs "bool" $hlValue) -}}
         {{- range until (int (sub $i (len $param))) }}
-          {{- $param = append $param "" }}
+          {{- $param = append $param $gapFill }}
         {{- end }}
         {{- $param = append $param $hlValue }}
         {{- $_ := set $args $key $param -}}

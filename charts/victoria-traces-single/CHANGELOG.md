@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- fixed `HTTPRoute` backend template rendering where the `port` field was incorrectly joined onto the same line as `name`.
+- fixed rendering failure when an http list entry does not have the `primary` field set.
 
 ## 0.1.4
 

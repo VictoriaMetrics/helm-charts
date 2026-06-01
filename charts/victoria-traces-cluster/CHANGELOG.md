@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- fixed `HTTPRoute` backend template rendering where the `port` field was incorrectly joined onto the same line as `name`.
+- fixed rendering failure when an http list entry does not have the `primary` field set.
 
 ## 0.2.4
 
@@ -59,7 +60,8 @@
 
 ![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.8.2](https://img.shields.io/badge/v0.8.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriatraces%2Fchangelog%2F%23v082)
 
-- TODO
+- fixed `HTTPRoute` backend template rendering where the `port` field was incorrectly joined onto the same line as `name`.
+- fixed rendering failure when an http list entry does not have the `primary` field set.
 
 ## 0.1.1
 

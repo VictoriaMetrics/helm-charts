@@ -59,7 +59,7 @@ spec:
     {{- range ternary $app.http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
     - name: {{ .name }}
       {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9428") }}
-      port: {{ ternary ($service.servicePort | default $port) $port (and .primary (not (empty $service.servicePort))) }}
+      port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
       protocol: TCP
       targetPort: {{ .name }}
       {{- if and .primary $service.nodePort }}
