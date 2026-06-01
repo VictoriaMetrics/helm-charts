@@ -37,34 +37,33 @@
   {{- $addr -}}
 {{- end -}}
 
-{{- define "vm.http.args" -}}
-  {{- $args := dict }}
-  {{- $hasPrimary := false -}}
-  {{- range $i, $hl := . -}}
-    {{- if not $hl.value -}}
-      {{- fail (printf "`value` is not set for `http` idx %d" $i) -}}
-    {{- end -}}
-    {{- if not $hl.name -}}
-      {{- fail (printf "`name` is not set for `http` idx %d" $i) -}}
-    {{- end -}}
-    {{- if $hl.primary -}}
-      {{- $hasPrimary = true -}}
-    {{- end -}}
-    {{- range $hlKey, $hlValue := (omit $hl "name" "primary") -}}
-      {{- $key := ternary "httpListenAddr" $hlKey (eq $hlKey "value") -}}
-      {{- $param := index $args $key | default list -}}
-      {{- if or $hlValue (kindIs "bool" $hlValue) -}}
-        {{- $gapFill := ternary false "" (kindIs "bool" $hlValue) -}}
+{{- define "vm.args.positional" -}}
+  {{- $args := dict -}}
+  {{- $boolKeys := dict -}}
+  {{- $n := 0 -}}
+  {{- range $i, $item := . -}}
+    {{- $n = add $i 1 -}}
+    {{- range $k, $v := $item -}}
+      {{- if kindIs "bool" $v -}}
+        {{- $_ := set $boolKeys $k true -}}
+      {{- end -}}
+      {{- $param := index $args $k | default list -}}
+      {{- if or $v (kindIs "bool" $v) -}}
+        {{- $gapFill := ternary false "" ((index $boolKeys $k) | default false) -}}
         {{- range until (int (sub $i (len $param))) }}
           {{- $param = append $param $gapFill }}
         {{- end }}
-        {{- $param = append $param $hlValue }}
-        {{- $_ := set $args $key $param -}}
+        {{- $param = append $param $v }}
+        {{- $_ := set $args $k $param -}}
       {{- end -}}
     {{- end -}}
   {{- end -}}
-  {{- if not $hasPrimary -}}
-    {{- fail "at least one item in `http` must have `primary: true`" -}}
+  {{- range $k := keys $boolKeys -}}
+    {{- $v := index $args $k | default list -}}
+    {{- range until (int (sub $n (len $v))) }}
+      {{- $v = append $v false }}
+    {{- end }}
+    {{- $_ := set $args $k $v -}}
   {{- end -}}
   {{- $dropKeys := list -}}
   {{- range $k, $v := $args -}}
@@ -80,6 +79,55 @@
   {{- end -}}
   {{- range $k := $dropKeys -}}
     {{- $_ := unset $args $k -}}
+  {{- end -}}
+  {{- toYaml $args -}}
+{{- end -}}
+
+{{- define "vm.http.args" -}}
+  {{- $hasPrimary := false -}}
+  {{- $items := list -}}
+  {{- range $i, $hl := . -}}
+    {{- if not $hl.value -}}
+      {{- fail (printf "`value` is not set for `http` idx %d" $i) -}}
+    {{- end -}}
+    {{- if not $hl.name -}}
+      {{- fail (printf "`name` is not set for `http` idx %d" $i) -}}
+    {{- end -}}
+    {{- if $hl.primary -}}
+      {{- $hasPrimary = true -}}
+    {{- end -}}
+    {{- $item := omit $hl "name" "primary" -}}
+    {{- $_ := set $item "httpListenAddr" (index $item "value") -}}
+    {{- $item = omit $item "value" -}}
+    {{- $items = append $items $item -}}
+  {{- end -}}
+  {{- if not $hasPrimary -}}
+    {{- fail "at least one item in `http` must have `primary: true`" -}}
+  {{- end -}}
+  {{- include "vm.args.positional" $items -}}
+{{- end -}}
+
+{{- define "vl.syslog.args" -}}
+  {{- $args := dict -}}
+  {{- range $kind, $sls := . -}}
+    {{- $items := list -}}
+    {{- range $i, $sl := $sls -}}
+      {{- if not $sl.value -}}
+        {{- fail (printf "`value` is not set for `syslog.%s` idx %d" $kind $i) -}}
+      {{- end -}}
+      {{- $item := dict -}}
+      {{- range $k, $v := (omit $sl "name") -}}
+        {{- if eq $k "value" -}}
+          {{- $_ := set $item (printf "syslog.listenAddr.%s" $kind) $v -}}
+        {{- else if hasPrefix "tls" $k -}}
+          {{- $_ := set $item (printf "syslog.%s" $k) $v -}}
+        {{- else -}}
+          {{- $_ := set $item (printf "syslog.%s.%s" $k $kind) $v -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $items = append $items $item -}}
+    {{- end -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.args.positional" $items)) -}}
   {{- end -}}
   {{- toYaml $args -}}
 {{- end -}}

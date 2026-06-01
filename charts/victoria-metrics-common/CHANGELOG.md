@@ -2,7 +2,9 @@
 
 ## Next release
 
-- TODO
+- added `vm.args.positional` template: builds positional CLI arg lists from a flat list of items with boolean tracking, boolean trailing padding, and all-false key dropping.
+- added `vl.syslog.args` template moved from victoria-logs charts; uses `vm.args.positional` internally.
+- `vm.http.args` refactored to use `vm.args.positional`.
 
 ## 0.3.7
 
