@@ -2,6 +2,7 @@
 
 - fixed rendering failure when an http list entry does not have the `primary` field set.
 - fixed `syslog` args rendering: boolean `false` values (e.g. `tls: false`, `useLocalTimestamp: false`) are now correctly included; absent boolean fields are gap-filled with `false` instead of empty string.
+- bump common chart version 0.3.5 -> 0.3.7
 
 ## 0.2.2
 
