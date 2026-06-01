@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- `vm.probe` and `vm.url` now detect TLS from the primary http list item's `tls` field when `httpListenAddr` is not set in `extraArgs`; `extraArgs.tls` is used as fallback in all other cases.
+- `vm.http.args` now correctly includes boolean `false` values (e.g. `tls: false`, `mtls: false`); absent boolean fields at earlier indices are gap-filled with `false` instead of empty string.
 
 ## 0.3.5
 

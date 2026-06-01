@@ -1,0 +1,114 @@
+suite: http.args templates
+templates:
+  - http_args.yaml
+tests:
+  - it: single item produces httpListenAddr
+    set:
+      http:
+        - name: http
+          value: :8429
+          primary: true
+    asserts:
+      - equal:
+          path: args.httpListenAddr
+          value:
+            - :8429
+
+  - it: boolean false is included not skipped
+    set:
+      http:
+        - name: http
+          value: :8429
+          primary: true
+          tls: false
+          mtls: false
+    asserts:
+      - equal:
+          path: args.tls
+          value:
+            - false
+      - equal:
+          path: args.mtls
+          value:
+            - false
+
+  - it: multi-item boolean gap fill uses false not empty string
+    set:
+      http:
+        - name: http
+          value: :8429
+          primary: true
+          tls: false
+        - name: https
+          value: :8443
+          tls: true
+    asserts:
+      - equal:
+          path: args.httpListenAddr
+          value:
+            - :8429
+            - :8443
+      - equal:
+          path: args.tls
+          value:
+            - false
+            - true
+
+  - it: multi-item string gap fill uses empty string
+    set:
+      http:
+        - name: http
+          value: :8429
+          primary: true
+        - name: https
+          value: :8443
+          tlsCertFile: /path/cert.crt
+    asserts:
+      - equal:
+          path: args.httpListenAddr
+          value:
+            - :8429
+            - :8443
+      - equal:
+          path: args.tlsCertFile
+          value:
+            - ""
+            - /path/cert.crt
+
+  - it: empty string fields are omitted
+    set:
+      http:
+        - name: http
+          value: :8429
+          primary: true
+          tlsCertFile: ""
+    asserts:
+      - notExists:
+          path: args.tlsCertFile
+
+  - it: fails when no item has primary true
+    set:
+      http:
+        - name: http
+          value: :8429
+    asserts:
+      - failedTemplate:
+          errorMessage: "at least one item in `http` must have `primary: true`"
+
+  - it: fails when item has no value
+    set:
+      http:
+        - name: http
+          primary: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "`value` is not set for `http` idx 0"
+
+  - it: fails when item has no name
+    set:
+      http:
+        - value: :8429
+          primary: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "`name` is not set for `http` idx 0"
