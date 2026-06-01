@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.8
+
+**Release date:** 01 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - added `vm.args.positional` template: builds positional CLI arg lists from a flat list of items with boolean tracking, boolean trailing padding, and all-false key dropping.
 - added `vl.syslog.args` template moved from victoria-logs charts; uses `vm.args.positional` internally.
 - `vm.http.args` refactored to use `vm.args.positional`.
