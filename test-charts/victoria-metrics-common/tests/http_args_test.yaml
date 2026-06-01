@@ -50,6 +50,22 @@ tests:
             - false
             - true
 
+  - it: trailing boolean false padded when later item omits the key
+    set:
+      http:
+        - name: https
+          value: :8443
+          primary: true
+          tls: true
+        - name: http
+          value: :8429
+    asserts:
+      - equal:
+          path: args.tls
+          value:
+            - true
+            - false
+
   - it: multi-item string gap fill uses empty string
     set:
       http:
