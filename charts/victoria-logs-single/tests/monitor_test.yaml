@@ -5,6 +5,45 @@ chart:
 templates:
   - monitor.yaml
 tests:
+  - it: default port uses primary http item name
+    set:
+      server:
+        serviceMonitor:
+          enabled: true
+        http:
+          - name: https
+            value: :9428
+            primary: true
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: https
+
+  - it: serviceMonitor.port overrides primary http name
+    set:
+      server:
+        serviceMonitor:
+          enabled: true
+          port: custom
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: custom
+
+  - it: targetPort takes priority over port
+    set:
+      server:
+        serviceMonitor:
+          enabled: true
+          port: custom
+          targetPort: 9428
+    asserts:
+      - equal:
+          path: spec.endpoints[0].targetPort
+          value: 9428
+      - notExists:
+          path: spec.endpoints[0].port
+
   - it: should render tpl in serviceMonitor basicAuth
     set:
       server:

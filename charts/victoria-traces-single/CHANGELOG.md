@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- `serviceMonitor` and `vmServiceScrape` port now defaults to the primary `http` list item name; added explicit `port` field to override it without using `targetPort`.
+- fixed HTTPRoute backend `port` field being rendered on the same line as `name` due to incorrect whitespace trimming in the route template.
 
 ## 0.1.6
 

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- `serviceMonitor` port now defaults to the primary `http` list item name; added explicit `port` field to override it without using `targetPort`.
 
 ## 0.2.4
 

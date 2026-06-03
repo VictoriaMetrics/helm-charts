@@ -2,6 +2,12 @@
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
+{{- $port := "http" -}}
+{{- range $app.http -}}
+  {{- if .primary -}}
+    {{- $port = .name -}}
+  {{- end -}}
+{{- end -}}
 
 {{- if and $app.enabled $app.serviceMonitor.enabled }}
 ---
@@ -29,7 +35,7 @@ spec:
       {{- with $app.serviceMonitor.targetPort }}
       targetPort: {{ . }}
       {{- else }}
-      port: http
+      port: {{ $app.serviceMonitor.port | default $port }}
       {{- end }}
       {{- with $app.serviceMonitor.basicAuth }}
       basicAuth: {{ toYaml . | nindent 8 }}
@@ -80,7 +86,7 @@ spec:
       {{- with $app.vmServiceScrape.targetPort }}
       targetPort: {{ . }}
       {{- else }}
-      port: http
+      port: {{ $app.vmServiceScrape.port | default $port }}
       {{- end }}
       {{- with $app.vmServiceScrape.basicAuth }}
       basicAuth: {{ toYaml . | nindent 8 }}
