@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.1.7
+
+**Release date:** 03 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.9.2](https://img.shields.io/badge/v0.9.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriatraces%2Fchangelog%2F%23v092)
+
 - `serviceMonitor` and `vmServiceScrape` port now defaults to the primary `http` list item name; added explicit `port` field to override it without using `targetPort`.
 - fixed HTTPRoute backend `port` field being rendered on the same line as `name` due to incorrect whitespace trimming in the route template.
 
