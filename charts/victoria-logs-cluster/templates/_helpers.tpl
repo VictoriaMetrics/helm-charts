@@ -126,7 +126,7 @@
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9471") }}
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ .name }}
+  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
@@ -146,7 +146,7 @@
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9481") }}
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ .name }}
+  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
 {{- end }}
 {{- $syslogTCPAddr := index $extraArgs "syslog.listenAddr.tcp" -}}
 {{- $tcpPorts := ternary .syslog.tcp (list (dict "name" "syslog-tcp" "value" $syslogTCPAddr)) (empty $syslogTCPAddr) }}
@@ -182,7 +182,7 @@
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9491") }}
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ .name }}
+  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
@@ -202,7 +202,7 @@
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "8427") }}
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ .name }}
+  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
