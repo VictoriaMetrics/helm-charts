@@ -10,7 +10,7 @@
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 Write API:
 
-The Victoria Metrics write api can be accessed via port {{ .Values.vminsert.service.servicePort }} with the following DNS name from within your cluster:
+The Victoria Metrics write api can be accessed via port {{ .Values.vminsert.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (include "vm.addr.primary" .Values.vminsert.http) "default" "8480")) }} with the following DNS name from within your cluster:
 {{ include "vm.fqdn" $ctx }}
 
 Get the Victoria Metrics insert service URL by running these commands in the same shell:
@@ -23,10 +23,10 @@ Get the Victoria Metrics insert service URL by running these commands in the sam
         You can watch the status of by running 'kubectl get svc --namespace {{ $ns }} -w {{ $fullname }}'
 
   export SERVICE_IP=$(kubectl get svc --namespace {{ $ns }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-  echo http://$SERVICE_IP:{{ .Values.vminsert.service.servicePort }}
+  echo http://$SERVICE_IP:{{ .Values.vminsert.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (include "vm.addr.primary" .Values.vminsert.http) "default" "8480")) }}
 {{- else if contains "ClusterIP"  .Values.vminsert.service.type }}
   export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app.kubernetes.io/component={{ include "vm.app.name" $ctx }}" -l "app.kubernetes.io/instance={{ include "vm.release" $ctx }}" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.vminsert.service.servicePort }}
+  kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.vminsert.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (include "vm.addr.primary" .Values.vminsert.http) "default" "8480")) }}
 {{- end }}
 
 You need to update your Prometheus configuration file and add the following lines to it:
@@ -52,7 +52,7 @@ for example -  inside the Kubernetes cluster:
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 Read API:
 
-The VictoriaMetrics read api can be accessed via port {{ .Values.vmselect.service.servicePort }} with the following DNS name from within your cluster:
+The VictoriaMetrics read api can be accessed via port {{ .Values.vmselect.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (include "vm.addr.primary" .Values.vmselect.http) "default" "8481")) }} with the following DNS name from within your cluster:
 {{ include "vm.fqdn" $ctx }}
 
 Get the VictoriaMetrics select service URL by running these commands in the same shell:
@@ -65,10 +65,10 @@ Get the VictoriaMetrics select service URL by running these commands in the same
         You can watch the status of by running 'kubectl get svc --namespace {{ $ns }} -w {{ $fullname }}'
 
   export SERVICE_IP=$(kubectl get svc --namespace {{ $ns }} {{ $fullname }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-  echo http://$SERVICE_IP:{{ .Values.vmselect.service.servicePort }}
+  echo http://$SERVICE_IP:{{ .Values.vmselect.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (include "vm.addr.primary" .Values.vmselect.http) "default" "8481")) }}
 {{- else if contains "ClusterIP"  .Values.vmselect.service.type }}
   export POD_NAME=$(kubectl get pods --namespace {{ $ns }} -l "app.kubernetes.io/component={{ include "vm.app.name" $ctx }}" -l "app.kubernetes.io/instance={{ include "vm.release" $ctx }}" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.vmselect.service.servicePort }}
+  kubectl --namespace {{ $ns }} port-forward $POD_NAME {{ .Values.vmselect.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (include "vm.addr.primary" .Values.vmselect.http) "default" "8481")) }}
 {{- end }}
 
 You need to specify select service URL into your Grafana:

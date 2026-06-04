@@ -75,8 +75,11 @@ spec:
           args: {{ include "vmgateway.args" $ctx | nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" .Values.extraArgs.httpListenAddr "default" "8431") }}
+            {{- $httpAddr := (.Values.extraArgs | default dict).httpListenAddr -}}
+            {{- range ternary .Values.http (list (dict "name" "http" "value" $httpAddr)) (empty $httpAddr) }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "8431") }}
+            {{- end }}
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}

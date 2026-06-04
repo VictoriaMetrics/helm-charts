@@ -23,7 +23,11 @@
   {{- end -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.args.positional" $rwItems)) -}}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args $Values.extraArgs -}}
+  {{- $extraArgs := $Values.extraArgs | default dict }}
+  {{- $args = mergeOverwrite $args $extraArgs -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $Values.http)) -}}
+  {{- end -}}
   {{- if and (eq $Values.mode "statefulSet") $Values.statefulSet.clusterMode }}
     {{- $_ := set $args "promscrape.cluster.membersCount" $Values.replicaCount -}}
     {{- $_ := set $args "promscrape.cluster.replicationFactor" $Values.statefulSet.replicationFactor -}}

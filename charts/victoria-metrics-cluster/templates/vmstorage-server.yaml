@@ -100,8 +100,11 @@ spec:
           {{- end }}
           args: {{ include "vmstorage.args" $ctx | nindent 12 }}
           ports:
-            - name: {{ $app.ports.name | default "http" }}
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.extraArgs.httpListenAddr "default" "8482") }}
+            {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr -}}
+            {{- range ternary $app.http (list (dict "name" "http" "value" $httpAddr)) (empty $httpAddr) }}
+            - name: {{ .name }}
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "8482") }}
+            {{- end }}
             - name: vminsert
               containerPort: 8400
             - name: vmselect

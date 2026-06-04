@@ -2,6 +2,12 @@
 {{- $serviceMonitor := .Values.serviceMonitor -}}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $port := "http" -}}
+{{- range .Values.http -}}
+  {{- if .primary -}}
+    {{- $port = .name -}}
+  {{- end -}}
+{{- end -}}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -22,7 +28,12 @@ spec:
   selector:
     matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}
   endpoints:
-    - port: http
+    -
+      {{- with $serviceMonitor.targetPort }}
+      targetPort: {{ . }}
+      {{- else }}
+      port: {{ $serviceMonitor.port | default $port }}
+      {{- end }}
       {{- with $serviceMonitor.basicAuth }}
       basicAuth: {{ toYaml . | nindent 8 }}
       {{- end }}

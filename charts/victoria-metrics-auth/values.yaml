@@ -73,12 +73,17 @@ podDisruptionBudget:
   unhealthyPodEvictionPolicy:
   labels: {}
 
+# -- HTTP listen address configuration. See https://docs.victoriametrics.com/victoriametrics/#http-listen-address for details.
+http:
+  - name: http
+    value: :8427
+    primary: true
+
 # -- Extra command line arguments for container of component
 extraArgs:
   envflag.enable: true
   envflag.prefix: VM_
   loggerFormat: json
-  httpListenAddr: :8427
   # Enable IPv6 support. Useful for running in IPv6-only Kubernetes clusters
   # enableTCP6: true
 
@@ -154,7 +159,7 @@ service:
   # -- Load balancer source range
   loadBalancerSourceRanges: []
   # -- Service port
-  servicePort: 8427
+  servicePort: ""
   # nodePort: 30000
   # -- Service type
   type: ClusterIP
@@ -310,6 +315,10 @@ serviceMonitor:
   basicAuth: {}
   # -- Service Monitor metricRelabelings
   metricRelabelings: []
+  # -- Service Monitor port. Uses primary http item name by default
+  port: ""
+  # -- Service Monitor target port. Overrides port when set
+  targetPort: ""
 #    interval: 15s
 #    scrapeTimeout: 5s
   # -- Commented. HTTP scheme to use for scraping.

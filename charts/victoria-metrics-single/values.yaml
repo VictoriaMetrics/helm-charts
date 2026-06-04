@@ -93,12 +93,26 @@ server:
   fullnameOverride:
   # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention)
   retentionPeriod: 1
+  # -- HTTP listen address configuration. See https://docs.victoriametrics.com/victoriametrics/#http-listen-address for details.
+  http:
+    - name: http
+      value: :8428
+      primary: true
+      tls: false
+      tlsCertFile: ""
+      tlsKeyFile: ""
+      tlsMinVersion: ""
+      tlsAutocertHosts: ""
+      tlsAutocertEmail: ""
+      tlsAutocertCacheDir: ""
+      mtls: false
+      mtlsCAFile: ""
+
   # -- Extra command line arguments for container of component
   extraArgs:
     envflag.enable: true
     envflag.prefix: VM_
     loggerFormat: json
-    httpListenAddr: :8428
     # Enable IPv6 support. Useful for running in IPv6-only Kubernetes clusters
     # enableTCP6: true
 
@@ -402,9 +416,7 @@ server:
     # -- Load balancer source range
     loadBalancerSourceRanges: []
     # -- Service port
-    servicePort: 8428
-    # -- Target port
-    targetPort: http
+    servicePort: ""
     # -- Node port
     # nodePort: 30000
     # -- Service type
@@ -461,8 +473,10 @@ server:
     relabelings: []
     # -- Service Monitor metricRelabelings
     metricRelabelings: []
-    # -- Service Monitor target port
-    targetPort: http
+    # -- Service Monitor port. Uses primary http item name by default
+    port: ""
+    # -- Service Monitor target port. Overrides port when set
+    targetPort: ""
 
   # -- Global relabel configuration
   relabel:

@@ -156,8 +156,12 @@
   {{- end }}
   {{- $args := dict }}
   {{- include "vmalert.subargs" (dict "args" $args "datasource" $datasource "remoteWrite" $remoteWrite "remoteRead" $remoteRead "notifier" $notifiers) }}
+  {{- $extraArgs := $app.extraArgs | default dict }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args $extraArgs -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 

@@ -1,5 +1,8 @@
 ## Next release
 
+**Update note 1**: `.Values.server.extraArgs.httpListenAddr` was replaced by `.Values.server.http` list for HTTP listen address configuration. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-metrics-alert/#http-listen-address) for details.
+
+- added `.Values.server.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Has higher priority than `extraArgs`.
 - add ability to override container command.
 
 ## 0.41.0

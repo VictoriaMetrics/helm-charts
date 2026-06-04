@@ -22,8 +22,12 @@
   {{- if $app.relabel.enabled -}}
     {{- $_ := set $args "relabelConfig" "/relabelconfig/relabel.yml" -}}
   {{- end -}}
+  {{- $extraArgs := $app.extraArgs | default dict }}
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
-  {{- $args = mergeOverwrite $args $app.extraArgs -}}
+  {{- $args = mergeOverwrite $args $extraArgs -}}
+  {{- if empty $extraArgs.httpListenAddr -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+  {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
 
