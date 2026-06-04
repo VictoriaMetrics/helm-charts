@@ -61,7 +61,7 @@ spec:
       {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9428") }}
       port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
       protocol: TCP
-      targetPort: {{ .name }}
+      targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
       {{- if and .primary $service.nodePort }}
       nodePort: {{ $service.nodePort }}
       {{- end }}

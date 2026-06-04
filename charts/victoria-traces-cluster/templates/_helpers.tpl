@@ -117,7 +117,7 @@
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10471") }}
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ .name }}
+  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
@@ -137,7 +137,7 @@
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10481") }}
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ .name }}
+  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
 {{- end }}
 {{- with .extraArgs.otlpGRPCListenAddr }}
 - name: otlpgrpc-tcp
@@ -163,7 +163,7 @@
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10491") }}
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
-  targetPort: {{ .name }}
+  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
@@ -182,7 +182,7 @@
 - name: {{ .name }}
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "8427") }}
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
-  targetPort: {{ .name }}
+  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
   protocol: TCP
 {{- end }}
 {{- range $service.extraPorts }}
