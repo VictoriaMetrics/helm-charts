@@ -2,6 +2,7 @@
 
 **Update note 1**: `.Values.{vminsert,vmselect,vmstorage,vmauth}.extraArgs.httpListenAddr` was replaced by `.Values.{vminsert,vmselect,vmstorage,vmauth}.http` list for HTTP listen address configuration. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-metrics-cluster/#http-listen-address) for details.
 
+- bump version of VM components to [v1.145.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.145.0)
 - `serviceMonitor` port for each component now defaults to the primary `http` list item name; added explicit `port` field to override it without using `targetPort`.
 - fixed HTTPRoute backend `port` field being rendered on the same line as `name` due to incorrect whitespace trimming in the route template.
 
