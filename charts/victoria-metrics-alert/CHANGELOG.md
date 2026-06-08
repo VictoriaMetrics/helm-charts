@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.42.0
+
+**Release date:** 08 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.145.0](https://img.shields.io/badge/v1.145.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-alert%2Fchangelog%2F%23v11450)
+
 **Update note 1**: `.Values.server.extraArgs.httpListenAddr` was replaced by `.Values.server.http` list for HTTP listen address configuration. See [HTTP listen address](https://docs.victoriametrics.com/helm/victoria-metrics-alert/#http-listen-address) for details.
 
 - bump version of VM components to [v1.145.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.145.0)
