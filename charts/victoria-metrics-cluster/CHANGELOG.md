@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed default image tag for vmbackupmanager. See [#2978](https://github.com/VictoriaMetrics/helm-charts/issues/2978).
 
 ## 0.44.0
 
