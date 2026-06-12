@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
         with:
           path: __vm-helm-charts
+          persist-credentials: false
 
       - name: Checkout docs repo
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
@@ -36,6 +37,7 @@ jobs:
           repository: VictoriaMetrics/vmdocs
           ref: main
           token: ${{ secrets.VM_BOT_GH_TOKEN }}
+          persist-credentials: true  # required by the "Push to vmdocs" step below
           path: __vm-docs
 
       - name: Import GPG key
@@ -93,6 +95,7 @@ jobs:
         with:
           ref: gh-pages
           path: __vm-helm-charts
+          persist-credentials: true  # required by the "Synchronize docs" step below
 
       - name: Synchronize docs
         run: |
