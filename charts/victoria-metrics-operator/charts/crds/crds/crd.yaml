@@ -251,6 +251,8 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              enableServiceLinks:
+                type: boolean
               extraArgs:
                 additionalProperties:
                   type: string
@@ -492,6 +494,9 @@ spec:
                 type: object
               port:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               readinessGates:
@@ -1301,6 +1306,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -1462,6 +1469,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -1749,6 +1759,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -1774,11 +1792,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -1805,6 +1859,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -1859,6 +1914,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -2029,6 +2086,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -2238,6 +2298,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -2263,11 +2331,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -2294,6 +2398,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -2353,6 +2458,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -2879,6 +2986,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -3104,6 +3214,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -3129,11 +3247,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -3160,6 +3314,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -3402,6 +3557,8 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              enableServiceLinks:
+                type: boolean
               extraArgs:
                 additionalProperties:
                   type: string
@@ -3578,6 +3735,9 @@ spec:
                 type: object
               port:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               readinessGates:
@@ -4475,6 +4635,8 @@ spec:
                 type: string
               enableKubernetesAPISelectors:
                 type: boolean
+              enableServiceLinks:
+                type: boolean
               enforcedNamespaceLabel:
                 type: string
               externalLabelName:
@@ -5334,6 +5496,9 @@ spec:
                 x-kubernetes-map-type: atomic
               port:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               probeNamespaceSelector:
@@ -7575,6 +7740,8 @@ spec:
                             - key
                             type: object
                             x-kubernetes-map-type: atomic
+                          alert_source_token_file:
+                            type: string
                           http_config:
                             x-kubernetes-preserve-unknown-fields: true
                           max_alerts:
@@ -7584,6 +7751,8 @@ spec:
                           timeout:
                             type: string
                           url:
+                            type: string
+                          url_file:
                             type: string
                         type: object
                       type: array
@@ -10137,6 +10306,8 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              enableServiceLinks:
+                type: boolean
               enforcedNamespaceLabel:
                 type: string
               enforcedTopRouteMatchers:
@@ -10460,6 +10631,9 @@ spec:
                 type: string
               portName:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               readinessGates:
@@ -11267,6 +11441,8 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              enableServiceLinks:
+                type: boolean
               enforcedNamespaceLabel:
                 type: string
               evaluationInterval:
@@ -11686,6 +11862,9 @@ spec:
                 type: object
               port:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               readinessGates:
@@ -12449,6 +12628,8 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              enableServiceLinks:
+                type: boolean
               extraArgs:
                 additionalProperties:
                   type: string
@@ -12804,6 +12985,9 @@ spec:
                 type: object
               port:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               reader:
@@ -12873,6 +13057,8 @@ spec:
                     type: string
                   maxPointsPerQuery:
                     type: integer
+                  offset:
+                    type: string
                   queryFromLastSeenTimestamp:
                     type: boolean
                   queryRangePath:
@@ -13044,7 +13230,6 @@ spec:
                   addr:
                     type: string
                   maxConcurrentTasks:
-                    maximum: 20
                     minimum: 1
                     type: integer
                   pathPrefix:
@@ -13053,6 +13238,8 @@ spec:
                     type: string
                   uiDefaultState:
                     type: string
+                  useReaderConnectionSettings:
+                    type: boolean
                 type: object
               serviceAccountName:
                 type: string
@@ -13368,6 +13555,9 @@ spec:
                         type: object
                         x-kubernetes-map-type: atomic
                     type: object
+                  connectionRetryAttempts:
+                    minimum: 1
+                    type: integer
                   datasourceURL:
                     type: string
                   healthPath:
@@ -13925,6 +14115,8 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              enableServiceLinks:
+                type: boolean
               externalConfig:
                 properties:
                   localPath:
@@ -14639,6 +14831,9 @@ spec:
                 type: object
               port:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               readinessGates:
@@ -15233,6 +15428,14 @@ spec:
                                 pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                 x-kubernetes-int-or-string: true
                               type: object
+                            memoryAggregationIntervalCount:
+                              format: int64
+                              minimum: 1
+                              type: integer
+                            memoryAggregationIntervalSeconds:
+                              format: int32
+                              minimum: 1
+                              type: integer
                             minAllowed:
                               additionalProperties:
                                 anyOf:
@@ -15258,11 +15461,47 @@ spec:
                               - type: string
                               pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                               x-kubernetes-int-or-string: true
+                            startupBoost:
+                              properties:
+                                cpu:
+                                  properties:
+                                    durationSeconds:
+                                      format: int32
+                                      type: integer
+                                    factor:
+                                      format: int32
+                                      type: integer
+                                    quantity:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      x-kubernetes-int-or-string: true
+                                    type:
+                                      enum:
+                                      - Factor
+                                      - Quantity
+                                      type: string
+                                  required:
+                                  - type
+                                  type: object
+                                  x-kubernetes-validations:
+                                  - message: factor is required when type is Factor
+                                      and forbidden otherwise
+                                    rule: (self.type == 'Factor') == has(self.factor)
+                                  - message: quantity is required when type is Quantity
+                                      and forbidden otherwise
+                                    rule: (self.type == 'Quantity') == has(self.quantity)
+                              type: object
                           type: object
                         type: array
                     type: object
                   updatePolicy:
                     properties:
+                      evictAfterOOMSeconds:
+                        format: int32
+                        minimum: 1
+                        type: integer
                       evictionRequirements:
                         items:
                           properties:
@@ -15289,6 +15528,7 @@ spec:
                         - Initial
                         - Recreate
                         - InPlaceOrRecreate
+                        - InPlace
                         - Auto
                         type: string
                     type: object
@@ -15404,6 +15644,44 @@ spec:
                 type: string
               clusterVersion:
                 type: string
+              discovery:
+                properties:
+                  enabled:
+                    type: boolean
+                  filter:
+                    type: string
+                  interval:
+                    pattern: ^[0-9]+(s|m|h)$
+                    type: string
+                required:
+                - enabled
+                type: object
+              downsampling:
+                properties:
+                  dedupInterval:
+                    type: string
+                  rules:
+                    items:
+                      properties:
+                        filter:
+                          type: string
+                        periods:
+                          items:
+                            properties:
+                              interval:
+                                type: string
+                              offset:
+                                type: string
+                            required:
+                            - interval
+                            - offset
+                            type: object
+                          type: array
+                      required:
+                      - periods
+                      type: object
+                    type: array
+                type: object
               imagePullSecrets:
                 items:
                   properties:
@@ -15494,6 +15772,18 @@ spec:
                     type: boolean
                   disableSelfServiceScrape:
                     type: boolean
+                  discovery:
+                    properties:
+                      enabled:
+                        type: boolean
+                      filter:
+                        type: string
+                      interval:
+                        pattern: ^[0-9]+(s|m|h)$
+                        type: string
+                    required:
+                    - enabled
+                    type: object
                   dnsConfig:
                     items:
                       x-kubernetes-preserve-unknown-fields: true
@@ -15521,6 +15811,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -15693,6 +15985,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -15902,6 +16197,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -15927,11 +16230,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -15958,6 +16297,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -15993,6 +16333,18 @@ spec:
                     type: boolean
                   disableSelfServiceScrape:
                     type: boolean
+                  discovery:
+                    properties:
+                      enabled:
+                        type: boolean
+                      filter:
+                        type: string
+                      interval:
+                        pattern: ^[0-9]+(s|m|h)$
+                        type: string
+                    required:
+                    - enabled
+                    type: object
                   dnsConfig:
                     items:
                       x-kubernetes-preserve-unknown-fields: true
@@ -16020,6 +16372,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -16188,6 +16542,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -16578,6 +16935,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -16603,11 +16968,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -16634,6 +17035,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -16693,6 +17095,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -17212,6 +17616,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -17262,6 +17669,18 @@ spec:
                           x-kubernetes-int-or-string: true
                         type: object
                     type: object
+                  retentionFilters:
+                    items:
+                      properties:
+                        filter:
+                          type: string
+                        retention:
+                          type: string
+                      required:
+                      - filter
+                      - retention
+                      type: object
+                    type: array
                   revisionHistoryLimitCount:
                     format: int32
                     type: integer
@@ -17674,6 +18093,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -17699,11 +18126,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -17730,6 +18193,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -19269,6 +19733,8 @@ spec:
                         type: object
                       dnsPolicy:
                         type: string
+                      enableServiceLinks:
+                        type: boolean
                       externalConfig:
                         properties:
                           localPath:
@@ -20847,6 +21313,9 @@ spec:
                         type: object
                       port:
                         type: string
+                      preStopSleepSeconds:
+                        format: int32
+                        type: integer
                       priorityClassName:
                         type: string
                       readinessGates:
@@ -23189,6 +23658,14 @@ spec:
                                         pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                         x-kubernetes-int-or-string: true
                                       type: object
+                                    memoryAggregationIntervalCount:
+                                      format: int64
+                                      minimum: 1
+                                      type: integer
+                                    memoryAggregationIntervalSeconds:
+                                      format: int32
+                                      minimum: 1
+                                      type: integer
                                     minAllowed:
                                       additionalProperties:
                                         anyOf:
@@ -23214,11 +23691,47 @@ spec:
                                       - type: string
                                       pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                       x-kubernetes-int-or-string: true
+                                    startupBoost:
+                                      properties:
+                                        cpu:
+                                          properties:
+                                            durationSeconds:
+                                              format: int32
+                                              type: integer
+                                            factor:
+                                              format: int32
+                                              type: integer
+                                            quantity:
+                                              anyOf:
+                                              - type: integer
+                                              - type: string
+                                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                              x-kubernetes-int-or-string: true
+                                            type:
+                                              enum:
+                                              - Factor
+                                              - Quantity
+                                              type: string
+                                          required:
+                                          - type
+                                          type: object
+                                          x-kubernetes-validations:
+                                          - message: factor is required when type
+                                              is Factor and forbidden otherwise
+                                            rule: (self.type == 'Factor') == has(self.factor)
+                                          - message: quantity is required when type
+                                              is Quantity and forbidden otherwise
+                                            rule: (self.type == 'Quantity') == has(self.quantity)
+                                      type: object
                                   type: object
                                 type: array
                             type: object
                           updatePolicy:
                             properties:
+                              evictAfterOOMSeconds:
+                                format: int32
+                                minimum: 1
+                                type: integer
                               evictionRequirements:
                                 items:
                                   properties:
@@ -23245,6 +23758,7 @@ spec:
                                 - Initial
                                 - Recreate
                                 - InPlaceOrRecreate
+                                - InPlace
                                 - Auto
                                 type: string
                             type: object
@@ -24626,6 +25140,8 @@ spec:
                             type: object
                           dnsPolicy:
                             type: string
+                          enableServiceLinks:
+                            type: boolean
                           extraArgs:
                             additionalProperties:
                               type: string
@@ -26032,6 +26548,9 @@ spec:
                             type: object
                           port:
                             type: string
+                          preStopSleepSeconds:
+                            format: int32
+                            type: integer
                           priorityClassName:
                             type: string
                           readinessGates:
@@ -28890,6 +29409,8 @@ spec:
                               type: object
                             dnsPolicy:
                               type: string
+                            enableServiceLinks:
+                              type: boolean
                             extraArgs:
                               additionalProperties:
                                 type: string
@@ -30296,6 +30817,9 @@ spec:
                               type: object
                             port:
                               type: string
+                            preStopSleepSeconds:
+                              format: int32
+                              type: integer
                             priorityClassName:
                               type: string
                             readinessGates:
@@ -40317,7 +40841,35 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              downsampling:
+                properties:
+                  dedupInterval:
+                    type: string
+                  rules:
+                    items:
+                      properties:
+                        filter:
+                          type: string
+                        periods:
+                          items:
+                            properties:
+                              interval:
+                                type: string
+                              offset:
+                                type: string
+                            required:
+                            - interval
+                            - offset
+                            type: object
+                          type: array
+                      required:
+                      - periods
+                      type: object
+                    type: array
+                type: object
               enableKubernetesAPISelectors:
+                type: boolean
+              enableServiceLinks:
                 type: boolean
               enforcedNamespaceLabel:
                 type: string
@@ -40805,6 +41357,9 @@ spec:
                 x-kubernetes-map-type: atomic
               port:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               probeNamespaceSelector:
@@ -40958,6 +41513,18 @@ spec:
                       x-kubernetes-int-or-string: true
                     type: object
                 type: object
+              retentionFilters:
+                items:
+                  properties:
+                    filter:
+                      type: string
+                    retention:
+                      type: string
+                  required:
+                  - filter
+                  - retention
+                  type: object
+                type: array
               retentionPeriod:
                 pattern: ^[0-9]+(h|d|w|y)?$
                 type: string
@@ -43371,6 +43938,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -43532,6 +44101,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -43741,6 +44313,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -43766,11 +44346,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -43797,6 +44413,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -43876,6 +44493,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -44046,6 +44665,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -44255,6 +44877,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -44280,11 +44910,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -44311,6 +44977,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -44372,6 +45039,8 @@ spec:
                     type: object
                   dnsPolicy:
                     type: string
+                  enableServiceLinks:
+                    type: boolean
                   extraArgs:
                     additionalProperties:
                       type: string
@@ -44898,6 +45567,9 @@ spec:
                     type: object
                   port:
                     type: string
+                  preStopSleepSeconds:
+                    format: int32
+                    type: integer
                   priorityClassName:
                     type: string
                   readinessGates:
@@ -45123,6 +45795,14 @@ spec:
                                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                     x-kubernetes-int-or-string: true
                                   type: object
+                                memoryAggregationIntervalCount:
+                                  format: int64
+                                  minimum: 1
+                                  type: integer
+                                memoryAggregationIntervalSeconds:
+                                  format: int32
+                                  minimum: 1
+                                  type: integer
                                 minAllowed:
                                   additionalProperties:
                                     anyOf:
@@ -45148,11 +45828,47 @@ spec:
                                   - type: string
                                   pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                   x-kubernetes-int-or-string: true
+                                startupBoost:
+                                  properties:
+                                    cpu:
+                                      properties:
+                                        durationSeconds:
+                                          format: int32
+                                          type: integer
+                                        factor:
+                                          format: int32
+                                          type: integer
+                                        quantity:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        type:
+                                          enum:
+                                          - Factor
+                                          - Quantity
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: factor is required when type is Factor
+                                          and forbidden otherwise
+                                        rule: (self.type == 'Factor') == has(self.factor)
+                                      - message: quantity is required when type is
+                                          Quantity and forbidden otherwise
+                                        rule: (self.type == 'Quantity') == has(self.quantity)
+                                  type: object
                               type: object
                             type: array
                         type: object
                       updatePolicy:
                         properties:
+                          evictAfterOOMSeconds:
+                            format: int32
+                            minimum: 1
+                            type: integer
                           evictionRequirements:
                             items:
                               properties:
@@ -45179,6 +45895,7 @@ spec:
                             - Initial
                             - Recreate
                             - InPlaceOrRecreate
+                            - InPlace
                             - Auto
                             type: string
                         type: object
@@ -45327,6 +46044,8 @@ spec:
                 type: object
               dnsPolicy:
                 type: string
+              enableServiceLinks:
+                type: boolean
               extraArgs:
                 additionalProperties:
                   type: string
@@ -45481,6 +46200,9 @@ spec:
                 type: object
               port:
                 type: string
+              preStopSleepSeconds:
+                format: int32
+                type: integer
               priorityClassName:
                 type: string
               readinessGates:
