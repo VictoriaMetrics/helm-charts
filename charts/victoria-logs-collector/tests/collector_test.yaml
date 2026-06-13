@@ -36,3 +36,71 @@ tests:
           path: spec.template.spec.containers[0].args
           content: "--remoteWrite.url=http://RELEASE-NAME-vlogs:9428/insert/native"
         template: server.yaml
+
+  - it: single fileCollector entry produces correct args
+    set:
+      remoteWrite:
+        - url: http://victoria-logs:9428
+      fileCollector:
+        - glob: /var/log/app/*.log
+          extraFields: '{"app":"myapp"}'
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.glob=/var/log/app/*.log'
+        template: server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.extraFields={"app":"myapp"}'
+        template: server.yaml
+
+  - it: multiple fileCollector entries produce repeated positional args
+    set:
+      remoteWrite:
+        - url: http://victoria-logs:9428
+      fileCollector:
+        - glob: /var/log/app/*.log
+          extraFields: '{"app":"myapp"}'
+        - glob: /var/log/nginx/*.log
+          extraFields: '{"app":"nginx"}'
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.glob=/var/log/app/*.log'
+        template: server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.glob=/var/log/nginx/*.log'
+        template: server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.extraFields={"app":"myapp"}'
+        template: server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.extraFields={"app":"nginx"}'
+        template: server.yaml
+
+  - it: fileCollector gap-fills excludeGlob when only some entries have it
+    set:
+      remoteWrite:
+        - url: http://victoria-logs:9428
+      fileCollector:
+        - glob: /var/log/*/*.log
+          excludeGlob: /var/log/nginx/*
+          extraFields: '{"app":"other"}'
+        - glob: /var/log/nginx/*.log
+          extraFields: '{"app":"nginx"}'
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.excludeGlob=/var/log/nginx/*'
+        template: server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.glob=/var/log/*/*.log'
+        template: server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: '--fileCollector.glob=/var/log/nginx/*.log'
+        template: server.yaml
