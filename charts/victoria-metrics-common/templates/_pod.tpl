@@ -63,8 +63,9 @@ Render probe
   {{- $probeType := "" -}}
   {{- $defaultProbe := dict -}}
   {{- if ne (dig "httpGet" $null $probe) $null -}}
-    {{- if $isSecure -}}
-      {{- /* TLS: use tcpSocket instead of httpGet */ -}}
+    {{- $httpGetConfig := dig "httpGet" (dict) $probe -}}
+    {{- if and $isSecure (empty $httpGetConfig) -}}
+      {{- /* TLS with default (empty) httpGet: use tcpSocket instead */ -}}
       {{- $defaultProbe = dict "port" $port -}}
       {{- $probeType = "tcpSocket" -}}
     {{- else -}}
@@ -80,7 +81,7 @@ Render probe
   {{- $defaultProbe = ternary (dict) (dict $probeType $defaultProbe) (empty $probeType) -}}
   {{- $probe = mergeOverwrite $defaultProbe $probe -}}
   {{- range $key, $value := $probe -}}
-    {{- if and (has (kindOf $value) (list "object" "map")) (ne $key $probeType) -}}
+    {{- if and (ne $key $probeType) (has (kindOf $value) (list "invalid" "object" "map")) -}}
       {{- $_ := unset $probe $key -}}
     {{- end -}}
   {{- end -}}

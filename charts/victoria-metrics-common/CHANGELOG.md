@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- `vm.probe`: fix TLS probe misconfiguration — when a TLS primary listener was configured and the probe used an explicit `httpGet` (e.g. `scheme: HTTPS`), the probe was silently replaced with `tcpSocket: null`, causing Kubernetes to reject the resource. An explicit `httpGet` is now always preserved; only an empty `httpGet: {}` triggers the automatic fallback to `tcpSocket`.
 
 ## 0.3.8
 

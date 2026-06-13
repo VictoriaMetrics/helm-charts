@@ -125,6 +125,53 @@ tests:
             tcpSocket:
               port: http
 
+  - it: httpGet probe with explicit scheme HTTPS is kept on TLS primary listener
+    set:
+      app:
+        http:
+          - name: health
+            value: :9428
+            primary: true
+            tls: true
+        probe:
+          readiness:
+            httpGet:
+              path: /health
+              scheme: HTTPS
+              port: health
+    asserts:
+      - equal:
+          path: probe.readiness
+          value:
+            httpGet:
+              path: /health
+              scheme: HTTPS
+              port: health
+
+  - it: tcpSocket null with explicit httpGet HTTPS is kept on TLS primary listener
+    set:
+      app:
+        http:
+          - name: health
+            value: :9428
+            primary: true
+            tls: true
+        probe:
+          readiness:
+            tcpSocket: null
+            httpGet:
+              path: /health
+              scheme: HTTPS
+              port: health
+    asserts:
+      - equal:
+          path: probe.readiness
+          value:
+            httpGet:
+              path: /health
+              scheme: HTTPS
+              port: health
+
   - it: tcpSocket probe passes through unchanged
     set:
       app:
