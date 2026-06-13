@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.9
+
+**Release date:** 13 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - `vm.probe`: fix TLS probe misconfiguration — when a TLS primary listener was configured and the probe used an explicit `httpGet` (e.g. `scheme: HTTPS`), the probe was silently replaced with `tcpSocket: null`, causing Kubernetes to reject the resource. An explicit `httpGet` is now always preserved; only an empty `httpGet: {}` triggers the automatic fallback to `tcpSocket`.
 
 ## 0.3.8
