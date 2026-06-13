@@ -1,6 +1,7 @@
 ## Next release
 
 - fixed default image tag for vmbackupmanager. See [#2978](https://github.com/VictoriaMetrics/helm-charts/issues/2978).
+- bump common chart version 0.3.8 -> 0.3.9
 
 ## 0.44.0
 

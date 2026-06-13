@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump common chart version 0.3.8 -> 0.3.9
 
 ## 0.32.0
 
