@@ -78,33 +78,33 @@
 {{- define "vmalert.subargs" }}
   {{- $args := .args }}
   {{- range $k, $vs := (omit . "args") }}
+    {{- $items := list }}
     {{- range $i, $v := $vs }}
-      {{- with $v }}
-        {{- if not .url -}}
-          {{- fail (printf "`url` is not set for `%s` idx %d" $k $i) -}}
-        {{- end -}}
-        {{- range $vKey, $vValue := . -}}
+      {{- $prefixed := dict }}
+      {{- if $v }}
+        {{- if not $v.url }}
+          {{- fail (printf "`url` is not set for `%s` idx %d" $k $i) }}
+        {{- end }}
+        {{- range $vKey, $vValue := $v }}
           {{- if $vValue }}
-            {{- $key := printf "%s.%s" $k $vKey -}}
-            {{- $param := index $args $key | default list -}}
-            {{- range until (int (sub $i (len $param))) }}
-              {{- $param = append $param "" }}
-            {{- end }}
+            {{- $serialized := $vValue }}
             {{- if kindIs "map" $vValue }}
               {{- $values := list }}
               {{- range $mk, $mvs := $vValue }}
                 {{- $mv := ternary (join "," $mvs | quote) $mvs (kindIs "slice" $mvs) }}
                 {{- $values = append $values (printf "%s:%s" $mk $mv) }}
               {{- end }}
-              {{- $param = append $param (join "^^" $values | squote) }}
-            {{- else -}}
-              {{- $param = append $param $vValue }}
+              {{- $serialized = join "^^" $values | squote }}
             {{- end }}
-            {{- $_ := set $args $key $param -}}
+            {{- $_ := set $prefixed (printf "%s.%s" $k $vKey) $serialized }}
           {{- end }}
-        {{- end -}}
-      {{- end -}}
-    {{- end -}}
+        {{- end }}
+      {{- end }}
+      {{- $items = append $items $prefixed }}
+    {{- end }}
+    {{- range $rk, $rv := (fromYaml (include "vm.args.positional" $items)) }}
+      {{- $_ := set $args $rk $rv }}
+    {{- end }}
   {{- end }}
 {{- end }}
 

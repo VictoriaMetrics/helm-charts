@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `fileCollector` list to support multiple file-based log collection configurations (glob patterns paired with extra fields). Each list entry maps to a set of positional `-fileCollector.*` flags, enabling configurations that were previously impossible with the `extraArgs` dict. See [#2990](https://github.com/VictoriaMetrics/helm-charts/issues/2990).
 
 ## 0.3.4
 

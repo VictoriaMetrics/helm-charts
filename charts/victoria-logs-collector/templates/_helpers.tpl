@@ -82,8 +82,7 @@
     {{- end }}
   {{- end }}
 
-  {{- $requiredParams := list "url" }}
-
+  {{- $rwItems := list }}
   {{- range $i, $oldRw := $Values.remoteWrite }}
     {{- $rw := fromYaml (tpl (toYaml (deepCopy $oldRw)) $) }}
     {{- $_ := set $ "rw" $rw }}
@@ -93,37 +92,40 @@
     {{- $_ := unset $rw "extraFields" }}
     {{- $_ := unset $rw "ignoreFields" }}
     {{- $rw = mergeOverwrite $rw (fromYaml (include "victoria-logs-collector.tls" $)) }}
-    {{- $_ := unset $rw "tls"}}
-
-    {{- range $rwKey, $rwValue := $rw }}
-      {{- if has $rwKey $requiredParams }}
-        {{- if empty $rw }}
-          {{- fail (printf "remoteWrite[%d].%s parameter is not set" $i $rwKey) }}
-        {{- end }}
-      {{- end }}
-
-      {{- $key := printf "remoteWrite.%s" $rwKey }}
-      {{- $param := index $args $key | default list}}
-      {{- range until (int (sub $i (len $param))) }}
-        {{- $param = append $param "" }}
-      {{- end }}
-      {{- $value := $rwValue }}
-      {{- if eq $rwKey "url" }}
-        {{- $url := urlParse $rwValue }}
-        {{- $isEmptyPath := empty (trimPrefix "/" $url.path) }}
-        {{- $isNativeFormat := or (empty $rw.format) (eq $rw.format "native") }}
-        {{- $_ = set $url "path" (ternary "/insert/native" $url.path (and $isEmptyPath $isNativeFormat)) }}
-        {{- $value = urlJoin $url }}
-      {{- else if eq $rwKey "headers" }}
-        {{- $headers := list }}
-        {{- range $hk, $hv := $rwValue }}
-          {{- $headers = append $headers (printf "%s:%s" $hk $hv) }}
-        {{- end }}
-        {{- $value = quote (join "^^" $headers) }}
-      {{- end }}
-      {{- $param = append $param $value }}
-      {{- $_ := set $args $key $param }}
+    {{- $_ := unset $rw "tls" }}
+    {{- if empty $rw.url }}
+      {{- fail (printf "remoteWrite[%d].url parameter is not set" $i) }}
     {{- end }}
+    {{- $url := urlParse $rw.url }}
+    {{- $isEmptyPath := empty (trimPrefix "/" $url.path) }}
+    {{- $isNativeFormat := or (empty $rw.format) (eq $rw.format "native") }}
+    {{- $_ := set $url "path" (ternary "/insert/native" $url.path (and $isEmptyPath $isNativeFormat)) }}
+    {{- $_ := set $rw "url" (urlJoin $url) }}
+    {{- $headers := list }}
+    {{- range $hk, $hv := $rw.headers }}
+      {{- $headers = append $headers (printf "%s:%s" $hk $hv) }}
+    {{- end }}
+    {{- $_ := set $rw "headers" (quote (join "^^" $headers)) }}
+    {{- $prefixed := dict }}
+    {{- range $k, $v := $rw }}
+      {{- $_ := set $prefixed (printf "remoteWrite.%s" $k) $v }}
+    {{- end }}
+    {{- $rwItems = append $rwItems $prefixed }}
   {{- end }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.args.positional" $rwItems)) }}
+
+  {{- $fcItems := list }}
+  {{- range $i, $fc := ($Values.fileCollector | default list) }}
+    {{- if empty $fc.glob }}
+      {{- fail (printf "fileCollector[%d].glob parameter is not set" $i) }}
+    {{- end }}
+    {{- $prefixed := dict }}
+    {{- range $k, $v := $fc }}
+      {{- $_ := set $prefixed (printf "fileCollector.%s" $k) $v }}
+    {{- end }}
+    {{- $fcItems = append $fcItems $prefixed }}
+  {{- end }}
+  {{- $args = mergeOverwrite $args (fromYaml (include "vm.args.positional" $fcItems)) }}
+
   {{- toYaml (mergeOverwrite $args $Values.extraArgs) -}}
 {{- end }}

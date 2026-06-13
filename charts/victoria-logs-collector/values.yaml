@@ -227,6 +227,17 @@ podMonitor:
   # -- Metric relabeling rules
   metricRelabelings: []
 
+# -- List of file-based log collection configurations.
+# Each entry maps directly to a set of positional `-fileCollector.*` flags, preserving
+# the order needed for multiple glob patterns to pair correctly with their extra fields.
+# See https://docs.victoriametrics.com/victorialogs/vlagent/#multiple-glob-patterns-and-ordering
+fileCollector: []
+  # - glob: /var/log/*/*.log
+  #   excludeGlob: /var/log/nginx/*
+  #   extraFields: '{"app":"other"}'
+  # - glob: /var/log/nginx/*.log
+  #   extraFields: '{"app":"nginx"}'
+
 # -- vlagent extra command line arguments.
 extraArgs:
   envflag.enable: true
