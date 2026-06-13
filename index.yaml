@@ -36578,6 +36578,43 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '`vm.probe`: fix TLS probe misconfiguration — when a TLS primary listener was configured and the probe used an explicit `httpGet` (e.g. `scheme: HTTPS`), the probe was silently replaced with `tcpSocket: null`, causing Kubernetes to reject the resource. An explicit `httpGet` is now always preserved; only an empty `httpGet: {}` triggers the automatic fallback to `tcpSocket`.'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Common Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/changelog/).
+    apiVersion: v2
+    created: "2026-06-13T04:56:13.476055329Z"
+    description: VictoriaMetrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: e3d36ae035a998b33637871ff9a1f872737a4c8e352d16e7953389ed14c4af1d
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.3.9/victoria-metrics-common-0.3.9.tgz
+    version: 0.3.9
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - 'added `vm.args.positional` template: builds positional CLI arg lists from a flat list of items with boolean tracking, boolean trailing padding, and all-false key dropping.'
         - added `vl.syslog.args` template moved from victoria-logs charts; uses `vm.args.positional` internally.
         - '`vm.http.args` refactored to use `vm.args.positional`.'
@@ -78044,4 +78081,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-06-12T13:51:32.445081337Z"
+generated: "2026-06-13T04:56:13.626065662Z"
