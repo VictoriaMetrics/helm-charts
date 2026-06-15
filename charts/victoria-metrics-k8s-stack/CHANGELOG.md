@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump operator dependency chart to version 0.65.0
 
 ## 0.83.0
 
