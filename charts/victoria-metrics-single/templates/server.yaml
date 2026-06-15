@@ -65,8 +65,8 @@ spec:
         {{- $_ := set $ctx "appKey" (list "server" "vmbackupmanager") }}
         image: {{ include "vm.image" $ctx }}
         imagePullPolicy: {{ $app.image.pullPolicy }}
-        {{- with $app.podSecurityContext }}
-        securityContext:  {{ toYaml . | nindent 10 }}
+        {{- if $app.securityContext.enabled }}
+        securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" .) | nindent 10 }}
         {{- end }}
         args: {{ include "vmbackupmanager.restore.args" $ctx | nindent 12 }}
         {{- with $manager.resources }}
@@ -84,13 +84,16 @@ spec:
         - name: manager-http
           containerPort: 8300
         volumeMounts:
-        - name: vmstorage-volume
+        - name: server-volume
           mountPath: {{ $pvc.mountPath }}
           subPath: {{ $pvc.subPath }}
         {{- range $manager.extraSecretMounts }}
         - name: {{ .name }}
           mountPath: {{ .mountPath }}
           subPath: {{ .subPath }}
+        {{- end }}
+        {{- with $manager.extraVolumeMounts }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- end }}
       {{- end }}
