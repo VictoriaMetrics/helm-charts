@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `dnsPolicy` option; when `hostNetwork` is enabled in daemonSet mode and `dnsPolicy` is not set, it defaults to `ClusterFirstWithHostNet`. See [#2994](https://github.com/VictoriaMetrics/helm-charts/issues/2994)
 
 ## 0.41.1
 
