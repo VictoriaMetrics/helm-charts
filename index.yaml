@@ -10800,6 +10800,56 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - add `dnsPolicy` option; when `hostNetwork` is enabled in daemonSet mode and `dnsPolicy` is not set, it defaults to `ClusterFirstWithHostNet`. See [#2994](https://github.com/VictoriaMetrics/helm-charts/issues/2994)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-agent
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victoriametrics/vmagent/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-metrics-agent/changelog/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Agent Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-agent/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-agent/changelog/).
+    apiVersion: v2
+    appVersion: v1.145.0
+    created: "2026-06-15T18:48:59.638854738Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    description: VictoriaMetrics Agent - collects metrics from various sources and
+      stores them to VictoriaMetrics
+    digest: 10af539454e3572fda0445ec79b2a7d7f9185be9c222fc39a39eee7c7cfcaa05
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmagent
+    - agent
+    - collector
+    - monitoring
+    - kubernetes
+    - observability
+    - metrics
+    - timeseries
+    - servicediscovery
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-agent
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-agent-0.41.2/victoria-metrics-agent-0.41.2.tgz
+    version: 0.41.2
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - bump common chart version 0.3.8 -> 0.3.9
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -63811,6 +63861,60 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - add `dnsPolicy` option; when `hostNetwork` is enabled and `dnsPolicy` is not set, it defaults to `ClusterFirstWithHostNet`. See [#2994](https://github.com/VictoriaMetrics/helm-charts/issues/2994)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/operator/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-metrics-operator/changelog/
+      artifacthub.io/operator: "true"
+      artifacthub.io/readme: |
+        # VictoriaMetrics Operator Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-operator/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-operator/changelog/).
+    apiVersion: v2
+    appVersion: v0.72.0
+    created: "2026-06-15T18:49:00.106761387Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    - condition: crds.plain
+      name: crds
+      repository: ""
+      version: 0.0.*
+    description: VictoriaMetrics Operator
+    digest: 4d87b2b6f5f1be7cc48602eb6ce8b209e20871cc0aa8fb072d60e6300c210057
+    home: https://github.com/VictoriaMetrics/operator
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-operator
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    - https://github.com/VictoriaMetrics/operator
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-operator-0.65.1/victoria-metrics-operator-0.65.1.tgz
+    version: 0.65.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - updates operator to [v0.72.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.72.0) version
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -78875,4 +78979,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-06-15T16:03:36.531976276Z"
+generated: "2026-06-15T18:49:00.10978411Z"
