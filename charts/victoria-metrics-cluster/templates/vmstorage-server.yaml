@@ -76,6 +76,9 @@ spec:
               mountPath: {{ .mountPath }}
               subPath: {{ .subPath }}
             {{- end }}
+            {{- with $app.vmbackupmanager.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
         {{- end }}
         {{- end }}
       {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
@@ -219,6 +222,9 @@ spec:
               {{- with .readOnly }}
               readOnly: {{ . }}
               {{- end }}
+            {{- end }}
+            {{- with $app.vmbackupmanager.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
             {{- include "vm.license.mount" . | nindent 12 }}
         {{- end }}
