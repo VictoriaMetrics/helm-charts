@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `nodePort` support for `Service` resources
 
 ## 0.44.1
 

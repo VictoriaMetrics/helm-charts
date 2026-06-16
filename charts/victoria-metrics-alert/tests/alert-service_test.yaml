@@ -1,0 +1,23 @@
+suite: alert service templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - alert-service.yaml
+tests:
+  - it: alert service should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: should render nodePort for alert service
+    set:
+      server:
+        service:
+          type: NodePort
+          nodePort: 30880
+    asserts:
+      - equal:
+          path: spec.type
+          value: NodePort
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30880

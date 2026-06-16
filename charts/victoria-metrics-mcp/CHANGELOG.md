@@ -1,6 +1,7 @@
 ## Next release
 
 - add ability to override container command.
+- add `nodePort` support for `Service` resources
 
 ## 0.3.0
 
