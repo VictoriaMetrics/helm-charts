@@ -47,6 +47,9 @@ spec:
       port: {{ $service.servicePort }}
       targetPort: http
       protocol: TCP
+      {{- if $service.nodePort }}
+      nodePort: {{ $service.nodePort }}
+      {{- end }}
     - name: webhook
       port: {{ $service.webhookPort }}
       targetPort: webhook

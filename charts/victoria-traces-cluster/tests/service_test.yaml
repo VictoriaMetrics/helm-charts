@@ -52,3 +52,33 @@ tests:
             extraServiceLabelName: storageExtraServiceLabelValue
     asserts:
       - matchSnapshot: {}
+  - it: should render nodePort for vtselect service
+    set:
+      vtselect:
+        service:
+          type: NodePort
+          nodePort: 30471
+    asserts:
+      - equal:
+          path: spec.type
+          value: NodePort
+        documentIndex: 1
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30471
+        documentIndex: 1
+  - it: should render nodePort for vtinsert service
+    set:
+      vtinsert:
+        service:
+          type: NodePort
+          nodePort: 30481
+    asserts:
+      - equal:
+          path: spec.type
+          value: NodePort
+        documentIndex: 0
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30481
+        documentIndex: 0

@@ -1,0 +1,22 @@
+suite: service templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - service.yaml
+tests:
+  - it: service should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: should render nodePort for service
+    set:
+      service:
+        type: NodePort
+        nodePort: 30808
+    asserts:
+      - equal:
+          path: spec.type
+          value: NodePort
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30808

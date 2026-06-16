@@ -44,6 +44,9 @@
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
   targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- if and (.primary | default false) $service.nodePort }}
+  nodePort: {{ $service.nodePort }}
+  {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
@@ -64,6 +67,9 @@
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
   targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- if and (.primary | default false) $service.nodePort }}
+  nodePort: {{ $service.nodePort }}
+  {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}

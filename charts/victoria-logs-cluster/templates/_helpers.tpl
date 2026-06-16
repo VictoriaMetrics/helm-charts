@@ -127,6 +127,9 @@
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
   targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- if and (.primary | default false) $service.nodePort }}
+  nodePort: {{ $service.nodePort }}
+  {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
@@ -147,6 +150,9 @@
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
   targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- if and (.primary | default false) $service.nodePort }}
+  nodePort: {{ $service.nodePort }}
+  {{- end }}
 {{- end }}
 {{- $syslogTCPAddr := index $extraArgs "syslog.listenAddr.tcp" -}}
 {{- $tcpPorts := ternary .syslog.tcp (list (dict "name" "syslog-tcp" "value" $syslogTCPAddr)) (empty $syslogTCPAddr) }}
@@ -183,6 +189,9 @@
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
   targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- if and (.primary | default false) $service.nodePort }}
+  nodePort: {{ $service.nodePort }}
+  {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}
@@ -203,6 +212,9 @@
   port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
   protocol: TCP
   targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- if and (.primary | default false) $service.nodePort }}
+  nodePort: {{ $service.nodePort }}
+  {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
 - name: {{ .name }}

@@ -1,0 +1,27 @@
+suite: alertmanager service templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - alertmanager-service.yaml
+tests:
+  - it: alertmanager service should match snapshot
+    set:
+      alertmanager:
+        enabled: true
+    asserts:
+      - matchSnapshot: {}
+  - it: should render nodePort for alertmanager service
+    set:
+      alertmanager:
+        enabled: true
+        service:
+          type: NodePort
+          nodePort: 30093
+    asserts:
+      - equal:
+          path: spec.type
+          value: NodePort
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 30093

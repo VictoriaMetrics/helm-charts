@@ -3,6 +3,7 @@
 **Update node 1**: due to change in label name pods will be restarted.
 
 - added `app.kubernetes.io/component` with value from custom `app` label. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
+- add `nodePort` support for `Service` resources
 
 ## 0.1.0
 
