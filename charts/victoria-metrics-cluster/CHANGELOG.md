@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added extraVolumeMounts to vmbackupmanager sidecar container and vmbackupmanager init restore container
 
 ## 0.44.1
 
