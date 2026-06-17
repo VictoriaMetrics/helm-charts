@@ -42,41 +42,139 @@ victoria-metrics-operator:
     disable_prometheus_converter: false
 
 defaultDashboards:
-  # -- Enable custom dashboards installation
+  # -- Enable dashboard sync via sync-job
   enabled: true
-  defaultTimezone: utc
+  # -- Additional labels for dashboard resources (ConfigMaps or GrafanaDashboard CRDs)
   labels: {}
+  # -- Additional annotations for dashboard resources
   annotations: {}
   grafanaOperator:
-    # -- Create dashboards as CRDs (requires grafana-operator to be installed)
+    # -- Create GrafanaDashboard CRDs instead of ConfigMaps (requires grafana-operator)
     enabled: false
     spec:
       instanceSelector:
         matchLabels:
           dashboards: grafana
       allowCrossNamespaceImport: false
-  # -- Create dashboards as ConfigMap despite dependency it requires is not installed
+  # -- Per-dashboard configuration. Keys match dashboard names from JSON content.
+  # Set enabled: false to skip a dashboard. Set clusterMetric to patch the cluster variable query.
   dashboards:
+    victoriametrics-single-node:
+      clusterMetric: vm_app_version
+    victoriametrics-vmagent:
+      clusterMetric: vm_app_version
+    victoriametrics-cluster:
+      clusterMetric: vm_app_version
     victoriametrics-vmalert:
       enabled: true
+      clusterMetric: vm_app_version
     victoriametrics-operator:
       enabled: true
-    # -- In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply
-    # See [this issue](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards)
+      clusterMetric: vm_app_version
     node-exporter-full:
       enabled: true
+      clusterMetric: node_uname_info
+    alertmanager-overview:
+      enabled: '{{ .Values.alertmanager.enabled }}'
+    grafana-overview:
+      enabled: '{{ .Values.grafana.enabled }}'
+    controller-manager:
+      enabled: '{{ .Values.kubeControllerManager.enabled }}'
+    kubelet:
+      enabled: '{{ .Values.kubelet.enabled }}'
+    proxy:
+      enabled: '{{ .Values.kubeProxy.enabled }}'
+    scheduler:
+      enabled: '{{ .Values.kubeScheduler.enabled }}'
+  # -- Dashboard sources. Set enabled: false on any entry to disable it. Add new keys to extend.
+  sources:
+    victoriametrics-single-node:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json
+      enabled: '{{ .Values.vmsingle.enabled }}'
+    victoriametrics-vmagent:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json
+      enabled: '{{ .Values.vmagent.enabled }}'
+    victoriametrics-cluster:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics-cluster.json
+      enabled: '{{ .Values.vmcluster.enabled }}'
+    victoriametrics-vmalert:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json
+      enabled: '{{ .Values.vmalert.enabled }}'
+    victoriametrics-operator:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/operator.json
+      enabled: '{{ index .Values "victoria-metrics-operator" "enabled" }}'
+    victoriametrics-backupmanager:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/backupmanager.json
+      enabled: '{{ or (not (empty (dig "spec" "vmBackup" "destination" "" .Values.vmsingle))) (not (empty (dig "spec" "storage" "vmBackup" "destination" "" .Values.vmcluster))) }}'
+    kubernetes-views-global:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
+    kubernetes-views-namespaces:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
+    kubernetes-views-pods:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
+    kubernetes-views-nodes:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
+    kubernetes-system-api-server:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json
+      enabled: '{{ .Values.kubeApiServer.enabled }}'
+    kubernetes-system-coredns:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json
+      enabled: '{{ .Values.coreDns.enabled }}'
+    node-exporter-full:
+      url: https://raw.githubusercontent.com/rfmoz/grafana-dashboards/master/prometheus/node-exporter-full.json
+      enabled: '{{ index .Values "prometheus-node-exporter" "enabled" }}'
+    etcd:
+      url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/etcd/dashboards/etcd.json
+      enabled: '{{ .Values.kubeEtcd.enabled }}'
+    kube-prometheus:
+      url: https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml
+
+syncJob:
+  # -- Fetch dashboards and rules from upstream sources at deploy time.
+  # Creates ConfigMaps (for Grafana sidecar) or GrafanaDashboard CRDs and VMRules directly in the cluster.
+  # A new Job runs automatically whenever this config changes.
+  enabled: true
+  image:
+    repository: ghcr.io/victoriametrics/sync-job
+    tag: latest
+    pullPolicy: IfNotPresent
+  # -- Seconds to keep a finished job before automatic deletion
+  ttlSecondsAfterFinished: 600
+  # -- Delete managed resources that are no longer in the current config
+  prune: true
+  # -- Prefix for managed resource names (VMRules, ConfigMaps, GrafanaDashboards).
+  # Defaults to the Helm release name when empty.
+  resourcePrefix: ""
+  # -- Override multicluster mode for dashboard and rule patching.
+  # Falls back to grafana.sidecar.dashboards.multicluster when not set.
+  # multicluster: false
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  # -- Maximum number of retries before the Job is considered failed
+  backoffLimit: 3
+  # -- Annotations to add to the sync-job Pod
+  podAnnotations: {}
+  # -- Security context for the sync-job Pod
+  podSecurityContext: {}
+  # -- Security context for the sync-job container
+  containerSecurityContext: {}
+  # -- Affinity for sync-job Pod scheduling
+  affinity: {}
 
 # -- Create default rules for monitoring the cluster
 defaultRules:
   # -- Labels, which are used for grouping results of the queries. Note that these labels are joined with `.Values.global.clusterLabel`
   extraGroupByLabels: []
   enabled: true
+  # -- Inject namespace=~"<value>" filter into metric selectors for metrics scraped by the given job.
+  # Merged with per-group jobNamespaces (per-group wins on conflict).
+  # Only use for jobs whose metrics are always namespace-scoped.
+  jobNamespaces: {}
 
   # -- Common properties for VMRule groups
   group:
-    spec:
-      # -- Optional HTTP URL parameters added to each rule request
-      params: {}
+    spec: {}
 
   # -- Common properties for all VMRules
   rule:
@@ -105,12 +203,12 @@ defaultRules:
   # -- Per rule properties
   rules: {}
     # CPUThrottlingHigh:
-    #   enabled: true
+    #   enabled: false
     #   spec:
     #     for: 15m
     #     labels:
     #       severity: critical
-  # -- Rule group properties
+  # -- Rule group properties. Keys must match upstream group names exactly.
   groups:
     etcd:
       # -- Enable/disable rule group
@@ -132,83 +230,85 @@ defaultRules:
       # spec:
       #   annotations:
       #     dashboard: https://example.com/dashboard/1
-    general:
+    alertmanager.rules:
       rules: {}
-    k8sContainerCpuLimits:
+    general.rules:
       rules: {}
-    k8sContainerCpuRequests:
+    k8s.rules.container_cpu_limits:
       rules: {}
-    k8sContainerCpuUsageSecondsTotal:
+    k8s.rules.container_cpu_requests:
       rules: {}
-    k8sContainerMemoryLimits:
+    k8s.rules.container_cpu_usage_seconds_total:
       rules: {}
-    k8sContainerMemoryRequests:
+    k8s.rules.container_memory_limits:
       rules: {}
-    k8sContainerMemoryRss:
+    k8s.rules.container_memory_requests:
       rules: {}
-    k8sContainerMemoryCache:
+    k8s.rules.container_memory_rss:
       rules: {}
-    k8sContainerMemoryWorkingSetBytes:
+    k8s.rules.container_memory_cache:
       rules: {}
-    k8sContainerMemorySwap:
+    k8s.rules.container_memory_working_set_bytes:
       rules: {}
-    k8sPodOwner:
+    k8s.rules.container_memory_swap:
       rules: {}
-    k8sContainerResource:
+    k8s.rules.pod_owner:
       rules: {}
-    kubeApiserver:
+    kube-apiserver-burnrate.rules:
       rules: {}
-    kubeApiserverAvailability:
+    kube-apiserver-histogram.rules:
       rules: {}
-    kubeApiserverBurnrate:
+    kube-apiserver-slos:
       rules: {}
-    kubeApiserverHistogram:
+    kube-prometheus-general.rules:
       rules: {}
-    kubeApiserverSlos:
+    kube-prometheus-node-recording.rules:
       rules: {}
-    kubelet:
+    kube-scheduler.rules:
       rules: {}
-    kubePrometheusGeneral:
+    kube-state-metrics:
       rules: {}
-    kubePrometheusNodeRecording:
+    kubelet.rules:
       rules: {}
-    kubernetesApps:
+    kubernetes-apps:
       rules: {}
-      targetNamespace: ".*"
-    kubernetesResources:
+      jobNamespaces:
+        kube-state-metrics: ".*"
+    kubernetes-resources:
       rules: {}
-    kubernetesStorage:
+    kubernetes-storage:
       rules: {}
-      targetNamespace: ".*"
-    kubernetesSystem:
+      jobNamespaces:
+        kubelet: ".*"
+    kubernetes-system:
       rules: {}
-    kubernetesSystemKubelet:
+    kubernetes-system-apiserver:
       rules: {}
-    kubernetesSystemApiserver:
+    kubernetes-system-controller-manager:
       rules: {}
-    kubernetesSystemControllerManager:
+    kubernetes-system-kubelet:
       rules: {}
-    kubeScheduler:
+    kubernetes-system-scheduler:
       rules: {}
-    kubernetesSystemScheduler:
+    node-exporter:
       rules: {}
-    kubeStateMetrics:
+    node-exporter.rules:
       rules: {}
-    nodeNetwork:
+    node-network:
       rules: {}
-    node:
+    node.rules:
+      rules: {}
+    vm-health:
       rules: {}
     vmagent:
       rules: {}
-    vmsingle:
+    vmalert:
       rules: {}
     vmcluster:
       rules: {}
-    vmHealth:
-      rules: {}
     vmoperator:
       rules: {}
-    alertmanager:
+    vmsingle:
       rules: {}
 
   # -- Runbook url prefix for default rules
@@ -218,6 +318,43 @@ defaultRules:
   labels: {}
   # -- Annotations for default rules
   annotations: {}
+
+  # -- Rule sources. Set enabled: false on any entry to disable it. Add new keys to extend.
+  sources:
+    etcd:
+      url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/etcd/alerts.yaml
+      enabled: '{{ .Values.kubeEtcd.enabled }}'
+    alertmanager:
+      url: https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/alertmanager-prometheusRule.yaml
+      enabled: '{{ .Values.alertmanager.enabled }}'
+    kubernetes-control-plane:
+      url: https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml
+    kubernetes:
+      url: https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubePrometheus-prometheusRule.yaml
+    kube-state-metrics:
+      url: https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubeStateMetrics-prometheusRule.yaml
+      enabled: '{{ index .Values "kube-state-metrics" "enabled" }}'
+    node-exporter:
+      url: https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/nodeExporter-prometheusRule.yaml
+      enabled: '{{ index .Values "prometheus-node-exporter" "enabled" }}'
+    vmhealth:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-health.yml
+      enabled: '{{ or .Values.vmsingle.enabled .Values.vmcluster.enabled }}'
+    vmagent:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-vmagent.yml
+      enabled: '{{ .Values.vmagent.enabled }}'
+    vmalert:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-vmalert.yml
+      enabled: '{{ .Values.vmalert.enabled }}'
+    vmsingle:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-single-node.yml
+      enabled: '{{ .Values.vmsingle.enabled }}'
+    vmcluster:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/deployment/docker/rules/alerts-cluster.yml
+      enabled: '{{ .Values.vmcluster.enabled }}'
+    vmoperator:
+      url: https://raw.githubusercontent.com/VictoriaMetrics/operator/master/config/alerting/vmoperator-rules.yaml
+      enabled: '{{ index .Values "victoria-metrics-operator" "enabled" }}'
 
 # -- Provide custom recording or alerting rules to be deployed into the cluster.
 extraRules: {}

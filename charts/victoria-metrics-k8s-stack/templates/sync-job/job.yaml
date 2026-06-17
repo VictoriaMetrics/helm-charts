@@ -1,0 +1,68 @@
+{{- if .Values.syncJob.enabled }}
+{{- $ctx := dict "helm" . "appKey" "syncJob" }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- $job := .Values.syncJob }}
+
+{{- $configHash := include (print $.Template.BasePath "/sync-job/config.yaml") . | sha256sum | trunc 8 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $fullname }}-sync-job-{{ $configHash }}
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec:
+  ttlSecondsAfterFinished: {{ $job.ttlSecondsAfterFinished }}
+  backoffLimit: {{ $job.backoffLimit }}
+  template:
+    metadata:
+      labels: {{ include "vm.labels" $ctx | nindent 8 }}
+      {{- with $job.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ $fullname }}-sync-job
+      restartPolicy: OnFailure
+      {{- with $job.podSecurityContext }}
+      securityContext: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: sync-job
+          image: "{{ $job.image.repository }}:{{ $job.image.tag }}"
+          imagePullPolicy: {{ $job.image.pullPolicy }}
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: RELEASE
+              value: {{ include "vm.release" $ctx | quote }}
+            - name: RESOURCE_PREFIX
+              value: {{ $job.resourcePrefix | default (include "vm.fullname" $ctx) | quote }}
+            - name: PRUNE
+              value: {{ $job.prune | quote }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+          {{- with $job.containerSecurityContext }}
+          securityContext: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $job.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $fullname }}-sync-job-config
+      {{- with $job.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $job.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $job.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

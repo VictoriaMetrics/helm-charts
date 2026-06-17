@@ -1,0 +1,153 @@
+{{- if .Values.syncJob.enabled }}
+{{- $ctx := dict "helm" . "appKey" "syncJob" }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+{{- $Values := .Values }}
+
+{{- $datasource := "prometheus" -}}
+{{- range $Values.defaultDatasources.victoriametrics.datasources | default list -}}
+  {{- if and .isDefault .type -}}{{- $datasource = .type -}}{{- end -}}
+{{- end -}}
+
+{{- $dashboards := dict -}}
+{{- $dashSources := list -}}
+{{- if $Values.defaultDashboards.enabled -}}
+  {{- range $key, $val := ($Values.defaultDashboards.dashboards | default dict) -}}
+    {{- $dc := dict -}}
+    {{- $enabledRaw := index $val "enabled" -}}
+    {{- if kindIs "string" $enabledRaw -}}
+      {{- $enabledRaw = eq (tpl $enabledRaw $) "true" -}}
+    {{- end -}}
+    {{- if eq $enabledRaw false -}}
+      {{- $dc = merge $dc (dict "enabled" false) -}}
+    {{- end -}}
+    {{- with index $val "clusterMetric" -}}
+      {{- $dc = merge $dc (dict "clusterMetric" .) -}}
+    {{- end -}}
+    {{- if $dc -}}
+      {{- $dashboards = set $dashboards $key $dc -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range $key := (keys $Values.defaultDashboards.sources | sortAlpha) -}}
+    {{- $src := merge (dict) (index $Values.defaultDashboards.sources $key) -}}
+    {{- if kindIs "string" (index $src "enabled") -}}
+      {{- $_ := set $src "enabled" (eq (tpl (index $src "enabled") $) "true") -}}
+    {{- end -}}
+    {{- $dashSources = append $dashSources $src -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $multicluster := $Values.grafana.sidecar.dashboards.multicluster -}}
+{{- if hasKey $Values.syncJob "multicluster" -}}{{- $multicluster = $Values.syncJob.multicluster -}}{{- end -}}
+{{- $ruleSources := list -}}
+{{- $commonRules := dict -}}
+{{- $groups := dict -}}
+{{- if or $Values.defaultRules.enabled $Values.defaultRules.create -}}
+  {{- range $key := (keys $Values.defaultRules.sources | sortAlpha) -}}
+    {{- $src := merge (dict) (index $Values.defaultRules.sources $key) -}}
+    {{- if kindIs "string" (index $src "enabled") -}}
+      {{- $_ := set $src "enabled" (eq (tpl (index $src "enabled") $) "true") -}}
+    {{- end -}}
+    {{- $ruleSources = append $ruleSources $src -}}
+  {{- end -}}
+  {{- range $ruleName, $ruleVal := ($Values.defaultRules.rules | default dict) -}}
+    {{- if or (eq (index $ruleVal "enabled") false) (eq (index $ruleVal "create") false) -}}
+      {{- $commonRules = set $commonRules $ruleName (dict "enabled" false) -}}
+    {{- else -}}
+      {{- $commonRules = set $commonRules $ruleName $ruleVal -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range $groupName, $groupVal := ($Values.defaultRules.groups | default dict) -}}
+    {{- $gc := dict -}}
+    {{- if or (eq (index $groupVal "enabled") false) (eq (index $groupVal "create") false) -}}
+      {{- $gc = set $gc "enabled" false -}}
+    {{- end -}}
+    {{- range $k := list "spec" "jobNamespaces" "rule" "alerting" "recording" -}}
+      {{- with index $groupVal $k -}}{{- $gc = set $gc $k . -}}{{- end -}}
+    {{- end -}}
+    {{- if hasKey $groupVal "extraGroupByLabels" -}}
+      {{- $gc = set $gc "extraGroupByLabels" (index $groupVal "extraGroupByLabels") -}}
+    {{- else if hasKey $groupVal "additionalGroupByLabels" -}}
+      {{- $gc = set $gc "extraGroupByLabels" (index $groupVal "additionalGroupByLabels") -}}
+    {{- end -}}
+    {{- $gr := dict -}}
+    {{- range $rn, $rv := (index $groupVal "rules" | default dict) -}}
+      {{- if or (eq (index $rv "enabled") false) (eq (index $rv "create") false) -}}
+        {{- $gr = set $gr $rn (dict "enabled" false) -}}
+      {{- else -}}
+        {{- $gr = set $gr $rn $rv -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if $gr -}}{{- $gc = set $gc "rules" $gr -}}{{- end -}}
+    {{- if $gc -}}{{- $groups = set $groups $groupName $gc -}}{{- end -}}
+  {{- end -}}
+{{- end -}}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullname }}-sync-job-config
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+data:
+  config.yaml: |
+    common:
+      clusterLabel: {{ $Values.global.clusterLabel | quote }}
+      multicluster: {{ $multicluster }}
+    dashboards:
+      common:
+        grafana:
+          labelName: {{ $Values.grafana.sidecar.dashboards.label | quote }}
+          labelValue: {{ $Values.grafana.sidecar.dashboards.labelValue | quote }}
+          datasource: {{ $datasource | quote }}
+          {{- if $Values.defaultDashboards.grafanaOperator.enabled }}
+          operator:
+            spec: {{ toYaml $Values.defaultDashboards.grafanaOperator.spec | nindent 14 }}
+          {{- end }}
+        {{- with $Values.defaultDashboards.labels }}
+        labels: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $Values.defaultDashboards.annotations }}
+        annotations: {{ toYaml . | nindent 10 }}
+        {{- end }}
+      {{- if $dashboards }}
+      dashboards: {{ toYaml $dashboards | nindent 8 }}
+      {{- end }}
+      sources: {{ toYaml $dashSources | nindent 8 }}
+    rules:
+      common:
+        runbookUrl: {{ $Values.defaultRules.runbookUrl | quote }}
+        grafanaUrl: {{ include "vm-k8s-stack.grafana.addr" . | quote }}
+        {{- with ($Values.defaultRules.extraGroupByLabels | default $Values.defaultRules.additionalGroupByLabels) }}
+        extraGroupByLabels: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $Values.defaultRules.group }}
+        group: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $Values.defaultRules.rule }}
+        rule: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $Values.defaultRules.alerting }}
+        alerting: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $Values.defaultRules.recording }}
+        recording: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $Values.defaultRules.labels }}
+        labels: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $Values.defaultRules.annotations }}
+        annotations: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $Values.defaultRules.jobNamespaces }}
+        jobNamespaces: {{ toYaml . | nindent 10 }}
+        {{- end }}
+      {{- if $commonRules }}
+      rules: {{ toYaml $commonRules | nindent 8 }}
+      {{- end }}
+      {{- if $groups }}
+      groups: {{ toYaml $groups | nindent 8 }}
+      {{- end }}
+      sources: {{ toYaml $ruleSources | nindent 8 }}
+{{- end }}
