@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	pollingInterval     = 5 * time.Second
+	pollingInterval     = 2 * time.Second
 	pollingTimeout      = 10 * time.Minute
 	resourceWaitTimeout = 1 * time.Minute
 )
@@ -90,13 +90,13 @@ func chartInstall(t *testing.T, name string, values map[string]string) *chartPar
 	}
 
 	o := &helm.Options{
-		BuildDependencies: true,
+		BuildDependencies: false,
 		KubectlOptions:    k8sOpts,
 		ExtraArgs: map[string][]string{
 			"upgrade": {"--create-namespace", "--wait"},
 		},
 		EnvVars: map[string]string{
-			"HELM_CACHE_HOME": filepath.Join(workdir, ".cache", namespaceName),
+			"HELM_CACHE_HOME": filepath.Join(workdir, ".cache"),
 		},
 		SetValues: values,
 	}

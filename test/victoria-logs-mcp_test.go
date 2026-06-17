@@ -10,6 +10,7 @@ import (
 
 // TestVictoriaLogsMCPInstallDefault tests that the victoria-logs-mcp chart can be installed with default values.
 func TestVictoriaLogsMCPInstallDefault(t *testing.T) {
+	t.Parallel()
 	name := "victoria-logs-mcp"
 	cp := chartInstall(t, name, map[string]string{
 		"vl.entrypoint": "http://example.com",
