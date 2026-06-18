@@ -1,6 +1,7 @@
 ## Next release
 
 - add `nodePort` support for `Service` resources
+- bump version of VictoriaTraces components to [v0.9.3](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.9.3)
 
 ## 0.2.7
 
