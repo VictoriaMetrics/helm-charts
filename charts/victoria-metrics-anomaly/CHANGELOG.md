@@ -2,6 +2,7 @@
 
 - fix VMPodMonitor relabelling configuration rendering. See [#2917](https://github.com/VictoriaMetrics/helm-charts/issues/2917).
 - add ability to override container command.
+- hard code container port name to http and port number to 8490 to match helm chart service definition.
 
 ## 1.12.12
 
