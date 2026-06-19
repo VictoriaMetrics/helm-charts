@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.10
+
+**Release date:** 19 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - extend `vm.managed.fullname` to preserve the `vt` prefix for VictoriaTraces components, consistent with existing `vm` and `vl` prefix handling
 
 ## 0.3.9
