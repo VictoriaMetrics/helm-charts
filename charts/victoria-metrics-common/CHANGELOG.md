@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- extend `vm.managed.fullname` to preserve the `vt` prefix for VictoriaTraces components, consistent with existing `vm` and `vl` prefix handling
 
 ## 0.3.9
 

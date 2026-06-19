@@ -85,7 +85,7 @@ If release name contains chart name it will be used as a full name.
     {{- $fullname = include "vm.fullname" . -}}
   {{- end -}}
   {{- with include "vm.internal.key.default" . -}}
-    {{- $prefix := ternary . (printf "vm%s" .) (or (hasPrefix "vm" .) (hasPrefix "vl" .)) -}}
+    {{- $prefix := ternary . (printf "vm%s" .) (or (hasPrefix "vm" .) (hasPrefix "vl" .) (hasPrefix "vt" .)) -}}
     {{- $fullname = printf "%s-%s" $prefix $fullname -}}
   {{- end -}}
   {{- $fullname = tpl $fullname . -}}
