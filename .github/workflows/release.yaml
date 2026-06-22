@@ -79,10 +79,36 @@ jobs:
                 # Release notes file
                 BADGES='![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)'
                 if [ "$APP_VERSION" != "null" ]; then
-                  export APP_VERSION_HASH="$(echo $APP_VERSION | tr -d '.' | cut -f1 -d '-')"
+                  export APP_VERSION_HASH="$(echo $APP_VERSION | tr -d '.')"
                   export APP_LABEL=$(echo $APP_VERSION | sed 's/-/--/g')
-                  export APP_CHANGELOG=$(yq '.annotations["artifacthub.io/links"] | from_yaml | .[] | select(.name == "Changelog").url + "#" + env(APP_VERSION_HASH)| @uri' $CHART_FILE)
-                  BADGES+=' ![AppVersion: '$APP_VERSION'](https://img.shields.io/badge/'$APP_LABEL'-success?logo=VictoriaMetrics&labelColor=gray&link='$APP_CHANGELOG')'
+                  APP_CHANGELOG_URL=""
+                  case "$CHART_DIR" in
+                    charts/victoria-logs-mcp|charts/victoria-metrics-mcp)
+                      ;;
+                    charts/victoria-logs-*)
+                      APP_CHANGELOG_URL="https://docs.victoriametrics.com/victorialogs/changelog/"
+                      ;;
+                    charts/victoria-traces-*)
+                      APP_CHANGELOG_URL="https://docs.victoriametrics.com/victoriatraces/changelog/"
+                      ;;
+                    charts/victoria-metrics-anomaly)
+                      APP_CHANGELOG_URL="https://docs.victoriametrics.com/anomaly-detection/changelog/"
+                      ;;
+                    charts/victoria-metrics-operator|charts/victoria-metrics-operator-crds)
+                      APP_CHANGELOG_URL="https://docs.victoriametrics.com/operator/changelog/"
+                      ;;
+                    charts/victoria-metrics-*)
+                      APP_CHANGELOG_URL="https://docs.victoriametrics.com/victoriametrics/changelog/"
+                      ;;
+                  esac
+
+                  if [ -n "$APP_CHANGELOG_URL" ]; then
+                    export APP_CHANGELOG_URL
+                    export APP_CHANGELOG=$(yq -n 'env(APP_CHANGELOG_URL) + "#" + env(APP_VERSION_HASH) | @uri')
+                    BADGES+=' ![AppVersion: '$APP_VERSION'](https://img.shields.io/badge/'$APP_LABEL'-success?logo=VictoriaMetrics&labelColor=gray&link='$APP_CHANGELOG')'
+                  else
+                    BADGES+=' ![AppVersion: '$APP_VERSION'](https://img.shields.io/badge/'$APP_LABEL'-success?logo=VictoriaMetrics&labelColor=gray)'
+                  fi
                 fi
 
                 export BADGES

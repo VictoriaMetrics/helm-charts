@@ -6,7 +6,7 @@
 
 **Release date:** 15 Jun 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.72.0](https://img.shields.io/badge/v0.72.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0720)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.72.0](https://img.shields.io/badge/v0.72.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0720)
 
 - add `dnsPolicy` option; when `hostNetwork` is enabled and `dnsPolicy` is not set, it defaults to `ClusterFirstWithHostNet`. See [#2994](https://github.com/VictoriaMetrics/helm-charts/issues/2994)
 
@@ -14,7 +14,7 @@
 
 **Release date:** 15 Jun 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.72.0](https://img.shields.io/badge/v0.72.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0720)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.72.0](https://img.shields.io/badge/v0.72.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0720)
 
 - updates operator to [v0.72.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.72.0) version
 
@@ -22,7 +22,7 @@
 
 **Release date:** 12 Jun 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.71.0](https://img.shields.io/badge/v0.71.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0710)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.71.0](https://img.shields.io/badge/v0.71.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0710)
 
 - add ability to override container command.
 - updates operator to [v0.71.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.71.0) version
@@ -64,7 +64,7 @@
 
 **Release date:** 20 Apr 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0684)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.68.4)
 
 - fixed selector for scrape objects. See [#2827](https://github.com/VictoriaMetrics/helm-charts/issues/2827).
 
@@ -72,7 +72,7 @@
 
 **Release date:** 16 Apr 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0684)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.68.4)
 
 - revert change in Deployment's matchLabels, that was introduced in release 0.60.0
 
@@ -80,7 +80,7 @@
 
 **Release date:** 14 Apr 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0684)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.68.4)
 
 **Known issue:** this release contains changes in Deployment matchLabels, which requires Deployment recreation. Skip this release to avoid disruption.
 
@@ -93,7 +93,7 @@
 
 **Release date:** 12 Apr 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0684)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.68.4)
 
 - added helm post-install and post-upgrade hooks for validatingwebhookconfiguration
 
@@ -101,7 +101,7 @@
 
 **Release date:** 09 Apr 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0684)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.4](https://img.shields.io/badge/v0.68.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.68.4)
 
 - added ability to configure operator deployment strategy. See [#2778](https://github.com/VictoriaMetrics/helm-charts/issues/2778).
 - updates operator to [v0.68.4](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.4) version
@@ -110,7 +110,7 @@
 
 **Release date:** 16 Mar 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.3](https://img.shields.io/badge/v0.68.3-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0683)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.3](https://img.shields.io/badge/v0.68.3-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.68.3)
 
 - support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
 - updates operator to [v0.68.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.3) version
@@ -119,7 +119,7 @@
 
 **Release date:** 05 Mar 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.2](https://img.shields.io/badge/v0.68.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0682)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.68.2](https://img.shields.io/badge/v0.68.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.68.2)
 
 - updates operator to [v0.68.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.2) version
 
@@ -572,7 +572,7 @@ This change could be reverted by providing env variable `VM_USECUSTOMCONFIGRELOA
 
 **Release date:** 19 Dec 2024
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.51.1](https://img.shields.io/badge/v0.51.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0511)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.51.1](https://img.shields.io/badge/v0.51.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.51.1)
 
 - Compact CRD template. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1888).
 - Exclude markdown files from package
@@ -581,7 +581,7 @@ This change could be reverted by providing env variable `VM_USECUSTOMCONFIGRELOA
 
 **Release date:** 19 Dec 2024
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.51.1](https://img.shields.io/badge/v0.51.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0511)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.51.1](https://img.shields.io/badge/v0.51.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.51.1)
 
 - updated common dependency 0.0.34 -> 0.0.35
 - updates operator to [v0.51.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.51.1) version
@@ -853,7 +853,7 @@ This change could be reverted by providing env variable `VM_USECUSTOMCONFIGRELOA
 
 **Release date:** 2024-07-04
 
-![AppVersion: v0.46.2](https://img.shields.io/badge/v0.46.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0462)
+![AppVersion: v0.46.2](https://img.shields.io/badge/v0.46.2-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fgithub.com%2FVictoriaMetrics%2Foperator%2Freleases%2Ftag%2Fv0.46.2)
 ![Helm: v3.14](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
 
 - breaking change: operator uses different entrypoint, remove `command` entrypoint
