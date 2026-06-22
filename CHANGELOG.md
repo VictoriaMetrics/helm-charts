@@ -82,5 +82,4 @@ See changelog for `victoria-metrics-operator-crds` helm chart
 See changelog for `victoria-metrics-single` helm chart
 
 * [In documentation](https://docs.victoriametrics.com/helm/victoria-metrics-single/changelog/)
-* [In repository](https://github.com/VictoriaMetrics/helm-charts/blob/master/chartsvictoria-metrics-single/CHANGELOG.md)
-
+* [In repository](https://github.com/VictoriaMetrics/helm-charts/blob/master/charts/victoria-metrics-single/CHANGELOG.md)
