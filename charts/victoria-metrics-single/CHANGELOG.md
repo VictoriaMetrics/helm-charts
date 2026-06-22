@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.146.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.146.0)
 - fixed security context issue with vmbackupmanager init recovery container
 - fixed incorrect mount name for persistent storage volume in vmbackupmanager init recovery container
 - added extraVolumeMounts to vmbackupmanager init recovery container

@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.146.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.146.0)
 - added extraVolumeMounts to vmbackupmanager sidecar container and vmbackupmanager init restore container
 
 ## 0.44.2
