@@ -57,8 +57,10 @@ spec:
           image: {{ include "vm.image" $ctx }}
           workingDir: {{ .Values.containerWorkingDir }}
           ports:
-            - containerPort: 8490
+            {{- with ((.Values.config).server).port | default 8490  }}
+            - containerPort: {{ . }}
               name: http
+            {{- end }}
           {{- with .Values.command }}
           command: {{ toYaml . | nindent 12 }}
           {{- end }}
