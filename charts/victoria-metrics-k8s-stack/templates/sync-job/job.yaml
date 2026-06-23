@@ -3,15 +3,16 @@
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $job := .Values.syncJob }}
-
-{{- $configHash := include (print $.Template.BasePath "/sync-job/config.yaml") . | sha256sum | trunc 8 }}
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ $fullname }}-sync-job-{{ $configHash }}
+  name: {{ $fullname }}-sync-job
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   ttlSecondsAfterFinished: {{ $job.ttlSecondsAfterFinished }}
   backoffLimit: {{ $job.backoffLimit }}
