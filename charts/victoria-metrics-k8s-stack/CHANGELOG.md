@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+-  sync-job Docker image is now multi-platform: `linux/amd64` and `linux/arm64`. See [#3018](https://github.com/VictoriaMetrics/helm-charts/issues/3018).
 
 ## 0.85.0
 
