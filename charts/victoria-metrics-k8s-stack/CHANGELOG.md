@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- use explicit semver tag for sync job
 
 ## 0.85.0
 
