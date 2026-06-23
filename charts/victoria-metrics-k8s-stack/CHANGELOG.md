@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix `syncJob.multicluster: false` having no effect on injected dashboards — cluster variable was left as a query type with multi-value selection enabled. See [#3024](https://github.com/VictoriaMetrics/helm-charts/issues/3024)
 
 ## 0.85.1
 

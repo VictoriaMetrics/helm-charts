@@ -318,18 +318,22 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 			if t.Label == "cluster" {
 				t.Label = cl
 			}
+			t.Multi = &boolOrStr{IsBool: true, BoolVal: common.Multicluster}
+			t.IncludeAll = &boolOrStr{IsBool: true, BoolVal: common.Multicluster}
 			if common.Multicluster {
 				t.Type = "query"
 				t.Hide = intOrStr{IsInt: true, IntVal: 0}
+				if t.Query != nil {
+					t.Query.StrVal = patchDashExpr(t.Query.StrVal, t.Name, cl)
+					if t.Definition != "" {
+						t.Definition = t.Query.StrVal
+					}
+				}
 			} else {
 				t.Type = "constant"
 				t.Hide = intOrStr{IsInt: true, IntVal: 2}
-			}
-			if t.Type == "query" && t.Query != nil {
-				t.Query.StrVal = patchDashExpr(t.Query.StrVal, t.Name, cl)
-				if t.Definition != "" {
-					t.Definition = t.Query.StrVal
-				}
+				t.Query = &strOrMap{StrVal: ".*"}
+				t.Definition = ".*"
 			}
 		} else if t.Type == "query" && t.Query != nil {
 			t.Query.StrVal = patchDashExpr(t.Query.StrVal, t.Name, cl)

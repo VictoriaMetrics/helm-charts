@@ -271,6 +271,67 @@ items:
 	})
 }
 
+func TestPatchDashboardClusterVariable(t *testing.T) {
+	existingClusterVar := dashVariable{
+		Name:       "cluster",
+		Type:       "query",
+		Query:      &strOrMap{StrVal: `label_values(up{job="kubelet"}, cluster)`},
+		Definition: `label_values(up{job="kubelet"}, cluster)`,
+		Multi:      &boolOrStr{IsBool: true, BoolVal: true},
+		IncludeAll: &boolOrStr{IsBool: true, BoolVal: true},
+		Hide:       intOrStr{IsInt: true, IntVal: 0},
+	}
+	patch := func(multicluster bool, vars ...dashVariable) *dashVariable {
+		t.Helper()
+		common := commonConfig{ClusterLabel: "cluster", Multicluster: multicluster}
+		d := &dashboard{Templating: dashTemplating{List: vars}}
+		patchDashboard(d, "test", "", common, grafanaConfig{Datasource: "prometheus"})
+		for i := range d.Templating.List {
+			if d.Templating.List[i].Name == "cluster" {
+				return &d.Templating.List[i]
+			}
+		}
+		t.Fatal("cluster variable not found")
+		return nil
+	}
+
+	// multicluster:false — existing query-type var becomes constant with query=".*", multi=false, includeAll=false
+	v := patch(false, existingClusterVar)
+	if v.Type != "constant" {
+		t.Fatalf("Type: got %q, want constant", v.Type)
+	}
+	if v.Query == nil || v.Query.StrVal != ".*" {
+		t.Fatalf("Query: got %v, want \".*\"", v.Query)
+	}
+	if v.Definition != ".*" {
+		t.Fatalf("Definition: got %q, want \".*\"", v.Definition)
+	}
+	if v.Multi == nil || v.Multi.BoolVal {
+		t.Fatalf("Multi: got %v, want false", v.Multi)
+	}
+	if v.IncludeAll == nil || v.IncludeAll.BoolVal {
+		t.Fatalf("IncludeAll: got %v, want false", v.IncludeAll)
+	}
+	if !v.Hide.IsInt || v.Hide.IntVal != 2 {
+		t.Fatalf("Hide: got %+v, want 2", v.Hide)
+	}
+
+	// multicluster:true — existing var keeps query type, multi=true, includeAll=true
+	v = patch(true, existingClusterVar)
+	if v.Type != "query" {
+		t.Fatalf("Type: got %q, want query", v.Type)
+	}
+	if v.Multi == nil || !v.Multi.BoolVal {
+		t.Fatalf("Multi: got %v, want true", v.Multi)
+	}
+	if v.IncludeAll == nil || !v.IncludeAll.BoolVal {
+		t.Fatalf("IncludeAll: got %v, want true", v.IncludeAll)
+	}
+	if !v.Hide.IsInt || v.Hide.IntVal != 0 {
+		t.Fatalf("Hide: got %+v, want 0", v.Hide)
+	}
+}
+
 func dashboardKeys(m map[string]*dashboard) []string {
 	keys := make([]string, 0, len(m))
 	for k := range m {
