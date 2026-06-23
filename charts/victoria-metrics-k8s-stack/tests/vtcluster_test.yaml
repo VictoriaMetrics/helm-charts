@@ -1,0 +1,117 @@
+suite: vtcluster tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vtcluster/vtcluster.yaml
+tests:
+  - it: renders VTCluster CR when enabled
+    set:
+      vtcluster:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VTCluster
+      - isAPIVersion:
+          of: operator.victoriametrics.com/v1
+
+  - it: does not render when disabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both vtsingle and vtcluster are enabled
+    set:
+      vtsingle:
+        enabled: true
+      vtcluster:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .vtsingle.enabled and .vtcluster.enabled can be true"
+
+  - it: CR name is derived from release name
+    set:
+      vtcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: clusterVersion defaults to the pinned VictoriaTraces version in values
+    set:
+      vtcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.clusterVersion
+          value: v0.9.3
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v0.9.3
+
+  - it: custom clusterVersion in values overrides the pinned default
+    set:
+      vtcluster:
+        enabled: true
+        spec:
+          clusterVersion: v0.99.0
+    asserts:
+      - equal:
+          path: spec.clusterVersion
+          value: v0.99.0
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v0.99.0
+
+  - it: vtselect is removed from spec when disabled
+    set:
+      vtcluster:
+        enabled: true
+        spec:
+          vtselect:
+            enabled: false
+    asserts:
+      - isNull:
+          path: spec.select
+
+  - it: vtinsert is removed from spec when disabled
+    set:
+      vtcluster:
+        enabled: true
+        spec:
+          vtinsert:
+            enabled: false
+    asserts:
+      - isNull:
+          path: spec.insert
+
+  - it: vtselect port is passed through to spec
+    set:
+      vtcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.select.port
+          value: "10471"
+
+  - it: vtinsert port is passed through to spec
+    set:
+      vtcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.insert.port
+          value: "10481"
+
+  - it: vtstorage port is passed through to spec
+    set:
+      vtcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.storage.port
+          value: "10491"

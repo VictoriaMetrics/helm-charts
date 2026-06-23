@@ -1,0 +1,82 @@
+suite: grafana datasource tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - grafana/datasource.yaml
+tests:
+  - it: VL datasource is absent when no VL backend configured
+    set:
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - notMatchRegex:
+          path: data["datasource.yaml"]
+          pattern: 'victoriametrics-logs-datasource'
+
+  - it: VL datasource has correct URL when vlsingle enabled
+    set:
+      alertmanager:
+        enabled: false
+      vlsingle:
+        enabled: true
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - matchRegex:
+          path: data["datasource.yaml"]
+          pattern: 'vlsingle-RELEASE-NAME-victoria-metrics-k8s-stack\.NAMESPACE\.svc\.cluster\.local\.:9428'
+
+  - it: VM datasource has correct URL when vmsingle enabled
+    set:
+      vmsingle:
+        enabled: true
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - matchRegex:
+          path: data["datasource.yaml"]
+          pattern: 'vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack\.NAMESPACE\.svc\.cluster\.local\.:8428'
+
+  - it: VM datasource is absent when no VM backend configured
+    set:
+      vmsingle:
+        enabled: false
+      vmalert:
+        enabled: false
+      alertmanager:
+        enabled: false
+    asserts:
+      - notMatchRegex:
+          path: data["datasource.yaml"]
+          pattern: 'victoriametrics-metrics-datasource'
+
+  - it: both VM and VL datasources present when both backends enabled
+    set:
+      vmsingle:
+        enabled: true
+      alertmanager:
+        enabled: false
+      vlsingle:
+        enabled: true
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - matchRegex:
+          path: data["datasource.yaml"]
+          pattern: 'vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack'
+      - matchRegex:
+          path: data["datasource.yaml"]
+          pattern: 'vlsingle-RELEASE-NAME-victoria-metrics-k8s-stack'

@@ -1,0 +1,101 @@
+suite: vlcluster tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vlcluster/vlcluster.yaml
+tests:
+  - it: renders VLCluster CR when enabled
+    set:
+      vlcluster:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VLCluster
+      - isAPIVersion:
+          of: operator.victoriametrics.com/v1
+
+  - it: does not render when disabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both vlsingle and vlcluster are enabled
+    set:
+      vlsingle:
+        enabled: true
+      vlcluster:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .vlsingle.enabled and .vlcluster.enabled can be true"
+
+  - it: CR name is derived from release name
+    set:
+      vlcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: clusterVersion defaults to the pinned VictoriaLogs version in values
+    set:
+      vlcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.clusterVersion
+          value: v1.51.0
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.51.0
+
+  - it: custom clusterVersion in values overrides the pinned default
+    set:
+      vlcluster:
+        enabled: true
+        spec:
+          clusterVersion: v1.99.0
+    asserts:
+      - equal:
+          path: spec.clusterVersion
+          value: v1.99.0
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.99.0
+
+  - it: vlselect is removed from spec when disabled
+    set:
+      vlcluster:
+        enabled: true
+        spec:
+          vlselect:
+            enabled: false
+    asserts:
+      - isNull:
+          path: spec.vlselect
+
+  - it: vlinsert is removed from spec when disabled
+    set:
+      vlcluster:
+        enabled: true
+        spec:
+          vlinsert:
+            enabled: false
+    asserts:
+      - isNull:
+          path: spec.vlinsert
+
+  - it: vmalert proxyURL is injected into vlselect extraArgs
+    set:
+      vlcluster:
+        enabled: true
+      alertmanager:
+        enabled: false
+    asserts:
+      - equal:
+          path: spec.vlselect.extraArgs["vmalert.proxyURL"]
+          value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8080

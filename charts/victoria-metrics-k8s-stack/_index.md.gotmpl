@@ -25,13 +25,15 @@ tags:
 * [Uninstall](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#how-to-uninstall)
 * [Version Upgrade](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#upgrade-guide)
 * [Troubleshooting](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#troubleshooting)
+* [Logs storage and collection](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#logs-storage-and-collection)
+* [Traces storage](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#traces-storage)
 * [Values](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/#parameters)
 
 ## Overview
 
-This chart is an All-in-one solution to start monitoring kubernetes cluster.
+This chart is an All-in-one solution to start monitoring and logging in a Kubernetes cluster.
 It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
-Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/resources/vmsingle/), [VMCluster](https://docs.victoriametrics.com/operator/resources/vmcluster/), [VMAgent](https://docs.victoriametrics.com/operator/resources/vmagent/), [VMAlert](https://docs.victoriametrics.com/operator/resources/vmalert/).
+Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/resources/vmsingle/), [VMCluster](https://docs.victoriametrics.com/operator/resources/vmcluster/), [VMAgent](https://docs.victoriametrics.com/operator/resources/vmagent/), [VMAlert](https://docs.victoriametrics.com/operator/resources/vmalert/) for metrics, optionally [VLSingle](https://docs.victoriametrics.com/operator/resources/vlsingle/), [VLCluster](https://docs.victoriametrics.com/operator/resources/vlcluster/), [VLAgent](https://docs.victoriametrics.com/operator/resources/vlagent/) for logs, and [VTSingle](https://docs.victoriametrics.com/operator/resources/vtsingle/), [VTCluster](https://docs.victoriametrics.com/operator/resources/vtcluster/) for traces.
 
 By default, the operator [converts all existing prometheus-operator API objects](https://docs.victoriametrics.com/operator/integrations/prometheus/#objects-conversion) into corresponding VictoriaMetrics Operator objects.
 
@@ -206,6 +208,157 @@ kubelet:
   # https://docs.victoriametrics.com/operator/api/#vmnodescrapespec
   spec:
     interval: "30s"
+```
+
+### Logs storage and collection
+
+This chart supports deploying [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/) alongside VictoriaMetrics for logs storage and collection.
+
+#### Logs storage
+
+Enable **VLSingle** for a single-node logs storage deployment:
+
+```yaml
+vlsingle:
+  enabled: true
+  spec:
+    retentionPeriod: 30d
+    storage:
+      resources:
+        requests:
+          storage: 50Gi
+```
+
+Enable **VLCluster** for a highly-available clustered deployment (mutually exclusive with VLSingle):
+
+```yaml
+vlcluster:
+  enabled: true
+  spec:
+    retentionPeriod: 30d
+    vlstorage:
+      replicaCount: 2
+    vlselect:
+      replicaCount: 2
+    vlinsert:
+      replicaCount: 2
+```
+
+To connect to an existing VictoriaLogs instance instead of deploying one, use the external URL configuration:
+
+```yaml
+external:
+  vl:
+    read:
+      url: http://your-victorialogs-host:9428
+    write:
+      url: http://your-victorialogs-host:9428
+```
+
+#### Logs collection
+
+Enable **VLAgent** to collect logs from Kubernetes pods and nodes:
+
+```yaml
+vlagent:
+  enabled: true
+  spec:
+    k8sCollector:
+      enabled: true
+```
+
+VLAgent automatically writes logs to the configured VictoriaLogs storage (VLSingle, VLCluster, or external). Additional remote write targets can be configured via `vlagent.additionalRemoteWrites`.
+
+#### Grafana datasource for VictoriaLogs
+
+When VLSingle, VLCluster, or an external VL URL is configured, a `VictoriaLogs (DS)` Grafana datasource is automatically provisioned. It requires the `victoriametrics-logs-datasource` Grafana plugin:
+
+```yaml
+grafana:
+  plugins:
+    - victoriametrics-logs-datasource
+```
+
+Without this plugin, the datasource entry will exist in Grafana but the plugin will not be available to use it.
+
+#### VMAlert with both VictoriaMetrics and VictoriaLogs
+
+When both a VM read endpoint (VLSingle, VMCluster, or external) and a VL read endpoint are configured and `vmalert.enabled` is `true`, the chart automatically deploys an internal VMAuth proxy that routes VMAlert datasource queries:
+
+- `/select/logsql/.*` → VictoriaLogs (for LogsQL alert rules)
+- `/.*` → VictoriaMetrics (for MetricsQL alert rules)
+
+No additional configuration is needed — the routing is handled transparently. This allows VMAlert to evaluate both MetricsQL and LogsQL rules against the correct backend.
+
+### Traces storage
+
+This chart supports deploying [VictoriaTraces](https://docs.victoriametrics.com/victorialogs/) alongside VictoriaMetrics for distributed traces storage.
+
+#### VTSingle (single-node)
+
+Enable **VTSingle** for a single-node traces storage deployment:
+
+```yaml
+vtsingle:
+  enabled: true
+  spec:
+    retentionPeriod: "7"    # days
+    storage:
+      resources:
+        requests:
+          storage: 20Gi
+```
+
+#### VTCluster
+
+Enable **VTCluster** for a highly-available clustered deployment (mutually exclusive with VTSingle):
+
+```yaml
+vtcluster:
+  enabled: true
+  spec:
+    retentionPeriod: 14d
+    vtstorage:
+      replicaCount: 2
+```
+
+#### External traces instance
+
+To connect to an existing VictoriaTraces instance instead of deploying one:
+
+```yaml
+external:
+  vt:
+    read:
+      url: http://your-victoriatraces-host:10428
+    write:
+      url: http://your-victoriatraces-host:10428
+```
+
+#### Grafana datasource for VictoriaTraces
+
+When VTSingle, VTCluster, or an external VT URL is configured, a `VictoriaTraces` Grafana datasource is automatically provisioned. It uses the Jaeger-compatible API exposed at `<endpoint>/select/jaeger`:
+
+| Field | Value |
+|---|---|
+| Name | `VictoriaTraces` |
+| UID | `VictoriaTraces` |
+| Type | `jaeger` |
+| URL | auto-set from the VTSingle / VTCluster service endpoint |
+
+The Jaeger datasource type is built into Grafana — no additional plugin is required.
+
+Additional datasource properties can be customised under `defaultDatasources.victoriatraces.datasources`:
+
+```yaml
+defaultDatasources:
+  victoriatraces:
+    datasources:
+      - name: VictoriaTraces
+        uid: VictoriaTraces
+        type: jaeger
+        jsonData:
+          tlsSkipVerify: true
 ```
 
 ### Using externally managed Grafana

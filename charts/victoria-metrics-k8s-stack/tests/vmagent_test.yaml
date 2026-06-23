@@ -1,0 +1,75 @@
+suite: vmagent spec tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vmagent/vmagent.yaml
+tests:
+  - it: default remoteWrite points to vmsingle write endpoint
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8428/api/v1/write
+
+  - it: additionalRemoteWrites are prepended to remoteWrite list
+    set:
+      vmagent:
+        additionalRemoteWrites:
+          - url: http://additional.example.com
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://additional.example.com
+      - equal:
+          path: spec.remoteWrite[1].url
+          value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8428/api/v1/write
+
+  - it: user-configured spec.remoteWrite entries after the first are preserved
+    set:
+      vmagent:
+        spec:
+          remoteWrite:
+            - url: http://custom1.example.com
+            - url: http://custom2.example.com
+    asserts:
+      - lengthEqual:
+          path: spec.remoteWrite
+          count: 2
+      - equal:
+          path: spec.remoteWrite[1].url
+          value: http://custom2.example.com
+
+  - it: user spec.remoteWrite overrides auto-discovered URL for first entry
+    set:
+      vmagent:
+        spec:
+          remoteWrite:
+            - url: http://custom.example.com
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://custom.example.com
+
+  - it: external vm write URL is used when vmsingle disabled
+    set:
+      vmsingle:
+        enabled: false
+      external:
+        vm:
+          write:
+            url: http://vm.external.example.com/api/v1/write
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vm.external.example.com/api/v1/write
+
+  - it: vmcluster write endpoint is used when vmcluster enabled
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+    asserts:
+      - matchRegex:
+          path: spec.remoteWrite[0].url
+          pattern: '^http://vminsert-.*\.svc\.cluster\.local\.:8480/insert/0/prometheus/api/v1/write$'

@@ -1,0 +1,92 @@
+suite: internal vmauth tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vmauth/internal.yaml
+tests:
+  - it: renders VMAuth CR when vmalert enabled with both VM and VL
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VMAuth
+
+  - it: does not render when vmalert disabled
+    set:
+      vmalert:
+        enabled: false
+      vlsingle:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: does not render when only VM configured (no VL)
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: does not render when only VL configured (no VM)
+    set:
+      vmsingle:
+        enabled: false
+      vlsingle:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: CR name includes release name with internal suffix
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack-internal
+
+  - it: component label is vmauth
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: vmauth
+
+  - it: url_map routes logsql paths to vlsingle
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.url_map[0].src_paths[0]
+          value: '/select/logsql/.*'
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.url_map[0].url_prefix[0]
+          value: 'http://vlsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9428/'
+
+  - it: url_map routes all other paths to vmsingle
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.url_map[1].src_paths[0]
+          value: '/.*'
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.url_map[1].url_prefix[0]
+          value: 'http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8428/'
+
+  - it: port is 8427
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.port
+          value: "8427"

@@ -1,0 +1,150 @@
+suite: vmcluster tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vmcluster/vmcluster.yaml
+tests:
+  - it: renders VMCluster CR when enabled
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VMCluster
+      - isAPIVersion:
+          of: operator.victoriametrics.com/v1beta1
+
+  - it: does not render when disabled
+    set:
+      vmsingle:
+        enabled: false
+      vmalert:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both vmsingle and vmcluster are enabled
+    set:
+      vmcluster:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .Values.vmsingle.enabled, .Values.vmdistributed.enabled and .Values.vmcluster.enabled can be true"
+
+  - it: clusterVersion is auto-computed from appVersion
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.clusterVersion
+          value: 0.1.0-cluster
+
+  - it: custom clusterVersion in values overrides auto-computed value
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+        spec:
+          clusterVersion: v1.99.0
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.clusterVersion
+          value: v1.99.0
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.99.0
+
+  - it: vmalert proxyURL is injected into vmselect extraArgs
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.vmselect.extraArgs["vmalert.proxyURL"]
+          value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8080
+
+  - it: vmselect is removed from spec when disabled
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+        spec:
+          vmselect:
+            enabled: false
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - isNull:
+          path: spec.vmselect
+
+  - it: vminsert is removed from spec when disabled
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+        spec:
+          vminsert:
+            enabled: false
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - isNull:
+          path: spec.vminsert

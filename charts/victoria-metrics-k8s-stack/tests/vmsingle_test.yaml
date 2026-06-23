@@ -1,0 +1,110 @@
+suite: vmsingle tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vmsingle/vmsingle.yml
+tests:
+  - it: renders VMSingle CR when enabled
+    set:
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VMSingle
+      - isAPIVersion:
+          of: operator.victoriametrics.com/v1beta1
+
+  - it: does not render when disabled
+    set:
+      vmsingle:
+        enabled: false
+      vmalert:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both vmsingle and vmcluster are enabled
+    set:
+      vmcluster:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .Values.vmsingle.enabled, .Values.vmdistributed.enabled and .Values.vmcluster.enabled can be true"
+
+  - it: fails when both vmsingle and vmdistributed are enabled
+    set:
+      vmdistributed:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .Values.vmsingle.enabled, .Values.vmdistributed.enabled and .Values.vmcluster.enabled can be true"
+
+  - it: CR name is derived from release name
+    set:
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: injects vmalert proxyURL into extraArgs when vmalert enabled
+    set:
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.extraArgs["vmalert.proxyURL"]
+          value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8080
+
+  - it: does not inject vmalert proxyURL when vmalert disabled
+    set:
+      vmalert:
+        enabled: false
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+    asserts:
+      - isNull:
+          path: spec.extraArgs["vmalert.proxyURL"]
+
+  - it: retentionPeriod is passed through to spec
+    set:
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+      vmsingle:
+        spec:
+          retentionPeriod: 90d
+    asserts:
+      - equal:
+          path: spec.retentionPeriod
+          value: 90d

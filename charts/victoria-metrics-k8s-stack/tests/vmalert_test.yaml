@@ -1,0 +1,108 @@
+suite: vmalert datasource routing tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vmalert/vmalert.yaml
+tests:
+  - it: datasource points to vmsingle when only VM configured
+    set:
+      grafana:
+        enabled: false
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.datasource.url
+          value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8428
+
+  - it: datasource points to internal vmauth when both VM and VL configured
+    set:
+      grafana:
+        enabled: false
+      alertmanager:
+        enabled: false
+      vlsingle:
+        enabled: true
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.datasource.url
+          value: http://vmauth-RELEASE-NAME-victoria-metrics-k8s-stack-internal.NAMESPACE.svc.cluster.local.:8427
+
+  - it: datasource points to vlsingle when only VL configured
+    set:
+      grafana:
+        enabled: false
+      alertmanager:
+        enabled: false
+      vmsingle:
+        enabled: false
+      vlsingle:
+        enabled: true
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.datasource.url
+          value: http://vlsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9428
+
+  - it: datasource uses external VM URL when vmsingle disabled and external URL set
+    set:
+      grafana:
+        enabled: false
+      alertmanager:
+        enabled: false
+      vmsingle:
+        enabled: false
+      external:
+        vm:
+          read:
+            url: http://vm.external.example.com:8428
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.datasource.url
+          value: http://vm.external.example.com:8428
+
+  - it: remoteWrite points to vmsingle by default
+    set:
+      grafana:
+        enabled: false
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.remoteWrite.url
+          value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8428/api/v1/write
+
+  - it: remoteRead points to vmsingle by default
+    set:
+      grafana:
+        enabled: false
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.remoteRead.url
+          value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8428

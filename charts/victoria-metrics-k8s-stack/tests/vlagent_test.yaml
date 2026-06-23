@@ -1,0 +1,79 @@
+suite: vlagent spec tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vlagent/vlagent.yaml
+tests:
+  - it: remoteWrite points to vlsingle write endpoint when vlsingle enabled
+    set:
+      vlagent:
+        enabled: true
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vlsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9428/insert/native
+
+  - it: user-configured spec.remoteWrite entries after the first are all preserved
+    set:
+      vlagent:
+        enabled: true
+        spec:
+          remoteWrite:
+            - url: http://custom1.example.com
+            - url: http://custom2.example.com
+            - url: http://custom3.example.com
+      vlsingle:
+        enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.remoteWrite
+          count: 3
+      - equal:
+          path: spec.remoteWrite[1].url
+          value: http://custom2.example.com
+      - equal:
+          path: spec.remoteWrite[2].url
+          value: http://custom3.example.com
+
+  - it: remoteWrite points to vlinsert when vlcluster enabled
+    set:
+      vlagent:
+        enabled: true
+      vlcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vlinsert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9481/insert/native
+
+  - it: external vl write URL is used when no vl CR configured
+    set:
+      vlagent:
+        enabled: true
+      external:
+        vl:
+          write:
+            url: http://vl.external.example.com/insert/native
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vl.external.example.com/insert/native
+
+  - it: additionalRemoteWrites are prepended to remoteWrite list
+    set:
+      vlagent:
+        enabled: true
+        additionalRemoteWrites:
+          - url: http://additional.example.com
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://additional.example.com
+      - equal:
+          path: spec.remoteWrite[1].url
+          value: http://vlsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9428/insert/native
