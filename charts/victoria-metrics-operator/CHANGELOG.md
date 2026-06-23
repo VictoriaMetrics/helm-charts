@@ -1,5 +1,6 @@
 ## Next release
 
+- added `runtimeClassName` option to the pod spec
 - add `nodePort` support for `Service` resources
 
 ## 0.65.1
