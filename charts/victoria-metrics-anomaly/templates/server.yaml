@@ -56,17 +56,11 @@ spec:
         - name: model
           image: {{ include "vm.image" $ctx }}
           workingDir: {{ .Values.containerWorkingDir }}
-          {{- if or (((.Values.config).monitoring).pull).enabled ((.Values.config).server).port }}
           ports:
-            {{- with (((.Values.config).monitoring).pull).port }}
-            - containerPort: {{ . }}
-              name: metrics
-            {{- end }}
-            {{- with ((.Values.config).server).port }}
+            {{- with ((.Values.config).server).port | default 8490  }}
             - containerPort: {{ . }}
               name: http
             {{- end }}
-          {{- end }}
           {{- with .Values.command }}
           command: {{ toYaml . | nindent 12 }}
           {{- end }}
