@@ -22,13 +22,10 @@ func TestVictoriaLogsCollectorInstallDefault(t *testing.T) {
 	defer chartCleanup(t, ctx, cp)
 
 	// Verify the DaemonSet was created and is ready using manual polling
-	releaseName := cp.releaseName
-	o := cp.opts
-	namespaceName := o.KubectlOptions.Namespace
-	daemonSetName := fmt.Sprintf("%s-%s", releaseName, name)
+	daemonSetName := fmt.Sprintf("%s-%s", cp.releaseName, name)
 	var daemonset *appsv1.DaemonSet
 	err := wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (done bool, err error) {
-		daemonset, err = cp.client.AppsV1().DaemonSets(namespaceName).Get(ctx, daemonSetName, metav1.GetOptions{})
+		daemonset, err = cp.client.AppsV1().DaemonSets(cp.namespace).Get(ctx, daemonSetName, metav1.GetOptions{})
 		if err != nil {
 			return false, nil
 		}

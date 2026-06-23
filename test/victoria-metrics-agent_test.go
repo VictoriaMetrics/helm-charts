@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-
-	"github.com/gruntwork-io/terratest/modules/k8s"
 )
 
 // TestVictoriaMetricsAgentInstallDefault tests that the victoria-metrics-agent chart can be installed with default values.
@@ -18,9 +16,6 @@ func TestVictoriaMetricsAgentInstallDefault(t *testing.T) {
 	ctx := context.Background()
 	defer chartCleanup(t, ctx, cp)
 
-	// Install the chart and verify no errors occurred.
-	releaseName := cp.releaseName
-	o := cp.opts
-	vmAgent := fmt.Sprintf("%s-%s", releaseName, name)
-	k8s.WaitUntilDeploymentAvailable(t, o.KubectlOptions, vmAgent, retries, pollingInterval)
+	vmAgent := fmt.Sprintf("%s-%s", cp.releaseName, name)
+	waitUntilDeploymentAvailable(t, ctx, cp.client, cp.namespace, vmAgent)
 }

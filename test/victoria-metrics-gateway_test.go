@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"testing"
-
-	"github.com/gruntwork-io/terratest/modules/k8s"
 )
 
 // TestVictoriaMetricsGatewayInstallDefault tests that the victoria-metrics-gateway chart can be installed with default values.
@@ -24,14 +22,9 @@ func TestVictoriaMetricsGatewayInstallDefault(t *testing.T) {
 		"read.url":            "http://cluster-victoria-metrics-cluster-vmselect.default.svc.cluster.local:8481",
 		"write.url":           "http://cluster-victoria-metrics-cluster-vminsert.default.svc.cluster.local:8480",
 	})
-	o := cp.opts
 	ctx := context.Background()
 	defer chartCleanup(t, ctx, cp)
 
-	// Install the chart and verify no errors occurred.
-	releaseName := cp.releaseName
-
-	// Verify vmgateway Deployment was created and is ready
-	vmGatewayName := fmt.Sprintf("%s-%s", releaseName, name)
-	k8s.WaitUntilDeploymentAvailable(t, o.KubectlOptions, vmGatewayName, retries, pollingInterval)
+	vmGatewayName := fmt.Sprintf("%s-%s", cp.releaseName, name)
+	waitUntilDeploymentAvailable(t, ctx, cp.client, cp.namespace, vmGatewayName)
 }

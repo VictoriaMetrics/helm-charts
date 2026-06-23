@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,23 +16,17 @@ func TestVictoriaMetricsK8sStackBasic(t *testing.T) {
 	ctx := context.Background()
 	defer chartCleanup(t, ctx, cp)
 
-	// Verify victoria-metrics-operator components
-	releaseName := cp.releaseName
-	o := cp.opts
-	namespaceName := o.KubectlOptions.Namespace
-	operatorName := fmt.Sprintf("%s-victoria-metrics-operator", releaseName)
-	k8s.WaitUntilDeploymentAvailable(t, o.KubectlOptions, operatorName, retries, pollingInterval)
+	operatorName := fmt.Sprintf("%s-victoria-metrics-operator", cp.releaseName)
+	waitUntilDeploymentAvailable(t, ctx, cp.client, cp.namespace, operatorName)
 
-	// Verify kube-state-metrics components
-	kubeStateMetricsName := fmt.Sprintf("%s-kube-state-metrics", releaseName)
-	k8s.WaitUntilDeploymentAvailable(t, o.KubectlOptions, kubeStateMetricsName, retries, pollingInterval)
-	k8s.WaitUntilServiceAvailable(t, o.KubectlOptions, kubeStateMetricsName, retries, pollingInterval)
+	kubeStateMetricsName := fmt.Sprintf("%s-kube-state-metrics", cp.releaseName)
+	waitUntilDeploymentAvailable(t, ctx, cp.client, cp.namespace, kubeStateMetricsName)
+	waitUntilServiceAvailable(t, ctx, cp.client, cp.namespace, kubeStateMetricsName)
 
-	// Verify prometheus-node-exporter components (DaemonSet)
-	promNodeExporterName := fmt.Sprintf("%s-prometheus-node-exporter", releaseName)
+	promNodeExporterName := fmt.Sprintf("%s-prometheus-node-exporter", cp.releaseName)
 	var daemonset *appsv1.DaemonSet
-	err := wait.PollUntilContextTimeout(context.Background(), pollingInterval, pollingTimeout, true, func(ctx context.Context) (done bool, err error) {
-		daemonset, err = cp.client.AppsV1().DaemonSets(namespaceName).Get(ctx, promNodeExporterName, metav1.GetOptions{})
+	err := wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (done bool, err error) {
+		daemonset, err = cp.client.AppsV1().DaemonSets(cp.namespace).Get(ctx, promNodeExporterName, metav1.GetOptions{})
 		if err != nil {
 			return false, nil
 		}
@@ -42,14 +35,12 @@ func TestVictoriaMetricsK8sStackBasic(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, daemonset)
-	k8s.WaitUntilServiceAvailable(t, o.KubectlOptions, promNodeExporterName, retries, pollingInterval)
+	waitUntilServiceAvailable(t, ctx, cp.client, cp.namespace, promNodeExporterName)
 
-	// Verify Grafana components (if enabled by default)
-	grafanaName := fmt.Sprintf("%s-grafana", releaseName)
-	// Check if grafana deployment exists before waiting, as it might be optional (e.g., if it's set to replicaCount: 0 or disabled)
-	k8s.WaitUntilDeploymentAvailable(t, o.KubectlOptions, grafanaName, retries, pollingInterval)
-	k8s.WaitUntilServiceAvailable(t, o.KubectlOptions, grafanaName, retries, pollingInterval)
-	k8s.WaitUntilSecretAvailable(t, o.KubectlOptions, grafanaName, retries, pollingInterval)
-	k8s.WaitUntilConfigMapAvailable(t, o.KubectlOptions, grafanaName, retries, pollingInterval)
-	k8s.WaitUntilConfigMapAvailable(t, o.KubectlOptions, fmt.Sprintf("%s-grafana-config-dashboards", releaseName), retries, pollingInterval)
+	grafanaName := fmt.Sprintf("%s-grafana", cp.releaseName)
+	waitUntilDeploymentAvailable(t, ctx, cp.client, cp.namespace, grafanaName)
+	waitUntilServiceAvailable(t, ctx, cp.client, cp.namespace, grafanaName)
+	waitUntilSecretAvailable(t, ctx, cp.client, cp.namespace, grafanaName)
+	waitUntilConfigMapAvailable(t, ctx, cp.client, cp.namespace, grafanaName)
+	waitUntilConfigMapAvailable(t, ctx, cp.client, cp.namespace, fmt.Sprintf("%s-grafana-config-dashboards", cp.releaseName))
 }
