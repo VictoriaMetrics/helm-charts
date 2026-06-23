@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.146.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.146.0)
 - add `nodePort` support for `Service` resources
 
 ## 0.42.1

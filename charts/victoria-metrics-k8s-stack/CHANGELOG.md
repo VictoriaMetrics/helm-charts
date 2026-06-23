@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.146.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.146.0)
 **Update note 1**: `defaultDashboards.defaultTimezone` is removed. Dashboard timezone is now managed exclusively by Grafana (e.g. `grafana.grafana\.ini.date_formats.default_timezone`).
 
 **Update note 2**: `defaultRules.groups[*].targetNamespace` is replaced by `defaultRules.groups[*].jobNamespaces`, a per-group map from scrape job name to namespace regex. A global `defaultRules.jobNamespaces` is also available and is merged with per-group values (per-group wins on conflict). The new defaults scope `kubernetesApps` to `kube-state-metrics` and `kubernetesStorage` to `kubelet`.
