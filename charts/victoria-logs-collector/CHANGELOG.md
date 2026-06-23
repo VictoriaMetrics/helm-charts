@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `runtimeClassName` option to the pod spec
 
 ## 0.3.6
 

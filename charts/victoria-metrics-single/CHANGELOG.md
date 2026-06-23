@@ -4,6 +4,7 @@
 - fixed security context issue with vmbackupmanager init recovery container
 - fixed incorrect mount name for persistent storage volume in vmbackupmanager init recovery container
 - added extraVolumeMounts to vmbackupmanager init recovery container
+- added `runtimeClassName` option to the pod spec
 
 ## 0.40.1
 

@@ -40,3 +40,15 @@ tests:
           path: spec.template.spec.containers[0].command
           value:
             - /custom/bin/victoriametrics
+  - it: should render runtimeClassName
+    set:
+      server:
+        runtimeClassName: gvisor
+    asserts:
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: gvisor
+  - it: should not render runtimeClassName by default
+    asserts:
+      - notExists:
+          path: spec.template.spec.runtimeClassName

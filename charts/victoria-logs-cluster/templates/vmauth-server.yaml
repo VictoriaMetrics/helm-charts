@@ -39,6 +39,9 @@ spec:
       {{- with $app.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
+      {{- with $app.runtimeClassName }}
+      runtimeClassName: {{ . }}
+      {{- end }}
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
       serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
