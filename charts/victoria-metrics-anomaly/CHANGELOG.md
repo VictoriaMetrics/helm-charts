@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 1.12.13
+
+**Release date:** 23 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.29.6](https://img.shields.io/badge/v1.29.6-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1296)
+
 - fix VMPodMonitor relabelling configuration rendering. See [#2917](https://github.com/VictoriaMetrics/helm-charts/issues/2917).
 - add ability to override container command.
 - removed potential confusion around targetPort in values by setting the containers port name always to be http and removing targetPort from values.yaml
