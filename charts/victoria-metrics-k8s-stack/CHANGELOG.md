@@ -1,6 +1,7 @@
 ## Next release
 
 - use explicit semver tag for sync job
+- make syncJob a helm hook
 
 ## 0.85.0
 
