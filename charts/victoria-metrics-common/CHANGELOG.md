@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.11
+
+**Release date:** 24 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - added `useLegacyNaming` support to `vm.plain.fullname`: when set to `false`, names use `<operator-kind>-<release>` convention matching the VictoriaMetrics operator
 
 ## 0.3.10
