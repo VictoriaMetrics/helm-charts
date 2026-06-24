@@ -1,6 +1,13 @@
 # Default values for victoria-metrics.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+# -- Use legacy naming convention (release-name based). When false, resource names
+# -- use the same convention as the operator (type-prefixed, e.g. vmsingle-<release>).
+# -- The default (`true`) exists for historical reasons and backwards compatibility with existing deployments.
+# -- For new deployments, setting this to `false` is recommended to match VictoriaMetrics operator naming
+# -- and simplify future migration to operator-managed resources.
+useLegacyNaming: true
 global:
   # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
