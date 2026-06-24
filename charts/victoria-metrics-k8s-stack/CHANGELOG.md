@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.85.4
+
+**Release date:** 24 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.146.0](https://img.shields.io/badge/v1.146.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11460)
+
 - sync-job now sets owner references on managed ConfigMaps, GrafanaDashboards, and VMRules pointing to its ServiceAccount, so Kubernetes automatically garbage-collects them when the chart is uninstalled via any tool (Helm, ArgoCD, etc.). Controlled by `syncJob.useOwnerReferences` (default `true`). See [#3032](https://github.com/VictoriaMetrics/helm-charts/issues/3032)
 
 ## 0.85.3
