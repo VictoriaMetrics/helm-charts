@@ -261,3 +261,84 @@ tests:
       - equal:
           path: vm.namespace
           value: NAMESPACE
+
+  # useLegacyNaming tests
+  - it: useLegacyNaming false without appKey uses chart-derived kind
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: vmcommon-RELEASE-NAME
+
+  - it: useLegacyNaming false with non-operator appKey uses chart-derived kind
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: server
+      server:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: vmcommon-RELEASE-NAME
+
+  - it: useLegacyNaming false with vminsert appKey uses component as kind
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: vminsert
+      vminsert:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: vminsert-RELEASE-NAME
+
+  - it: useLegacyNaming false with vlselect appKey uses component as kind
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: vlselect
+      vlselect:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: vlselect-RELEASE-NAME
+
+  - it: useLegacyNaming false with vtstorage appKey uses component as kind
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: vtstorage
+      vtstorage:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: vtstorage-RELEASE-NAME
+
+  - it: useLegacyNaming false with named sub-component prefixes with chart kind
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: alertmanager
+      alertmanager:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: vmalertmanager-RELEASE-NAME
+
+  - it: useLegacyNaming true preserves legacy naming
+    set:
+      useLegacyNaming: true
+      ctx:
+        appKey: server
+      server:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: RELEASE-NAME-victoria-metrics-common-server

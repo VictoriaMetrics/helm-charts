@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- added `useLegacyNaming` support to `vm.plain.fullname`: when set to `false`, names use `<operator-kind>-<release>` convention matching the VictoriaMetrics operator
 
 ## 0.3.10
 
@@ -344,7 +344,7 @@
 
 ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
-- TODO
+- added `useLegacyNaming` support to `vm.plain.fullname`: when set to `false`, names use `<operator-kind>-<release>` convention matching the VictoriaMetrics operator
 
 ## 0.0.18
 

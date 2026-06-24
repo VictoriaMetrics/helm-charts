@@ -96,18 +96,47 @@ If release name contains chart name it will be used as a full name.
   {{- end -}}
 {{- end -}}
 
+{{- /*
+vm.operator.kind returns the operator resource-name prefix for the current
+component (e.g. "vlsingle", "vminsert", "vmalertmanager").
+Rules (checked in order):
+  1. appKey already has vm/vl/vt prefix → use as-is (cluster components)
+  2. empty appKey or "server"           → derive from chart name
+  3. other named sub-component          → chart prefix + appKey
+*/ -}}
+{{- define "vm.operator.kind" -}}
+  {{- $appKey := include "vm.internal.key.default" . -}}
+  {{- $Chart  := (.helm).Chart | default .Chart -}}
+  {{- $p := "vm" -}}
+  {{- if hasPrefix "victoria-logs" $Chart.Name -}}{{- $p = "vl" -}}{{- end -}}
+  {{- if hasPrefix "victoria-traces" $Chart.Name -}}{{- $p = "vt" -}}{{- end -}}
+  {{- if or (hasPrefix "vm" $appKey) (hasPrefix "vl" $appKey) (hasPrefix "vt" $appKey) -}}
+    {{- $appKey -}}
+  {{- else if or (empty $appKey) (eq $appKey "server") -}}
+    {{- printf "%s%s" $p (regexReplaceAll "^victoria-(metrics|logs|traces)-" $Chart.Name "") -}}
+  {{- else -}}
+    {{- printf "%s%s" $p $appKey -}}
+  {{- end -}}
+{{- end -}}
+
 {{- define "vm.plain.fullname" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $_ := set . "overrideKey" "fullnameOverride" -}}
-  {{- $fullname := include "vm.internal.key" . -}}
-  {{- $_ := unset . "overrideKey" -}}
-  {{- if empty $fullname -}}
-    {{- $fullname = include "vm.fullname" . -}}
-    {{- with include "vm.internal.key.default" . -}}
-      {{- $fullname = printf "%s-%s" $fullname . -}}
+  {{- $fullname := "" -}}
+  {{- if and (hasKey $Values "useLegacyNaming") (not $Values.useLegacyNaming) -}}
+    {{- $release := ((.helm).Release | default .Release).Name -}}
+    {{- $fullname = printf "%s-%s" (include "vm.operator.kind" .) $release -}}
+  {{- else -}}
+    {{- $_ := set . "overrideKey" "fullnameOverride" -}}
+    {{- $fullname = include "vm.internal.key" . -}}
+    {{- $_ := unset . "overrideKey" -}}
+    {{- if empty $fullname -}}
+      {{- $fullname = include "vm.fullname" . -}}
+      {{- with include "vm.internal.key.default" . -}}
+        {{- $fullname = printf "%s-%s" $fullname . -}}
+      {{- end -}}
     {{- end -}}
+    {{- $fullname = tpl $fullname . -}}
   {{- end -}}
-  {{- $fullname = tpl $fullname . -}}
   {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
     {{- $fullname -}}
   {{- else -}}
