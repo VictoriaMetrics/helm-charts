@@ -17,6 +17,7 @@ func main() {
 	instance := os.Getenv("RELEASE")
 	resourcePrefix := envOrDefault("RESOURCE_PREFIX", instance)
 	prune := envOrDefault("PRUNE", "true") != "false"
+	useOwnerRef := envOrDefault("OWNER_REFERENCES", "true") != "false"
 
 	cfg, err := loadConfig(configPath)
 	if err != nil {
@@ -26,6 +27,13 @@ func main() {
 	kube, err := newKubeClient(namespace, instance, resourcePrefix)
 	if err != nil {
 		log.Fatalf("create kube client: %v", err)
+	}
+
+	if useOwnerRef {
+		saName := os.Getenv("SERVICE_ACCOUNT")
+		if err := kube.resolveOwnerRef(context.Background(), saName); err != nil {
+			log.Printf("warning: cannot resolve service account %q for owner references: %v", saName, err)
+		}
 	}
 
 	if err := run(context.Background(), kube, cfg, prune); err != nil {

@@ -38,6 +38,7 @@ type kubeClient struct {
 	namespace      string
 	instance       string
 	resourcePrefix string
+	ownerRef       *metav1.OwnerReference
 }
 
 func newKubeClient(namespace, instance, resourcePrefix string) (*kubeClient, error) {
@@ -98,6 +99,9 @@ func (k *kubeClient) applyConfigMap(ctx context.Context, name string, data map[s
 		},
 		Data: data,
 	}
+	if k.ownerRef != nil {
+		cm.OwnerReferences = []metav1.OwnerReference{*k.ownerRef}
+	}
 	existing, err := k.cs.CoreV1().ConfigMaps(k.namespace).Get(ctx, name, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		_, err = k.cs.CoreV1().ConfigMaps(k.namespace).Create(ctx, cm, metav1.CreateOptions{})
@@ -153,6 +157,14 @@ func (k *kubeClient) applyGrafanaDashboard(ctx context.Context, name, jsonConten
 			annots[key] = val
 		}
 		metadata["annotations"] = annots
+	}
+	if k.ownerRef != nil {
+		metadata["ownerReferences"] = []any{map[string]any{
+			"apiVersion": k.ownerRef.APIVersion,
+			"kind":       k.ownerRef.Kind,
+			"name":       k.ownerRef.Name,
+			"uid":        string(k.ownerRef.UID),
+		}}
 	}
 	obj := &unstructured.Unstructured{
 		Object: map[string]any{
@@ -214,6 +226,14 @@ func (k *kubeClient) applyVMRule(ctx context.Context, name string, spec map[stri
 		}
 		metadata["annotations"] = annots
 	}
+	if k.ownerRef != nil {
+		metadata["ownerReferences"] = []any{map[string]any{
+			"apiVersion": k.ownerRef.APIVersion,
+			"kind":       k.ownerRef.Kind,
+			"name":       k.ownerRef.Name,
+			"uid":        string(k.ownerRef.UID),
+		}}
+	}
 	obj := &unstructured.Unstructured{
 		Object: map[string]any{
 			"apiVersion": "operator.victoriametrics.com/v1beta1",
@@ -241,6 +261,20 @@ func (k *kubeClient) deleteVMRule(ctx context.Context, name string) error {
 		return nil
 	}
 	return err
+}
+
+func (k *kubeClient) resolveOwnerRef(ctx context.Context, saName string) error {
+	sa, err := k.cs.CoreV1().ServiceAccounts(k.namespace).Get(ctx, saName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	k.ownerRef = &metav1.OwnerReference{
+		APIVersion: "v1",
+		Kind:       "ServiceAccount",
+		Name:       sa.Name,
+		UID:        sa.UID,
+	}
+	return nil
 }
 
 func (k *kubeClient) listManagedVMRules(ctx context.Context) ([]string, error) {

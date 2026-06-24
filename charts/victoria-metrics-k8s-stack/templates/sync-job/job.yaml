@@ -43,6 +43,12 @@ spec:
               value: {{ $job.resourcePrefix | default (include "vm.fullname" $ctx) | quote }}
             - name: PRUNE
               value: {{ $job.prune | quote }}
+            - name: OWNER_REFERENCES
+              value: {{ $job.useOwnerReferences | quote }}
+            - name: SERVICE_ACCOUNT
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.serviceAccountName
           volumeMounts:
             - name: config
               mountPath: /etc/config

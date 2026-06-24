@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- sync-job now sets owner references on managed ConfigMaps, GrafanaDashboards, and VMRules pointing to its ServiceAccount, so Kubernetes automatically garbage-collects them when the chart is uninstalled via any tool (Helm, ArgoCD, etc.). Controlled by `syncJob.useOwnerReferences` (default `true`). See [#3032](https://github.com/VictoriaMetrics/helm-charts/issues/3032)
 
 ## 0.85.3
 

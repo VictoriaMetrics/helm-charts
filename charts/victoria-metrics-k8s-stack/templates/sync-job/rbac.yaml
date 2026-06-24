@@ -20,6 +20,11 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 rules:
+  {{- if .Values.syncJob.useOwnerReferences }}
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["get"]
+  {{- end }}
   {{- if and $hasDashboards (not $grafanaOperator) }}
   - apiGroups: [""]
     resources: ["configmaps"]
