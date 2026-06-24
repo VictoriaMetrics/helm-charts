@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix sync-job patching dashboard datasource `uid` to the datasource type instead of the actual UID, causing "Datasource not found" errors for dashboards with hardcoded datasource UIDs. See [#3028](https://github.com/VictoriaMetrics/helm-charts/issues/3028)
 
 ## 0.85.2
 

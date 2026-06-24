@@ -293,22 +293,22 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 	cl := common.ClusterLabel
 	for i := range d.Annotations.List {
 		a := &d.Annotations.List[i]
-		patchDatasource(a.Datasource, grafana.Datasource)
+		patchDatasource(a.Datasource, grafana)
 		a.Expr = patchDashExpr(a.Expr, a.Name, cl)
 	}
 	for i := range d.Targets {
 		t := &d.Targets[i]
-		patchDatasource(t.Datasource, grafana.Datasource)
+		patchDatasource(t.Datasource, grafana)
 		t.Expr = patchDashExpr(t.Expr, name, cl)
 	}
 	for i := range d.Panels {
-		patchPanel(&d.Panels[i], name, cl, grafana.Datasource)
+		patchPanel(&d.Panels[i], name, cl, grafana)
 	}
 
 	hasCluster := false
 	for i := range d.Templating.List {
 		t := &d.Templating.List[i]
-		patchDatasource(t.Datasource, grafana.Datasource)
+		patchDatasource(t.Datasource, grafana)
 		if t.Type == "datasource" {
 			patchVariableDatasource(t, grafana.Datasource)
 		}
@@ -369,24 +369,24 @@ func buildClusterVariable(metric string, common commonConfig) dashVariable {
 	return v
 }
 
-func patchDatasource(d *strOrMap, datasource string) {
+func patchDatasource(d *strOrMap, grafana grafanaConfig) {
 	if d == nil || d.MapVal == nil {
 		return
 	}
 	if t, ok := d.MapVal["type"]; !ok || t != "prometheus" {
 		return
 	}
-	d.MapVal["type"] = datasource
+	d.MapVal["type"] = grafana.Datasource
 	uid, _ := d.MapVal["uid"].(string)
 	if uid == "" {
 		return
 	}
 	// Leave Grafana dashboard variable references (e.g. "${datasource}") intact;
-	// replace import-time inputs (e.g. "${DS_PROMETHEUS}") and plain "prometheus".
+	// replace import-time inputs (e.g. "${DS_PROMETHEUS}") and plain UIDs.
 	if strings.HasPrefix(uid, "${") && !strings.HasPrefix(uid, "${DS_") {
 		return
 	}
-	d.MapVal["uid"] = datasource
+	d.MapVal["uid"] = grafana.DatasourceUID
 }
 
 func patchVariableDatasource(t *dashVariable, datasource string) {
@@ -403,15 +403,15 @@ func patchVariableDatasource(t *dashVariable, datasource string) {
 	}
 }
 
-func patchPanel(p *dashPanel, name, clusterLabel, datasource string) {
-	patchDatasource(p.Datasource, datasource)
+func patchPanel(p *dashPanel, name, clusterLabel string, grafana grafanaConfig) {
+	patchDatasource(p.Datasource, grafana)
 	for i := range p.Targets {
 		t := &p.Targets[i]
-		patchDatasource(t.Datasource, datasource)
+		patchDatasource(t.Datasource, grafana)
 		t.Expr = patchDashExpr(t.Expr, p.Title, clusterLabel)
 	}
 	for i := range p.Panels {
-		patchPanel(&p.Panels[i], name, clusterLabel, datasource)
+		patchPanel(&p.Panels[i], name, clusterLabel, grafana)
 	}
 }
 

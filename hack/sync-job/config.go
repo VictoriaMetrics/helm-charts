@@ -24,10 +24,11 @@ type dashboardOverride struct {
 }
 
 type grafanaConfig struct {
-	LabelName  string                 `yaml:"labelName"`
-	LabelValue string                 `yaml:"labelValue"`
-	Operator   *grafanaOperatorConfig `yaml:"operator,omitempty"`
-	Datasource string                 `yaml:"datasource"`
+	LabelName     string                 `yaml:"labelName"`
+	LabelValue    string                 `yaml:"labelValue"`
+	Operator      *grafanaOperatorConfig `yaml:"operator,omitempty"`
+	Datasource    string                 `yaml:"datasource"`
+	DatasourceUID string                 `yaml:"datasourceUID"`
 }
 
 type dashboardsCommonConfig struct {
@@ -101,6 +102,9 @@ func loadConfig(path string) (*config, error) {
 	}
 	if cfg.Dashboards.Common.Grafana.Datasource == "" {
 		cfg.Dashboards.Common.Grafana.Datasource = "prometheus"
+	}
+	if cfg.Dashboards.Common.Grafana.DatasourceUID == "" {
+		cfg.Dashboards.Common.Grafana.DatasourceUID = cfg.Dashboards.Common.Grafana.Datasource
 	}
 	if cfg.Dashboards.Common.Grafana.LabelName == "" {
 		cfg.Dashboards.Common.Grafana.LabelName = "grafana_dashboard"

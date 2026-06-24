@@ -5,8 +5,12 @@
 {{- $Values := .Values }}
 
 {{- $datasource := "prometheus" -}}
+{{- $datasourceUID := "prometheus" -}}
 {{- range $Values.defaultDatasources.victoriametrics.datasources | default list -}}
-  {{- if and .isDefault .type -}}{{- $datasource = .type -}}{{- end -}}
+  {{- if and .isDefault .type -}}
+    {{- $datasource = .type -}}
+    {{- $datasourceUID = .uid | default .type -}}
+  {{- end -}}
 {{- end -}}
 
 {{- $dashboards := dict -}}
@@ -101,6 +105,7 @@ data:
           labelName: {{ $Values.grafana.sidecar.dashboards.label | quote }}
           labelValue: {{ $Values.grafana.sidecar.dashboards.labelValue | quote }}
           datasource: {{ $datasource | quote }}
+          datasourceUID: {{ $datasourceUID | quote }}
           {{- if $Values.defaultDashboards.grafanaOperator.enabled }}
           operator:
             spec: {{ toYaml $Values.defaultDashboards.grafanaOperator.spec | nindent 14 }}

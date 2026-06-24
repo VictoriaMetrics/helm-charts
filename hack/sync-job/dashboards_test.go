@@ -124,15 +124,20 @@ func TestPatchDashExpr(t *testing.T) {
 
 func TestPatchDatasource(t *testing.T) {
 	type opts struct {
-		input      map[string]any
-		datasource string
-		wantType   string
-		wantUID    string
+		input         map[string]any
+		datasource    string
+		datasourceUID string
+		wantType      string
+		wantUID       string
 	}
 	f := func(o opts) {
 		t.Helper()
+		uid := o.datasourceUID
+		if uid == "" {
+			uid = o.datasource
+		}
 		d := &strOrMap{MapVal: o.input}
-		patchDatasource(d, o.datasource)
+		patchDatasource(d, grafanaConfig{Datasource: o.datasource, DatasourceUID: uid})
 		if o.wantType != "" {
 			if got, _ := d.MapVal["type"].(string); got != o.wantType {
 				t.Fatalf("type: got %q, want %q", got, o.wantType)
@@ -145,32 +150,51 @@ func TestPatchDatasource(t *testing.T) {
 		}
 	}
 
-	// prometheus type replaced, ${DS_*} uid replaced
+	// type and uid replaced separately: type stays "prometheus", uid set to VictoriaMetrics
 	f(opts{
-		input:      map[string]any{"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
-		datasource: "victoriametrics",
-		wantType:   "victoriametrics",
-		wantUID:    "victoriametrics",
+		input:         map[string]any{"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+		datasource:    "prometheus",
+		datasourceUID: "VictoriaMetrics",
+		wantType:      "prometheus",
+		wantUID:       "VictoriaMetrics",
+	})
+	// plain uid replaced with datasourceUID, not datasource type
+	f(opts{
+		input:         map[string]any{"type": "prometheus", "uid": "prometheus"},
+		datasource:    "prometheus",
+		datasourceUID: "VictoriaMetrics",
+		wantType:      "prometheus",
+		wantUID:       "VictoriaMetrics",
 	})
 	// ${datasource} uid preserved (dashboard variable reference, not import input)
 	f(opts{
-		input:      map[string]any{"type": "prometheus", "uid": "${datasource}"},
-		datasource: "victoriametrics",
-		wantType:   "victoriametrics",
-		wantUID:    "${datasource}",
+		input:         map[string]any{"type": "prometheus", "uid": "${datasource}"},
+		datasource:    "prometheus",
+		datasourceUID: "VictoriaMetrics",
+		wantType:      "prometheus",
+		wantUID:       "${datasource}",
 	})
 	// no uid — only type replaced
 	f(opts{
-		input:      map[string]any{"type": "prometheus"},
-		datasource: "victoriametrics",
-		wantType:   "victoriametrics",
+		input:         map[string]any{"type": "prometheus"},
+		datasource:    "prometheus",
+		datasourceUID: "VictoriaMetrics",
+		wantType:      "prometheus",
 	})
 	// non-prometheus type — unchanged
 	f(opts{
 		input:      map[string]any{"type": "loki", "uid": "loki-uid"},
-		datasource: "victoriametrics",
+		datasource: "prometheus",
 		wantType:   "loki",
 		wantUID:    "loki-uid",
+	})
+	// custom datasource type (VM plugin): type replaced, uid replaced with datasourceUID
+	f(opts{
+		input:         map[string]any{"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+		datasource:    "victoriametrics-metrics-datasource",
+		datasourceUID: "VictoriaMetrics",
+		wantType:      "victoriametrics-metrics-datasource",
+		wantUID:       "VictoriaMetrics",
 	})
 }
 
@@ -285,7 +309,7 @@ func TestPatchDashboardClusterVariable(t *testing.T) {
 		t.Helper()
 		common := commonConfig{ClusterLabel: "cluster", Multicluster: multicluster}
 		d := &dashboard{Templating: dashTemplating{List: vars}}
-		patchDashboard(d, "test", "", common, grafanaConfig{Datasource: "prometheus"})
+		patchDashboard(d, "test", "", common, grafanaConfig{Datasource: "prometheus", DatasourceUID: "prometheus"})
 		for i := range d.Templating.List {
 			if d.Templating.List[i].Name == "cluster" {
 				return &d.Templating.List[i]
