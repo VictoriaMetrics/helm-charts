@@ -2,7 +2,9 @@
 
 ## Next release
 
-- TODO
+- added `vm.useLegacyNaming` helper that resolves the effective `useLegacyNaming` setting by traversing the `appKey` path in Values, allowing per-component overrides to take precedence over the chart-level setting
+- added `useLegacyNaming` support to `vm.plain.fullname`: when set to `false`, names use `<operator-kind>-<release>` convention matching the VictoriaMetrics operator; `fullnameOverride` now always takes precedence regardless of `useLegacyNaming`
+- added `useLegacyNaming` support to `vm.managed.fullname`: when set to `true`, managed resource names use suffix style (`<fullname>-<kind>`, matching the operator's `UseLegacyNaming` convention); when `false` or unset, the existing prefix style is preserved
 
 ## 0.3.11
 

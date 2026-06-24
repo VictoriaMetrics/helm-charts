@@ -342,3 +342,63 @@ tests:
       - equal:
           path: vm.plain.fullname
           value: RELEASE-NAME-victoria-metrics-common-server
+
+  # vm.managed.fullname useLegacyNaming tests
+  - it: managed.fullname useLegacyNaming true with operator-prefix appKey uses suffix style
+    set:
+      useLegacyNaming: true
+      ctx:
+        appKey: vminsert
+      vminsert:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.managed.fullname
+          value: RELEASE-NAME-victoria-metrics-common-vminsert
+
+  - it: managed.fullname useLegacyNaming true with vl-prefix appKey uses suffix style
+    set:
+      useLegacyNaming: true
+      ctx:
+        appKey: vlselect
+      vlselect:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.managed.fullname
+          value: RELEASE-NAME-victoria-metrics-common-vlselect
+
+  - it: managed.fullname useLegacyNaming true with non-operator appKey prefixes and uses suffix style
+    set:
+      useLegacyNaming: true
+      ctx:
+        appKey: alertmanager
+      alertmanager:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.managed.fullname
+          value: RELEASE-NAME-victoria-metrics-common-vmalertmanager
+
+  - it: managed.fullname useLegacyNaming false with vminsert appKey uses prefix style
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: vminsert
+      vminsert:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.managed.fullname
+          value: vminsert-RELEASE-NAME-victoria-metrics-common
+
+  - it: managed.fullname no useLegacyNaming set uses prefix style (default)
+    set:
+      ctx:
+        appKey: vminsert
+      vminsert:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.managed.fullname
+          value: vminsert-RELEASE-NAME-victoria-metrics-common

@@ -84,9 +84,14 @@ If release name contains chart name it will be used as a full name.
   {{- if empty $fullname -}}
     {{- $fullname = include "vm.fullname" . -}}
   {{- end -}}
+  {{- $isLegacy := eq (include "vm.useLegacyNaming" .) "true" -}}
   {{- with include "vm.internal.key.default" . -}}
     {{- $prefix := ternary . (printf "vm%s" .) (or (hasPrefix "vm" .) (hasPrefix "vl" .) (hasPrefix "vt" .)) -}}
-    {{- $fullname = printf "%s-%s" $prefix $fullname -}}
+    {{- if $isLegacy -}}
+      {{- $fullname = printf "%s-%s" $fullname $prefix -}}
+    {{- else -}}
+      {{- $fullname = printf "%s-%s" $prefix $fullname -}}
+    {{- end -}}
   {{- end -}}
   {{- $fullname = tpl $fullname . -}}
   {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
@@ -119,24 +124,52 @@ Rules (checked in order):
   {{- end -}}
 {{- end -}}
 
+{{- /*
+vm.useLegacyNaming resolves the effective useLegacyNaming setting for the current context.
+It traverses the appKey path in Values so that per-component settings (e.g.
+.Values.vmsingle.spec.useLegacyNaming) take precedence over the chart-level
+.Values.useLegacyNaming.
+Returns "true", "false", or "" (not set at any level).
+*/ -}}
+{{- define "vm.useLegacyNaming" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $result := "" -}}
+  {{- if hasKey $Values "useLegacyNaming" -}}
+    {{- $result = ternary "true" "false" $Values.useLegacyNaming -}}
+  {{- end -}}
+  {{- $appKey := list -}}
+  {{- if .appKey -}}
+    {{- $appKey = ternary (list .appKey) .appKey (kindIs "string" .appKey) -}}
+  {{- end -}}
+  {{- $values := $Values -}}
+  {{- range $ak := $appKey -}}
+    {{- if kindIs "map" $values -}}
+      {{- $values = index $values $ak | default dict -}}
+      {{- if and (kindIs "map" $values) (hasKey $values "useLegacyNaming") -}}
+        {{- $result = ternary "true" "false" (index $values "useLegacyNaming") -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $result -}}
+{{- end -}}
+
 {{- define "vm.plain.fullname" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $fullname := "" -}}
-  {{- if and (hasKey $Values "useLegacyNaming") (not $Values.useLegacyNaming) -}}
-    {{- $release := ((.helm).Release | default .Release).Name -}}
-    {{- $fullname = printf "%s-%s" (include "vm.operator.kind" .) $release -}}
-  {{- else -}}
-    {{- $_ := set . "overrideKey" "fullnameOverride" -}}
-    {{- $fullname = include "vm.internal.key" . -}}
-    {{- $_ := unset . "overrideKey" -}}
-    {{- if empty $fullname -}}
+  {{- $_ := set . "overrideKey" "fullnameOverride" -}}
+  {{- $fullname := include "vm.internal.key" . -}}
+  {{- $_ := unset . "overrideKey" -}}
+  {{- if empty $fullname -}}
+    {{- if eq (include "vm.useLegacyNaming" .) "false" -}}
+      {{- $release := ((.helm).Release | default .Release).Name -}}
+      {{- $fullname = printf "%s-%s" (include "vm.operator.kind" .) $release -}}
+    {{- else -}}
       {{- $fullname = include "vm.fullname" . -}}
       {{- with include "vm.internal.key.default" . -}}
         {{- $fullname = printf "%s-%s" $fullname . -}}
       {{- end -}}
     {{- end -}}
-    {{- $fullname = tpl $fullname . -}}
   {{- end -}}
+  {{- $fullname = tpl $fullname . -}}
   {{- if or ($Values.global).disableNameTruncation $Values.disableNameTruncation -}}
     {{- $fullname -}}
   {{- else -}}
