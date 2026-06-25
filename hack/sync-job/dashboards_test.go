@@ -296,64 +296,147 @@ items:
 }
 
 func TestPatchDashboardClusterVariable(t *testing.T) {
-	existingClusterVar := dashVariable{
-		Name:       "cluster",
-		Type:       "query",
-		Query:      &strOrMap{StrVal: `label_values(up{job="kubelet"}, cluster)`},
-		Definition: `label_values(up{job="kubelet"}, cluster)`,
-		Multi:      &boolOrStr{IsBool: true, BoolVal: true},
-		IncludeAll: &boolOrStr{IsBool: true, BoolVal: true},
-		Hide:       intOrStr{IsInt: true, IntVal: 0},
+	type opts struct {
+		multicluster bool
+		wantType     string
+		wantQuery    string
+		wantDef      string
+		wantMulti    bool
+		wantIncAll   bool
+		wantHide     int
 	}
-	patch := func(multicluster bool, vars ...dashVariable) *dashVariable {
+	f := func(o opts) {
 		t.Helper()
-		common := commonConfig{ClusterLabel: "cluster", Multicluster: multicluster}
-		d := &dashboard{Templating: dashTemplating{List: vars}}
-		patchDashboard(d, "test", "", common, grafanaConfig{Datasource: "prometheus", DatasourceUID: "prometheus"})
-		for i := range d.Templating.List {
-			if d.Templating.List[i].Name == "cluster" {
-				return &d.Templating.List[i]
+		v := dashVariable{
+			Name:       "cluster",
+			Type:       "query",
+			Query:      &strOrMap{StrVal: `label_values(up{job="kubelet"}, cluster)`},
+			Definition: `label_values(up{job="kubelet"}, cluster)`,
+			Multi:      &boolOrStr{IsBool: true, BoolVal: true},
+			IncludeAll: &boolOrStr{IsBool: true, BoolVal: true},
+			Hide:       intOrStr{IsInt: true, IntVal: 0},
+		}
+		common := commonConfig{ClusterLabel: "cluster", Multicluster: o.multicluster}
+		d := &dashboard{Templating: dashTemplating{List: []dashVariable{v}}}
+		patchDashboard(d, "test", "", common, grafanaConfig{
+			Datasource:    "prometheus",
+			DatasourceUID: "prometheus",
+		})
+		got := &d.Templating.List[0]
+		if got.Type != o.wantType {
+			t.Fatalf("Type: got %q, want %q", got.Type, o.wantType)
+		}
+		if o.wantQuery != "" {
+			if got.Query == nil || got.Query.StrVal != o.wantQuery {
+				t.Fatalf("Query.StrVal: got %q, want %q", got.Query.StrVal, o.wantQuery)
 			}
 		}
-		t.Fatal("cluster variable not found")
-		return nil
+		if o.wantDef != "" && got.Definition != o.wantDef {
+			t.Fatalf("Definition: got %q, want %q", got.Definition, o.wantDef)
+		}
+		if got.Multi == nil || got.Multi.BoolVal != o.wantMulti {
+			t.Fatalf("Multi: got %v, want %v", got.Multi, o.wantMulti)
+		}
+		if got.IncludeAll == nil || got.IncludeAll.BoolVal != o.wantIncAll {
+			t.Fatalf("IncludeAll: got %v, want %v", got.IncludeAll, o.wantIncAll)
+		}
+		if !got.Hide.IsInt || got.Hide.IntVal != o.wantHide {
+			t.Fatalf("Hide: got %+v, want %d", got.Hide, o.wantHide)
+		}
 	}
 
-	// multicluster:false — existing query-type var becomes constant with query=".*", multi=false, includeAll=false
-	v := patch(false, existingClusterVar)
-	if v.Type != "constant" {
-		t.Fatalf("Type: got %q, want constant", v.Type)
+	// multicluster:false — becomes constant with query=".*", multi=false, includeAll=false, hidden
+	f(opts{
+		multicluster: false,
+		wantType:     "constant",
+		wantQuery:    ".*",
+		wantDef:      ".*",
+		wantMulti:    false,
+		wantIncAll:   false,
+		wantHide:     2,
+	})
+	// multicluster:true — stays query type, multi=true, includeAll=true, visible
+	f(opts{
+		multicluster: true,
+		wantType:     "query",
+		wantMulti:    true,
+		wantIncAll:   true,
+		wantHide:     0,
+	})
+}
+
+func TestPatchVariableExpr(t *testing.T) {
+	type opts struct {
+		name       string
+		queryStr   string
+		queryMap   map[string]any
+		definition string
+		wantStr    string
+		wantMap    string
+		wantDef    string
 	}
-	if v.Query == nil || v.Query.StrVal != ".*" {
-		t.Fatalf("Query: got %v, want \".*\"", v.Query)
-	}
-	if v.Definition != ".*" {
-		t.Fatalf("Definition: got %q, want \".*\"", v.Definition)
-	}
-	if v.Multi == nil || v.Multi.BoolVal {
-		t.Fatalf("Multi: got %v, want false", v.Multi)
-	}
-	if v.IncludeAll == nil || v.IncludeAll.BoolVal {
-		t.Fatalf("IncludeAll: got %v, want false", v.IncludeAll)
-	}
-	if !v.Hide.IsInt || v.Hide.IntVal != 2 {
-		t.Fatalf("Hide: got %+v, want 2", v.Hide)
+	f := func(o opts) {
+		t.Helper()
+		var q *strOrMap
+		if o.queryStr != "" {
+			q = &strOrMap{StrVal: o.queryStr}
+		} else if o.queryMap != nil {
+			q = &strOrMap{MapVal: o.queryMap}
+		}
+		v := dashVariable{
+			Name:       o.name,
+			Type:       "query",
+			Query:      q,
+			Definition: o.definition,
+		}
+		patchVariableExpr(&v, o.name, "cluster")
+		if o.wantStr != "" && v.Query.StrVal != o.wantStr {
+			t.Fatalf("Query.StrVal: got %q, want %q", v.Query.StrVal, o.wantStr)
+		}
+		if o.wantMap != "" {
+			if s, _ := v.Query.MapVal["query"].(string); s != o.wantMap {
+				t.Fatalf("Query.MapVal[query]: got %q, want %q", s, o.wantMap)
+			}
+		}
+		if o.wantDef != "" && v.Definition != o.wantDef {
+			t.Fatalf("Definition: got %q, want %q", v.Definition, o.wantDef)
+		}
 	}
 
-	// multicluster:true — existing var keeps query type, multi=true, includeAll=true
-	v = patch(true, existingClusterVar)
-	if v.Type != "query" {
-		t.Fatalf("Type: got %q, want query", v.Type)
-	}
-	if v.Multi == nil || !v.Multi.BoolVal {
-		t.Fatalf("Multi: got %v, want true", v.Multi)
-	}
-	if v.IncludeAll == nil || !v.IncludeAll.BoolVal {
-		t.Fatalf("IncludeAll: got %v, want true", v.IncludeAll)
-	}
-	if !v.Hide.IsInt || v.Hide.IntVal != 0 {
-		t.Fatalf("Hide: got %+v, want 0", v.Hide)
-	}
+	const (
+		queryExpr = `label_values(coredns_build_info{cluster="$cluster"},job)`
+		wantExpr  = `label_values(coredns_build_info{cluster=~"$cluster"}, job)`
+	)
+
+	// string-form query: cluster filter upgraded to =~, definition patched independently
+	f(opts{
+		name:       "job",
+		queryStr:   queryExpr,
+		definition: queryExpr,
+		wantStr:    wantExpr,
+		wantDef:    wantExpr,
+	})
+	// map-form query (newer Grafana format): MapVal["query"] patched, definition patched independently
+	f(opts{
+		name: "job",
+		queryMap: map[string]any{
+			"query": queryExpr,
+			"refId": "PrometheusVariableQueryEditor-VariableQuery",
+		},
+		definition: queryExpr,
+		wantMap:    wantExpr,
+		wantDef:    wantExpr,
+	})
+	// map-form query: definition must not be erased when Query.StrVal is empty
+	f(opts{
+		name: "protocol",
+		queryMap: map[string]any{
+			"query": `label_values(coredns_dns_requests_total{cluster="$cluster"}, proto)`,
+			"refId": "StandardVariableQuery",
+		},
+		definition: `label_values(coredns_dns_requests_total{cluster="$cluster"}, proto)`,
+		wantDef:    `label_values(coredns_dns_requests_total{cluster=~"$cluster"}, proto)`,
+	})
 }
 
 func dashboardKeys(m map[string]*dashboard) []string {

@@ -323,12 +323,7 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 			if common.Multicluster {
 				t.Type = "query"
 				t.Hide = intOrStr{IsInt: true, IntVal: 0}
-				if t.Query != nil {
-					t.Query.StrVal = patchDashExpr(t.Query.StrVal, t.Name, cl)
-					if t.Definition != "" {
-						t.Definition = t.Query.StrVal
-					}
-				}
+				patchVariableExpr(t, cl, cl)
 			} else {
 				t.Type = "constant"
 				t.Hide = intOrStr{IsInt: true, IntVal: 2}
@@ -336,10 +331,7 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 				t.Definition = ".*"
 			}
 		} else if t.Type == "query" && t.Query != nil {
-			t.Query.StrVal = patchDashExpr(t.Query.StrVal, t.Name, cl)
-			if t.Definition != "" {
-				t.Definition = t.Query.StrVal
-			}
+			patchVariableExpr(t, t.Name, cl)
 		}
 	}
 
@@ -367,6 +359,19 @@ func buildClusterVariable(metric string, common commonConfig) dashVariable {
 		v.Query = &strOrMap{StrVal: ".*"}
 	}
 	return v
+}
+
+func patchVariableExpr(t *dashVariable, varName, cl string) {
+	if t.Query != nil {
+		if t.Query.StrVal != "" {
+			t.Query.StrVal = patchDashExpr(t.Query.StrVal, varName, cl)
+		} else if q, ok := t.Query.MapVal["query"].(string); ok {
+			t.Query.MapVal["query"] = patchDashExpr(q, varName, cl)
+		}
+	}
+	if t.Definition != "" {
+		t.Definition = patchDashExpr(t.Definition, varName, cl)
+	}
 }
 
 func patchDatasource(d *strOrMap, grafana grafanaConfig) {

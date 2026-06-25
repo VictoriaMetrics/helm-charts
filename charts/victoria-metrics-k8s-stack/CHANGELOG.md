@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix sync-job failing to patch cluster variable filters in dashboards that store variable queries as structured objects (map form) instead of plain strings. See [#3038](https://github.com/VictoriaMetrics/helm-charts/issues/3038).
 
 ## 0.85.4
 
