@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.85.5
+
+**Release date:** 25 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.146.0](https://img.shields.io/badge/v1.146.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11460)
+
 - fix sync-job failing to patch cluster variable filters in dashboards that store variable queries as structured objects (map form) instead of plain strings. See [#3038](https://github.com/VictoriaMetrics/helm-charts/issues/3038).
 
 ## 0.85.4
