@@ -13,6 +13,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	cacheDir := filepath.Join(workdir, ".cache")
+	os.Setenv("HELM_CACHE_HOME", cacheDir) //nolint:errcheck
 	chartsDir := filepath.Join(filepath.Dir(workdir), "charts")
 	entries, err := os.ReadDir(chartsDir)
 	if err != nil {
