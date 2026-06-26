@@ -47550,6 +47550,75 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - 'sync-job supports manifest generation mode: set `OUTPUT=-` (stdout) or `OUTPUT=<file>` to write all rendered ConfigMap/GrafanaDashboard/VMRule manifests as YAML instead of applying them to the cluster, allowing users to commit the output to a repository and deploy via GitOps tools in air-gapped environments. See [#3040](https://github.com/VictoriaMetrics/helm-charts/issues/3040)'
+        - 'fix sync-job not injecting hidden constant `$cluster` variable into dashboards that have no cluster template variable, causing Grafana to show "No data" or variable errors when `multicluster: false`. See [#3042](https://github.com/VictoriaMetrics/helm-charts/issues/3042)'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victoriametrics/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/changelog/
+        - name: App Changelog
+          url: https://docs.victoriametrics.com/victoriametrics/changelog/
+      artifacthub.io/operator: "true"
+      artifacthub.io/readme: |
+        # VictoriaMetrics K8s Stack Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/changelog/).
+    apiVersion: v2
+    appVersion: v1.146.0
+    created: "2026-06-26T21:15:41.488864226Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    - condition: victoria-metrics-operator.enabled
+      name: victoria-metrics-operator
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.65.*
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: oci://ghcr.io/prometheus-community/charts
+      version: 7.5.*
+    - condition: prometheus-node-exporter.enabled
+      name: prometheus-node-exporter
+      repository: oci://ghcr.io/prometheus-community/charts
+      version: 4.55.*
+    - condition: grafana.enabled
+      name: grafana
+      repository: oci://ghcr.io/grafana-community/helm-charts
+      version: 12.3.*
+    description: Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics
+      Operator, Grafana dashboards, ServiceScrapes and VMRules
+    digest: ecdd2932f47411852c038990a0565e44379b18090d82ffd856075297943d70c9
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-k8s-stack
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-k8s-stack-0.85.6/victoria-metrics-k8s-stack-0.85.6.tgz
+    version: 0.85.6
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - fix sync-job failing to patch cluster variable filters in dashboards that store variable queries as structured objects (map form) instead of plain strings. See [#3038](https://github.com/VictoriaMetrics/helm-charts/issues/3038).
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -80372,4 +80441,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-06-25T17:28:09.216953959Z"
+generated: "2026-06-26T21:15:41.491506195Z"
