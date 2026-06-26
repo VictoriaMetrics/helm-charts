@@ -168,7 +168,7 @@ type dashboardItem struct {
 
 // --- reconcile ---
 
-func reconcileDashboards(ctx context.Context, kube *kubeClient, cfg *dashboardsConfig, common commonConfig, rawByURL map[string][]byte, prune bool) error {
+func reconcileDashboards(ctx context.Context, kube *syncClient, cfg *dashboardsConfig, common commonConfig, rawByURL map[string][]byte, prune bool) error {
 	grafana := cfg.Common.Grafana
 	useOperator := grafana.Operator != nil
 
@@ -335,7 +335,7 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 		}
 	}
 
-	if !hasCluster && clusterMetric != "" {
+	if !hasCluster && (clusterMetric != "" || !common.Multicluster) {
 		d.Templating.List = append(d.Templating.List, buildClusterVariable(clusterMetric, common))
 	}
 }

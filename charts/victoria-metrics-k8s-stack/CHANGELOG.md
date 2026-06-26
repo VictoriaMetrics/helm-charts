@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- sync-job supports manifest generation mode: set `OUTPUT=-` (stdout) or `OUTPUT=<file>` to write all rendered ConfigMap/GrafanaDashboard/VMRule manifests as YAML instead of applying them to the cluster, allowing users to commit the output to a repository and deploy via GitOps tools in air-gapped environments. See [#3040](https://github.com/VictoriaMetrics/helm-charts/issues/3040)
+- fix sync-job not injecting hidden constant `$cluster` variable into dashboards that have no cluster template variable, causing Grafana to show "No data" or variable errors when `multicluster: false`. See [#3042](https://github.com/VictoriaMetrics/helm-charts/issues/3042)
 
 ## 0.85.5
 

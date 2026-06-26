@@ -18,6 +18,35 @@ A Go binary that runs as a Kubernetes Job on every Helm install/upgrade. It fetc
 | `RELEASE` | _(empty)_ | Helm release name; scopes managed resources per release via `app.kubernetes.io/instance` |
 | `RESOURCE_PREFIX` | value of `RELEASE` | Prefix for managed resource names (`<prefix>-rule-<group>`, `<prefix>-dashboard-<name>`). Defaults to `RELEASE`; falls back to `vm-k8s-stack` when both are unset. |
 | `PRUNE` | `true` | Set to `false` to disable deletion of orphaned resources |
+| `OWNER_REFERENCES` | `true` | Set to `false` to disable setting owner references on managed resources |
+| `OUTPUT` | _(empty)_ | Write manifests to this path instead of applying to the cluster. Use `-` for stdout. See [Manifest generation](#manifest-generation). |
+
+Standard `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` environment variables are respected for all outbound HTTP requests.
+
+## Manifest generation
+
+Setting `OUTPUT` switches the sync-job from apply mode to generate mode: it fetches and patches all sources exactly as normal, but writes the resulting manifests as YAML to the specified path (or stdout when `-`) instead of applying them to the cluster. No Kubernetes connection is required.
+
+This is useful for:
+
+- **GitOps workflows** — run the sync-job in CI, commit the output to your repository, and deploy the manifests with ArgoCD, Flux, or any other tool. Changes to upstream dashboards and rules become visible as normal Git diffs.
+- **Air-gapped clusters** — generate manifests where internet access is available, then deploy the committed output inside the cluster without outbound connectivity.
+
+```sh
+docker run \
+  -e OUTPUT=- \
+  -e CONFIG=/path/to/config.yaml \
+  -e NAMESPACE=monitoring \
+  -e RELEASE=my-release \
+  victoriametrics/sync-job > manifests.yaml
+```
+
+### Air-gapped environments
+
+Two approaches are available depending on infrastructure:
+
+- **Manifest generation** — generate manifests in a network-connected environment (CI, developer laptop) and commit them as described above.
+- **Private source URLs** — mirror the upstream dashboard and rule files to an internal HTTP server or object storage, then override the `sources` URLs in `values.yaml` to point to your internal endpoints. The sync-job fetches from whatever URLs are configured; no code changes are required. If the internal server requires a proxy, set `HTTP_PROXY`/`HTTPS_PROXY` accordingly.
 
 ## Config file
 
