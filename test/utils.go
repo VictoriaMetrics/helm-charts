@@ -20,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	discovery "k8s.io/api/discovery/v1"
 )
 
 const (
@@ -185,9 +186,28 @@ func waitUntilDeploymentAvailable(t *testing.T, ctx context.Context, client *kub
 
 func waitUntilServiceAvailable(t *testing.T, ctx context.Context, client *kubernetes.Clientset, namespace, name string) {
 	t.Helper()
-	err := wait.PollUntilContextTimeout(ctx, pollingInterval, resourceWaitTimeout, true, func(ctx context.Context) (bool, error) {
-		_, err := client.CoreV1().Services(namespace).Get(ctx, name, metav1.GetOptions{})
-		return err == nil, nil
+	err := wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (bool, error) {
+		svc, err := client.CoreV1().Services(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return false, nil
+		}
+		if svc.Spec.Type == corev1.ServiceTypeLoadBalancer && len(svc.Status.LoadBalancer.Ingress) == 0 {
+			return false, nil
+		}
+		slices, err := client.DiscoveryV1().EndpointSlices(namespace).List(ctx, metav1.ListOptions{
+			LabelSelector: discovery.LabelServiceName + "=" + name,
+		})
+		if err != nil {
+			return false, nil
+		}
+		for _, slice := range slices.Items {
+			for _, ep := range slice.Endpoints {
+				if ep.Conditions.Ready != nil && *ep.Conditions.Ready {
+					return true, nil
+				}
+			}
+		}
+		return false, nil
 	})
 	require.NoError(t, err, "service %s not available", name)
 }
