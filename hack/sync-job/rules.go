@@ -37,7 +37,7 @@ type rule struct {
 	XXX         map[string]any    `yaml:",inline"`
 }
 
-func reconcileRules(ctx context.Context, kube *kubeClient, cfg *rulesConfig, common commonConfig, rawByURL map[string][]byte, prune bool) error {
+func reconcileRules(ctx context.Context, kube *syncClient, cfg *rulesConfig, common commonConfig, rawByURL map[string][]byte, prune bool) error {
 	existing, err := kube.listManagedVMRules(ctx)
 	if err != nil {
 		return fmt.Errorf("list managed vmrules: %w", err)

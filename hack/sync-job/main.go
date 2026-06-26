@@ -11,38 +11,64 @@ import (
 	"time"
 )
 
+func openOutput(path string) (io.WriteCloser, error) {
+	if path == "-" {
+		return os.Stdout, nil
+	}
+	return os.Create(path)
+}
+
 func main() {
 	configPath := envOrDefault("CONFIG", "/etc/config/config.yaml")
 	namespace := envOrDefault("NAMESPACE", "default")
-	instance := os.Getenv("RELEASE")
+	instance := envOrDefault("RELEASE", "vm-k8s-stack")
 	resourcePrefix := envOrDefault("RESOURCE_PREFIX", instance)
 	prune := envOrDefault("PRUNE", "true") != "false"
 	useOwnerRef := envOrDefault("OWNER_REFERENCES", "true") != "false"
+	outputPath := os.Getenv("OUTPUT")
 
 	cfg, err := loadConfig(configPath)
 	if err != nil {
 		log.Fatalf("load config: %v", err)
 	}
 
-	kube, err := newKubeClient(namespace, instance, resourcePrefix)
-	if err != nil {
-		log.Fatalf("create kube client: %v", err)
-	}
-
-	if useOwnerRef {
-		saName := os.Getenv("SERVICE_ACCOUNT")
-		if err := kube.resolveOwnerRef(context.Background(), saName); err != nil {
-			log.Printf("warning: cannot resolve service account %q for owner references: %v", saName, err)
+	var kube *syncClient
+	if outputPath != "" {
+		w, err := openOutput(outputPath)
+		if err != nil {
+			log.Fatalf("open output: %v", err)
+		}
+		if w != os.Stdout {
+			defer w.Close()
+		}
+		kube = &syncClient{
+			namespace:      namespace,
+			instance:       instance,
+			resourcePrefix: resourcePrefix,
+			out:            w,
+		}
+	} else {
+		kube, err = newSyncClient(namespace, instance, resourcePrefix)
+		if err != nil {
+			log.Fatalf("create kube client: %v", err)
+		}
+		if useOwnerRef {
+			saName := os.Getenv("SERVICE_ACCOUNT")
+			if err := kube.resolveOwnerRef(context.Background(), saName); err != nil {
+				log.Printf("warning: cannot resolve service account %q for owner references: %v", saName, err)
+			}
 		}
 	}
 
 	if err := run(context.Background(), kube, cfg, prune); err != nil {
 		log.Fatalf("sync: %v", err)
 	}
-	log.Println("sync complete")
+	if outputPath == "" {
+		log.Println("sync complete")
+	}
 }
 
-func run(ctx context.Context, kube *kubeClient, cfg *config, prune bool) error {
+func run(ctx context.Context, kube *syncClient, cfg *config, prune bool) error {
 	allURLs := make(map[string]struct{})
 	for _, src := range cfg.Dashboards.Sources {
 		if src.Enabled == nil || *src.Enabled {

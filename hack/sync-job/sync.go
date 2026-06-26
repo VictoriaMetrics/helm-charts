@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
 	"os"
 
 	corev1 "k8s.io/api/core/v1"
@@ -14,6 +16,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	sigsyaml "sigs.k8s.io/yaml"
 )
 
 const managedByLabel = "app.kubernetes.io/managed-by"
@@ -32,16 +35,26 @@ var vmruleGVR = schema.GroupVersionResource{
 	Resource: "vmrules",
 }
 
-type kubeClient struct {
+type syncClient struct {
 	cs             kubernetes.Interface
 	dyn            dynamic.Interface
 	namespace      string
 	instance       string
 	resourcePrefix string
 	ownerRef       *metav1.OwnerReference
+	out            io.Writer
 }
 
-func newKubeClient(namespace, instance, resourcePrefix string) (*kubeClient, error) {
+func (k *syncClient) writeManifest(obj any) {
+	data, err := sigsyaml.Marshal(obj)
+	if err != nil {
+		log.Printf("marshal manifest: %v", err)
+		return
+	}
+	fmt.Fprintf(k.out, "---\n%s", data)
+}
+
+func newSyncClient(namespace, instance, resourcePrefix string) (*syncClient, error) {
 	cfg, err := rest.InClusterConfig()
 	if err != nil {
 		kubecfg := os.Getenv("KUBECONFIG")
@@ -61,13 +74,10 @@ func newKubeClient(namespace, instance, resourcePrefix string) (*kubeClient, err
 	if err != nil {
 		return nil, fmt.Errorf("create dynamic client: %w", err)
 	}
-	if resourcePrefix == "" {
-		resourcePrefix = "vm-k8s-stack"
-	}
-	return &kubeClient{cs: cs, dyn: dyn, namespace: namespace, instance: instance, resourcePrefix: resourcePrefix}, nil
+	return &syncClient{cs: cs, dyn: dyn, namespace: namespace, instance: instance, resourcePrefix: resourcePrefix}, nil
 }
 
-func (k *kubeClient) baseLabels() map[string]any {
+func (k *syncClient) baseLabels() map[string]any {
 	labels := map[string]any{managedByLabel: managedByValue}
 	if k.instance != "" {
 		labels[instanceLabel] = k.instance
@@ -75,14 +85,14 @@ func (k *kubeClient) baseLabels() map[string]any {
 	return labels
 }
 
-func (k *kubeClient) labelSelector() string {
+func (k *syncClient) labelSelector() string {
 	if k.instance != "" {
 		return fmt.Sprintf("%s=%s,%s=%s", managedByLabel, managedByValue, instanceLabel, k.instance)
 	}
 	return fmt.Sprintf("%s=%s", managedByLabel, managedByValue)
 }
 
-func (k *kubeClient) applyConfigMap(ctx context.Context, name string, data map[string]string, extraLabels, extraAnnotations map[string]string) error {
+func (k *syncClient) applyConfigMap(ctx context.Context, name string, data map[string]string, extraLabels, extraAnnotations map[string]string) error {
 	labels := map[string]string{
 		managedByLabel: managedByValue,
 		instanceLabel:  k.instance,
@@ -102,6 +112,11 @@ func (k *kubeClient) applyConfigMap(ctx context.Context, name string, data map[s
 	if k.ownerRef != nil {
 		cm.OwnerReferences = []metav1.OwnerReference{*k.ownerRef}
 	}
+	if k.out != nil {
+		cm.TypeMeta = metav1.TypeMeta{APIVersion: "v1", Kind: "ConfigMap"}
+		k.writeManifest(cm)
+		return nil
+	}
 	existing, err := k.cs.CoreV1().ConfigMaps(k.namespace).Get(ctx, name, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		_, err = k.cs.CoreV1().ConfigMaps(k.namespace).Create(ctx, cm, metav1.CreateOptions{})
@@ -115,7 +130,7 @@ func (k *kubeClient) applyConfigMap(ctx context.Context, name string, data map[s
 	return err
 }
 
-func (k *kubeClient) deleteConfigMap(ctx context.Context, name string) error {
+func (k *syncClient) deleteConfigMap(ctx context.Context, name string) error {
 	err := k.cs.CoreV1().ConfigMaps(k.namespace).Delete(ctx, name, metav1.DeleteOptions{})
 	if k8serrors.IsNotFound(err) {
 		return nil
@@ -123,7 +138,10 @@ func (k *kubeClient) deleteConfigMap(ctx context.Context, name string) error {
 	return err
 }
 
-func (k *kubeClient) listManagedConfigMaps(ctx context.Context) ([]string, error) {
+func (k *syncClient) listManagedConfigMaps(ctx context.Context) ([]string, error) {
+	if k.out != nil {
+		return nil, nil
+	}
 	list, err := k.cs.CoreV1().ConfigMaps(k.namespace).List(ctx, metav1.ListOptions{
 		LabelSelector: k.labelSelector(),
 	})
@@ -137,7 +155,7 @@ func (k *kubeClient) listManagedConfigMaps(ctx context.Context) ([]string, error
 	return names, nil
 }
 
-func (k *kubeClient) applyGrafanaDashboard(ctx context.Context, name, jsonContent string, extraSpec map[string]any, extraLabels, extraAnnotations map[string]string) error {
+func (k *syncClient) applyGrafanaDashboard(ctx context.Context, name, jsonContent string, extraSpec map[string]any, extraLabels, extraAnnotations map[string]string) error {
 	spec := map[string]any{"json": jsonContent}
 	for key, val := range extraSpec {
 		spec[key] = val
@@ -174,6 +192,10 @@ func (k *kubeClient) applyGrafanaDashboard(ctx context.Context, name, jsonConten
 			"spec":       spec,
 		},
 	}
+	if k.out != nil {
+		k.writeManifest(obj.Object)
+		return nil
+	}
 	existing, err := k.dyn.Resource(grafanaDashboardGVR).Namespace(k.namespace).Get(ctx, name, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		_, err = k.dyn.Resource(grafanaDashboardGVR).Namespace(k.namespace).Create(ctx, obj, metav1.CreateOptions{})
@@ -187,7 +209,7 @@ func (k *kubeClient) applyGrafanaDashboard(ctx context.Context, name, jsonConten
 	return err
 }
 
-func (k *kubeClient) deleteGrafanaDashboard(ctx context.Context, name string) error {
+func (k *syncClient) deleteGrafanaDashboard(ctx context.Context, name string) error {
 	err := k.dyn.Resource(grafanaDashboardGVR).Namespace(k.namespace).Delete(ctx, name, metav1.DeleteOptions{})
 	if k8serrors.IsNotFound(err) {
 		return nil
@@ -195,7 +217,10 @@ func (k *kubeClient) deleteGrafanaDashboard(ctx context.Context, name string) er
 	return err
 }
 
-func (k *kubeClient) listManagedGrafanaDashboards(ctx context.Context) ([]string, error) {
+func (k *syncClient) listManagedGrafanaDashboards(ctx context.Context) ([]string, error) {
+	if k.out != nil {
+		return nil, nil
+	}
 	list, err := k.dyn.Resource(grafanaDashboardGVR).Namespace(k.namespace).List(ctx, metav1.ListOptions{
 		LabelSelector: k.labelSelector(),
 	})
@@ -209,7 +234,7 @@ func (k *kubeClient) listManagedGrafanaDashboards(ctx context.Context) ([]string
 	return names, nil
 }
 
-func (k *kubeClient) applyVMRule(ctx context.Context, name string, spec map[string]any, extraLabels, extraAnnotations map[string]string) error {
+func (k *syncClient) applyVMRule(ctx context.Context, name string, spec map[string]any, extraLabels, extraAnnotations map[string]string) error {
 	labels := k.baseLabels()
 	for key, val := range extraLabels {
 		labels[key] = val
@@ -242,6 +267,10 @@ func (k *kubeClient) applyVMRule(ctx context.Context, name string, spec map[stri
 			"spec":       spec,
 		},
 	}
+	if k.out != nil {
+		k.writeManifest(obj.Object)
+		return nil
+	}
 	existing, err := k.dyn.Resource(vmruleGVR).Namespace(k.namespace).Get(ctx, name, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		_, err = k.dyn.Resource(vmruleGVR).Namespace(k.namespace).Create(ctx, obj, metav1.CreateOptions{})
@@ -255,7 +284,7 @@ func (k *kubeClient) applyVMRule(ctx context.Context, name string, spec map[stri
 	return err
 }
 
-func (k *kubeClient) deleteVMRule(ctx context.Context, name string) error {
+func (k *syncClient) deleteVMRule(ctx context.Context, name string) error {
 	err := k.dyn.Resource(vmruleGVR).Namespace(k.namespace).Delete(ctx, name, metav1.DeleteOptions{})
 	if k8serrors.IsNotFound(err) {
 		return nil
@@ -263,7 +292,7 @@ func (k *kubeClient) deleteVMRule(ctx context.Context, name string) error {
 	return err
 }
 
-func (k *kubeClient) resolveOwnerRef(ctx context.Context, saName string) error {
+func (k *syncClient) resolveOwnerRef(ctx context.Context, saName string) error {
 	sa, err := k.cs.CoreV1().ServiceAccounts(k.namespace).Get(ctx, saName, metav1.GetOptions{})
 	if err != nil {
 		return err
@@ -277,7 +306,10 @@ func (k *kubeClient) resolveOwnerRef(ctx context.Context, saName string) error {
 	return nil
 }
 
-func (k *kubeClient) listManagedVMRules(ctx context.Context) ([]string, error) {
+func (k *syncClient) listManagedVMRules(ctx context.Context) ([]string, error) {
+	if k.out != nil {
+		return nil, nil
+	}
 	list, err := k.dyn.Resource(vmruleGVR).Namespace(k.namespace).List(ctx, metav1.ListOptions{
 		LabelSelector: k.labelSelector(),
 	})

@@ -439,6 +439,71 @@ func TestPatchVariableExpr(t *testing.T) {
 	})
 }
 
+func TestPatchDashboardInjectClusterVariable(t *testing.T) {
+	type opts struct {
+		multicluster  bool
+		clusterMetric string
+		wantInjected  bool
+		wantType      string
+		wantHide      int
+	}
+	f := func(o opts) {
+		t.Helper()
+		common := commonConfig{ClusterLabel: "cluster", Multicluster: o.multicluster}
+		d := &dashboard{Templating: dashTemplating{List: []dashVariable{}}}
+		patchDashboard(d, "test", o.clusterMetric, common, grafanaConfig{
+			Datasource:    "prometheus",
+			DatasourceUID: "prometheus",
+		})
+		found := false
+		for _, v := range d.Templating.List {
+			if v.Name == "cluster" {
+				found = true
+				if v.Type != o.wantType {
+					t.Fatalf("Type: got %q, want %q", v.Type, o.wantType)
+				}
+				if !v.Hide.IsInt || v.Hide.IntVal != o.wantHide {
+					t.Fatalf("Hide: got %+v, want %d", v.Hide, o.wantHide)
+				}
+			}
+		}
+		if found != o.wantInjected {
+			t.Fatalf("cluster variable injected=%v, want %v", found, o.wantInjected)
+		}
+	}
+
+	// multicluster:false, no clusterMetric — hidden constant injected so $cluster resolves in patched queries
+	f(opts{
+		multicluster:  false,
+		clusterMetric: "",
+		wantInjected:  true,
+		wantType:      "constant",
+		wantHide:      2,
+	})
+	// multicluster:false, clusterMetric set — hidden constant injected
+	f(opts{
+		multicluster:  false,
+		clusterMetric: "up",
+		wantInjected:  true,
+		wantType:      "constant",
+		wantHide:      2,
+	})
+	// multicluster:true, clusterMetric set — visible query variable injected
+	f(opts{
+		multicluster:  true,
+		clusterMetric: "up",
+		wantInjected:  true,
+		wantType:      "query",
+		wantHide:      0,
+	})
+	// multicluster:true, no clusterMetric — cannot build query variable, nothing injected
+	f(opts{
+		multicluster:  true,
+		clusterMetric: "",
+		wantInjected:  false,
+	})
+}
+
 func dashboardKeys(m map[string]*dashboard) []string {
 	keys := make([]string, 0, len(m))
 	for k := range m {
