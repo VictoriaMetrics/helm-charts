@@ -1,7 +1,15 @@
 ## Next release
 
+- TODO
+
+## 0.85.6
+
+**Release date:** 26 Jun 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.146.0](https://img.shields.io/badge/v1.146.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11460)
+
 - sync-job supports manifest generation mode: set `OUTPUT=-` (stdout) or `OUTPUT=<file>` to write all rendered ConfigMap/GrafanaDashboard/VMRule manifests as YAML instead of applying them to the cluster, allowing users to commit the output to a repository and deploy via GitOps tools in air-gapped environments. See [#3040](https://github.com/VictoriaMetrics/helm-charts/issues/3040)
-- fix sync-job not injecting hidden constant `$cluster` variable into dashboards that have no cluster template variable, causing Grafana to show "No data" or variable errors when `multicluster: false`. See [#3042](https://github.com/VictoriaMetrics/helm-charts/issues/3042)
+- fix sync-job not injecting hidden constant `` variable into dashboards that have no cluster template variable, causing Grafana to show "No data" or variable errors when `multicluster: false`. See [#3042](https://github.com/VictoriaMetrics/helm-charts/issues/3042)
 
 ## 0.85.5
 
