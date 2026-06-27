@@ -32,8 +32,8 @@ spec:
       dnsConfig:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if $job.dnsPolicy }}
-      dnsPolicy: {{ $job.dnsPolicy }}
+      {{- with $job.dnsPolicy }}
+      dnsPolicy: {{ . }}
       {{- end }}
       containers:
         - name: sync-job
