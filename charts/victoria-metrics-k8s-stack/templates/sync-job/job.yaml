@@ -28,6 +28,13 @@ spec:
       {{- with $job.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $job.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $job.dnsPolicy }}
+      dnsPolicy: {{ $job.dnsPolicy }}
+      {{- end }}
       containers:
         - name: sync-job
           image: "{{ $job.image.repository }}:{{ $job.image.tag }}"
