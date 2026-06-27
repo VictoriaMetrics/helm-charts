@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- sync-job now supports overriding the dnsConfig and dnsPolicy
 
 ## 0.85.6
 
