@@ -640,13 +640,7 @@
   {{- tpl (deepCopy $Values.vtsingle.spec | mergeOverwrite $spec | toYaml) . -}}
 {{- end }}
 
-{{- /* VTCluster select spec */ -}}
-{{- define "vt.select.spec" -}}
-  {{- $spec := dict -}}
-  {{- toYaml $spec -}}
-{{- end -}}
-
-{{- /* VTCluster spec - translates vtinsert/vtselect/vtstorage → insert/select/storage for CRD */ -}}
+{{- /* VTCluster spec */ -}}
 {{- define "vt.cluster.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $clusterSpec := deepCopy $Values.vtcluster.spec -}}
@@ -654,7 +648,6 @@
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- $clusterSpec = mergeOverwrite (dict "vtselect" (include "vt.select.spec" . | fromYaml)) $clusterSpec -}}
   {{- $vtselect := deepCopy ($clusterSpec.vtselect | default dict) -}}
   {{- $_ := unset $clusterSpec "vtselect" -}}
   {{- if $vtselect.enabled -}}

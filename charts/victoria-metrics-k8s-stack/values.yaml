@@ -555,12 +555,12 @@ vlcluster:
   annotations: {}
   # -- Full spec for VLCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vlclusterspec)
   spec:
-    # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention)
-    retentionPeriod: 14d
     # renovate: image=victoriametrics/victoria-logs
     clusterVersion: v1.51.0
     vlstorage:
       replicaCount: 2
+      # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/victorialogs/#retention)
+      retentionPeriod: 14d
       storageDataPath: /vl-data
       port: "9491"
       storage:
@@ -580,12 +580,6 @@ vlcluster:
       port: "9471"
       replicaCount: 2
       extraArgs: {}
-      storage:
-        volumeClaimTemplate:
-          spec:
-            resources:
-              requests:
-                storage: 2Gi
       resources:
         {}
         # limits:
@@ -968,13 +962,13 @@ vtcluster:
   annotations: {}
   # -- Full spec for VTCluster CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vtclusterspec)
   spec:
-    # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h.
-    retentionPeriod: 14d
     # renovate: image=victoriametrics/victoria-traces
     clusterVersion: v0.9.3
     vtstorage:
       replicaCount: 2
       storageDataPath: /vt-data
+      # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h.
+      retentionPeriod: 14d
       port: "10491"
       storage:
         volumeClaimTemplate:
@@ -993,12 +987,6 @@ vtcluster:
       port: "10471"
       replicaCount: 2
       extraArgs: {}
-      storage:
-        volumeClaimTemplate:
-          spec:
-            resources:
-              requests:
-                storage: 2Gi
       resources:
         {}
         # limits:
