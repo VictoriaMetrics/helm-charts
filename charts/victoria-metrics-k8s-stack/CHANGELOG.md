@@ -1,6 +1,7 @@
 ## Next release
 
 - sync-job now supports overriding the dnsConfig and dnsPolicy
+- removed unsupported vl and vt cluster parameters. See [#3047](https://github.com/VictoriaMetrics/helm-charts/issues/3047).
 
 ## 0.85.6
 
