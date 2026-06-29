@@ -40,6 +40,9 @@ spec:
           image: "{{ $job.image.repository }}:{{ $job.image.tag }}"
           imagePullPolicy: {{ $job.image.pullPolicy }}
           env:
+            {{- with $job.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             - name: NAMESPACE
               valueFrom:
                 fieldRef:

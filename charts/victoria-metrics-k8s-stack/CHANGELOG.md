@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- support additional env variables for syncJob. See [#3052](https://github.com/VictoriaMetrics/helm-charts/issues/3052).
 
 ## 0.85.7
 
