@@ -1,6 +1,7 @@
 ## Next release
 
 - added `runtimeClassName` option to the pod spec
+- added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 
 ## 0.3.6
 

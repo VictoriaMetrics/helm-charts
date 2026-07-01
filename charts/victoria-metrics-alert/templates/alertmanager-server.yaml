@@ -32,9 +32,9 @@ spec:
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
       labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}
-      {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/alertmanager-configmap.yaml") . | sha256sum) }}
-      {{- $annotations = merge $annotations (deepCopy $app.podAnnotations) }}
-      annotations: {{ toYaml $annotations | nindent 8 }}
+      {{- $_ := set $ctx "extraAnnotations" (merge (dict "checksum/config" (include (print .Template.BasePath "/alertmanager-configmap.yaml") . | sha256sum)) (deepCopy $app.podAnnotations)) }}
+      annotations: {{ include "vm.annotations" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
       serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}

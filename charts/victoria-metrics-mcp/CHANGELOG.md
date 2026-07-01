@@ -2,6 +2,7 @@
 
 - add ability to override container command.
 - add `nodePort` support for `Service` resources
+- added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 
 ## 0.3.0
 

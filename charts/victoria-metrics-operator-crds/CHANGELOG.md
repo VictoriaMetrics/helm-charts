@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `global.extraAnnotations` support for upgrade job pod template
 
 ## 0.12.0
 

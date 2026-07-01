@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 
 ## 0.45.0
 

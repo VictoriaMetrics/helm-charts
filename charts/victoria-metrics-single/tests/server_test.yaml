@@ -52,3 +52,57 @@ tests:
     asserts:
       - notExists:
           path: spec.template.spec.runtimeClassName
+  - it: should apply global.extraLabels to resource metadata and pod template
+    set:
+      global:
+        extraLabels:
+          team: platform
+    asserts:
+      - equal:
+          path: metadata.labels.team
+          value: platform
+      - equal:
+          path: spec.template.metadata.labels.team
+          value: platform
+  - it: should apply global.extraAnnotations to resource metadata and pod template
+    set:
+      global:
+        extraAnnotations:
+          owner: platform-team
+    asserts:
+      - equal:
+          path: metadata.annotations.owner
+          value: platform-team
+      - equal:
+          path: spec.template.metadata.annotations.owner
+          value: platform-team
+  - it: should merge global.extraLabels with component extraLabels
+    set:
+      global:
+        extraLabels:
+          global-label: global-value
+      server:
+        extraLabels:
+          component-label: component-value
+    asserts:
+      - equal:
+          path: metadata.labels.global-label
+          value: global-value
+      - equal:
+          path: metadata.labels.component-label
+          value: component-value
+  - it: should merge global.extraAnnotations with component annotations
+    set:
+      global:
+        extraAnnotations:
+          global-annotation: global-value
+      server:
+        annotations:
+          component-annotation: component-value
+    asserts:
+      - equal:
+          path: metadata.annotations.global-annotation
+          value: global-value
+      - equal:
+          path: metadata.annotations.component-annotation
+          value: component-value

@@ -18,9 +18,11 @@ spec:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      {{- $_ := set $ctx "extraAnnotations" .Values.podAnnotations }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
       {{- end }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
       labels:
         {{- include "vm.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}

@@ -53,3 +53,39 @@ tests:
             - /custom/bin/vmagent
         template: server.yaml
         documentIndex: 0
+  - it: should apply global.extraLabels to resource metadata and pod template
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      global:
+        extraLabels:
+          team: platform
+    asserts:
+      - equal:
+          path: metadata.labels.team
+          value: platform
+        template: server.yaml
+        documentIndex: 0
+      - equal:
+          path: spec.template.metadata.labels.team
+          value: platform
+        template: server.yaml
+        documentIndex: 0
+  - it: should apply global.extraAnnotations to resource metadata and pod template
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      global:
+        extraAnnotations:
+          owner: platform-team
+    asserts:
+      - equal:
+          path: metadata.annotations.owner
+          value: platform-team
+        template: server.yaml
+        documentIndex: 0
+      - equal:
+          path: spec.template.metadata.annotations.owner
+          value: platform-team
+        template: server.yaml
+        documentIndex: 0
