@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.13
+
+**Release date:** 01 Jul 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - extended `vm.podLabels` helper to include `global.extraLabels` in pod template labels
 - added `vm.annotations` helper to merge `global.extraAnnotations` with per-resource annotations
 - added `vm.keyValue` helper to serialize a label/annotation map to `key=value,...` format
