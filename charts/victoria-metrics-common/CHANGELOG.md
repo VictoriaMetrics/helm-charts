@@ -2,7 +2,9 @@
 
 ## Next release
 
-- TODO
+- extended `vm.podLabels` helper to include `global.extraLabels` in pod template labels
+- added `vm.annotations` helper to merge `global.extraAnnotations` with per-resource annotations
+- added `vm.keyValue` helper to serialize a label/annotation map to `key=value,...` format
 
 ## 0.3.12
 

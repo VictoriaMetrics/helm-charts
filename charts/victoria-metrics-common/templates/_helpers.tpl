@@ -237,13 +237,33 @@ Returns "true", "false", or "" (not set at any level).
 {{- define "vm.podLabels" -}}
   {{- include "vm.validate.args" . -}}
   {{- $Release := (.helm).Release | default .Release -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $globalLabels := deepCopy (($Values.global).extraLabels | default dict) -}}
   {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
   {{- with $labels.app -}}
     {{- $_ := set $labels "app.kubernetes.io/component" . -}}
   {{- end -}}
-  {{- $labels = mergeOverwrite $labels (.extraLabels | default dict) -}}
+  {{- $labels = mergeOverwrite $globalLabels $labels (.extraLabels | default dict) -}}
   {{- $_ := set $labels "app.kubernetes.io/managed-by" $Release.Service -}}
   {{- toYaml $labels -}}
+{{- end -}}
+
+{{- define "vm.annotations" -}}
+  {{- include "vm.validate.args" . -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $globalAnnotations := deepCopy (($Values.global).extraAnnotations | default dict) -}}
+  {{- $annotations := mergeOverwrite $globalAnnotations (.extraAnnotations | default dict) -}}
+  {{- if $annotations -}}
+    {{- toYaml $annotations -}}
+  {{- end -}}
+{{- end -}}
+
+{{- define "vm.keyValue" -}}
+  {{- $pairs := list -}}
+  {{- range $k, $v := . -}}
+    {{- $pairs = append $pairs (printf "%s=%s" $k $v) -}}
+  {{- end -}}
+  {{- join "," $pairs -}}
 {{- end -}}
 
 {{- /* Common labels */ -}}
