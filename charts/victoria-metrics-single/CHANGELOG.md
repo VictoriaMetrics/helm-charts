@@ -1,6 +1,7 @@
 ## Next release
 
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
+- added `global.compatibility.openshift.automountServiceSigningCA` (default `auto`) to automount the OpenShift service signing CA (`openshift-service-ca.crt`) into the pod; CA available at `/etc/ssl/certs/openshift-service-ca/service-ca.crt`
 
 ## 0.41.0
 

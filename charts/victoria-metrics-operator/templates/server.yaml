@@ -98,20 +98,7 @@ spec:
               value: {{ include "vm.image" $ctx }}
               {{- $_ := unset $ctx "appKey" }}
             {{- end }}
-            {{- if .Values.operator.disable_prometheus_converter }}
-            - name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
-              value: "false"
-            - name: VM_ENABLEDPROMETHEUSCONVERTER_SERVICESCRAPE
-              value: "false"
-            - name: VM_ENABLEDPROMETHEUSCONVERTER_PROMETHEUSRULE
-              value: "false"
-            - name: VM_ENABLEDPROMETHEUSCONVERTER_PROBE
-              value: "false"
-            - name: VM_ENABLEDPROMETHEUSCONVERTER_ALERTMANAGERCONFIG
-              value: "false"
-            - name: VM_ENABLEDPROMETHEUSCONVERTER_SCRAPECONFIG
-              value: "false"
-            {{- else if .Values.operator.prometheus_converter_add_argocd_ignore_annotations }}
+            {{- if .Values.operator.prometheus_converter_add_argocd_ignore_annotations }}
             - name: VM_PROMETHEUSCONVERTERADDARGOCDIGNOREANNOTATIONS
               value: "true"
             {{- end }}
@@ -120,6 +107,18 @@ spec:
           {{- with .Values.command }}
           command: {{ toYaml . | nindent 12 }}
           {{- end }}
+          {{- $extraArgs := deepCopy .Values.extraArgs }}
+          {{- $existing := index $extraArgs "controller.disableReconcileFor" }}
+          {{- $disableFor := ternary (splitList "," (toString $existing)) ($existing | default list) (kindIs "string" $existing) }}
+          {{- if .Values.operator.disable_prometheus_converter }}
+          {{- $disableFor = concat $disableFor (list "PodMonitor" "ServiceMonitor" "PrometheusRule" "Probe" "AlertmanagerConfig" "ScrapeConfig") }}
+          {{- end }}
+          {{- $disableFor = $disableFor | compact | uniq }}
+          {{- if $disableFor }}
+          {{- $_ := set $extraArgs "controller.disableReconcileFor" ($disableFor | join ",") }}
+          {{- else }}
+          {{- $_ := unset $extraArgs "controller.disableReconcileFor" }}
+          {{- end }}
           args:
             - --zap-log-level={{ .Values.logLevel }}
             - --leader-elect
@@ -127,7 +126,7 @@ spec:
             {{- if .Values.admissionWebhooks.enabled }}
             - --webhook.enable=true
             {{- end }}
-            {{- range $key, $value := .Values.extraArgs }}
+            {{- range $key, $value := $extraArgs }}
             {{- if kindIs "slice" $value }}
             {{- range $v := $value }}
             - --{{ $key }}={{ $v }}

@@ -165,6 +165,7 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
             {{- include "vm.license.mount" . | nindent 12 }}
+            {{- include "vm.openshift.serviceCA.volumeMount" . | nindent 12 }}
         {{- with $app.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -222,6 +223,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
+        {{- include "vm.openshift.serviceCA.volume" . | nindent 8 }}
   {{- if and (eq $mode "statefulSet") $pvc.enabled (not $pvc.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1

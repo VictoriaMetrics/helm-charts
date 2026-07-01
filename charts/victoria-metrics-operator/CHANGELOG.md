@@ -3,6 +3,7 @@
 - added `runtimeClassName` option to the pod spec
 - add `nodePort` support for `Service` resources
 - added `global.extraLabels` and `global.extraAnnotations`; automatically injects `VM_COMMON_LABELS` and `VM_COMMON_ANNOTATIONS` env vars into the operator so they propagate to CRs
+- removed deprecated `VM_ENABLEDPROMETHEUSCONVERTER_*` env vars; `operator.disable_prometheus_converter: true` now uses `--controller.disableReconcileFor` CLI arg, merging with any user-provided values in `extraArgs` and deduplicating
 
 ## 0.65.1
 
