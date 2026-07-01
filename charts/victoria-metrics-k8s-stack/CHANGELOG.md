@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix sync-job incorrectly renaming the Grafana cluster variable when `global.clusterLabel` is customized, causing `$cluster` references in panel expressions to break. The variable name is now always kept as `cluster`; only the metric label in selectors is renamed to the configured value. See [#3059](https://github.com/VictoriaMetrics/helm-charts/issues/3059).
 
 ## 0.85.8
 

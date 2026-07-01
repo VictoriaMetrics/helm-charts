@@ -314,10 +314,6 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 		}
 		if t.Name == cl || t.Name == "cluster" {
 			hasCluster = true
-			t.Name = cl
-			if t.Label == "cluster" {
-				t.Label = cl
-			}
 			t.Multi = &boolOrStr{IsBool: true, BoolVal: common.Multicluster}
 			t.IncludeAll = &boolOrStr{IsBool: true, BoolVal: common.Multicluster}
 			if common.Multicluster {
@@ -342,8 +338,8 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 
 func buildClusterVariable(metric string, common commonConfig) dashVariable {
 	v := dashVariable{
-		Name:       common.ClusterLabel,
-		Label:      common.ClusterLabel,
+		Name:       "cluster",
+		Label:      "cluster",
 		AllValue:   ".*",
 		Multi:      &boolOrStr{IsBool: true, BoolVal: common.Multicluster},
 		IncludeAll: &boolOrStr{IsBool: true, BoolVal: common.Multicluster},

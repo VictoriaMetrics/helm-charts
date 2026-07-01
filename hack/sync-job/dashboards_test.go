@@ -297,7 +297,9 @@ items:
 
 func TestPatchDashboardClusterVariable(t *testing.T) {
 	type opts struct {
+		clusterLabel string
 		multicluster bool
+		wantName     string
 		wantType     string
 		wantQuery    string
 		wantDef      string
@@ -307,6 +309,10 @@ func TestPatchDashboardClusterVariable(t *testing.T) {
 	}
 	f := func(o opts) {
 		t.Helper()
+		cl := o.clusterLabel
+		if cl == "" {
+			cl = "cluster"
+		}
 		v := dashVariable{
 			Name:       "cluster",
 			Type:       "query",
@@ -316,13 +322,16 @@ func TestPatchDashboardClusterVariable(t *testing.T) {
 			IncludeAll: &boolOrStr{IsBool: true, BoolVal: true},
 			Hide:       intOrStr{IsInt: true, IntVal: 0},
 		}
-		common := commonConfig{ClusterLabel: "cluster", Multicluster: o.multicluster}
+		common := commonConfig{ClusterLabel: cl, Multicluster: o.multicluster}
 		d := &dashboard{Templating: dashTemplating{List: []dashVariable{v}}}
 		patchDashboard(d, "test", "", common, grafanaConfig{
 			Datasource:    "prometheus",
 			DatasourceUID: "prometheus",
 		})
 		got := &d.Templating.List[0]
+		if o.wantName != "" && got.Name != o.wantName {
+			t.Fatalf("Name: got %q, want %q", got.Name, o.wantName)
+		}
 		if got.Type != o.wantType {
 			t.Fatalf("Type: got %q, want %q", got.Type, o.wantType)
 		}
@@ -348,6 +357,7 @@ func TestPatchDashboardClusterVariable(t *testing.T) {
 	// multicluster:false — becomes constant with query=".*", multi=false, includeAll=false, hidden
 	f(opts{
 		multicluster: false,
+		wantName:     "cluster",
 		wantType:     "constant",
 		wantQuery:    ".*",
 		wantDef:      ".*",
@@ -358,7 +368,20 @@ func TestPatchDashboardClusterVariable(t *testing.T) {
 	// multicluster:true — stays query type, multi=true, includeAll=true, visible
 	f(opts{
 		multicluster: true,
+		wantName:     "cluster",
 		wantType:     "query",
+		wantMulti:    true,
+		wantIncAll:   true,
+		wantHide:     0,
+	})
+	// custom clusterLabel — variable name stays "cluster", query uses custom label
+	f(opts{
+		clusterLabel: "k8s_cluster",
+		multicluster: true,
+		wantName:     "cluster",
+		wantType:     "query",
+		wantQuery:    `label_values(up{job="kubelet"}, k8s_cluster)`,
+		wantDef:      `label_values(up{job="kubelet"}, k8s_cluster)`,
 		wantMulti:    true,
 		wantIncAll:   true,
 		wantHide:     0,
