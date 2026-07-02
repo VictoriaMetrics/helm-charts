@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- sort `vm.keyValue` template items for consistency
 
 ## 0.3.13
 

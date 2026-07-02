@@ -263,7 +263,7 @@ Returns "true", "false", or "" (not set at any level).
   {{- range $k, $v := . -}}
     {{- $pairs = append $pairs (printf "%s=%s" $k $v) -}}
   {{- end -}}
-  {{- join "," $pairs -}}
+  {{- join "," ($pairs | sortAlpha) -}}
 {{- end -}}
 
 {{- /* Common labels */ -}}
