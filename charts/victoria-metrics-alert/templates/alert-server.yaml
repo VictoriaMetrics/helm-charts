@@ -17,9 +17,11 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
-  {{- with $app.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{- $_ := set $ctx "extraAnnotations" $app.annotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
   {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
 spec:
   minReadySeconds: {{ $app.minReadySeconds }}
   replicas: {{ $app.replicaCount }}
@@ -35,7 +37,9 @@ spec:
       {{- $_ := unset $ctx "extraLabels" }}
       {{- $annotations := dict "checksum/config" (include (print .Template.BasePath "/alert-configmap.yaml") . | sha256sum) }}
       {{- $annotations = merge $annotations $app.podAnnotations }}
-      annotations: {{ toYaml $annotations | nindent 8 }}
+      {{- $_ := set $ctx "extraAnnotations" $annotations }}
+      annotations: {{ include "vm.annotations" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
       serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}

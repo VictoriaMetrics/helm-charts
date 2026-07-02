@@ -17,9 +17,11 @@ spec:
       {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
       labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}
-      {{- with .Values.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      {{- $_ := set $ctx "extraAnnotations" .Values.podAnnotations }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
       {{- end }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}

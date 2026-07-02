@@ -19,6 +19,9 @@ metadata:
     {{- with $app.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- with ((.Values.global).extraAnnotations) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- $extraLabels := $app.labels | default dict }}
   {{- $_ := set $ctx "extraLabels" $app.labels }}
   {{- $_ := set $extraLabels "app.kubernetes.io/component" "upgrade-crds" }}
@@ -32,9 +35,11 @@ spec:
       {{- with $app.podLabels }}
       labels: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $app.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      {{- $_ := set $ctx "extraAnnotations" $app.podAnnotations }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
       {{- end }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
       {{- with (.Values.imagePullSecrets | default (.Values.global).imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}

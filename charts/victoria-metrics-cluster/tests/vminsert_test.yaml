@@ -29,3 +29,27 @@ tests:
           path: spec.template.spec.containers[0].command
           value:
             - /custom/bin/vminsert
+  - it: should apply global.extraLabels to resource metadata and pod template
+    set:
+      global:
+        extraLabels:
+          team: platform
+    asserts:
+      - equal:
+          path: metadata.labels.team
+          value: platform
+      - equal:
+          path: spec.template.metadata.labels.team
+          value: platform
+  - it: should apply global.extraAnnotations to resource metadata and pod template
+    set:
+      global:
+        extraAnnotations:
+          owner: platform-team
+    asserts:
+      - equal:
+          path: metadata.annotations.owner
+          value: platform-team
+      - equal:
+          path: spec.template.metadata.annotations.owner
+          value: platform-team

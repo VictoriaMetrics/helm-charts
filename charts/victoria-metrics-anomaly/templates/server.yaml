@@ -41,7 +41,11 @@ spec:
       {{- if semverCompare "<1.25.0" $tag }}
       {{- $_ := set $annotations "checksum/config" (include (print .Template.BasePath "/configmap.yaml") . | sha256sum) }}
       {{- end }}
-      annotations: {{ toYaml $annotations | nindent 8 }}
+      {{- $_ := set $ctx "extraAnnotations" $annotations }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
+      {{- end }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
       {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
       labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}

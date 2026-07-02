@@ -1,0 +1,95 @@
+suite: server templates test
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - server.yaml
+tests:
+  - it: should inject VM_COMMON_LABELS env var when global.extraLabels is set
+    set:
+      global:
+        extraLabels:
+          team: platform
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VM_COMMON_LABELS
+            value: "team=platform"
+          any: true
+  - it: should inject VM_COMMON_ANNOTATIONS env var when global.extraAnnotations is set
+    set:
+      global:
+        extraAnnotations:
+          owner: platform-team
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VM_COMMON_ANNOTATIONS
+            value: "owner=platform-team"
+          any: true
+  - it: should not inject VM_COMMON_LABELS when global.extraLabels is empty
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VM_COMMON_LABELS
+          any: true
+  - it: should not inject VM_COMMON_ANNOTATIONS when global.extraAnnotations is empty
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VM_COMMON_ANNOTATIONS
+          any: true
+  - it: should apply global.extraLabels to resource metadata and pod template
+    set:
+      global:
+        extraLabels:
+          team: platform
+    asserts:
+      - equal:
+          path: metadata.labels.team
+          value: platform
+      - equal:
+          path: spec.template.metadata.labels.team
+          value: platform
+  - it: should apply global.extraAnnotations to resource metadata and pod template
+    set:
+      global:
+        extraAnnotations:
+          owner: platform-team
+    asserts:
+      - equal:
+          path: metadata.annotations.owner
+          value: platform-team
+      - equal:
+          path: spec.template.metadata.annotations.owner
+          value: platform-team
+  - it: should add controller.disableReconcileFor arg when disable_prometheus_converter is true
+    set:
+      operator:
+        disable_prometheus_converter: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --controller.disableReconcileFor=PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
+          any: true
+  - it: should merge disable_prometheus_converter with user-provided controller.disableReconcileFor
+    set:
+      operator:
+        disable_prometheus_converter: true
+      extraArgs:
+        controller.disableReconcileFor: "VMCluster,PodMonitor"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --controller.disableReconcileFor=VMCluster,PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
+          any: true
+  - it: should not add controller.disableReconcileFor arg when disable_prometheus_converter is false and extraArgs has no override
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --controller.disableReconcileFor=PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
+          any: true
