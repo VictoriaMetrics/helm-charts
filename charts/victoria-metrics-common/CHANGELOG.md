@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.15
+
+**Release date:** 02 Jul 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - added `vm.openshift.serviceCA.volume` and `vm.openshift.serviceCA.volumeMount` helpers to conditionally mount the OpenShift service signing CA (`openshift-service-ca.crt` ConfigMap)
 
 ## 0.3.14
