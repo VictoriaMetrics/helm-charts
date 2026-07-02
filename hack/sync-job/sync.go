@@ -16,7 +16,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	sigsyaml "sigs.k8s.io/yaml"
+	"sigs.k8s.io/yaml"
 )
 
 const managedByLabel = "app.kubernetes.io/managed-by"
@@ -46,7 +46,7 @@ type syncClient struct {
 }
 
 func (k *syncClient) writeManifest(obj any) {
-	data, err := sigsyaml.Marshal(obj)
+	data, err := yaml.Marshal(obj)
 	if err != nil {
 		log.Printf("marshal manifest: %v", err)
 		return

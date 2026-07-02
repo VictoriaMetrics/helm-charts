@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/VictoriaMetrics/metricsql"
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/yaml"
 )
 
 var dashboardNameRe = regexp.MustCompile(`[ /_-]+`)
