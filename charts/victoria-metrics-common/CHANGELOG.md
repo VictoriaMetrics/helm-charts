@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- added `vm.openshift.serviceCA.volume` and `vm.openshift.serviceCA.volumeMount` helpers to conditionally mount the OpenShift service signing CA (`openshift-service-ca.crt` ConfigMap)
 
 ## 0.3.14
 

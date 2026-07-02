@@ -88,6 +88,27 @@ Render probe
   {{- tpl (toYaml $probe) . -}}
 {{- end -}}
 
+{{- define "vm.openshift.serviceCA.volume" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $mode := (((($Values).global).compatibility).openshift).automountServiceSigningCA | default "auto" -}}
+  {{- if or (eq $mode "force") (and (eq $mode "auto") (include "vm.isOpenshift" .)) -}}
+- name: openshift-service-ca
+  configMap:
+    name: openshift-service-ca.crt
+    optional: true
+  {{- end -}}
+{{- end -}}
+
+{{- define "vm.openshift.serviceCA.volumeMount" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $mode := (((($Values).global).compatibility).openshift).automountServiceSigningCA | default "auto" -}}
+  {{- if or (eq $mode "force") (and (eq $mode "auto") (include "vm.isOpenshift" .)) -}}
+- name: openshift-service-ca
+  mountPath: /etc/ssl/certs/openshift-service-ca
+  readOnly: true
+  {{- end -}}
+{{- end -}}
+
 {{- define "vm.arg" -}}
   {{- if and (empty .value) (kindIs "string" .value) (ne (toString .list) "true") }}
     {{- .key -}}
