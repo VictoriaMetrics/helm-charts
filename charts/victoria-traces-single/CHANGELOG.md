@@ -1,5 +1,6 @@
 ## Next release
 
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 - added `runtimeClassName` option to the pod spec
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 
