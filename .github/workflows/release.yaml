@@ -58,6 +58,38 @@ jobs:
 
       - name: Generate release notes
         run: |
+          # Recursively resolve the victoria-metrics-operator version from a Chart.lock.
+          # For direct dependencies the local lock is read; for transitive ones the pinned
+          # chart version is pulled from its OCI repository so the correct lock is used.
+          find_operator_version() {
+            local LOCK_FILE="$1"
+            local DEPTH="${2:-0}"
+            [ -f "$LOCK_FILE" ] || return 1
+            [ "$DEPTH" -le 5 ] || return 1
+
+            local VERSION
+            VERSION=$(yq -M '.dependencies[] | select(.name == "victoria-metrics-operator") | .version' "$LOCK_FILE")
+            if [ -n "$VERSION" ] && [ "$VERSION" != "null" ]; then
+              echo "$VERSION"
+              return 0
+            fi
+
+            while IFS=$'\t' read -r DEP_NAME DEP_REPO DEP_VER; do
+              local TMPDIR
+              TMPDIR=$(mktemp -d)
+              if helm pull "${DEP_REPO}/${DEP_NAME}" --version "$DEP_VER" --untar --untardir "$TMPDIR" 2>/dev/null; then
+                VERSION=$(find_operator_version "${TMPDIR}/${DEP_NAME}/Chart.lock" $((DEPTH + 1)))
+              fi
+              rm -rf "$TMPDIR"
+              if [ -n "$VERSION" ]; then
+                echo "$VERSION"
+                return 0
+              fi
+            done < <(yq -M '.dependencies[] | select(.name | test("^victoria-")) | [.name, .repository, .version] | join("\t")' "$LOCK_FILE")
+
+            return 1
+          }
+
           for CHANGELOG in $(find charts/*/CHANGELOG.md); do
               if grep -q "^## Next release$" $CHANGELOG; then
                 echo "Processing $CHANGELOG"
@@ -92,12 +124,11 @@ jobs:
                   fi
                 fi
 
-                # Add operator version badge if this chart depends on victoria-metrics-operator
+                # Add operator version badge if this chart depends on victoria-metrics-operator (directly or transitively)
                 OPERATOR_CHANGELOG_URL="$(yq -M '.annotations["artifacthub.io/links"] | from_yaml | .[] | select(.name == "Operator Changelog") | .url' $CHART_FILE)"
-                OPERATOR_LOCK="${CHART_DIR}/Chart.lock"
-                if [ -n "$OPERATOR_CHANGELOG_URL" ] && [ -f "$OPERATOR_LOCK" ]; then
-                  OPERATOR_VERSION=$(yq -M '.dependencies[] | select(.name == "victoria-metrics-operator") | .version' $OPERATOR_LOCK)
-                  if [ -n "$OPERATOR_VERSION" ] && [ "$OPERATOR_VERSION" != "null" ]; then
+                if [ -n "$OPERATOR_CHANGELOG_URL" ] && [ -f "${CHART_DIR}/Chart.lock" ]; then
+                  OPERATOR_VERSION=$(find_operator_version "${CHART_DIR}/Chart.lock")
+                  if [ -n "$OPERATOR_VERSION" ]; then
                     export OPERATOR_VERSION
                     export OPERATOR_VERSION_HASH="$(echo $OPERATOR_VERSION | tr -d '.')"
                     export OPERATOR_CHANGELOG_URL
