@@ -1,0 +1,26 @@
+suite: useLegacyNaming tests (alertmanager)
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - alertmanager-service.yaml
+tests:
+  - it: useLegacyNaming false uses operator-style name
+    set:
+      useLegacyNaming: false
+      alertmanager:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+
+  - it: useLegacyNaming true preserves legacy naming
+    set:
+      useLegacyNaming: true
+      alertmanager:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
