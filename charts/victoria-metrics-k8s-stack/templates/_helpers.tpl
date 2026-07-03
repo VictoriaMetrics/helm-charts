@@ -531,11 +531,24 @@
 
 {{- /* VLAgent spec */ -}}
 {{- define "vl.agent.spec" -}}
-  {{- $_ := set . "agentKey" "vlagent" -}}
-  {{- $_ := set . "writeEndpoint" (include "vl.write.endpoint" .) -}}
-  {{- include "vm.agent.spec" . -}}
-  {{- $_ := unset . "agentKey" -}}
-  {{- $_ := unset . "writeEndpoint" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $agentValues := $Values.vlagent -}}
+  {{- $remoteWrites := $agentValues.additionalRemoteWrites | default list }}
+  {{- $rws := $agentValues.spec.remoteWrite | default list }}
+  {{- $writeEndpoint := include "vl.write.endpoint" . -}}
+  {{- with $writeEndpoint -}}
+    {{- if $rws -}}
+      {{- $rws = prepend (slice $rws 1) (mergeOverwrite (fromYaml .) (deepCopy (first $rws))) -}}
+    {{- else -}}
+      {{- $rws = append $rws (fromYaml .) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $remoteWrites = concat $remoteWrites $rws }}
+  {{- $spec := dict "remoteWrite" $remoteWrites -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- tpl (mergeOverwrite (deepCopy $agentValues.spec) (deepCopy $spec) | toYaml) . -}}
 {{- end }}
 
 {{- /* VLSingle spec */ -}}

@@ -1,6 +1,7 @@
 ## Next release
 
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
+- fix `vlagent` spec incorrectly delegating to `vmagent` implementation and overriding the image tag with the chart `appVersion` instead of using the VictoriaLogs image tag configured in `vlagent.spec.image.tag`
 
 ## 0.85.9
 
