@@ -2,6 +2,7 @@
 
 - added `runtimeClassName` option to the pod spec
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
+- bump version of VictoriaTraces components to [v0.9.4](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.9.4)
 
 ## 0.1.9
 
