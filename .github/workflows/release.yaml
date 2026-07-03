@@ -92,6 +92,21 @@ jobs:
                   fi
                 fi
 
+                # Add operator version badge if this chart depends on victoria-metrics-operator
+                OPERATOR_CHANGELOG_URL="$(yq -M '.annotations["artifacthub.io/links"] | from_yaml | .[] | select(.name == "Operator Changelog") | .url' $CHART_FILE)"
+                OPERATOR_LOCK="${CHART_DIR}/Chart.lock"
+                if [ -n "$OPERATOR_CHANGELOG_URL" ] && [ -f "$OPERATOR_LOCK" ]; then
+                  OPERATOR_VERSION=$(yq -M '.dependencies[] | select(.name == "victoria-metrics-operator") | .version' $OPERATOR_LOCK)
+                  if [ -n "$OPERATOR_VERSION" ] && [ "$OPERATOR_VERSION" != "null" ]; then
+                    export OPERATOR_VERSION
+                    export OPERATOR_VERSION_HASH="$(echo $OPERATOR_VERSION | tr -d '.')"
+                    export OPERATOR_CHANGELOG_URL
+                    OPERATOR_VERSION_LABEL=$(echo $OPERATOR_VERSION | sed 's/-/--/g')
+                    OPERATOR_CHANGELOG=$(yq -n 'env(OPERATOR_CHANGELOG_URL) + "#" + env(OPERATOR_VERSION_HASH) | @uri')
+                    BADGES+=' ![VM Operator: '$OPERATOR_VERSION'](https://img.shields.io/badge/VM_Operator-'$OPERATOR_VERSION_LABEL'-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link='$OPERATOR_CHANGELOG')'
+                  fi
+                fi
+
                 export BADGES
                 export CHANGELOG
                 export RELEASE_DATE="**Release date:** $(date '+%d %b %Y')"
