@@ -2,7 +2,7 @@
 {{- $app := .Values }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
-{{- if and $mode (not $.Values.useOperator) (hasKey $app $mode) }}
+{{- if and $mode (hasKey $app $mode) }}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

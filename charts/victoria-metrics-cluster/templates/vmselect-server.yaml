@@ -3,7 +3,7 @@
 {{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vmselect" $app }}
 {{- $mode := $app.mode }}
-{{- if and $mode $app.enabled (not $.Values.useOperator) (hasKey $app $mode) -}}
+{{- if and $mode $app.enabled (hasKey $app $mode) -}}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "vmselect" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

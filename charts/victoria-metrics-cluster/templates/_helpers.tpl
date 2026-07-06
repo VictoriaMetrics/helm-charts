@@ -313,38 +313,3 @@
   targetPort: {{ .targetPort }}
 {{- end }}
 {{- end -}}
-
-{{- define "vmcluster.cr.spec" -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- $clusterSpec := dict -}}
-  {{- if $Values.vminsert.enabled }}
-    {{- $compSpec := include "vm.cr.component.spec" (dict "comp" $Values.vminsert) | fromYaml -}}
-    {{- $_ := set $clusterSpec "vminsert" $compSpec -}}
-  {{- end -}}
-  {{- if $Values.vmselect.enabled }}
-    {{- $comp := $Values.vmselect -}}
-    {{- $compSpec := include "vm.cr.component.spec" (dict "comp" $comp) | fromYaml -}}
-    {{- if ($comp.persistentVolume).enabled }}
-      {{- $pvc := $comp.persistentVolume -}}
-      {{- $storage := dict "resources" (dict "requests" (dict "storage" $pvc.size)) -}}
-      {{- with $pvc.accessModes }}{{- $_ := set $storage "accessModes" . }}{{- end -}}
-      {{- with $pvc.storageClassName }}{{- $_ := set $storage "storageClassName" . }}{{- end -}}
-      {{- $_ := set $compSpec "storage" $storage -}}
-    {{- end -}}
-    {{- $_ := set $clusterSpec "vmselect" $compSpec -}}
-  {{- end -}}
-  {{- if $Values.vmstorage.enabled }}
-    {{- $comp := $Values.vmstorage -}}
-    {{- $compSpec := include "vm.cr.component.spec" (dict "comp" $comp) | fromYaml -}}
-    {{- if ($comp.persistentVolume).enabled }}
-      {{- $pvc := $comp.persistentVolume -}}
-      {{- $storage := dict "resources" (dict "requests" (dict "storage" $pvc.size)) -}}
-      {{- with $pvc.accessModes }}{{- $_ := set $storage "accessModes" . }}{{- end -}}
-      {{- with $pvc.storageClassName }}{{- $_ := set $storage "storageClassName" . }}{{- end -}}
-      {{- $_ := set $compSpec "storage" $storage -}}
-    {{- end -}}
-    {{- $_ := set $clusterSpec "vmstorage" $compSpec -}}
-  {{- end -}}
-  {{- if $Values.useLegacyNaming }}{{- $_ := set $clusterSpec "useLegacyNaming" true }}{{- end -}}
-  {{- toYaml (mergeOverwrite $clusterSpec ($Values.spec | default dict)) -}}
-{{- end -}}

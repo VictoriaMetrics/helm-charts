@@ -10,10 +10,3 @@
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
-
-{{- define "vmauth.cr.spec" -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- $spec := include "vm.cr.component.spec" (dict "comp" $Values) | fromYaml -}}
-  {{- if $Values.useLegacyNaming }}{{- $_ := set $spec "useLegacyNaming" true }}{{- end -}}
-  {{- toYaml (mergeOverwrite $spec ($Values.spec | default dict)) -}}
-{{- end -}}

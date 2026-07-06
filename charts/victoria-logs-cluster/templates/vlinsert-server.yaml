@@ -1,6 +1,6 @@
 {{- $app := merge (deepCopy .Values.vlinsert) (deepCopy .Values.common) -}}
 {{- $_ := set .Values "vlinsert" $app }}
-{{- if and $app.enabled (not $.Values.useOperator) -}}
+{{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vlinsert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $sa := include "vm.fullname" . }}

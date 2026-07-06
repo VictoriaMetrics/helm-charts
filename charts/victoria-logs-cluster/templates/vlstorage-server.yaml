@@ -1,7 +1,7 @@
 {{- $app := merge (deepCopy .Values.vlstorage) (deepCopy .Values.common) -}}
 {{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vlstorage" $app }}
-{{- if and $app.enabled (not $.Values.useOperator) -}}
+{{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vlstorage" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $sa := include "vm.fullname" . }}

@@ -58,23 +58,3 @@
   {{- $fullname := include "vm.plain.fullname" . -}}
   {{- $Values.configMap | default (printf "%s-config" $fullname) -}}
 {{- end -}}
-
-{{- define "vmagent.cr.spec" -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- $spec := include "vm.cr.component.spec" (dict "comp" $Values) | fromYaml -}}
-  {{- if eq $Values.mode "statefulSet" }}
-    {{- $_ := set $spec "statefulMode" true -}}
-    {{- if ($Values.persistentVolume).enabled }}
-      {{- $pvc := $Values.persistentVolume -}}
-      {{- $pvcSpec := dict "resources" (dict "requests" (dict "storage" $pvc.size)) -}}
-      {{- with $pvc.accessModes }}{{- $_ := set $pvcSpec "accessModes" . }}{{- end -}}
-      {{- with $pvc.storageClassName }}{{- $_ := set $pvcSpec "storageClassName" . }}{{- end -}}
-      {{- $_ := set $spec "statefulStorage" (dict "volumeClaimTemplate" (dict "spec" $pvcSpec)) -}}
-    {{- end -}}
-  {{- else if eq $Values.mode "daemonSet" }}
-    {{- $_ := set $spec "daemonSetMode" true -}}
-  {{- end -}}
-  {{- with $Values.remoteWrite }}{{- $_ := set $spec "remoteWrite" . }}{{- end -}}
-  {{- if $Values.useLegacyNaming }}{{- $_ := set $spec "useLegacyNaming" true }}{{- end -}}
-  {{- toYaml (mergeOverwrite $spec ($Values.spec | default dict)) -}}
-{{- end -}}

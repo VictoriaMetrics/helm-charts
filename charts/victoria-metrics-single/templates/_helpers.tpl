@@ -65,20 +65,3 @@
   {{- $output = concat (list "restore") $output -}}
   {{- toYaml $output -}}
 {{- end -}}
-
-{{- define "vmsingle.cr.spec" -}}
-  {{- $Values := (.helm).Values | default .Values -}}
-  {{- $app := $Values.server -}}
-  {{- $spec := include "vm.cr.component.spec" (dict "comp" $app) | fromYaml -}}
-  {{- $_ := unset $spec "hpa" -}}
-  {{- with $app.retentionPeriod }}{{- $_ := set $spec "retentionPeriod" (toString .) }}{{- end -}}
-  {{- if ($app.persistentVolume).enabled }}
-    {{- $pvc := $app.persistentVolume -}}
-    {{- $storage := dict "resources" (dict "requests" (dict "storage" $pvc.size)) -}}
-    {{- with $pvc.accessModes }}{{- $_ := set $storage "accessModes" . }}{{- end -}}
-    {{- with $pvc.storageClassName }}{{- $_ := set $storage "storageClassName" . }}{{- end -}}
-    {{- $_ := set $spec "storage" $storage -}}
-  {{- end -}}
-  {{- if $Values.useLegacyNaming }}{{- $_ := set $spec "useLegacyNaming" true }}{{- end -}}
-  {{- toYaml (mergeOverwrite $spec ($Values.spec | default dict)) -}}
-{{- end -}}
