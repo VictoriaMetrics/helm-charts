@@ -9,6 +9,8 @@ tests:
     set:
       alertmanager:
         enabled: true
+        image:
+          tag: v0.0.0
     asserts:
       - matchSnapshot: {}
   - it: should render nodePort for alertmanager service
@@ -18,6 +20,8 @@ tests:
         service:
           type: NodePort
           nodePort: 30093
+        image:
+          tag: v0.0.0
     asserts:
       - equal:
           path: spec.type
