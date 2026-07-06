@@ -1,5 +1,5 @@
 {{- $hpa := .Values.horizontalPodAutoscaler }}
-{{- if $hpa.enabled }}
+{{- if and $hpa.enabled (not .Values.useOperator) }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

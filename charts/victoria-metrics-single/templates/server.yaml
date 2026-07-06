@@ -2,7 +2,7 @@
 {{- $app := .Values.server }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
-{{- if and $mode $app.enabled (hasKey $app $mode) }}
+{{- if and $mode $app.enabled (not $.Values.useOperator) (hasKey $app $mode) }}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "server" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

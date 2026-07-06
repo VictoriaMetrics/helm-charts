@@ -1,0 +1,15 @@
+{{- if .Values.useOperator }}
+{{- $ctx := dict "helm" . }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  {{- with .Values.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "vm.cr.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  {{- $_ := set $ctx "style" "managed" }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec: {{ include "vmauth.cr.spec" $ctx | nindent 2 }}
+{{- end }}

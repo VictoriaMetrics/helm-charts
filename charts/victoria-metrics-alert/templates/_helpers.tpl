@@ -176,3 +176,26 @@
   {{- $fullname := include "vm.plain.fullname" . -}}
   {{- $Values.alertmanager.configMap | default (printf "%s-config" $fullname) -}}
 {{- end -}}
+
+{{- define "vmalert.cr.spec" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.server -}}
+  {{- $spec := include "vm.cr.component.spec" (dict "comp" $app) | fromYaml -}}
+  {{- $_ := unset $spec "hpa" -}}
+  {{- with $app.datasource }}{{- $_ := set $spec "datasource" . }}{{- end -}}
+  {{- with $app.notifier }}{{- $_ := set $spec "notifier" . }}{{- end -}}
+  {{- with $app.notifiers }}{{- $_ := set $spec "notifiers" . }}{{- end -}}
+  {{- with $app.remoteRead }}{{- $_ := set $spec "remoteRead" . }}{{- end -}}
+  {{- with $app.remoteWrite }}{{- $_ := set $spec "remoteWrite" . }}{{- end -}}
+  {{- if $Values.useLegacyNaming }}{{- $_ := set $spec "useLegacyNaming" true }}{{- end -}}
+  {{- toYaml (mergeOverwrite $spec ($Values.spec | default dict)) -}}
+{{- end -}}
+
+{{- define "vmalertmanager.cr.spec" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $app := $Values.alertmanager -}}
+  {{- $spec := include "vm.cr.component.spec" (dict "comp" $app) | fromYaml -}}
+  {{- $_ := unset $spec "hpa" -}}
+  {{- if $Values.useLegacyNaming }}{{- $_ := set $spec "useLegacyNaming" true }}{{- end -}}
+  {{- toYaml (mergeOverwrite $spec ($Values.spec | default dict)) -}}
+{{- end -}}

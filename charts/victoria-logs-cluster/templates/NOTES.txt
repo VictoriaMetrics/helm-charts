@@ -30,4 +30,10 @@ The VictoriaLogs query APIs can be accessed with the following url:
 
 Check how to query data in https://docs.victoriametrics.com/victorialogs/querying/
 {{- end }}
+{{- if and .Values.useOperator .Values.vmauth.enabled }}
+
+WARNING: vmauth is enabled but useOperator=true — vmauth is not deployed in operator mode.
+To use VMAuth in front of the operator-managed cluster, deploy the victoria-metrics-auth
+chart separately with useOperator=true and point it at the operator-managed services.
+{{- end }}
 {{- end }}

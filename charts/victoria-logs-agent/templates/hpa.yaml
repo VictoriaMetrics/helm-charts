@@ -1,5 +1,5 @@
 {{- $hpa := .Values.horizontalPodAutoscaling | default .Values.horizontalPodAutoscaler }}
-{{- if $hpa.enabled }}
+{{- if and $hpa.enabled (not .Values.useOperator) }}
 {{- $ctx := dict "helm" . }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

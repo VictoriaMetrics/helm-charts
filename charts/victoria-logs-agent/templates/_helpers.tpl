@@ -55,3 +55,18 @@
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end }}
+
+{{- define "vlagent.cr.spec" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $spec := include "vm.cr.component.spec" (dict "comp" $Values) | fromYaml -}}
+  {{- with $Values.remoteWrite }}{{- $_ := set $spec "remoteWrite" . }}{{- end -}}
+  {{- if ($Values.persistentVolume).enabled }}
+    {{- $pvc := $Values.persistentVolume -}}
+    {{- $pvcSpec := dict "resources" (dict "requests" (dict "storage" $pvc.size)) -}}
+    {{- with $pvc.accessModes }}{{- $_ := set $pvcSpec "accessModes" . }}{{- end -}}
+    {{- with $pvc.storageClassName }}{{- $_ := set $pvcSpec "storageClassName" . }}{{- end -}}
+    {{- $_ := set $spec "storage" (dict "volumeClaimTemplate" (dict "spec" $pvcSpec)) -}}
+  {{- end -}}
+  {{- if $Values.useLegacyNaming }}{{- $_ := set $spec "useLegacyNaming" true }}{{- end -}}
+  {{- toYaml (mergeOverwrite $spec ($Values.spec | default dict)) -}}
+{{- end -}}

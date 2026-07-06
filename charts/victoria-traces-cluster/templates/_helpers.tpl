@@ -204,3 +204,30 @@
   targetPort: {{ .targetPort }}
 {{- end }}
 {{- end -}}
+
+{{- define "vtcluster.cr.spec" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $clusterSpec := dict -}}
+  {{- if $Values.vtinsert.enabled }}
+    {{- $compSpec := include "vm.cr.component.spec" (dict "comp" $Values.vtinsert) | fromYaml -}}
+    {{- $_ := set $clusterSpec "insert" $compSpec -}}
+  {{- end -}}
+  {{- if $Values.vtselect.enabled }}
+    {{- $compSpec := include "vm.cr.component.spec" (dict "comp" $Values.vtselect) | fromYaml -}}
+    {{- $_ := set $clusterSpec "select" $compSpec -}}
+  {{- end -}}
+  {{- if $Values.vtstorage.enabled }}
+    {{- $comp := $Values.vtstorage -}}
+    {{- $compSpec := include "vm.cr.component.spec" (dict "comp" $comp) | fromYaml -}}
+    {{- if ($comp.persistentVolume).enabled }}
+      {{- $pvc := $comp.persistentVolume -}}
+      {{- $storage := dict "resources" (dict "requests" (dict "storage" $pvc.size)) -}}
+      {{- with $pvc.accessModes }}{{- $_ := set $storage "accessModes" . }}{{- end -}}
+      {{- with $pvc.storageClassName }}{{- $_ := set $storage "storageClassName" . }}{{- end -}}
+      {{- $_ := set $compSpec "storage" $storage -}}
+    {{- end -}}
+    {{- $_ := set $clusterSpec "storage" $compSpec -}}
+  {{- end -}}
+  {{- if $Values.useLegacyNaming }}{{- $_ := set $clusterSpec "useLegacyNaming" true }}{{- end -}}
+  {{- toYaml (mergeOverwrite $clusterSpec ($Values.spec | default dict)) -}}
+{{- end -}}

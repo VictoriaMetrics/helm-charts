@@ -1,7 +1,7 @@
 {{- $ctx := dict "helm" . }}
 {{- $ns := include "vm.namespace" . }}
 {{- range $name, $app := .Values }}
-{{- if and (kindIs "map" $app) $app.enabled ($app.horizontalPodAutoscaler).enabled }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.horizontalPodAutoscaler).enabled (not $.Values.useOperator) }}
 {{- $isStatefulSet := eq $name "vlstorage" }}
 {{- $hpa := $app.horizontalPodAutoscaler }}
 {{- $_ := set $ctx "extraLabels" $app.extraLabels }}

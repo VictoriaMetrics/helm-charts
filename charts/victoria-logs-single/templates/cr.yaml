@@ -1,0 +1,15 @@
+{{- if .Values.useOperator }}
+{{- $ctx := dict "helm" . "appKey" "server" }}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VLSingle
+metadata:
+  {{- with .Values.server.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "vm.cr.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  {{- $_ := set $ctx "style" "managed" }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec: {{ include "vlsingle.cr.spec" $ctx | nindent 2 }}
+{{- end }}

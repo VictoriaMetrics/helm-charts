@@ -1,3 +1,4 @@
+{{- if not .Values.useOperator }}
 {{- $ctx := dict "helm" . }}
 ---
 apiVersion: apps/v1
@@ -147,3 +148,4 @@ spec:
           matchLabels: {{ toYaml . | nindent 12 }}
         {{- end }}
   {{- end }}
+{{- end }}
