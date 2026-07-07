@@ -32,7 +32,7 @@ spec:
     matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}
   endpoints:
     -
-      {{- with $serviceMonitor.path }}
+      {{- with $app.serviceMonitor.path }}
       path: {{ . }}
       {{- else }}
       {{- $prefix := trimSuffix "/" (trimPrefix "/" (dig "extraArgs" "http.pathPrefix" "" .Values.server)) }}
