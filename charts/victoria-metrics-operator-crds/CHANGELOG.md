@@ -1,6 +1,7 @@
 ## Next release
 
 - added `global.extraAnnotations` support for upgrade job pod template
+- Release CRDs for operator [v0.73.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.73.0)
 
 ## 0.12.0
 

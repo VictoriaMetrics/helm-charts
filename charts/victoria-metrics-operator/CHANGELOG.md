@@ -1,5 +1,6 @@
 ## Next release
 
+- updates operator to [v0.73.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.73.0) version
 - added `runtimeClassName` option to the pod spec
 - add `nodePort` support for `Service` resources
 - added `global.extraLabels` and `global.extraAnnotations`; automatically injects `VM_COMMON_LABELS` and `VM_COMMON_ANNOTATIONS` env vars into the operator so they propagate to CRs
