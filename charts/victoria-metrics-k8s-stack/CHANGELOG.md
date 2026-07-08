@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.86.0
+
+**Release date:** 08 Jul 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.147.0](https://img.shields.io/badge/v1.147.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11470) ![VM Operator: 0.66.2](https://img.shields.io/badge/VM_Operator-0.66.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230662)
+
 - bump version of VM components to [v1.147.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.147.0)
 - fixed hardcoded datasources in dashboards when datasource variable is present. See [#3079](https://github.com/VictoriaMetrics/helm-charts/issues/3079).
 - bump operator dependency chart to version 0.66.2
