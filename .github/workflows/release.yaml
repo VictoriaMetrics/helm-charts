@@ -64,8 +64,11 @@ jobs:
           find_operator_version() {
             local LOCK_FILE="$1"
             local DEPTH="${2:-0}"
-            [ -f "$LOCK_FILE" ] || return 1
-            [ "$DEPTH" -le 5 ] || return 1
+            local NOT_FOUND=1
+            [ "$DEPTH" -eq 0 ] || NOT_FOUND=0
+
+            [ -f "$LOCK_FILE" ] || return "$NOT_FOUND"
+            [ "$DEPTH" -le 5 ] || return "$NOT_FOUND"
 
             local VERSION
             VERSION=$(yq -M '.dependencies[] | select(.name == "victoria-metrics-operator") | .version' "$LOCK_FILE")
@@ -87,7 +90,7 @@ jobs:
               fi
             done < <(yq -M '.dependencies[] | select(.name | test("^victoria-")) | [.name, .repository, .version] | join("\t")' "$LOCK_FILE")
 
-            return 1
+            return "$NOT_FOUND"
           }
 
           for CHANGELOG in $(find charts/*/CHANGELOG.md); do

@@ -36,6 +36,9 @@ spec:
   clusterIP: {{ . }}
   {{- end }}
   {{- end }}
+  {{- with $service.publishNotReadyAddresses }}
+  publishNotReadyAddresses: {{ . }}
+  {{- end }}
   {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
