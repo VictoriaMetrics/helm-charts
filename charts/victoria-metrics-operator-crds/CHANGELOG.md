@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- Release CRDs for operator [v0.73.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.73.1)
 
 ## 0.13.0
 

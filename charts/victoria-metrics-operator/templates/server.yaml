@@ -104,6 +104,10 @@ spec:
             {{- end }}
             - name: VM_ENABLEDPROMETHEUSCONVERTEROWNERREFERENCES
               value: {{ .Values.operator.enable_converter_ownership | quote}}
+            {{- if .Values.operator.openshift_compatibility }}
+            - name: VM_OPENSHIFT_COMPATIBILITY
+              value: "true"
+            {{- end }}
           {{- with .Values.command }}
           command: {{ toYaml . | nindent 12 }}
           {{- end }}

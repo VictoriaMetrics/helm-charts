@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- added openshift_compatibility property, which allows to enabled openshift compatibility on operator. Check [docs](https://docs.victoriametrics.com/operator/configuration/#variables-vm-openshift-compatibility).
+- updates operator to [v0.73.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.73.1) version
 
 ## 0.66.0
 
