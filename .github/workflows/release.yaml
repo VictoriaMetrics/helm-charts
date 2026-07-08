@@ -78,6 +78,7 @@ jobs:
             fi
 
             while IFS=$'\t' read -r DEP_NAME DEP_REPO DEP_VER; do
+              [ -n "$DEP_NAME" ] || continue
               local TMPDIR
               TMPDIR=$(mktemp -d)
               if helm pull "${DEP_REPO}/${DEP_NAME}" --version "$DEP_VER" --untar --untardir "$TMPDIR" 2>/dev/null; then
