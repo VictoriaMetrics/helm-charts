@@ -2,6 +2,8 @@
 
 - bump version of VM components to [v1.147.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.147.0)
 - fixed hardcoded datasources in dashboards when datasource variable is present. See [#3079](https://github.com/VictoriaMetrics/helm-charts/issues/3079).
+- bump operator dependency chart to version 0.66.2
+- bump grafana dependency chart to version 12.7.2
 
 ## 0.85.10
 
