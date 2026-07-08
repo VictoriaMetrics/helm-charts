@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## 0.66.1
+
+**Release date:** 08 Jul 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.73.0](https://img.shields.io/badge/v0.73.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0730)
+
 - added openshift_compatibility property, which allows to enabled openshift compatibility on operator. Check [docs](https://docs.victoriametrics.com/operator/configuration/#variables-vm-openshift-compatibility).
 - updates operator to [v0.73.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.73.1) version
 
