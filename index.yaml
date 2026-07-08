@@ -48045,6 +48045,79 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - bump version of VM components to [v1.147.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.147.0)
+        - fixed hardcoded datasources in dashboards when datasource variable is present. See [#3079](https://github.com/VictoriaMetrics/helm-charts/issues/3079).
+        - bump operator dependency chart to version 0.66.2
+        - bump grafana dependency chart to version 12.7.2
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victoriametrics/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/changelog/
+        - name: App Changelog
+          url: https://docs.victoriametrics.com/victoriametrics/changelog/
+        - name: Operator Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-metrics-operator/changelog/
+      artifacthub.io/operator: "true"
+      artifacthub.io/readme: |
+        # VictoriaMetrics K8s Stack Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/changelog/).
+    apiVersion: v2
+    appVersion: v1.147.0
+    created: "2026-07-08T10:48:54.03757891Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    - condition: victoria-metrics-operator.enabled
+      name: victoria-metrics-operator
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.66.*
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: oci://ghcr.io/prometheus-community/charts
+      version: 7.5.*
+    - condition: prometheus-node-exporter.enabled
+      name: prometheus-node-exporter
+      repository: oci://ghcr.io/prometheus-community/charts
+      version: 4.55.*
+    - condition: grafana.enabled
+      name: grafana
+      repository: oci://ghcr.io/grafana-community/helm-charts
+      version: 12.7.*
+    description: Kubernetes monitoring on VictoriaMetrics stack. Includes VictoriaMetrics
+      Operator, Grafana dashboards, ServiceScrapes and VMRules
+    digest: b0e2f428f39d6a485b9bda7bdcadb0777fc746cee6fcb246b6d904476e654ec0
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-k8s-stack
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-k8s-stack-0.86.0/victoria-metrics-k8s-stack-0.86.0.tgz
+    version: 0.86.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
         - fix `vlagent` spec incorrectly delegating to `vmagent` implementation and overriding the image tag with the chart `appVersion` instead of using the VictoriaLogs image tag configured in `vlagent.spec.image.tag`
       artifacthub.io/license: Apache-2.0
@@ -81639,4 +81712,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-07-08T10:12:21.875994815Z"
+generated: "2026-07-08T10:48:54.329582425Z"
