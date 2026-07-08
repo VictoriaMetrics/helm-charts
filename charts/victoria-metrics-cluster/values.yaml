@@ -280,6 +280,8 @@ vmselect:
     labels: {}
     # -- Service ClusterIP
     clusterIP: ""
+    # -- Publish not-ready addresses. Set this to `true` together with `clusterIP: None` when vmselect is discovered via its headless service (e.g. behind vmauth balancing) before pods pass readiness checks
+    publishNotReadyAddresses: false
     # -- Service external IPs. Details are [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips)
     externalIPs: []
     # -- Extra service ports
@@ -1321,6 +1323,8 @@ vmstorage:
     annotations: {}
     # -- Service ClusterIP
     clusterIP: None
+    # -- Publish not-ready addresses for the headless service, so vminsert/vmselect can discover vmstorage pods via DNS before they pass readiness checks
+    publishNotReadyAddresses: true
     # -- Service type
     type: ClusterIP
     # -- Service labels
@@ -1449,13 +1453,7 @@ vmstorage:
     # -- Readiness & Liveness probes
     probe:
       # -- VMBackupManager readiness probe
-      readiness:
-        httpGet:
-          port: manager-http
-        initialDelaySeconds: 5
-        periodSeconds: 5
-        timeoutSeconds: 5
-        failureThreshold: 10
+      readiness: {}
       # -- VMBackupManager liveness probe
       liveness:
         tcpSocket:

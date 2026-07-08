@@ -11,7 +11,7 @@ on:
 
 env:
   HELM_VERSION: 4.1.3
-  YQ_VERSION: 4.44.2
+  YQ_VERSION: 4.53.3
 
 permissions: {}
 
@@ -40,7 +40,7 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Install tools
-        uses: yokawasa/action-setup-kube-tools@9d39563c24d4a419d1a8289c34d6da5a6171252c  # v0.13.5
+        uses: yokawasa/action-setup-kube-tools@b16d49b2c459d33cf9d4c300a220ef0bcdbc730a  # v0.14.0
         with:
           setup-tools: |
             helm
@@ -64,8 +64,11 @@ jobs:
           find_operator_version() {
             local LOCK_FILE="$1"
             local DEPTH="${2:-0}"
-            [ -f "$LOCK_FILE" ] || return 1
-            [ "$DEPTH" -le 5 ] || return 1
+            local NOT_FOUND=1
+            [ "$DEPTH" -eq 0 ] || NOT_FOUND=0
+
+            [ -f "$LOCK_FILE" ] || return "$NOT_FOUND"
+            [ "$DEPTH" -le 5 ] || return "$NOT_FOUND"
 
             local VERSION
             VERSION=$(yq -M '.dependencies[] | select(.name == "victoria-metrics-operator") | .version' "$LOCK_FILE")
@@ -74,7 +77,8 @@ jobs:
               return 0
             fi
 
-            while IFS=$'\t' read -r DEP_NAME DEP_REPO DEP_VER; do
+            while IFS='|' read -r DEP_NAME DEP_REPO DEP_VER; do
+              [ -n "$DEP_NAME" ] || continue
               local TMPDIR
               TMPDIR=$(mktemp -d)
               if helm pull "${DEP_REPO}/${DEP_NAME}" --version "$DEP_VER" --untar --untardir "$TMPDIR" 2>/dev/null; then
@@ -85,9 +89,9 @@ jobs:
                 echo "$VERSION"
                 return 0
               fi
-            done < <(yq -M '.dependencies[] | select(.name | test("^victoria-")) | [.name, .repository, .version] | join("\t")' "$LOCK_FILE")
+            done < <(yq -M '.dependencies[] | select(.name | test("^victoria-")) | [.name, .repository, .version] | join("|")' "$LOCK_FILE")
 
-            return 1
+            return "$NOT_FOUND"
           }
 
           for CHANGELOG in $(find charts/*/CHANGELOG.md); do

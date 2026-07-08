@@ -25,6 +25,9 @@ spec:
   {{- with $service.clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
+  {{- with $service.publishNotReadyAddresses }}
+  publishNotReadyAddresses: {{ . }}
+  {{- end }}
   {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -71,6 +74,7 @@ metadata:
   name: {{ $fullname }}-headless
 spec:
   clusterIP: None
+  publishNotReadyAddresses: true
   ports:
     - name: web
       port: {{ $service.servicePort }}

@@ -45,13 +45,15 @@ tests:
     set:
       vlcluster:
         enabled: true
+        spec:
+          clusterVersion: v0.0.7
     asserts:
       - equal:
           path: spec.clusterVersion
-          value: v1.51.0
+          value: v0.0.7
       - equal:
           path: metadata.labels["app.kubernetes.io/version"]
-          value: v1.51.0
+          value: v0.0.7
 
   - it: custom clusterVersion in values overrides the pinned default
     set:

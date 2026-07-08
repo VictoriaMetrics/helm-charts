@@ -75,7 +75,6 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --controller.disableReconcileFor=PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
-          any: true
   - it: should merge disable_prometheus_converter with user-provided controller.disableReconcileFor
     set:
       operator:
@@ -86,10 +85,8 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --controller.disableReconcileFor=VMCluster,PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
-          any: true
   - it: should not add controller.disableReconcileFor arg when disable_prometheus_converter is false and extraArgs has no override
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].args
           content: --controller.disableReconcileFor=PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
-          any: true

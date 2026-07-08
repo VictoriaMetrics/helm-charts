@@ -166,13 +166,29 @@ func TestPatchDatasource(t *testing.T) {
 		wantType:      "prometheus",
 		wantUID:       "VictoriaMetrics",
 	})
-	// ${datasource} uid preserved (dashboard variable reference, not import input)
+	// ${datasource} uid preserved (dashboard variable reference with braces, not import input)
 	f(opts{
 		input:         map[string]any{"type": "prometheus", "uid": "${datasource}"},
 		datasource:    "prometheus",
 		datasourceUID: "VictoriaMetrics",
 		wantType:      "prometheus",
 		wantUID:       "${datasource}",
+	})
+	// $ds uid preserved (short-form variable reference, common in VictoriaMetrics dashboards)
+	f(opts{
+		input:         map[string]any{"type": "prometheus", "uid": "$ds"},
+		datasource:    "victoriametrics-metrics-datasource",
+		datasourceUID: "VictoriaMetrics",
+		wantType:      "victoriametrics-metrics-datasource",
+		wantUID:       "$ds",
+	})
+	// $datasource uid preserved (short-form, no braces)
+	f(opts{
+		input:         map[string]any{"type": "prometheus", "uid": "$datasource"},
+		datasource:    "prometheus",
+		datasourceUID: "VictoriaMetrics",
+		wantType:      "prometheus",
+		wantUID:       "$datasource",
 	})
 	// no uid — only type replaced
 	f(opts{

@@ -382,10 +382,12 @@ func patchDatasource(d *strOrMap, grafana grafanaConfig) {
 	if uid == "" {
 		return
 	}
-	// Leave Grafana dashboard variable references (e.g. "${datasource}") intact;
-	// replace import-time inputs (e.g. "${DS_PROMETHEUS}") and plain UIDs.
-	if strings.HasPrefix(uid, "${") && !strings.HasPrefix(uid, "${DS_") {
-		return
+	// Preserve Grafana variable references like "$ds" or "${datasource}".
+	// Replace import-time inputs like "${DS_PROMETHEUS}" / "$DS_FOO" and plain UIDs.
+	if strings.HasPrefix(uid, "$") {
+		if !strings.HasPrefix(uid, "${DS_") && !strings.HasPrefix(uid, "$DS_") {
+			return
+		}
 	}
 	d.MapVal["uid"] = grafana.DatasourceUID
 }
