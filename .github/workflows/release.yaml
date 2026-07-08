@@ -11,7 +11,7 @@ on:
 
 env:
   HELM_VERSION: 4.1.3
-  YQ_VERSION: 4.44.2
+  YQ_VERSION: 4.53.3
 
 permissions: {}
 
@@ -77,7 +77,7 @@ jobs:
               return 0
             fi
 
-            while IFS=$'\t' read -r DEP_NAME DEP_REPO DEP_VER; do
+            while IFS='|' read -r DEP_NAME DEP_REPO DEP_VER; do
               [ -n "$DEP_NAME" ] || continue
               local TMPDIR
               TMPDIR=$(mktemp -d)
@@ -89,7 +89,7 @@ jobs:
                 echo "$VERSION"
                 return 0
               fi
-            done < <(yq -M '.dependencies[] | select(.name | test("^victoria-")) | [.name, .repository, .version] | join("\t")' "$LOCK_FILE")
+            done < <(yq -M '.dependencies[] | select(.name | test("^victoria-")) | [.name, .repository, .version] | join("|")' "$LOCK_FILE")
 
             return "$NOT_FOUND"
           }
