@@ -52,7 +52,7 @@ spec:
       {{- if $app.podSecurityContext.enabled }}
       securityContext: {{ include "vm.securityContext" (dict "securityContext" $app.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
-      {{- with ($app.imagePullSecrets | default .Values.global.imagePullSecrets) }}
+      {{- with ($app.imagePullSecrets | default (.Values.global).imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $app.initContainers }}
