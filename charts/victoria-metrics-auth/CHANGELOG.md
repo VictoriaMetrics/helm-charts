@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `configRaw` for templated vmauth config, allowing reusable backend blocks and maintenance toggles.
 
 ## 0.36.0
 
