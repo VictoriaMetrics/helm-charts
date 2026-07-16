@@ -44,6 +44,20 @@ func TestPatchDashExpr(t *testing.T) {
 		varName: "cluster",
 		want:    `label_values(up{job="$job"}, instance)`,
 	})
+	// cluster variable's own query: existing cluster filter label renamed, value/operator preserved — no circular $cluster
+	f(opts{
+		expr:         `label_values(kube_node_info{cluster!=""}, cluster)`,
+		varName:      "cluster",
+		clusterLabel: "cluster",
+		want:         `label_values(kube_node_info{cluster!=""}, cluster)`,
+	})
+	// cluster variable with custom clusterLabel: filter label renamed, value kept intact
+	f(opts{
+		expr:         `label_values(kube_node_info{cluster!=""}, cluster)`,
+		varName:      "k8s_cluster",
+		clusterLabel: "k8s_cluster",
+		want:         `label_values(kube_node_info{k8s_cluster!=""}, k8s_cluster)`,
+	})
 
 	// cluster label replacement in by/on modifiers
 	f(opts{

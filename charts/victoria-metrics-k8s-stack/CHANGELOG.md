@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix sync-job introducing a circular `$cluster` reference into the cluster template variable's own query expression when `multicluster: true`, which prevented the variable from resolving and broke panel queries. See [#3099](https://github.com/VictoriaMetrics/helm-charts/issues/3099).
 
 ## 0.86.0
 

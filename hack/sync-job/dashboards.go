@@ -382,8 +382,6 @@ func patchDatasource(d *strOrMap, grafana grafanaConfig) {
 	if uid == "" {
 		return
 	}
-	// Preserve Grafana variable references like "$ds" or "${datasource}".
-	// Replace import-time inputs like "${DS_PROMETHEUS}" / "$DS_FOO" and plain UIDs.
 	if strings.HasPrefix(uid, "$") {
 		if !strings.HasPrefix(uid, "${DS_") && !strings.HasPrefix(uid, "$DS_") {
 			return
@@ -468,8 +466,10 @@ func patchDashExpr(expr, varName, clusterLabel string) string {
 				for _, f := range t.LabelFilterss[i] {
 					if f.Label == "cluster" || f.Value == "$cluster" {
 						f.Label = cl
-						f.Value = "$cluster"
-						f.IsRegexp = true
+						if varName != cl && varName != "cluster" {
+							f.Value = "$cluster"
+							f.IsRegexp = true
+						}
 						found = true
 					} else if f.Label == "__name__" && f.Value == "cluster" {
 						f.Value = cl
