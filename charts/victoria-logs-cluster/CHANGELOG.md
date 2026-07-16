@@ -1,5 +1,6 @@
 ## Next release
 
+- bump VictoriaLogs version to [v1.52.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.52.0).
 - added `runtimeClassName` option to the pod spec
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 
