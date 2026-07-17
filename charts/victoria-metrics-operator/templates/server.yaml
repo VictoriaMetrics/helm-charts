@@ -108,6 +108,14 @@ spec:
             - name: VM_OPENSHIFT_COMPATIBILITY
               value: "true"
             {{- end }}
+            {{- if .Values.operator.gateway_support }}
+            - name: VM_GATEWAY_API_ENABLED
+              value: "true"
+            {{- end }}
+            {{- if .Values.operator.vpa_support }}
+            - name: VM_VPA_API_ENABLED
+              value: "true"
+            {{- end }}
           {{- with .Values.command }}
           command: {{ toYaml . | nindent 12 }}
           {{- end }}
