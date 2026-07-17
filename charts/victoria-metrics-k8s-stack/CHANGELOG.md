@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix sync-job injecting `$cluster` label selectors into panel expressions for dashboards that have no cluster template variable (e.g. `k8s-resources-multicluster`), causing all panels to fail with an unresolved variable reference when `multicluster: true` and no `clusterMetric` is configured for that dashboard. See [#3099](https://github.com/VictoriaMetrics/helm-charts/issues/3099).
 
 ## 0.86.1
 
