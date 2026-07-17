@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestPatchDashExpr(t *testing.T) {
 		if cl == "" {
 			cl = "cluster"
 		}
-		got := patchDashExpr(o.expr, o.varName, cl)
+		got := patchDashExpr(o.expr, o.varName, cl, true)
 		if got != o.want {
 			t.Fatalf("patchDashExpr(%q, varName=%q, cl=%q)\ngot:  %s\nwant: %s", o.expr, o.varName, cl, got, o.want)
 		}
@@ -555,6 +556,26 @@ func TestPatchDashboardInjectClusterVariable(t *testing.T) {
 		clusterMetric: "",
 		wantInjected:  false,
 	})
+}
+
+func TestPatchDashboardNoClusterVarNoInjection(t *testing.T) {
+	panel := dashPanel{
+		Title: "some panel",
+		Targets: []dashTarget{
+			{Expr: `sum(kube_pod_info{job="kube-state-metrics",namespace=~"$namespace"}) by (cluster)`},
+		},
+	}
+	d := &dashboard{
+		Panels:     []dashPanel{panel},
+		Templating: dashTemplating{List: []dashVariable{{Name: "namespace", Type: "query"}}},
+	}
+	common := commonConfig{ClusterLabel: "cluster", Multicluster: true}
+	patchDashboard(d, "test", "", common, grafanaConfig{Datasource: "prometheus", DatasourceUID: "prometheus"})
+
+	got := d.Panels[0].Targets[0].Expr
+	if strings.Contains(got, "$cluster") {
+		t.Fatalf("panel expr must not reference $cluster when no cluster variable exists, got: %s", got)
+	}
 }
 
 func dashboardKeys(m map[string]*dashboard) []string {

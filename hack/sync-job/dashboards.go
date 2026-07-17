@@ -291,21 +291,33 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 	d.Tags = appendUnique(d.Tags, "vm-k8s-stack")
 
 	cl := common.ClusterLabel
+
+	// Pre-scan to determine whether a cluster variable will be present after patching.
+	// Panel expressions must not reference $cluster unless the variable actually exists.
+	hasCluster := false
+	for _, t := range d.Templating.List {
+		if t.Name == cl || t.Name == "cluster" {
+			hasCluster = true
+			break
+		}
+	}
+	willHaveCluster := hasCluster || clusterMetric != "" || !common.Multicluster
+
 	for i := range d.Annotations.List {
 		a := &d.Annotations.List[i]
 		patchDatasource(a.Datasource, grafana)
-		a.Expr = patchDashExpr(a.Expr, a.Name, cl)
+		a.Expr = patchDashExpr(a.Expr, a.Name, cl, willHaveCluster)
 	}
 	for i := range d.Targets {
 		t := &d.Targets[i]
 		patchDatasource(t.Datasource, grafana)
-		t.Expr = patchDashExpr(t.Expr, name, cl)
+		t.Expr = patchDashExpr(t.Expr, name, cl, willHaveCluster)
 	}
 	for i := range d.Panels {
-		patchPanel(&d.Panels[i], name, cl, grafana)
+		patchPanel(&d.Panels[i], name, cl, grafana, willHaveCluster)
 	}
 
-	hasCluster := false
+	hasCluster = false
 	for i := range d.Templating.List {
 		t := &d.Templating.List[i]
 		patchDatasource(t.Datasource, grafana)
@@ -360,13 +372,13 @@ func buildClusterVariable(metric string, common commonConfig) dashVariable {
 func patchVariableExpr(t *dashVariable, varName, cl string) {
 	if t.Query != nil {
 		if t.Query.StrVal != "" {
-			t.Query.StrVal = patchDashExpr(t.Query.StrVal, varName, cl)
+			t.Query.StrVal = patchDashExpr(t.Query.StrVal, varName, cl, true)
 		} else if q, ok := t.Query.MapVal["query"].(string); ok {
-			t.Query.MapVal["query"] = patchDashExpr(q, varName, cl)
+			t.Query.MapVal["query"] = patchDashExpr(q, varName, cl, true)
 		}
 	}
 	if t.Definition != "" {
-		t.Definition = patchDashExpr(t.Definition, varName, cl)
+		t.Definition = patchDashExpr(t.Definition, varName, cl, true)
 	}
 }
 
@@ -404,19 +416,19 @@ func patchVariableDatasource(t *dashVariable, datasource string) {
 	}
 }
 
-func patchPanel(p *dashPanel, name, clusterLabel string, grafana grafanaConfig) {
+func patchPanel(p *dashPanel, name, clusterLabel string, grafana grafanaConfig, withCluster bool) {
 	patchDatasource(p.Datasource, grafana)
 	for i := range p.Targets {
 		t := &p.Targets[i]
 		patchDatasource(t.Datasource, grafana)
-		t.Expr = patchDashExpr(t.Expr, p.Title, clusterLabel)
+		t.Expr = patchDashExpr(t.Expr, p.Title, clusterLabel, withCluster)
 	}
 	for i := range p.Panels {
-		patchPanel(&p.Panels[i], name, clusterLabel, grafana)
+		patchPanel(&p.Panels[i], name, clusterLabel, grafana, withCluster)
 	}
 }
 
-func patchDashExpr(expr, varName, clusterLabel string) string {
+func patchDashExpr(expr, varName, clusterLabel string, withCluster bool) string {
 	if expr == "" {
 		return expr
 	}
@@ -440,7 +452,7 @@ func patchDashExpr(expr, varName, clusterLabel string) string {
 				found = true
 			}
 		}
-		if !found {
+		if !found && withCluster {
 			m.Args = append(m.Args, cl)
 		}
 	}
@@ -455,7 +467,7 @@ func patchDashExpr(expr, varName, clusterLabel string) string {
 				return
 			}
 			modifierFn(&t.Modifier)
-			if t.Modifier.Op == "" {
+			if withCluster && t.Modifier.Op == "" {
 				t.Modifier.Op = "by"
 				t.Modifier.Args = append(t.Modifier.Args, cl)
 			}
@@ -466,7 +478,7 @@ func patchDashExpr(expr, varName, clusterLabel string) string {
 				for _, f := range t.LabelFilterss[i] {
 					if f.Label == "cluster" || f.Value == "$cluster" {
 						f.Label = cl
-						if varName != cl && varName != "cluster" {
+						if withCluster && varName != cl && varName != "cluster" {
 							f.Value = "$cluster"
 							f.IsRegexp = true
 						}
@@ -477,7 +489,7 @@ func patchDashExpr(expr, varName, clusterLabel string) string {
 					}
 					out = append(out, f)
 				}
-				if !found && len(out) > 1 && varName != cl && varName != "cluster" {
+				if !found && withCluster && len(out) > 1 && varName != cl && varName != "cluster" {
 					out = append(out, metricsql.LabelFilter{Label: cl, Value: "$cluster", IsRegexp: true})
 				}
 				t.LabelFilterss[i] = out
