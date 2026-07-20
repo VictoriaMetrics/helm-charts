@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added permissions for VPA and Gateway API. See [#3102](https://github.com/VictoriaMetrics/helm-charts/issues/3102).
 
 ## 0.66.2
 

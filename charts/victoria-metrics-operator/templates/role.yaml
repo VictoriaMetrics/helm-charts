@@ -160,13 +160,23 @@ rules:
   - ingresses/finalizers
   verbs:
   - "*"
+{{- if .Values.operator.gateway_support }}
 - apiGroups:
-    - gateway.networking.k8s.io
+  - gateway.networking.k8s.io
   resources:
-    - httproutes
-    - httproutes/finalizers
+  - httproutes
+  - httproutes/finalizers
   verbs:
-    - '*'
+  - '*'
+{{- end }}
+{{- if .Values.operator.vpa_support }}
+- apiGroups:
+  - autoscaling.k8s.io
+  verbs:
+  - "*"
+  resources:
+  - verticalpodautoscalers
+{{- end }}
 - apiGroups:
   - apiextensions.k8s.io
   resources:
