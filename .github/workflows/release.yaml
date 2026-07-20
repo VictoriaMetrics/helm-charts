@@ -81,7 +81,7 @@ jobs:
               [ -n "$DEP_NAME" ] || continue
               local TMPDIR
               TMPDIR=$(mktemp -d)
-              if helm pull "${DEP_REPO}/${DEP_NAME}" --version "$DEP_VER" --untar --untardir "$TMPDIR" 2>/dev/null; then
+              if helm pull "${DEP_REPO}/${DEP_NAME}" --version "$DEP_VER" --untar --untardir "$TMPDIR" > /dev/null 2>&1; then
                 VERSION=$(find_operator_version "${TMPDIR}/${DEP_NAME}/Chart.lock" $((DEPTH + 1)))
               fi
               rm -rf "$TMPDIR"
@@ -121,7 +121,7 @@ jobs:
 
                   if [ -n "$APP_CHANGELOG_URL" ]; then
                     export APP_CHANGELOG_URL
-                    export APP_CHANGELOG=$(yq -n 'env(APP_CHANGELOG_URL) + "#" + env(APP_VERSION_HASH) | @uri')
+                    export APP_CHANGELOG=$(yq -n 'strenv(APP_CHANGELOG_URL) + "#" + strenv(APP_VERSION_HASH) | @uri')
                     BADGES+=' ![AppVersion: '$APP_VERSION'](https://img.shields.io/badge/'$APP_LABEL'-success?logo=VictoriaMetrics&labelColor=gray&link='$APP_CHANGELOG')'
                   else
                     BADGES+=' ![AppVersion: '$APP_VERSION'](https://img.shields.io/badge/'$APP_LABEL'-success?logo=VictoriaMetrics&labelColor=gray)'
@@ -137,7 +137,7 @@ jobs:
                     export OPERATOR_VERSION_HASH="$(echo $OPERATOR_VERSION | tr -d '.')"
                     export OPERATOR_CHANGELOG_URL
                     OPERATOR_VERSION_LABEL=$(echo $OPERATOR_VERSION | sed 's/-/--/g')
-                    OPERATOR_CHANGELOG=$(yq -n 'env(OPERATOR_CHANGELOG_URL) + "#" + env(OPERATOR_VERSION_HASH) | @uri')
+                    OPERATOR_CHANGELOG=$(yq -n 'strenv(OPERATOR_CHANGELOG_URL) + "#" + strenv(OPERATOR_VERSION_HASH) | @uri')
                     BADGES+=' ![VM Operator: '$OPERATOR_VERSION'](https://img.shields.io/badge/VM_Operator-'$OPERATOR_VERSION_LABEL'-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link='$OPERATOR_CHANGELOG')'
                   fi
                 fi
