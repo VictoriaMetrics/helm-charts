@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 
 ## 0.38.0
 

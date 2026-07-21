@@ -5,6 +5,7 @@
 - added `app.kubernetes.io/component` with value from custom `app` label. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 - add `nodePort` support for `Service` resources
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
+- added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 
 ## 0.1.0
 

@@ -1,0 +1,24 @@
+{{- if and .Values.alertmanager.enabled (.Values.alertmanager.networkPolicy).enabled }}
+{{- $np := .Values.alertmanager.networkPolicy }}
+{{- $ctx := dict "helm" . "appKey" "alertmanager" }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "vm.plain.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  {{- $_ := set $ctx "extraLabels" $np.labels }}
+  labels: {{ include "vm.metaLabels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- with $np.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  podSelector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  {{- with $np.ingress }}
+  ingress: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $np.egress }}
+  egress: {{ toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

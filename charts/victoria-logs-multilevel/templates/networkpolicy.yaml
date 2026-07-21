@@ -1,0 +1,28 @@
+{{- $ctx := dict "helm" . }}
+{{- range $name, $app := .Values }}
+{{- if and (kindIs "map" $app) $app.enabled ($app.networkPolicy).enabled }}
+{{- $np := $app.networkPolicy }}
+{{- $_ := set $ctx "extraLabels" $np.labels }}
+{{- $_ := set $ctx "appKey" $name }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "vm.plain.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ }}
+  labels: {{ include "vm.metaLabels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- with $np.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  podSelector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  {{- with $np.ingress }}
+  ingress: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $np.egress }}
+  egress: {{ toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
