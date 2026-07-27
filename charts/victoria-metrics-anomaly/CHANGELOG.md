@@ -1,5 +1,6 @@
 ## Next release
 
+- upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.30.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1300)
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 
