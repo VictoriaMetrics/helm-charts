@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## 0.3.16
+
+**Release date:** 28 Jul 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - updated `vm.namespace` to resolve per-component namespace override: when `appKey` is set in the template context, the first key is used to look up `<component>.namespaceOverride` in chart values. Component-level namespace takes precedence over chart-wide `namespaceOverride` and `global.namespaceOverride`. Enables `victoria-metrics-k8s-stack` to deploy individual CRs into separate namespaces. See [#3113](https://github.com/VictoriaMetrics/helm-charts/issues/3113)
 
 ## 0.3.15
