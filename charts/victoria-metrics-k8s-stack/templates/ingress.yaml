@@ -1,4 +1,3 @@
-{{- $ns := include "vm.namespace" . }}
 {{- range $name, $config := .Values }}
   {{- if and (kindIs "map" $config) (hasKey $config "ingress") ($config.enabled) (empty (index $.Subcharts $name)) }}
     {{- $ingresses := $config.ingress }}
@@ -22,7 +21,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullname }}
-  namespace: {{ $ns }}
+  namespace: {{ include "vm.namespace" $ctx }}
   {{- $_ := set $ctx "extraLabels" $ingress.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $ingress.annotations }}

@@ -1,4 +1,3 @@
-{{- $ns := include "vm.namespace" . }}
 {{- range $name, $config := .Values }}
   {{- if and (kindIs "map" $config) (hasKey $config "route") ($config.enabled) (empty (index $.Subcharts $name)) }}
     {{- $routes := $config.route }}
@@ -22,7 +21,7 @@ apiVersion: {{ $route.apiVersion | default "gateway.networking.k8s.io/v1" }}
 kind: {{ $route.kind | default "HTTPRoute" }}
 metadata:
   name: {{ $fullname }}
-  namespace: {{ $ns }}
+  namespace: {{ include "vm.namespace" $ctx }}
   {{- $_ := set $ctx "extraLabels" $route.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $route.annotations }}

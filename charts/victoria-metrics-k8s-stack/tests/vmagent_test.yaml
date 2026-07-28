@@ -90,3 +90,12 @@ tests:
       - equal:
           path: spec.remoteWrite[0].url
           value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.metrics.svc.cluster.local.:8428/api/v1/write
+
+  - it: remoteWrite URL uses vmsingle namespaceOverride
+    set:
+      vmsingle:
+        namespaceOverride: metrics
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.metrics.svc.cluster.local.:8428/api/v1/write
