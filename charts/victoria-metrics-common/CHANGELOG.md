@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- updated `vm.namespace` to resolve per-component namespace override: when `appKey` is set in the template context, the first key is used to look up `<component>.namespaceOverride` in chart values. Component-level namespace takes precedence over chart-wide `namespaceOverride` and `global.namespaceOverride`. Enables `victoria-metrics-k8s-stack` to deploy individual CRs into separate namespaces. See [#3113](https://github.com/VictoriaMetrics/helm-charts/issues/3113)
 
 ## 0.3.15
 

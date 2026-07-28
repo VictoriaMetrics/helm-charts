@@ -402,3 +402,78 @@ tests:
       - equal:
           path: vm.managed.fullname
           value: vminsert-RELEASE-NAME-victoria-metrics-common
+
+  - it: namespace uses component namespaceOverride when appKey list matches component
+    set:
+      ctx:
+        appKey:
+          - mycomponent
+      mycomponent:
+        namespaceOverride: component-ns
+    asserts:
+      - equal:
+          path: vm.namespace
+          value: component-ns
+
+  - it: namespace uses component namespaceOverride when appKey is a string
+    set:
+      ctx:
+        appKey: mycomponent
+      mycomponent:
+        namespaceOverride: component-ns
+    asserts:
+      - equal:
+          path: vm.namespace
+          value: component-ns
+
+  - it: component namespaceOverride takes precedence over chart-wide namespaceOverride
+    set:
+      namespaceOverride: chart-ns
+      ctx:
+        appKey:
+          - mycomponent
+      mycomponent:
+        namespaceOverride: component-ns
+    asserts:
+      - equal:
+          path: vm.namespace
+          value: component-ns
+
+  - it: component namespaceOverride takes precedence over global.namespaceOverride
+    set:
+      global:
+        namespaceOverride: global-ns
+      ctx:
+        appKey:
+          - mycomponent
+      mycomponent:
+        namespaceOverride: component-ns
+    asserts:
+      - equal:
+          path: vm.namespace
+          value: component-ns
+
+  - it: falls back to chart-wide namespaceOverride when component has no namespaceOverride
+    set:
+      namespaceOverride: chart-ns
+      ctx:
+        appKey:
+          - mycomponent
+      mycomponent:
+        enabled: false
+    asserts:
+      - equal:
+          path: vm.namespace
+          value: chart-ns
+
+  - it: falls back to release namespace when component has no namespaceOverride and no chart-wide override
+    set:
+      ctx:
+        appKey:
+          - mycomponent
+      mycomponent:
+        enabled: false
+    asserts:
+      - equal:
+          path: vm.namespace
+          value: NAMESPACE

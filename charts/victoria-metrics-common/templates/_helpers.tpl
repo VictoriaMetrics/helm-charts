@@ -2,7 +2,21 @@
   {{- include "vm.validate.args" . -}}
   {{- $Release := (.helm).Release | default .Release -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- $Values.namespaceOverride | default ($Values.global).namespaceOverride | default $Release.Namespace -}}
+  {{- $componentNs := "" -}}
+  {{- $appKey := .appKey -}}
+  {{- if $appKey -}}
+    {{- $firstKey := $appKey -}}
+    {{- if kindIs "slice" $appKey -}}
+      {{- $firstKey = first $appKey -}}
+    {{- end -}}
+    {{- if kindIs "string" $firstKey -}}
+      {{- $component := index $Values $firstKey -}}
+      {{- if kindIs "map" $component -}}
+        {{- $componentNs = $component.namespaceOverride | default "" -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $componentNs | default $Values.namespaceOverride | default ($Values.global).namespaceOverride | default $Release.Namespace -}}
 {{- end -}}
 
 {{- define "vm.validate.args" -}}
