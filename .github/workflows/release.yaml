@@ -109,7 +109,7 @@ jobs:
               export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
               
               # If version already released
-              if grep -q "^## $CHART_VERSION$" $CHANGELOG; then
+              if grep -q "^## v$CHART_VERSION$" $CHANGELOG; then
                 echo "There is nothing to release for $CHANGELOG"
               else
                 # Release notes file
@@ -163,7 +163,7 @@ jobs:
           EOT
 
                 # Update chart version in CHANGELOG
-                sed -i 's/## Next release/&\n\n- TODO\n\n## $CHART_VERSION\n\n$RELEASE_DATE\n\n$BADGES/' $CHANGELOG
+                sed -i 's/## Next release/&\n\n- TODO\n\n## v$CHART_VERSION\n\n$RELEASE_DATE\n\n$BADGES/' $CHANGELOG
                 envsubst < $CHANGELOG > $CHANGELOG.copy
                 mv $CHANGELOG.copy $CHANGELOG
               fi
