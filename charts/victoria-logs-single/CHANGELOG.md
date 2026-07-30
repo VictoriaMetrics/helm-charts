@@ -2,7 +2,7 @@
 
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 
-## 0.13.9
+## v0.13.9
 
 **Release date:** 16 Jul 2026
 
@@ -12,7 +12,7 @@
 - added `runtimeClassName` option to the pod spec
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 
-## 0.13.8
+## v0.13.8
 
 **Release date:** 17 Jun 2026
 
@@ -20,7 +20,7 @@
 
 - bump VictoriaLogs version to [v1.51.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.51.0).
 
-## 0.13.7
+## v0.13.7
 
 **Release date:** 13 Jun 2026
 
@@ -28,7 +28,7 @@
 
 - bump common chart version 0.3.8 -> 0.3.9
 
-## 0.13.6
+## v0.13.6
 
 **Release date:** 03 Jun 2026
 
@@ -36,7 +36,7 @@
 
 - `serviceMonitor` and `vmServiceScrape` port now defaults to the primary `http` list item name; added explicit `port` field to override it without using `targetPort`.
 
-## 0.13.5
+## v0.13.5
 
 **Release date:** 01 Jun 2026
 
@@ -44,7 +44,7 @@
 
 - bump common chart version 0.3.7 -> 0.3.8
 
-## 0.13.4
+## v0.13.4
 
 **Release date:** 01 Jun 2026
 
@@ -55,7 +55,7 @@
 - fixed `syslog` args rendering: boolean `false` values (e.g. `tls: false`, `useLocalTimestamp: false`) are now correctly included; absent boolean fields are gap-filled with `false` instead of empty string.
 - bump common chart version 0.3.5 -> 0.3.7
 
-## 0.13.3
+## v0.13.3
 
 **Release date:** 30 May 2026
 
@@ -63,7 +63,7 @@
 
 - bump common chart version 0.3.4 -> 0.3.5
 
-## 0.13.2
+## v0.13.2
 
 **Release date:** 30 May 2026
 
@@ -71,7 +71,7 @@
 
 - bump common chart version 0.3.2 -> 0.3.4
 
-## 0.13.1
+## v0.13.1
 
 **Release date:** 28 May 2026
 
@@ -79,7 +79,7 @@
 
 - fix invalid YAML rendered by `templates/route.yaml` when `server.route.enabled=true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
 
-## 0.13.0
+## v0.13.0
 
 **Release date:** 28 May 2026
 
@@ -93,7 +93,7 @@
 - support `.Values.server.syslog.tcp` and `.Values.server.syslog.udp` lists for configuring syslog TCP/UDP listen addresses with optional TLS settings. Has higher priority than `extraArgs`.
 - add ability to override VictoriaLogs container command.
 
-## 0.12.5
+## v0.12.5
 
 **Release date:** 21 May 2026
 
@@ -101,7 +101,7 @@
 
 - render Vector dashboard only if subchart is enabled. See [#2896](https://github.com/VictoriaMetrics/helm-charts/issues/2896).
 
-## 0.12.4
+## v0.12.4
 
 **Release date:** 02 May 2026
 
@@ -111,7 +111,7 @@
 - fixed rendering failure when an http list entry does not have the `primary` field set.
 - fixed `syslog` args rendering: boolean `false` values (e.g. `tls: false`, `useLocalTimestamp: false`) are now correctly included; absent boolean fields are gap-filled with `false` instead of empty string.
 
-## 0.12.3
+## v0.12.3
 
 **Release date:** 01 May 2026
 
@@ -119,7 +119,7 @@
 
 - removed vector playground property, which is not supported anymore
 
-## 0.12.2
+## v0.12.2
 
 **Release date:** 21 Apr 2026
 
@@ -127,7 +127,7 @@
 
 - fixed selector for ServiceMonitor. See [#2827](https://github.com/VictoriaMetrics/helm-charts/issues/2827).
 
-## 0.12.1
+## v0.12.1
 
 **Release date:** 20 Apr 2026
 
@@ -135,7 +135,7 @@
 
 - fixed selector for scrape objects. See [#2827](https://github.com/VictoriaMetrics/helm-charts/issues/2827).
 
-## 0.12.0
+## v0.12.0
 
 **Release date:** 16 Apr 2026
 
@@ -143,7 +143,7 @@
 
 - revert change in Deployment and StatefulSet matchLabels, that was introduced in release 0.11.32.
 
-## 0.11.32
+## v0.11.32
 
 **Release date:** 14 Apr 2026
 
@@ -154,7 +154,7 @@
 - replace custom app label with app.kubernetes.io/component. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 - bump VictoriaLogs version to [v1.50.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.50.0).
 
-## 0.11.31
+## v0.11.31
 
 **Release date:** 03 Apr 2026
 
@@ -164,7 +164,7 @@
 - fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template
 - support volumeAttributesClassName PVC attribute. See [#2782](https://github.com/VictoriaMetrics/helm-charts/issues/2782).
 
-## 0.11.30
+## v0.11.30
 
 **Release date:** 16 Mar 2026
 
@@ -172,7 +172,7 @@
 
 - updated vector dependency 0.46.0 -> 0.51.0
 
-## 0.11.29
+## v0.11.29
 
 **Release date:** 11 Mar 2026
 
@@ -181,7 +181,7 @@
 - bump VictoriaLogs version to [v1.48.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.48.0).
 - support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
 
-## 0.11.28
+## v0.11.28
 
 **Release date:** 25 Feb 2026
 
@@ -190,7 +190,7 @@
 - bump VictoriaLogs version to [v1.47.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.47.0).
 - feature: support `tpl` in `basicAuth` on `VMServiceScrape` and `ServiceMonitor`
 
-## 0.11.27
+## v0.11.27
 
 **Release date:** 23 Feb 2026
 
@@ -199,7 +199,7 @@
 - bump VictoriaLogs version to [v1.46.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.46.0).
 - feature: support `tpl` in `envFrom` and `env` fields. See [#2690](https://github.com/VictoriaMetrics/helm-charts/issues/2690)
 
-## 0.11.26
+## v0.11.26
 
 **Release date:** 05 Feb 2026
 
@@ -207,7 +207,7 @@
 
 - bump VictoriaLogs version to [v1.45.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.45.0).
 
-## 0.11.25
+## v0.11.25
 
 **Release date:** 27 Jan 2026
 
@@ -215,7 +215,7 @@
 
 - `nodes/proxy` permission was removed from default clusterrole. This permission may be used to [raise privileges](https://grahamhelton.com/blog/nodes-proxy-rce). In case the vmagent will be used to scrape Kubelet's proxy endpoint, it is recommended to create a custom role with the necessary permissions.
 
-## 0.11.24
+## v0.11.24
 
 **Release date:** 10 Jan 2026
 
@@ -223,7 +223,7 @@
 
 - add ability to configure license for VictoriaLogs enterprise. See [#2649](https://github.com/VictoriaMetrics/helm-charts/issues/2649).
 
-## 0.11.23
+## v0.11.23
 
 **Release date:** 26 Dec 2025
 
@@ -231,7 +231,7 @@
 
 - bump VictoriaLogs version to [v1.43.1](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.43.1).
 
-## 0.11.22
+## v0.11.22
 
 **Release date:** 23 Dec 2025
 
@@ -239,7 +239,7 @@
 
 - bump common chart version 0.0.45 -> 0.0.46
 
-## 0.11.21
+## v0.11.21
 
 **Release date:** 22 Dec 2025
 
@@ -247,7 +247,7 @@
 
 - bump VictoriaLogs version to [v1.43.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.43.0).
 
-## 0.11.20
+## v0.11.20
 
 **Release date:** 20 Dec 2025
 
@@ -255,7 +255,7 @@
 
 - bump VictoriaLogs version to [v1.42.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.42.0).
 
-## 0.11.19
+## v0.11.19
 
 **Release date:** 17 Dec 2025
 
@@ -263,7 +263,7 @@
 
 - bump VictoriaLogs version to [v1.41.1](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.41.1).
 
-## 0.11.18
+## v0.11.18
 
 **Release date:** 02 Dec 2025
 
@@ -273,7 +273,7 @@
 - add support of k8s service traffic distribution. See [#2580](https://github.com/VictoriaMetrics/helm-charts/issues/2580).
 - bump VictoriaLogs version to [v1.39.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.39.0).
 
-## 0.11.17
+## v0.11.17
 
 **Release date:** 29 Oct 2025
 
@@ -281,7 +281,7 @@
 
 - fixed usage of `.vector.customConfigName`
 
-## 0.11.16
+## v0.11.16
 
 **Release date:** 20 Oct 2025
 
@@ -289,7 +289,7 @@
 
 - support HTTPRoute for chart components, where ingress is available. See [#2492](https://github.com/VictoriaMetrics/helm-charts/issues/2492).
 
-## 0.11.15
+## v0.11.15
 
 **Release date:** 14 Oct 2025
 
@@ -297,7 +297,7 @@
 
 - fixed template typo in vector config
 
-## 0.11.14
+## v0.11.14
 
 **Release date:** 14 Oct 2025
 
@@ -305,7 +305,7 @@
 
 - add .Values.vector.customConfigName variable for managed by chart vector custom config map name. See [#2482](https://github.com/VictoriaMetrics/helm-charts/issues/2482).
 
-## 0.11.13
+## v0.11.13
 
 **Release date:** 08 Oct 2025
 
@@ -313,7 +313,7 @@
 
 - do not merge .Values.server.persistentVolume.extraLabels with default chart labels. See [#2460](https://github.com/VictoriaMetrics/helm-charts/issues/2460).
 
-## 0.11.12
+## v0.11.12
 
 **Release date:** 08 Oct 2025
 
@@ -322,7 +322,7 @@
 - Bump VictoriaLogs version to [v1.36.1](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.36.1).
 - add .Values.server.persistentVolume.extraLabels for PVC specific labels
 
-## 0.11.11
+## v0.11.11
 
 **Release date:** 27 Sep 2025
 
@@ -330,7 +330,7 @@
 
 - Bump VictoriaLogs version to [v1.35.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.35.0).
 
-## 0.11.10
+## v0.11.10
 
 **Release date:** 24 Sep 2025
 
@@ -338,7 +338,7 @@
 
 - updated dashboard
 
-## 0.11.9
+## v0.11.9
 
 **Release date:** 22 Sep 2025
 
@@ -347,7 +347,7 @@
 - Added `params` support for `ServiceMonitor`
 - Bump VictoriaLogs version to [v1.34.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.34.0).
 
-## 0.11.8
+## v0.11.8
 
 **Release date:** 10 Sep 2025
 
@@ -355,7 +355,7 @@
 
 - Bump VictoriaLogs version to [v1.33.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.33.0).
 
-## 0.11.7
+## v0.11.7
 
 **Release date:** 30 Aug 2025
 
@@ -364,7 +364,7 @@
 - Sync dashboard
 - Bump VictoriaLogs version to [v1.31.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.31.0).
 
-## 0.11.6
+## v0.11.6
 
 **Release date:** 13 Aug 2025
 
@@ -372,7 +372,7 @@
 
 - Bump VictoriaLogs version to [v1.28.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.28.0).
 
-## 0.11.5
+## v0.11.5
 
 **Release date:** 14 Jul 2025
 
@@ -380,7 +380,7 @@
 
 - Bump VictoriaLogs version to [v1.25.1](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.25.1).
 
-## 0.11.4
+## v0.11.4
 
 **Release date:** 07 Jul 2025
 
@@ -389,7 +389,7 @@
 - Add default label selector `.Values.server.topologySpreadConstraints` property. See [#2219](https://github.com/VictoriaMetrics/helm-charts/issues/2219)
 - Bump VictoriaLogs version to [v1.25.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.25.0).
 
-## 0.11.3
+## v0.11.3
 
 **Release date:** 23 Jun 2025
 
@@ -398,7 +398,7 @@
 - Bump VictoriaLogs version to [v1.24.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.24.0-victorialogs).
 - Fixed relabeling config for the VMServiceScrape of the server. See [#2216](https://github.com/VictoriaMetrics/helm-charts/issues/2216) for details.
 
-## 0.11.2
+## v0.11.2
 
 **Release date:** 03 Jun 2025
 
@@ -406,7 +406,7 @@
 
 - Fixed vector endpoints rendering. See [#2214](https://github.com/VictoriaMetrics/helm-charts/issues/2214) for details.
 
-## 0.11.1
+## v0.11.1
 
 **Release date:** 29 May 2025
 
@@ -414,7 +414,7 @@
 
 - Check if sink is not empty
 
-## 0.11.0
+## v0.11.0
 
 **Release date:** 29 May 2025
 
@@ -423,7 +423,7 @@
 - Removed `vlogs.es.urls` template. Leave `endpoints` parameter of each `type: elasticsearch` Vector sink blank instead.
 - Create sink per statefulset node in Vector.
 
-## 0.10.0
+## v0.10.0
 
 **Release date:** 26 May 2025
 
@@ -433,7 +433,7 @@
 - VictoriaLogs upgrade 1.21.0 -> 1.22.2
 - Reduce server readiness probe periodSeconds from 15 to 5 and add `-http.shutdownDelay=15s` cmd-line flag, for graceful shutdown during rolling restarts.
 
-## 0.9.8
+## v0.9.8
 
 **Release date:** 01 May 2025
 
@@ -444,7 +444,7 @@
 - Enable Persistent Volume Claim for VictoriaLogs by default to prevent data loss during restarts.
 - Bumped VictoriaLogs version to [v1.21.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.21.0-victorialogs).
 
-## 0.9.7
+## v0.9.7
 
 **Release date:** 24 Apr 2025
 
@@ -452,7 +452,7 @@
 
 - Update VictoriaLogs version to [v1.20.0](https://docs.victoriametrics.com/victorialogs/changelog/#v1200).
 
-## 0.9.6
+## v0.9.6
 
 **Release date:** 18 Apr 2025
 
@@ -462,7 +462,7 @@
 - Bumped VictoriaLogs version to v1.19.0.
 - Support wildcard in ingress hostname. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2134).
 
-## 0.9.5
+## v0.9.5
 
 **Release date:** 11 Apr 2025
 
@@ -472,7 +472,7 @@
 - fixed rendering failure when an http list entry does not have the `primary` field set.
 - fixed `syslog` args rendering: boolean `false` values (e.g. `tls: false`, `useLocalTimestamp: false`) are now correctly included; absent boolean fields are gap-filled with `false` instead of empty string.
 
-## 0.9.4
+## v0.9.4
 
 **Release date:** 06 Apr 2025
 
@@ -481,7 +481,7 @@
 - updated common dependency 0.0.39 -> 0.0.42
 - add .Values.service.extraPorts. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2111).
 
-## 0.9.3
+## v0.9.3
 
 **Release date:** 14 Mar 2025
 
@@ -490,7 +490,7 @@
 - Upgraded dashboard
 - fixed usage of existingClaim in statefulSet mode. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2056).
 
-## 0.9.2
+## v0.9.2
 
 **Release date:** 27 Feb 2025
 
@@ -498,7 +498,7 @@
 
 - Reverted serviceName removal, which was done in 0.9.0 release
 
-## 0.9.1
+## v0.9.1
 
 **Release date:** 27 Feb 2025
 
@@ -506,7 +506,7 @@
 
 - fix service not being deployed with default `.Values` configuration.
 
-## 0.9.0
+## v0.9.0
 
 **Release date:** 26 Feb 2025
 
@@ -519,7 +519,7 @@
 
 - Upgrade VictoriaLogs 1.8.0 -> 1.14.0
 
-## 0.8.16
+## v0.8.16
 
 **Release date:** 07 Feb 2025
 
@@ -528,7 +528,7 @@
 - add `.Values.server.vmServiceScrape` for [VMOperator](https://docs.victoriametrics.com/operator/) [VMServiceScrape](https://docs.victoriametrics.com/operator/api/#vmservicescrape) resource
 - update victorialogs version to [v1.8.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.8.0-victorialogs)
 
-## 0.8.15
+## v0.8.15
 
 **Release date:** 06 Feb 2025
 
@@ -538,7 +538,7 @@
 - vector chart 0.37.x -> 0.40.x
 - updated common dependency 0.0.37 -> 0.0.39
 
-## 0.8.14
+## v0.8.14
 
 **Release date:** 20 Jan 2025
 
@@ -547,7 +547,7 @@
 - update victorialogs version to v1.6.1
 - add `.Values.statefulSet.updateStrategy`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1928) for details.
 
-## 0.8.13
+## v0.8.13
 
 **Release date:** 14 Jan 2025
 
@@ -555,7 +555,7 @@
 
 - victorialogs version: v1.4.0 -> v1.5.0
 
-## 0.8.12
+## v0.8.12
 
 **Release date:** 06 Jan 2025
 
@@ -566,7 +566,7 @@
 - victorialogs version: v1.3.2 -> v1.4.0
 - support templating in `.Values.extraObjects`
 
-## 0.8.11
+## v0.8.11
 
 **Release date:** 2024-12-09
 
@@ -575,7 +575,7 @@
 
 - victorialogs version: v1.1.0 -> v1.3.2
 
-## 0.8.10
+## v0.8.10
 
 **Release date:** 2024-12-05
 
@@ -585,7 +585,7 @@
 - added `server.retentionDiskUsage` to control [retention by disk space](https://docs.victoriametrics.com/victorialogs/#retention-by-disk-space-usage). See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1845)
 - victorialogs version: v1.0.0 -> v1.1.0
 
-## 0.8.9
+## v0.8.9
 
 **Release date:** 2024-12-03
 
@@ -594,7 +594,7 @@
 
 - do not set clusterIP value, when service type is not ClusterIP. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1838)
 
-## 0.8.8
+## v0.8.8
 
 **Release date:** 2024-12-02
 
@@ -604,7 +604,7 @@
 - enable watch-config in vector by default
 - exclude default service port, when serviceMonitor.targetPort is defined
 
-## 0.8.7
+## v0.8.7
 
 **Release date:** 2024-11-28
 
@@ -613,7 +613,7 @@
 
 - updated common dependency 0.0.32 -> 0.0.33
 
-## 0.8.6
+## v0.8.6
 
 **Release date:** 2024-11-28
 
@@ -622,7 +622,7 @@
 
 - Use only pod FQDN for statefulsets in `vm.es.urls` template
 
-## 0.8.5
+## v0.8.5
 
 **Release date:** 2024-11-27
 
@@ -632,7 +632,7 @@
 - Added `vector.customConfigNamespace` to force Vector configmap creation in a given namespace even if vector.enabled: false
 - Added `service.targetPort` and `serviceMonitor.targetPort` to add ability to point service to one of extraContainers port, like oauth2-proxy
 
-## 0.8.4
+## v0.8.4
 
 **Release date:** 2024-11-26
 
@@ -643,7 +643,7 @@
 - synced rules and dashboards
 - added .Values.dashboards.namespace to override default namespace for dashboards
 
-## 0.8.3
+## v0.8.3
 
 **Release date:** 2024-11-25
 
@@ -653,7 +653,7 @@
 - removed duplicated app label from dashboards. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1795).
 - synced dashboards
 
-## 0.8.2
+## v0.8.2
 
 **Release date:** 2024-11-22
 
@@ -666,7 +666,7 @@
 - fixed app.kubernetes.io/version tag override if custom tag is set. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1766).
 - Upgraded VictoriaLogs 0.41.0 -> 1.0.0
 
-## 0.8.1
+## v0.8.1
 
 **Release date:** 2024-11-08
 
@@ -676,7 +676,7 @@
 - updated common dependency 0.0.21 -> 0.0.23
 - added `log.message` to a list of default vector message fields
 
-## 0.8.0
+## v0.8.0
 
 **Release date:** 2024-11-08
 
@@ -694,7 +694,7 @@ to update your agent configuration if you are using it.
 - Parsed json fields are now nested into `log` key. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1708)
 - updated common dependency 0.0.19 -> 0.0.21
 
-## 0.7.3
+## v0.7.3
 
 **Release date:** 2024-11-06
 
@@ -704,7 +704,7 @@ to update your agent configuration if you are using it.
 - set default DNS domain to `cluster.local.`
 - made message, time, stream fields configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1695)
 
-## 0.7.2
+## v0.7.2
 
 **Release date:** 2024-11-06
 
@@ -717,7 +717,7 @@ to update your agent configuration if you are using it.
 - upgraded victorialogs 0.37.0 -> 0.40.0
 - made configurable service port in fluent-bit output config. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1693)
 
-## 0.7.1
+## v0.7.1
 
 **Release date:** 2024-10-25
 
@@ -726,7 +726,7 @@ to update your agent configuration if you are using it.
 
 - Support multiple paths for a single ingress domain
 
-## 0.7.0
+## v0.7.0
 
 **Release date:** 2024-10-25
 
@@ -736,7 +736,7 @@ to update your agent configuration if you are using it.
 - Added grafana dashboard. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1590)
 - Custom fluent-bit template to push data to multiple VLogs instances when replica count is greater than 1
 
-## 0.6.6
+## v0.6.6
 
 **Release date:** 2024-10-11
 
@@ -745,7 +745,7 @@ to update your agent configuration if you are using it.
 
 - Human-readable error about Helm version requirement
 
-## 0.6.5
+## v0.6.5
 
 **Release date:** 2024-10-04
 
@@ -754,7 +754,7 @@ to update your agent configuration if you are using it.
 
 - upgraded common chart dependency
 
-## 0.6.4
+## v0.6.4
 
 **Release date:** 2024-09-23
 
@@ -764,7 +764,7 @@ to update your agent configuration if you are using it.
 - VictoriaLogs 0.29.0
 - Fixed host template in default fluent-bit output configuration
 
-## 0.6.3
+## v0.6.3
 
 **Release date:** 2024-09-16
 
@@ -773,7 +773,7 @@ to update your agent configuration if you are using it.
 
 - Avoid variant if tag is set explicitly
 
-## 0.6.2
+## v0.6.2
 
 **Release date:** 2024-09-12
 
@@ -784,7 +784,7 @@ to update your agent configuration if you are using it.
 - Made replicas configurable
 - Allow override default for statefulset headless service
 
-## 0.6.1
+## v0.6.1
 
 **Release date:** 2024-09-03
 
@@ -797,7 +797,7 @@ to update your agent configuration if you are using it.
 - Removed necessity to set `.Values.server.persistentVolume.existingClaim` when volume is expected to be created by chart. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/189)
 - Fixed PVC in StatefulSet
 
-## 0.6.0
+## v0.6.0
 
 **Release date:** 2024-08-21
 
@@ -823,7 +823,7 @@ to update your agent configuration if you are using it.
 - Removed `networking.k8s.io/v1beta1/Ingress` and `extensions/v1beta1/Ingress` support
 - Added `.Values.server.service.ipFamilies` and `.Values.server.service.ipFamilyPolicy` for service IP family management
 
-## 0.5.4
+## v0.5.4
 
 **Release date:** 2024-07-25
 
@@ -832,7 +832,7 @@ to update your agent configuration if you are using it.
 
 - update VictoriaLogs to [v0.28.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.28.0-victorialogs).
 
-## 0.5.3
+## v0.5.3
 
 **Release date:** 2024-07-08
 
@@ -841,7 +841,7 @@ to update your agent configuration if you are using it.
 
 - add missing API version and kind for volumeClaimTemplates, see [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1092).
 
-## 0.5.2
+## v0.5.2
 
 **Release date:** 2024-06-17
 
@@ -850,7 +850,7 @@ to update your agent configuration if you are using it.
 
 - fix invalid label selector usage in notes printed after chart installation
 
-## 0.5.1
+## v0.5.1
 
 **Release date:** 2024-05-30
 
@@ -859,7 +859,7 @@ to update your agent configuration if you are using it.
 
 - Update VictoriaLogs to [v0.15.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.15.0-victorialogs).
 
-## 0.5.0
+## v0.5.0
 
 **Release date:** 2024-05-23
 
@@ -869,7 +869,7 @@ to update your agent configuration if you are using it.
 - Update fluent-bit chart to 0.46.7 and fluentbit to 3.0.4
 - Update VictoriaLogs version to 0.9.1
 
-## 0.4.0
+## v0.4.0
 
 **Release date:** 2024-05-20
 
@@ -880,7 +880,7 @@ to update your agent configuration if you are using it.
 - Move `.Values.server.name`, `.Values.server.fullnameOverride` to `.Values.global.victoriaLogs.server`. This allows to avoid issues with Fluent Bit output definition. See the [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/1028) for the details.
 - Include `kubernetes_namespace_name` field in the [stream fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) configuration of Fluent Bit output.
 
-## 0.3.8
+## v0.3.8
 
 **Release date:** 2024-05-10
 
@@ -890,7 +890,7 @@ to update your agent configuration if you are using it.
 - properly truncate value of `app.kubernetes.io/managed-by` and `app.kubernetes.io/instance` labels in case release name exceeds 63 characters.
 - support disabling default securityContext to keep compatible with platform like openshift, see this [pull request](https://github.com/VictoriaMetrics/helm-charts/pull/995) by @Baboulinet-33 for details.
 
-## 0.3.7
+## v0.3.7
 
 **Release date:** 2024-04-16
 
@@ -899,7 +899,7 @@ to update your agent configuration if you are using it.
 
 - bump version of victorialogs to [0.5.2](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.5.2-victorialogs)
 
-## 0.3.6
+## v0.3.6
 
 **Release date:** 2024-03-28
 
@@ -908,7 +908,7 @@ to update your agent configuration if you are using it.
 
 - support adding `metricRelabelings` for server serviceMonitor (#946)
 
-## 0.3.5
+## v0.3.5
 
 **Release date:** 2024-03-05
 
@@ -917,7 +917,7 @@ to update your agent configuration if you are using it.
 
 - bump version of vlogs single to [0.5.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.5.0-victorialogs)
 
-## 0.3.4
+## v0.3.4
 
 **Release date:** 2023-11-15
 
@@ -926,7 +926,7 @@ to update your agent configuration if you are using it.
 
 - bump version of vlogs single to [0.4.2](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.4.2-victorialogs)
 
-## 0.3.3
+## v0.3.3
 
 **Release date:** 2023-10-10
 
@@ -935,7 +935,7 @@ to update your agent configuration if you are using it.
 
 - Add `kubernetes_container_name` into default [stream fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) configuration `fluent-bit`.
 
-## 0.3.2
+## v0.3.2
 
 **Release date:** 2023-10-04
 
@@ -944,7 +944,7 @@ to update your agent configuration if you are using it.
 
 - bump version of vlogs single to [0.4.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v0.4.1-victorialogs)
 
-## 0.3.1
+## v0.3.1
 
 **Release date:** 2023-09-13
 
@@ -953,7 +953,7 @@ to update your agent configuration if you are using it.
 
 - added: extraObjects: [] for dynamic supportive objects configuration
 
-## 0.3.0
+## v0.3.0
 
 **Release date:** 2023-08-15
 
@@ -963,7 +963,7 @@ to update your agent configuration if you are using it.
 - vlogs-single: update to 0.3.0 (#598)
 - Remove repeated volumeMounts section (#610)
 
-## 0.1.3
+## v0.1.3
 
 **Release date:** 2023-07-27
 
@@ -974,7 +974,7 @@ to update your agent configuration if you are using it.
 - charts/victoria-logs-single: fix STS render when using statefulset is disabled (#585)
 - charts/victoria-logs-single: add imagePullSecrets (#586)
 
-## 0.1.2
+## v0.1.2
 
 **Release date:** 2023-06-23
 
@@ -990,7 +990,7 @@ to update your agent configuration if you are using it.
 # No changes in this release
 ```
 
-## 0.1.1
+## v0.1.1
 
 **Release date:** 2023-06-22
 
@@ -999,7 +999,7 @@ to update your agent configuration if you are using it.
 
 - charts/victoria-logs-single: template Host field (#566)
 
-## 0.1.0
+## v0.1.0
 
 **Release date:** 2023-06-22
 
@@ -1010,7 +1010,7 @@ to update your agent configuration if you are using it.
 - add victoria-logs to build process, make package
 - charts/victoria-logs-single: add fluentbit setup (#563)
 
-## 0.0.1
+## v0.0.1
 
 **Release date:** 2023-06-12
 

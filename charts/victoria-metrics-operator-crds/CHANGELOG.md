@@ -2,7 +2,7 @@
 
 - TODO
 
-## 0.13.1
+## v0.13.1
 
 **Release date:** 08 Jul 2026
 
@@ -10,7 +10,7 @@
 
 - Release CRDs for operator [v0.73.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.73.1)
 
-## 0.13.0
+## v0.13.0
 
 **Release date:** 08 Jul 2026
 
@@ -19,7 +19,7 @@
 - added `global.extraAnnotations` support for upgrade job pod template
 - Release CRDs for operator [v0.73.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.73.0)
 
-## 0.12.0
+## v0.12.0
 
 **Release date:** 15 Jun 2026
 
@@ -27,7 +27,7 @@
 
 - Release CRDs for operator [v0.72.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.72.0)
 
-## 0.11.0
+## v0.11.0
 
 **Release date:** 12 Jun 2026
 
@@ -35,7 +35,7 @@
 
 - Release CRDs for operator [v0.71.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.71.0)
 
-## 0.10.1
+## v0.10.1
 
 **Release date:** 20 May 2026
 
@@ -43,7 +43,7 @@
 
 - TODO
 
-## 0.10.0
+## v0.10.0
 
 **Release date:** 18 May 2026
 
@@ -51,7 +51,7 @@
 
 - Release CRDs for operator [v0.70.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.70.0)
 
-## 0.9.0
+## v0.9.0
 
 **Release date:** 22 Apr 2026
 
@@ -59,7 +59,7 @@
 
 - Release CRDs for operator [v0.69.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.69.0)
 
-## 0.8.0
+## v0.8.0
 
 **Release date:** 24 Feb 2026
 
@@ -67,7 +67,7 @@
 
 - Release CRDs for operator [v0.68.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.68.0)
 
-## 0.7.0
+## v0.7.0
 
 **Release date:** 23 Jan 2026
 
@@ -75,7 +75,7 @@
 
 - Release CRDs for operator [v0.67.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.67.0)
 
-## 0.6.1
+## v0.6.1
 
 **Release date:** 06 Dec 2025
 
@@ -83,7 +83,7 @@
 
 - Release CRDs for operator [v0.66.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.66.1)
 
-## 0.6.0
+## v0.6.0
 
 **Release date:** 29 Oct 2025
 
@@ -91,7 +91,7 @@
 
 - Release CRDs for operator [v0.64.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.64.0)
 
-## 0.5.1
+## v0.5.1
 
 **Release date:** 27 Sep 2025
 
@@ -99,7 +99,7 @@
 
 - Moved crds into a supchart to decrease helm release secret size. See [#2420](https://github.com/VictoriaMetrics/helm-charts/issues/2420).
 
-## 0.5.0
+## v0.5.0
 
 **Release date:** 12 Sep 2025
 
@@ -107,7 +107,7 @@
 
 - Release CRDs for operator [v0.63.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.63.0)
 
-## 0.4.0
+## v0.4.0
 
 **Release date:** 15 Jul 2025
 
@@ -115,7 +115,7 @@
 
 - Release CRDs for operator [v0.61.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.61.0)
 
-## 0.3.0
+## v0.3.0
 
 **Release date:** 23 Jun 2025
 
@@ -123,7 +123,7 @@
 
 - Release CRDs for operator [v0.60.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.60.0)
 
-## 0.2.1
+## v0.2.1
 
 **Release date:** 12 Jun 2025
 
@@ -131,7 +131,7 @@
 
 - Release CRDs for operator [v0.59.2](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.2)
 
-## 0.2.0
+## v0.2.0
 
 **Release date:** 30 May 2025
 
@@ -139,7 +139,7 @@
 
 - Release CRDs for operator [v0.59.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.59.0)
 
-## 0.1.2
+## v0.1.2
 
 **Release date:** 14 May 2025
 
@@ -147,7 +147,7 @@
 
 - Release CRDs for operator v0.58.0
 
-## 0.1.1
+## v0.1.1
 
 **Release date:** 09 May 2025
 
@@ -155,7 +155,7 @@
 
 - Release CRDs for operator [v0.57.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.57.0)
 
-## 0.1.0
+## v0.1.0
 
 **Release date:** 17 Apr 2025
 
@@ -163,7 +163,7 @@
 
 - Release CRDs for operator [v0.56.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.56.0)
 
-## 0.0.3
+## v0.0.3
 
 **Release date:** 05 Apr 2025
 
@@ -171,7 +171,7 @@
 
 - Fixed CRD duplication. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2112).
 
-## 0.0.2
+## v0.0.2
 
 **Release date:** 04 Apr 2025
 
@@ -179,7 +179,7 @@
 
 - Fix OCI package publishing. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/2108).
 
-## 0.0.1
+## v0.0.1
 
 **Release date:** 03 Apr 2025
 

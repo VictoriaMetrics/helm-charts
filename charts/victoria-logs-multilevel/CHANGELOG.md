@@ -2,7 +2,7 @@
 
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 
-## 0.2.8
+## v0.2.8
 
 **Release date:** 16 Jul 2026
 
@@ -12,7 +12,7 @@
 - added `runtimeClassName` option to the pod spec
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 
-## 0.2.7
+## v0.2.7
 
 **Release date:** 17 Jun 2026
 
@@ -21,7 +21,7 @@
 - add `nodePort` support for `Service` resources
 - bump VictoriaLogs version to [v1.51.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.51.0).
 
-## 0.2.6
+## v0.2.6
 
 **Release date:** 13 Jun 2026
 
@@ -29,7 +29,7 @@
 
 - bump common chart version 0.3.8 -> 0.3.9
 
-## 0.2.5
+## v0.2.5
 
 **Release date:** 01 Jun 2026
 
@@ -37,7 +37,7 @@
 
 - bump common chart version 0.3.7 -> 0.3.8
 
-## 0.2.4
+## v0.2.4
 
 **Release date:** 01 Jun 2026
 
@@ -47,7 +47,7 @@
 - fixed rendering failure when an http list entry does not have the `primary` field set.
 - bump common chart version 0.3.5 -> 0.3.7
 
-## 0.2.3
+## v0.2.3
 
 **Release date:** 30 May 2026
 
@@ -55,7 +55,7 @@
 
 - bump common chart version 0.3.4 -> 0.3.5
 
-## 0.2.2
+## v0.2.2
 
 **Release date:** 30 May 2026
 
@@ -63,7 +63,7 @@
 
 - bump common chart version 0.3.2 -> 0.3.4
 
-## 0.2.1
+## v0.2.1
 
 **Release date:** 28 May 2026
 
@@ -71,7 +71,7 @@
 
 - fix invalid YAML rendered by `templates/route.yaml` when `vmauth.route.enabled=true` or `vlselect.route.enabled=true`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
 
-## 0.2.0
+## v0.2.0
 
 **Release date:** 28 May 2026
 
@@ -82,7 +82,7 @@
 - added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation.
 - add ability to override VictoriaLogs container command.
 
-## 0.1.1
+## v0.1.1
 
 **Release date:** 20 Apr 2026
 
@@ -90,7 +90,7 @@
 
 - fixed selector for scrape objects. See [#2827](https://github.com/VictoriaMetrics/helm-charts/issues/2827).
 
-## 0.1.0
+## v0.1.0
 
 **Release date:** 16 Apr 2026
 
@@ -98,7 +98,7 @@
 
 - revert change in Deployment matchLabels, that was introduced in release 0.0.14
 
-## 0.0.14
+## v0.0.14
 
 **Release date:** 14 Apr 2026
 
@@ -109,7 +109,7 @@
 - replace custom app label with app.kubernetes.io/component. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 - bump VictoriaLogs version to [v1.50.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.50.0).
 
-## 0.0.13
+## v0.0.13
 
 **Release date:** 03 Apr 2026
 
@@ -118,7 +118,7 @@
 - bump VictoriaLogs version to [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0).
 - fix: rename `route.labels` to `route.extraLabels` in values.yaml to match the route template
 
-## 0.0.12
+## v0.0.12
 
 **Release date:** 11 Mar 2026
 
@@ -127,7 +127,7 @@
 - bump VictoriaLogs version to [v1.48.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.48.0).
 - support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
 
-## 0.0.11
+## v0.0.11
 
 **Release date:** 25 Feb 2026
 
@@ -135,7 +135,7 @@
 
 - bump VictoriaLogs version to [v1.47.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.47.0).
 
-## 0.0.10
+## v0.0.10
 
 **Release date:** 23 Feb 2026
 
@@ -144,7 +144,7 @@
 - bump VictoriaLogs version to [v1.46.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.46.0).
 - support vertical pod autoscaler
 
-## 0.0.9
+## v0.0.9
 
 **Release date:** 05 Feb 2026
 
@@ -152,7 +152,7 @@
 
 - bump VictoriaLogs version to [v1.45.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.45.0).
 
-## 0.0.8
+## v0.0.8
 
 **Release date:** 27 Jan 2026
 
@@ -160,7 +160,7 @@
 
 - bump VictoriaLogs version to [v1.44.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.44.0).
 
-## 0.0.7
+## v0.0.7
 
 **Release date:** 10 Jan 2026
 
@@ -168,7 +168,7 @@
 
 - add ability to configure license for VictoriaLogs enterprise. See [#2649](https://github.com/VictoriaMetrics/helm-charts/issues/2649).
 
-## 0.0.6
+## v0.0.6
 
 **Release date:** 26 Dec 2025
 
@@ -176,7 +176,7 @@
 
 - bump VictoriaLogs version to [v1.43.1](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.43.1).
 
-## 0.0.5
+## v0.0.5
 
 **Release date:** 23 Dec 2025
 
@@ -184,7 +184,7 @@
 
 - bump common chart version 0.0.45 -> 0.0.46
 
-## 0.0.4
+## v0.0.4
 
 **Release date:** 22 Dec 2025
 
@@ -192,7 +192,7 @@
 
 - bump VictoriaLogs version to [v1.43.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.43.0).
 
-## 0.0.3
+## v0.0.3
 
 **Release date:** 20 Dec 2025
 
@@ -200,7 +200,7 @@
 
 - bump VictoriaLogs version to [v1.42.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.42.0).
 
-## 0.0.2
+## v0.0.2
 
 **Release date:** 17 Dec 2025
 
@@ -208,7 +208,7 @@
 
 - bump VictoriaLogs version to [v1.41.1](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.41.1).
 
-## 0.0.1
+## v0.0.1
 
 **Release date:** 04 Dec 2025
 

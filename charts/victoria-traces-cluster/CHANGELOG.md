@@ -2,7 +2,7 @@
 
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 
-## 0.2.9
+## v0.2.9
 
 **Release date:** 03 Jul 2026
 
@@ -12,7 +12,7 @@
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 - bump version of VictoriaTraces components to [v0.9.4](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.9.4)
 
-## 0.2.8
+## v0.2.8
 
 **Release date:** 18 Jun 2026
 
@@ -21,7 +21,7 @@
 - add `nodePort` support for `Service` resources
 - bump version of VictoriaTraces components to [v0.9.3](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.9.3)
 
-## 0.2.7
+## v0.2.7
 
 **Release date:** 13 Jun 2026
 
@@ -29,7 +29,7 @@
 
 - bump common chart version 0.3.8 -> 0.3.9
 
-## 0.2.6
+## v0.2.6
 
 **Release date:** 01 Jun 2026
 
@@ -37,7 +37,7 @@
 
 - bump common chart version 0.3.7 -> 0.3.8
 
-## 0.2.5
+## v0.2.5
 
 **Release date:** 01 Jun 2026
 
@@ -47,7 +47,7 @@
 - fixed rendering failure when an http list entry does not have the `primary` field set.
 - bump common chart version 0.3.5 -> 0.3.7
 
-## 0.2.4
+## v0.2.4
 
 **Release date:** 01 Jun 2026
 
@@ -55,7 +55,7 @@
 
 - bump version of VictoriaTraces components to [v0.9.1](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.9.1)
 
-## 0.2.3
+## v0.2.3
 
 **Release date:** 30 May 2026
 
@@ -63,7 +63,7 @@
 
 - bump common chart version 0.3.4 -> 0.3.5
 
-## 0.2.2
+## v0.2.2
 
 **Release date:** 30 May 2026
 
@@ -71,7 +71,7 @@
 
 - bump common chart version 0.3.2 -> 0.3.4
 
-## 0.2.1
+## v0.2.1
 
 **Release date:** 28 May 2026
 
@@ -79,7 +79,7 @@
 
 - fix invalid YAML rendered by `templates/route.yaml` when route is enabled on `vtinsert`/`vtselect`/`vtstorage`/`vmauth`. See [#2939](https://github.com/VictoriaMetrics/helm-charts/issues/2939).
 
-## 0.2.0
+## v0.2.0
 
 **Release date:** 28 May 2026
 
@@ -90,7 +90,7 @@
 - added `.Values.<component>.http` list of objects, where each item configures an HTTP listen address with optional TLS settings. Items are used for Pod ports, command line arguments and Service port generation. Item with `primary: true` on `vtstorage` is used for storageNode address resolution. Has higher priority than `extraArgs`.
 - add ability to override container command.
 
-## 0.1.3
+## v0.1.3
 
 **Release date:** 20 May 2026
 
@@ -98,7 +98,7 @@
 
 - bump version of VictoriaTraces components to [v0.9.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.9.0)
 
-## 0.1.2
+## v0.1.2
 
 **Release date:** 18 May 2026
 
@@ -107,7 +107,7 @@
 - fixed `HTTPRoute` backend template rendering where the `port` field was incorrectly joined onto the same line as `name`.
 - fixed rendering failure when an http list entry does not have the `primary` field set.
 
-## 0.1.1
+## v0.1.1
 
 **Release date:** 30 Apr 2026
 
@@ -115,7 +115,7 @@
 
 - properly render topologySpreadConstraints for vlinsert pods. See [#2861](https://github.com/VictoriaMetrics/helm-charts/issues/2861).
 
-## 0.1.0
+## v0.1.0
 
 **Release date:** 30 Apr 2026
 
@@ -128,7 +128,7 @@
 - support volumeAttributesClassName PVC attribute. See [#2782](https://github.com/VictoriaMetrics/helm-charts/issues/2782).
 - properly render topologySpreadConstraints for vminsert pods. See [#2861](https://github.com/VictoriaMetrics/helm-charts/issues/2861).
 
-## 0.0.7
+## v0.0.7
 
 **Release date:** 17 Mar 2026
 
@@ -139,7 +139,7 @@
 - support unhealthyPodEvictionPolicy for PodDisruptionBudget. See [#2747](https://github.com/VictoriaMetrics/helm-charts/issues/2747).
 - expose otlp ports when otlpGRPCListenAddr extra arg for vtinsert is set. See [#2761](https://github.com/VictoriaMetrics/helm-charts/issues/2761).
 
-## 0.0.6
+## v0.0.6
 
 **Release date:** 21 Jan 2026
 
@@ -147,7 +147,7 @@
 
 - bump version of VictoriaTraces components to [v0.7.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.7.0)
 
-## 0.0.5
+## v0.0.5
 
 **Release date:** 07 Jan 2026
 
@@ -155,7 +155,7 @@
 
 - bump version of VictoriaTraces components to [v0.6.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.6.0)
 
-## 0.0.4
+## v0.0.4
 
 **Release date:** 23 Dec 2025
 
@@ -165,7 +165,7 @@
 - add support of k8s service traffic distribution. See [#2580](https://github.com/VictoriaMetrics/helm-charts/issues/2580).
 - bump version of VictoriaTraces components to [v0.5.1](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.5.1)
 
-## 0.0.3
+## v0.0.3
 
 **Release date:** 08 Nov 2025
 
@@ -173,7 +173,7 @@
 
 - support HTTPRoute for chart components, where ingress is available. See [#2492](https://github.com/VictoriaMetrics/helm-charts/issues/2492).
 
-## 0.0.2
+## v0.0.2
 
 **Release date:** 14 Oct 2025
 
@@ -182,7 +182,7 @@
 - replaced .Values.vtstorage.persistentVolume.labels with .Values.vtstorage.persistentVolume.extraLabels
 - bump version of VictoriaTraces components to [v0.4.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.4.0)
 
-## 0.0.1
+## v0.0.1
 
 **Release date:** 16 Sep 2025
 

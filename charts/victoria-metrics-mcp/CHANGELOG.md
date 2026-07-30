@@ -6,7 +6,7 @@
 - fix `VMServiceScrape` to target the correct namespace
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 
-## 0.3.0
+## v0.3.0
 
 **Release date:** 18 May 2026
 
@@ -16,7 +16,7 @@
 
 - added `app.kubernetes.io/component` with value from custom `app` label. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
 
-## 0.2.0
+## v0.2.0
 
 **Release date:** 18 Mar 2026
 
@@ -25,7 +25,7 @@
 - move helm chart from mcp-victoriametrics repo to helm-charts repo
 - add new `mcp.passthroughHeaders` param
 
-## 0.1.0
+## v0.1.0
 
 **Release date:** 27 Oct 2025
 
