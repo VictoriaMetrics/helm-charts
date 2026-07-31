@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `syncJob.extraVolumes` and `syncJob.extraVolumeMounts` to allow mounting custom CA certificates into the sync-job pod. To trust a self-signed certificate, create a Secret with the CA cert, mount it via these fields, and set `SSL_CERT_FILE=/path/to/ca.crt` in `syncJob.env`. See [#3127](https://github.com/VictoriaMetrics/helm-charts/issues/3127)
 
 ## v0.87.0
 

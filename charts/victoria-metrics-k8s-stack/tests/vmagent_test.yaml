@@ -73,3 +73,20 @@ tests:
       - matchRegex:
           path: spec.remoteWrite[0].url
           pattern: '^http://vminsert-.*\.svc\.cluster\.local\.:8480/insert/0/prometheus/api/v1/write$'
+
+  - it: vmsingle namespaceOverride is reflected in remoteWrite URL
+    set:
+      vmsingle:
+        namespaceOverride: metrics
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.metrics.svc.cluster.local.:8428/api/v1/write

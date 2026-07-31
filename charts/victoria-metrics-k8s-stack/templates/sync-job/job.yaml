@@ -63,6 +63,9 @@ spec:
             - name: config
               mountPath: /etc/config
               readOnly: true
+            {{- with $job.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- with $job.containerSecurityContext }}
           securityContext: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -73,6 +76,9 @@ spec:
         - name: config
           configMap:
             name: {{ $fullname }}-sync-job-config
+        {{- with $job.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with $job.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

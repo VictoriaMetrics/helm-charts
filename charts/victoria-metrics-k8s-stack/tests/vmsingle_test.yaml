@@ -108,3 +108,20 @@ tests:
       - equal:
           path: spec.retentionPeriod
           value: 90d
+
+  - it: namespaceOverride sets CR namespace
+    set:
+      vmsingle:
+        namespaceOverride: metrics
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+      grafana:
+        enabled: false
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: metrics

@@ -60,3 +60,13 @@ tests:
       - equal:
           path: spec.port
           value: "10428"
+
+  - it: namespaceOverride sets CR namespace
+    set:
+      vtsingle:
+        enabled: true
+        namespaceOverride: traces
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: traces
