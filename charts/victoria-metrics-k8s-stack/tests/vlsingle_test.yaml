@@ -71,3 +71,29 @@ tests:
       - equal:
           path: spec.extraArgs["vmalert.proxyURL"]
           value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8080
+
+  - it: namespaceOverride sets CR namespace
+    set:
+      vlsingle:
+        enabled: true
+        namespaceOverride: logs
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: logs
+
+  - it: vmalert namespaceOverride is reflected in proxyURL
+    set:
+      vlsingle:
+        enabled: true
+      alertmanager:
+        enabled: false
+      vmalert:
+        namespaceOverride: alerts
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.extraArgs["vmalert.proxyURL"]
+          value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.alerts.svc.cluster.local.:8080
