@@ -97,3 +97,16 @@ tests:
       - equal:
           path: spec.extraArgs["vmalert.proxyURL"]
           value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.alerts.svc.cluster.local.:8080
+
+  - it: vmalert proxyURL uses vmalert namespaceOverride
+    set:
+      vlsingle:
+        enabled: true
+      vmalert:
+        namespaceOverride: alerts
+      alertmanager:
+        enabled: false
+    asserts:
+      - equal:
+          path: spec.extraArgs["vmalert.proxyURL"]
+          value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.alerts.svc.cluster.local.:8080
