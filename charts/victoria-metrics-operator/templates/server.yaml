@@ -102,6 +102,20 @@ spec:
             - name: VM_PROMETHEUSCONVERTERADDARGOCDIGNOREANNOTATIONS
               value: "true"
             {{- end }}
+            {{- if .Values.operator.disable_prometheus_converter }}
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_SERVICESCRAPE
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PROMETHEUSRULE
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PROBE
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_ALERTMANAGERCONFIG
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_SCRAPECONFIG
+              value: "false"
+            {{- end }}
             - name: VM_ENABLEDPROMETHEUSCONVERTEROWNERREFERENCES
               value: {{ .Values.operator.enable_converter_ownership | quote}}
             {{- if .Values.operator.openshift_compatibility }}
@@ -122,9 +136,6 @@ spec:
           {{- $extraArgs := deepCopy .Values.extraArgs }}
           {{- $existing := index $extraArgs "controller.disableReconcileFor" }}
           {{- $disableFor := ternary (splitList "," (toString $existing)) ($existing | default list) (kindIs "string" $existing) }}
-          {{- if .Values.operator.disable_prometheus_converter }}
-          {{- $disableFor = concat $disableFor (list "PodMonitor" "ServiceMonitor" "PrometheusRule" "Probe" "AlertmanagerConfig" "ScrapeConfig") }}
-          {{- end }}
           {{- $disableFor = $disableFor | compact | uniq }}
           {{- if $disableFor }}
           {{- $_ := set $extraArgs "controller.disableReconcileFor" ($disableFor | join ",") }}
