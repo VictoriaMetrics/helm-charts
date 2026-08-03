@@ -66948,6 +66948,62 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - 'restored `VM_ENABLEDPROMETHEUSCONVERTER_*` env vars when `operator.disable_prometheus_converter: true` and removed Prometheus CRD names (`PodMonitor`, `ServiceMonitor`, etc.) from `--controller.disableReconcileFor`. In operator v0.68.x the `controllersByName` map does not include Prometheus CRD names — passing them causes the operator to fail on startup.'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/operator/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-metrics-operator/changelog/
+        - name: App Changelog
+          url: https://docs.victoriametrics.com/operator/changelog/
+      artifacthub.io/operator: "true"
+      artifacthub.io/readme: |
+        # VictoriaMetrics Operator Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-operator/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-operator/changelog/).
+    apiVersion: v2
+    appVersion: v0.74.0
+    created: "2026-08-03T07:20:13.75101934Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    - condition: crds.plain
+      name: crds
+      repository: ""
+      version: 0.0.*
+    description: VictoriaMetrics Operator
+    digest: b0710abec736218f67df0deb854404fbc812dd427d597a7b6d57d2094d9af326
+    home: https://github.com/VictoriaMetrics/operator
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - operator
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-operator
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    - https://github.com/VictoriaMetrics/operator
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-operator-0.67.2/victoria-metrics-operator-0.67.2.tgz
+    version: 0.67.2
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - added `networkpolicies` permission to the operator ClusterRole. Without it the operator cannot sync its NetworkPolicy informer and stops reconciling every CR, even when no CR sets `.spec.networkPolicy`. See [#3129](https://github.com/VictoriaMetrics/helm-charts/issues/3129).
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -82907,4 +82963,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-07-31T13:24:25.626717926Z"
+generated: "2026-08-03T07:20:13.754192606Z"
