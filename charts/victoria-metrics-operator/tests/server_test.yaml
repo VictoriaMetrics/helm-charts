@@ -67,26 +67,50 @@ tests:
       - equal:
           path: spec.template.metadata.annotations.owner
           value: platform-team
-  - it: should add controller.disableReconcileFor arg when disable_prometheus_converter is true
+  - it: should not add prometheus CRD names to controller.disableReconcileFor when disable_prometheus_converter is true
     set:
       operator:
         disable_prometheus_converter: true
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].args
-          content: --controller.disableReconcileFor=PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
-  - it: should merge disable_prometheus_converter with user-provided controller.disableReconcileFor
-    set:
-      operator:
-        disable_prometheus_converter: true
-      extraArgs:
-        controller.disableReconcileFor: "VMCluster,PodMonitor"
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].args
-          content: --controller.disableReconcileFor=VMCluster,PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
-  - it: should not add controller.disableReconcileFor arg when disable_prometheus_converter is false and extraArgs has no override
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].args
           content: --controller.disableReconcileFor=PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
+  - it: should pass user-provided controller.disableReconcileFor unchanged
+    set:
+      extraArgs:
+        controller.disableReconcileFor: "VMCluster,VMSingle"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --controller.disableReconcileFor=VMCluster,VMSingle
+  - it: should not add controller.disableReconcileFor when extraArgs has no override
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --controller.disableReconcileFor=PodMonitor,ServiceMonitor,PrometheusRule,Probe,AlertmanagerConfig,ScrapeConfig
+  - it: should inject legacy VM_ENABLEDPROMETHEUSCONVERTER env vars when disable_prometheus_converter is true
+    set:
+      operator:
+        disable_prometheus_converter: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
+            value: "false"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VM_ENABLEDPROMETHEUSCONVERTER_SERVICESCRAPE
+            value: "false"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VM_ENABLEDPROMETHEUSCONVERTER_PROMETHEUSRULE
+            value: "false"
+  - it: should not inject legacy VM_ENABLEDPROMETHEUSCONVERTER env vars when disable_prometheus_converter is false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR

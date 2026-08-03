@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- restored `VM_ENABLEDPROMETHEUSCONVERTER_*` env vars when `operator.disable_prometheus_converter: true` and removed Prometheus CRD names (`PodMonitor`, `ServiceMonitor`, etc.) from `--controller.disableReconcileFor`. In operator v0.68.x the `controllersByName` map does not include Prometheus CRD names — passing them causes the operator to fail on startup.
 
 ## v0.67.1
 
