@@ -2,6 +2,7 @@
 
 - added `syncJob.extraVolumes` and `syncJob.extraVolumeMounts` to allow mounting custom CA certificates into the sync-job pod. To trust a self-signed certificate, create a Secret with the CA cert, mount it via these fields, and set `SSL_CERT_FILE=/path/to/ca.crt` in `syncJob.env`. See [#3127](https://github.com/VictoriaMetrics/helm-charts/issues/3127)
 - added per-component `namespaceOverride` to all operator-managed components (`vmsingle`, `vmcluster`, `vmagent`, `vmalert`, `alertmanager`, `vmauth`, `vlsingle`, `vlcluster`, `vlagent`, `vtsingle`, `vtcluster`). Setting `<component>.namespaceOverride: <ns>` deploys that CR, its Ingress, and its HTTPRoute into a separate namespace while keeping the rest of the stack in the release namespace. Cross-component FQDNs are updated automatically. See [#3113](https://github.com/VictoriaMetrics/helm-charts/issues/3113)
+- restored `VM_ENABLEDPROMETHEUSCONVERTER_*` env vars when `operator.disable_prometheus_converter: true` and removed Prometheus CRD names (`PodMonitor`, `ServiceMonitor`, etc.) from `--controller.disableReconcileFor`. In operator v0.68.x the `controllersByName` map does not include Prometheus CRD names — passing them causes the operator to fail on startup.
 
 ## v0.87.0
 
