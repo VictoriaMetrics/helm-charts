@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.88.0
+
+**Release date:** 04 Aug 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.148.0](https://img.shields.io/badge/v1.148.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11480) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+
 - added `syncJob.extraVolumes` and `syncJob.extraVolumeMounts` to allow mounting custom CA certificates into the sync-job pod. To trust a self-signed certificate, create a Secret with the CA cert, mount it via these fields, and set `SSL_CERT_FILE=/path/to/ca.crt` in `syncJob.env`. See [#3127](https://github.com/VictoriaMetrics/helm-charts/issues/3127)
 - added per-component `namespaceOverride` to all operator-managed components (`vmsingle`, `vmcluster`, `vmagent`, `vmalert`, `alertmanager`, `vmauth`, `vlsingle`, `vlcluster`, `vlagent`, `vtsingle`, `vtcluster`). Setting `<component>.namespaceOverride: <ns>` deploys that CR, its Ingress, and its HTTPRoute into a separate namespace while keeping the rest of the stack in the release namespace. Cross-component FQDNs are updated automatically. See [#3113](https://github.com/VictoriaMetrics/helm-charts/issues/3113)
 - restored `VM_ENABLEDPROMETHEUSCONVERTER_*` env vars when `operator.disable_prometheus_converter: true` and removed Prometheus CRD names (`PodMonitor`, `ServiceMonitor`, etc.) from `--controller.disableReconcileFor`. In operator v0.68.x the `controllersByName` map does not include Prometheus CRD names — passing them causes the operator to fail on startup.
