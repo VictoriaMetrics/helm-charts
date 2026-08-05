@@ -153,6 +153,7 @@ docs-check-links: gen-docs docs-image
 		--rm \
 		--name vmdocs \
 		--platform $(DOCKER_PLATFORM) \
+		$(CONTAINER_USER_OPTION) \
 		-v $(REPODIR)/_index.md:/opt/docs/content/helm/_index.md$(CONTAINER_VOLUME_OPTION_SUFFIX) \
 		$(foreach chart,$(wildcard charts/*), -v $(REPODIR)/$(chart):/opt/docs/content/helm/$(notdir $(chart))$(CONTAINER_VOLUME_OPTION_SUFFIX)) \
 		-v $(REPODIR)/.helm/docs/public:/opt/docs/public$(CONTAINER_VOLUME_OPTION_SUFFIX) \
