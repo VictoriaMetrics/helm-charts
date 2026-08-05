@@ -146,6 +146,23 @@ docs-debug: gen-docs docs-image
 		$(foreach chart,$(wildcard charts/*), -v ./$(chart):/opt/docs/content/helm/$(basename $(chart))) \
 		vmdocs
 
+docs-check-links: gen-docs docs-image
+	rm -rf $(REPODIR)/.helm/docs/public
+	mkdir -p $(REPODIR)/.helm/docs/public
+	$(CONTAINER_TOOL) run \
+		--rm \
+		--name vmdocs \
+		--platform $(DOCKER_PLATFORM) \
+		-v $(REPODIR)/_index.md:/opt/docs/content/helm/_index.md$(CONTAINER_VOLUME_OPTION_SUFFIX) \
+		$(foreach chart,$(wildcard charts/*), -v $(REPODIR)/$(chart):/opt/docs/content/helm/$(notdir $(chart))$(CONTAINER_VOLUME_OPTION_SUFFIX)) \
+		-v $(REPODIR)/.helm/docs/public:/opt/docs/public$(CONTAINER_VOLUME_OPTION_SUFFIX) \
+		--entrypoint /bin/sh \
+		vmdocs \
+		-c "yarn install && hugo --minify && yarn run check-links"; \
+		status=$$?; \
+		rm -rf $(REPODIR)/.helm/docs/public; \
+		exit $$status
+
 docs-images-to-webp: docs-image
 	$(CONTAINER_TOOL) run \
 		--rm \
