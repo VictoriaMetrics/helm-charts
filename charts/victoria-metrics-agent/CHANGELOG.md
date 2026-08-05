@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.149.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.149.0)
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 
 ## v0.44.0
