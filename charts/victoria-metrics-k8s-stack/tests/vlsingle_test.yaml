@@ -30,7 +30,17 @@ tests:
         enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "Only one of .vlsingle.enabled and .vlcluster.enabled can be true"
+          errorMessage: "Only one of .Values.vlsingle.enabled, .Values.vldistributed.enabled and .Values.vlcluster.enabled can be true"
+
+  - it: fails when both vlsingle and vldistributed are enabled
+    set:
+      vlsingle:
+        enabled: true
+      vldistributed:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .Values.vlsingle.enabled, .Values.vldistributed.enabled and .Values.vlcluster.enabled can be true"
 
   - it: CR name is derived from release name
     set:
@@ -110,3 +120,15 @@ tests:
       - equal:
           path: spec.extraArgs["vmalert.proxyURL"]
           value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.alerts.svc.cluster.local.:8080
+
+  - it: app.kubernetes.io/version label reflects spec.image.tag
+    set:
+      vlsingle:
+        enabled: true
+        spec:
+          image:
+            tag: v1.52.0
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.52.0

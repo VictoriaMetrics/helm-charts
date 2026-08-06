@@ -91,3 +91,15 @@ tests:
       - equal:
           path: spec.image.tag
           value: v9.9.9
+
+  - it: app.kubernetes.io/version label reflects spec.image.tag
+    set:
+      vlagent:
+        enabled: true
+        spec:
+          image:
+            tag: v1.52.0
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.52.0

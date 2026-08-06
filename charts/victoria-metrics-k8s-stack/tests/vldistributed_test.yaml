@@ -1,0 +1,170 @@
+suite: vldistributed tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vldistributed/vldistributed.yaml
+tests:
+  - it: renders VLDistributed CR when enabled
+    set:
+      vldistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: VLDistributed
+      - isAPIVersion:
+          of: operator.victoriametrics.com/v1alpha1
+
+  - it: does not render when disabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both vlsingle and vldistributed are enabled
+    set:
+      vlsingle:
+        enabled: true
+      vldistributed:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .Values.vlsingle.enabled, .Values.vldistributed.enabled and .Values.vlcluster.enabled can be true"
+
+  - it: fails when both vlcluster and vldistributed are enabled
+    set:
+      vlcluster:
+        enabled: true
+      vldistributed:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Only one of .Values.vlsingle.enabled, .Values.vldistributed.enabled and .Values.vlcluster.enabled can be true"
+
+  - it: CR name is derived from release name
+    set:
+      vldistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: zoneCommon vlcluster clusterVersion defaults to the pinned VictoriaLogs version
+    set:
+      vldistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.zoneCommon.vlcluster.spec.clusterVersion
+          value: v1.52.0
+
+  - it: zoneCommon vlcluster clusterVersion can be overridden
+    set:
+      vldistributed:
+        enabled: true
+        spec:
+          zoneCommon:
+            vlcluster:
+              spec:
+                clusterVersion: v2.0.0
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.zoneCommon.vlcluster.spec.clusterVersion
+          value: v2.0.0
+
+  - it: vmalert proxyURL is injected into vlselect extraArgs
+    set:
+      vldistributed:
+        enabled: true
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.zoneCommon.vlcluster.spec.vlselect.extraArgs["vmalert.proxyURL"]
+          value: http://vmalert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8080
+
+  - it: app.kubernetes.io/version label reflects zoneCommon vlcluster clusterVersion
+    set:
+      vldistributed:
+        enabled: true
+        spec:
+          zoneCommon:
+            vlcluster:
+              spec:
+                clusterVersion: v1.52.0
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.52.0
+
+  - it: zones are passed through to spec
+    set:
+      vldistributed:
+        enabled: true
+        spec:
+          zones:
+            - name: eu-west-1
+            - name: us-east-1
+      alertmanager:
+        enabled: false
+      grafana:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - lengthEqual:
+          path: spec.zones
+          count: 2
+      - equal:
+          path: spec.zones[1].name
+          value: us-east-1

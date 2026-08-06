@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `vldistributed` as an alternative to `vlsingle` and `vlcluster` for multi-zone VictoriaLogs deployments. Set `vldistributed.enabled: true` (mutually exclusive with `vlsingle` and `vlcluster`). The `victorialogs-cluster` dashboard and VL alert rules are enabled automatically when `vldistributed.enabled` is set.
 
 ## v0.89.0
 
