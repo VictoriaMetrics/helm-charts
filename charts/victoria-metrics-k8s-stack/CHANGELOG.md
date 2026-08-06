@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.90.0
+
+**Release date:** 06 Aug 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+
 - added `vldistributed` as an alternative to `vlsingle` and `vlcluster` for multi-zone VictoriaLogs deployments. Set `vldistributed.enabled: true` (mutually exclusive with `vlsingle` and `vlcluster`). The `victorialogs-cluster` dashboard and VL alert rules are enabled automatically when `vldistributed.enabled` is set.
 
 ## v0.89.0
