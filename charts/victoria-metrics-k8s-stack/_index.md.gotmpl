@@ -199,6 +199,87 @@ grafana:
 ```
 When using this approach, you can find dashboards for VictoriaMetrics components published [here](https://grafana.com/orgs/victoriametrics).
 
+### Dashboards and rules in air-gapped environments
+
+By default the sync-job downloads dashboards and rules from public URLs (GitHub raw content) at deploy time.
+In environments without internet access there are several options.
+
+#### Option 1: Pre-generate manifests and commit to source control
+
+Run the sync-job binary locally against your `values.yaml` before deploying to the air-gapped cluster.
+The binary is distributed as a container image.
+
+**Step 1.** Render the sync-job config from your chart values:
+
+```shell
+helm template <RELEASE_NAME> vm/victoria-metrics-k8s-stack -f values.yaml \
+  --show-only templates/sync-job/config.yaml \
+  | yq '.data["config.yaml"]' > /tmp/sync-job-config.yaml
+```
+
+**Step 2.** Run the binary locally and capture the output:
+
+```shell
+docker run --rm \
+  -e OUTPUT=- \
+  -e NAMESPACE=<NAMESPACE> \
+  -e RELEASE=<RELEASE_NAME> \
+  -e RESOURCE_PREFIX=<RELEASE_NAME> \
+  -e PRUNE=false \
+  -e OWNER_REFERENCES=false \
+  -v /tmp/sync-job-config.yaml:/etc/config/config.yaml:ro \
+  ghcr.io/victoriametrics/sync-job:v0.0.11 > manifests.yaml
+```
+
+**Step 3.** Commit `manifests.yaml` to your source repository and apply it in the air-gapped cluster:
+
+```shell
+kubectl apply -f manifests.yaml
+```
+
+Disable the sync-job in your air-gapped deployment to prevent it from attempting to reach upstream sources:
+
+```yaml
+syncJob:
+  enabled: false
+```
+
+#### Option 2: Route traffic through an HTTP proxy
+
+If the cluster has a proxy with access to the internet, configure it in `syncJob.env`:
+
+```yaml
+syncJob:
+  env:
+    - name: HTTPS_PROXY
+      value: "http://proxy.example.com:3128"
+    - name: NO_PROXY
+      value: "kubernetes.default.svc,10.0.0.0/8"
+```
+
+#### Option 3: Mirror sources to an internal server
+
+Override `defaultDashboards.sources` and `defaultRules.sources` to point to an internal HTTP server
+(Nginx, Nexus, Artifactory, etc.) that mirrors the upstream files:
+
+```yaml
+defaultDashboards:
+  sources:
+    victoriametrics:
+      url: http://artifacts.internal/dashboards/victoriametrics.json
+    vmagent:
+      url: http://artifacts.internal/dashboards/vmagent.json
+    # ... override remaining sources
+
+defaultRules:
+  sources:
+    etcd:
+      url: http://artifacts.internal/rules/etcd-alerts.yaml
+    # ... override remaining sources
+```
+
+The source keys match those defined in the default `values.yaml`; override only the ones you need.
+
 ### Prometheus scrape configs
 This chart installs multiple scrape configurations for kubernetes monitoring. They are configured under `#ServiceMonitors` section in `values.yaml` file. For example if you want to configure scrape config for `kubelet` you should set it in values.yaml like this:
 ```yaml
