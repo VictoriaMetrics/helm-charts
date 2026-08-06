@@ -1,7 +1,7 @@
 {{- $app := .Values.vlsingle }}
 {{- if $app.enabled }}
-{{- if .Values.vlcluster.enabled }}
-  {{- fail "Only one of .vlsingle.enabled and .vlcluster.enabled can be true"}}
+{{- if or .Values.vlcluster.enabled .Values.vldistributed.enabled }}
+  {{- fail "Only one of .Values.vlsingle.enabled, .Values.vldistributed.enabled and .Values.vlcluster.enabled can be true"}}
 {{- end }}
 {{- $ctx := dict "helm" . "appKey" (list "vlsingle" "spec") }}
 {{- $fullname := include "vm.cr.fullname" $ctx }}
@@ -16,7 +16,11 @@ metadata:
   namespace: {{ $ns }}
   {{- $_ := set $ctx "style" "managed" }}
   {{- $_ := set $ctx "extraLabels" ($app.labels | default dict) }}
-  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $labels := include "vm.labels" $ctx | fromYaml }}
   {{- $_ := unset $ctx "extraLabels" }}
+  {{- if ($app.spec.image).tag }}
+    {{- $_ := set $labels "app.kubernetes.io/version" $app.spec.image.tag }}
+  {{- end }}
+  labels: {{ toYaml $labels | nindent 4 }}
 spec: {{ include "vl.single.spec" $ctx | nindent 2 }}
 {{- end }}

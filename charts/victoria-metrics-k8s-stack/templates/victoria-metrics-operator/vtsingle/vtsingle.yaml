@@ -16,7 +16,11 @@ metadata:
   namespace: {{ $ns }}
   {{- $_ := set $ctx "style" "managed" }}
   {{- $_ := set $ctx "extraLabels" ($app.labels | default dict) }}
-  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $labels := include "vm.labels" $ctx | fromYaml }}
   {{- $_ := unset $ctx "extraLabels" }}
+  {{- if ($app.spec.image).tag }}
+    {{- $_ := set $labels "app.kubernetes.io/version" $app.spec.image.tag }}
+  {{- end }}
+  labels: {{ toYaml $labels | nindent 4 }}
 spec: {{ include "vt.single.spec" $ctx | nindent 2 }}
 {{- end }}

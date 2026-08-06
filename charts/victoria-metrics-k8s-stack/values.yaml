@@ -110,7 +110,7 @@ defaultDashboards:
       enabled: '{{ .Values.vtsingle.enabled }}'
     victorialogs-cluster:
       url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/dashboards/victorialogs-cluster.json
-      enabled: '{{ .Values.vlcluster.enabled }}'
+      enabled: '{{ or .Values.vlcluster.enabled .Values.vldistributed.enabled }}'
     victorialogs-single-node:
       url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/dashboards/victorialogs.json
       enabled: '{{ .Values.vlsingle.enabled }}'
@@ -401,13 +401,13 @@ defaultRules:
       enabled: '{{ index .Values "victoria-metrics-operator" "enabled" }}'
     vlhealth:
       url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/deployment/docker/rules/alerts-health.yml
-      enabled: '{{ or .Values.vlsingle.enabled .Values.vlcluster.enabled .Values.vlagent.enabled }}'
+      enabled: '{{ or .Values.vlsingle.enabled .Values.vlcluster.enabled .Values.vldistributed.enabled .Values.vlagent.enabled }}'
     vlagent:
       url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/deployment/docker/rules/alerts-vlagent.yml
       enabled: '{{ .Values.vlagent.enabled }}'
     victorialogs:
       url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaLogs/master/deployment/docker/rules/alerts-vlogs.yml
-      enabled: '{{ or .Values.vlsingle.enabled .Values.vlcluster.enabled }}'
+      enabled: '{{ or .Values.vlsingle.enabled .Values.vlcluster.enabled .Values.vldistributed.enabled }}'
     victoriatraces:
       url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaTraces/master/deployment/docker/rules/alerts-vtraces.yml
       enabled: '{{ or .Values.vtsingle.enabled .Values.vtcluster.enabled }}'
@@ -805,6 +805,40 @@ vlcluster:
         - path:
             type: PathPrefix
             value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vlcluster.spec.vlinsert }}'
+
+vldistributed:
+  # -- Create VLDistributed CR
+  enabled: false
+  # -- VLDistributed labels
+  labels: {}
+  # -- VLDistributed annotations
+  annotations: {}
+  # -- Full spec for VLDistributed CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vldistributedspec)
+  spec:
+    vmauth:
+      spec:
+        port: "8427"
+    zoneCommon:
+      vlcluster:
+        spec:
+          # renovate: image=victoriametrics/victoria-logs
+          clusterVersion: v1.52.0
+          vlstorage:
+            replicaCount: 2
+            retentionPeriod: 14d
+            storageDataPath: /vl-data
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 10Gi
+          vlselect:
+            replicaCount: 2
+          vlinsert:
+            replicaCount: 2
+    zones:
+      - name: zone-0
 
 vlagent:
   # -- Create VLAgent CR

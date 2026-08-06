@@ -501,6 +501,9 @@
   {{- else if and $Values.vlcluster.enabled $Values.vlcluster.spec.vlselect.enabled -}}
     {{- $_ := set . "appKey" (list "vlcluster" "spec" "vlselect") -}}
     {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
+  {{- else if $Values.vldistributed.enabled -}}
+    {{- $_ := set . "appKey" (list "vldistributed" "spec" "vmauth" "spec") -}}
+    {{- $_ := set $endpoint "url" (include "vm.url" .) -}}
   {{- else if $Values.external.vl.read.url -}}
     {{- $_ := set $endpoint "url" ((($Values.external).vl).read).url -}}
   {{- end -}}
@@ -519,6 +522,10 @@
     {{- $_ := set $endpoint "url" (printf "%s/insert/native" $baseURL) -}}
   {{- else if and $Values.vlcluster.enabled $Values.vlcluster.spec.vlinsert.enabled -}}
     {{- $_ := set . "appKey" (list "vlcluster" "spec" "vlinsert") -}}
+    {{- $baseURL := include "vm.url" . -}}
+    {{- $_ := set $endpoint "url" (printf "%s/insert/native" $baseURL) -}}
+  {{- else if $Values.vldistributed.enabled -}}
+    {{- $_ := set . "appKey" (list "vldistributed" "spec" "vmauth" "spec") -}}
     {{- $baseURL := include "vm.url" . -}}
     {{- $_ := set $endpoint "url" (printf "%s/insert/native" $baseURL) -}}
   {{- else if $Values.external.vl.write.url -}}
@@ -583,7 +590,6 @@
 {{- define "vl.cluster.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $clusterSpec := deepCopy $Values.vlcluster.spec -}}
-  {{- $clusterSpec = mergeOverwrite (dict "clusterVersion" (printf "%s-cluster" (include "vm.image.tag" .))) $clusterSpec -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
   {{- end -}}
@@ -604,6 +610,25 @@
     {{- $_ := unset $clusterSpec.vlinsert "enabled" -}}
   {{- end -}}
   {{- tpl (toYaml $clusterSpec) . -}}
+{{- end -}}
+
+{{- /* VLDistributed spec */ -}}
+{{- define "vl.distributed.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $selectSpec := include "vl.select.spec" . | fromYaml -}}
+  {{- $distributedSpec := deepCopy (($Values.vldistributed).spec | default dict) -}}
+  {{- $clusterSpec := deepCopy ((($distributedSpec.zoneCommon).vlcluster).spec | default dict) -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $distributedSpec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- if ($clusterSpec.requestsLoadBalancer).enabled }}
+    {{- $balancerSpec := $clusterSpec.requestsLoadBalancer.spec | default dict }}
+    {{- $authImage := dict "image" (dict "tag" (include "vm.image.tag" .)) }}
+    {{- $_ := set $clusterSpec.requestsLoadBalancer "spec" (mergeOverwrite $authImage $balancerSpec) }}
+  {{- end }}
+  {{- $clusterSpec = mergeOverwrite (dict "vlselect" $selectSpec) $clusterSpec }}
+  {{- $distributedSpec = mergeOverwrite (dict "zoneCommon" (dict "vlcluster" (dict "spec" $clusterSpec))) $distributedSpec }}
+  {{- tpl (toYaml $distributedSpec) . -}}
 {{- end -}}
 
 {{- define "vt.read.endpoint" -}}
@@ -657,7 +682,6 @@
 {{- define "vt.cluster.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
   {{- $clusterSpec := deepCopy $Values.vtcluster.spec -}}
-  {{- $clusterSpec = mergeOverwrite (dict "clusterVersion" (printf "%s-cluster" (include "vm.image.tag" .))) $clusterSpec -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $clusterSpec "license" (fromYaml .) -}}
   {{- end -}}

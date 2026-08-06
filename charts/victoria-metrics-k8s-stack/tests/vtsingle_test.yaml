@@ -70,3 +70,15 @@ tests:
       - equal:
           path: metadata.namespace
           value: traces
+
+  - it: app.kubernetes.io/version label reflects spec.image.tag
+    set:
+      vtsingle:
+        enabled: true
+        spec:
+          image:
+            tag: v0.9.4
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v0.9.4
