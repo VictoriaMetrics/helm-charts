@@ -480,6 +480,198 @@ func TestRuleGroupVMRuleName(t *testing.T) {
 	})
 }
 
+// TestParseRuleGroupsInlineFields is the regression test for issue #3149:
+// group-level fields not modelled in ruleGroup (interval, params) and rule-level
+// fields not modelled in rule (keep_firing_for) were silently dropped because
+// sigs.k8s.io/yaml does not honour yaml:",inline" maps.
+func TestParseRuleGroupsInlineFields(t *testing.T) {
+	type opts struct {
+		yaml      string
+		srcURL    string
+		checkFunc func(*testing.T, []ruleGroup)
+	}
+	f := func(o opts) {
+		t.Helper()
+		groups, err := parseRuleGroups([]byte(o.yaml), o.srcURL)
+		if err != nil {
+			t.Fatalf("parseRuleGroups: %v", err)
+		}
+		o.checkFunc(t, groups)
+	}
+
+	// group-level interval preserved in XXX
+	f(opts{
+		yaml: `
+groups:
+- name: test.group
+  interval: 5m
+  rules:
+  - alert: A
+    expr: up == 0
+`,
+		srcURL: "test.yaml",
+		checkFunc: func(t *testing.T, groups []ruleGroup) {
+			t.Helper()
+			if len(groups) != 1 {
+				t.Fatalf("expected 1 group, got %d", len(groups))
+			}
+			got := groups[0].XXX["interval"]
+			if got != "5m" {
+				t.Fatalf("group interval: got %v, want %q", got, "5m")
+			}
+		},
+	})
+
+	// group-level params map preserved in XXX
+	f(opts{
+		yaml: `
+groups:
+- name: test.group
+  params:
+    severity: warning
+    team: infra
+  rules:
+  - alert: A
+    expr: up == 0
+`,
+		srcURL: "test.yaml",
+		checkFunc: func(t *testing.T, groups []ruleGroup) {
+			t.Helper()
+			if len(groups) != 1 {
+				t.Fatalf("expected 1 group, got %d", len(groups))
+			}
+			raw, ok := groups[0].XXX["params"]
+			if !ok {
+				t.Fatalf("group params missing from XXX; keys: %v", mapKeys(groups[0].XXX))
+			}
+			m, ok := raw.(map[string]any)
+			if !ok {
+				t.Fatalf("params: expected map[string]any, got %T", raw)
+			}
+			if m["severity"] != "warning" {
+				t.Fatalf("params.severity: got %v, want %q", m["severity"], "warning")
+			}
+			if m["team"] != "infra" {
+				t.Fatalf("params.team: got %v, want %q", m["team"], "infra")
+			}
+		},
+	})
+
+	// rule-level keep_firing_for preserved in XXX
+	f(opts{
+		yaml: `
+groups:
+- name: test.group
+  rules:
+  - alert: A
+    expr: up == 0
+    keep_firing_for: 10m
+`,
+		srcURL: "test.yaml",
+		checkFunc: func(t *testing.T, groups []ruleGroup) {
+			t.Helper()
+			if len(groups) == 0 || len(groups[0].Rules) == 0 {
+				t.Fatal("expected at least one rule")
+			}
+			got := groups[0].Rules[0].XXX["keep_firing_for"]
+			if got != "10m" {
+				t.Fatalf("rule keep_firing_for: got %v, want %q", got, "10m")
+			}
+		},
+	})
+
+	// known group fields are still parsed alongside inline fields
+	f(opts{
+		yaml: `
+groups:
+- name: mixed.group
+  interval: 2m
+  params:
+    env: prod
+  rules:
+  - alert: B
+    expr: up == 1
+    for: 5m
+    keep_firing_for: 3m
+`,
+		srcURL: "test.yaml",
+		checkFunc: func(t *testing.T, groups []ruleGroup) {
+			t.Helper()
+			if len(groups) == 0 {
+				t.Fatal("expected groups")
+			}
+			g := groups[0]
+			if g.Name != "mixed.group" {
+				t.Fatalf("name: got %q, want %q", g.Name, "mixed.group")
+			}
+			if g.XXX["interval"] != "2m" {
+				t.Fatalf("interval: got %v, want %q", g.XXX["interval"], "2m")
+			}
+			if len(g.Rules) == 0 {
+				t.Fatal("expected rules")
+			}
+			r := g.Rules[0]
+			if r.For != "5m" {
+				t.Fatalf("rule.for: got %q, want %q", r.For, "5m")
+			}
+			if r.XXX["keep_firing_for"] != "3m" {
+				t.Fatalf("rule.keep_firing_for: got %v, want %q", r.XXX["keep_firing_for"], "3m")
+			}
+		},
+	})
+
+	// CRD format also preserves inline fields
+	f(opts{
+		yaml: `
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+spec:
+  groups:
+  - name: crd.group
+    interval: 1m
+    rules:
+    - alert: C
+      expr: up == 0
+`,
+		srcURL: "test.yaml",
+		checkFunc: func(t *testing.T, groups []ruleGroup) {
+			t.Helper()
+			if len(groups) == 0 {
+				t.Fatal("expected groups")
+			}
+			if groups[0].XXX["interval"] != "1m" {
+				t.Fatalf("CRD format interval: got %v, want %q", groups[0].XXX["interval"], "1m")
+			}
+		},
+	})
+}
+
+func TestRuleGroupToSpecWithGroupDefaults(t *testing.T) {
+	g := ruleGroup{
+		Name: "test.group",
+		Rules: []rule{
+			{Alert: "A", Expr: "up == 0"},
+		},
+	}
+	defaults := map[string]any{
+		"params":   map[string]any{"severity": "critical"},
+		"interval": "5m",
+	}
+	spec := ruleGroupToSpec(g, defaults)
+	groups, ok := spec["groups"].([]map[string]any)
+	if !ok || len(groups) == 0 {
+		t.Fatal("spec.groups missing or empty")
+	}
+	grp := groups[0]
+	if grp["interval"] != "5m" {
+		t.Fatalf("interval: got %v, want %q", grp["interval"], "5m")
+	}
+	p, ok := grp["params"].(map[string]any)
+	if !ok || p["severity"] != "critical" {
+		t.Fatalf("params: got %v", grp["params"])
+	}
+}
+
 func TestMergeRule(t *testing.T) {
 	type opts struct {
 		dst   rule

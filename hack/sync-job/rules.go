@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/VictoriaMetrics/metricsql"
-	"sigs.k8s.io/yaml"
+	"github.com/goccy/go-yaml"
 )
 
 type ruleCRD struct {
