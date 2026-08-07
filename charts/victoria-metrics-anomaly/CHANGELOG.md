@@ -1,6 +1,7 @@
 ## Next release
 
 - render `extraContainers` and `extraHostPathMounts` in the vmanomaly pod. Both were documented in `values.yaml` but never used by the templates.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v1.12.20
 

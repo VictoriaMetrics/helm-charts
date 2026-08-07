@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.45.0
 

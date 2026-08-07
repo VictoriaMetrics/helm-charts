@@ -1,6 +1,7 @@
 ## Next release
 
 - add `checksum/config` annotation on `vmauth` and `vminsert` pods to trigger a rollout when the chart-managed vmauth Secret or vminsert relabel ConfigMap changes. Externally managed `vmauth.configSecretName` and `vminsert.relabel.configMap` are not tracked. A `checksum/config` key set in `podAnnotations` is overridden by the generated value.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.54.0
 
