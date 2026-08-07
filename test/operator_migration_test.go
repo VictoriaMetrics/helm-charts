@@ -244,10 +244,14 @@ var manifestKindRe = regexp.MustCompile(`(?m)^kind: (\w+)$`)
 // to be kept, and workloads, services, service accounts, volumes, containers and ports have to be named
 // the same way by the chart and the operator.
 //
-// Chart -> operator:
-//  1. Helm release secrets are deleted, so that Helm forgets the release without deleting its objects;
-//  2. the custom resource is applied, the operator adopts objects with the same names, updating them
-//     in place or, e.g. for StatefulSets with changed claim templates, recreating them without their pods.
+// Helm prunes objects a release stops rendering, so a plain `helm upgrade` would delete the workloads
+// and their Services on the way to the operator, and the custom resource with all its children on the
+// way back. Instead, the release secrets are deleted before each switch, so that Helm forgets the release
+// without deleting its objects, and on the way back the release is installed again with
+// `--take-ownership --force-conflicts`.
+//
+// Chart -> operator: the custom resource is applied, and the operator adopts objects with the same names,
+// updating them in place or, e.g. for StatefulSets with changed claim templates, recreating them without their pods.
 //
 // Operator -> chart:
 //  1. the custom resource is paused, so that an in-flight reconcile doesn't put back owner references
@@ -255,7 +259,7 @@ var manifestKindRe = regexp.MustCompile(`(?m)^kind: (\w+)$`)
 //  2. `kubectl delete <cr> --cascade=orphan` removes the custom resource without deleting its children;
 //  3. fields managed by the operator are handed over to Helm's field manager, otherwise server-side apply
 //     would keep fields the chart doesn't render, e.g. an httpGet probe next to the chart's tcpSocket one;
-//  4. `helm install --take-ownership --force-conflicts` adopts the objects in place, removing such fields.
+//  4. `helm install` adopts the objects in place, removing such fields.
 //
 // The operator has to be running in the cluster before the test starts.
 func TestOperatorMigration(t *testing.T) {
@@ -303,7 +307,12 @@ func TestOperatorMigration(t *testing.T) {
 				}
 			}
 			chartDir := filepath.Join(chartsDir, tc.chart)
-			chartArgs := migrationHelmArgs("install", chartDir, namespace, tc.values)
+			chartArgs := migrationHelmArgs(chartDir, namespace, tc.values)
+			forgetRelease := func() {
+				t.Helper()
+				_, err := kubectl(kc, "", "delete", "secrets", "-n", namespace, "-l", fmt.Sprintf("owner=helm,name=%s", compatName))
+				require.NoError(t, err)
+			}
 
 			out, err := helmRun(kc, chartArgs...)
 			require.NoError(t, err, "helm install failed: %s", out)
@@ -311,8 +320,7 @@ func TestOperatorMigration(t *testing.T) {
 			chartPVCs, err := releaseObjects(kc, namespace, "persistentvolumeclaims")
 			require.NoError(t, err)
 
-			_, err = kubectl(kc, "", "delete", "secrets", "-n", namespace, "-l", fmt.Sprintf("owner=helm,name=%s", compatName))
-			require.NoError(t, err)
+			forgetRelease()
 			_, err = kubectl(kc, compatManifest(tc.manifest), "apply", "-n", namespace, "-f", "-")
 			require.NoError(t, err)
 			waitForStatus("operational")
@@ -326,6 +334,7 @@ func TestOperatorMigration(t *testing.T) {
 				require.NoError(t, err)
 			}
 			waitForStatus("paused")
+			forgetRelease()
 			for _, k := range crKinds {
 				_, err = kubectl(kc, "", "delete", strings.ToLower(k), compatName, "-n", namespace, "--cascade=orphan")
 				require.NoError(t, err)
@@ -638,14 +647,9 @@ func requireKept(t *testing.T, expected, actual []*unstructured.Unstructured) {
 	}
 }
 
-// migrationHelmArgs builds a helm install or upgrade run of the compatName release with operator naming.
-func migrationHelmArgs(verb, chartDir, namespace string, values map[string]any) []string {
-	args := []string{verb, compatName, chartDir, "--namespace", namespace, "--set", "useLegacyNaming=false"}
-	return append(args, migrationValues(values)...)
-}
-
-func migrationValues(values map[string]any) []string {
-	var args []string
+// migrationHelmArgs builds a helm install run of the compatName release with operator naming.
+func migrationHelmArgs(chartDir, namespace string, values map[string]any) []string {
+	args := []string{"install", compatName, chartDir, "--namespace", namespace, "--set", "useLegacyNaming=false"}
 	for k, v := range values {
 		b, _ := json.Marshal(v)
 		args = append(args, "--set-json", k+"="+string(b))
