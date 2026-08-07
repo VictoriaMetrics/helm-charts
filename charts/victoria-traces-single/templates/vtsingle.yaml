@@ -1,0 +1,54 @@
+{{- $app := .Values.server }}
+{{- if and $app.enabled (include "vm.operator.enabled" .) }}
+{{- $ctx := dict
+    "helm" .
+    "appKey" "server"
+    "kindOverride" "vtsingle"
+}}
+{{- if .Values.podDisruptionBudget.enabled }}
+  {{- fail "`podDisruptionBudget` is not supported by the VTSingle resource with `operator.enabled: true`; the operator runs a single pod" }}
+{{- end }}
+{{- if gt (int ($app.replicaCount | default 1)) 1 }}
+  {{- fail "`server.replicaCount` greater than 1 is not supported by the VTSingle resource with `operator.enabled: true`; the operator runs a single pod" }}
+{{- end }}
+{{- $pvc := $app.persistentVolume }}
+{{- $useOperatorScrape := not $app.serviceMonitor.enabled }}
+{{- $appSpec := include "vm.operator.app.spec" (dict
+    "helm" .
+    "appKey" "server"
+    "app" $app
+    "scrape" (ternary $app.vmServiceScrape $app.serviceMonitor $useOperatorScrape)
+    "scrapePath" (ternary "server.vmServiceScrape" "server.serviceMonitor" $useOperatorScrape)
+) }}
+{{- $spec := fromYaml $appSpec }}
+{{- with $app.retentionPeriod }}
+  {{- $_ := set $spec "retentionPeriod" (toString .) }}
+{{- end }}
+{{- with $app.retentionDiskSpaceUsage }}
+  {{- $_ := set $spec "retentionMaxDiskSpaceUsageBytes" (ternary (printf "%dGiB" (int .)) (toString .) (gt (int .) 0)) }}
+{{- end }}
+{{- if $pvc.enabled }}
+  {{- $volumeSpec := include "vm.operator.data.volume" (dict
+      "helm" .
+      "persistentVolume" $pvc
+      "claim" (include "vm.plain.fullname" $ctx)
+      "volumes" $spec.volumes
+  ) }}
+  {{- $spec = mergeOverwrite $spec (fromYaml $volumeSpec) }}
+{{- end }}
+{{- $crSpec := dict
+    "helm" .
+    "spec" $spec
+}}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VTSingle
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" $crSpec | nindent 2 }}
+{{- end }}

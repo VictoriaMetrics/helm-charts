@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy vmauth through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VMAuth` resource built from chart values instead of its own Deployment, Service, ServiceAccount and PodDisruptionBudget. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-metrics-auth/#victoriametrics-operator).
 
 ## v0.45.0
 

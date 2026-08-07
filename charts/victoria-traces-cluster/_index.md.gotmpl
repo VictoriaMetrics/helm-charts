@@ -141,6 +141,47 @@ vtstorage:
 
 {{ include "chart.uninstallSection" . }}
 
+## Resource Naming
+
+By default, this chart uses release-name based resource naming for historical reasons and
+backwards compatibility with existing deployments.
+
+> [!WARNING]
+> For new deployments, it is recommended to set `useLegacyNaming: false` to use operator-style
+> names (e.g. `vtinsert-<release>`). This aligns resource names with the
+> [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) convention and
+> simplifies future migration to operator-managed resources.
+
+### VictoriaMetrics operator
+
+With `operator.enabled: true` the chart renders a [VTCluster](https://docs.victoriametrics.com/operator/resources/vtcluster/) resource
+instead of its own vtstorage, vtselect and vtinsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes,
+and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) manages the workload.
+The operator must already be installed in the cluster.
+
+The VTCluster is named after the release (or `fullnameOverride`), so the operator creates `vtstorage-<release>`, `vtselect-<release>` and `vtinsert-<release>` objects.
+The bundled `vmauth` becomes the VTCluster `requestsLoadBalancer`, and the operator creates the `vtclusterlb-<release>` load balancer in front of the components. Ingress and HTTPRoute are still rendered by the chart and target the Services the operator creates. The `vmauth` ones send `/insert` and `/select` to `vtinsert-<release>` and `vtselect-<release>`, which the operator routes through the load balancer: the HTTPRoute gets a rule per prefix, and each `vmauth.ingress.hosts` path goes to the Service matching its prefix, with `/` expanded to both.
+
+Settings without an operator equivalent fail rendering, with a message pointing to the replacement:
+
+- `vmauth.config` and `vmauth.configSecretName`, since the load balancer generates its own routing; customize it in `operator.spec.requestsLoadBalancer`;
+- `vmauth.verticalPodAutoscaler`, since the load balancer has no VPA;
+- a custom `vmauth.route.matches` or a `vmauth.ingress.hosts` path outside `/insert` and `/select`; use `vmauth.route.extraRules` or a component Ingress instead;
+- component `vmServiceScrape` `relabelings`, `metricRelabelings`, `port`, `targetPort`, `path`, `interval`, `scrapeTimeout`, `scheme`, `basicAuth` and `tlsConfig`; set `operator.spec.serviceScrapeSpec` instead;
+- component `networkPolicy` labels, annotations and `extraLabels`, since the operator-managed NetworkPolicy has no custom metadata.
+
+Fields that have no chart value, or need a different value, go to `operator.spec`, which is deep-merged over the generated spec:
+
+```yaml
+operator:
+  enabled: true
+  spec:
+    storage:
+      logLevel: WARN
+```
+
+Probes keep the operator defaults. Switching a release to `operator.enabled: true` recreates its pods.
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.

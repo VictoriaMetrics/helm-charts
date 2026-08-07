@@ -1,4 +1,4 @@
-{{- if .Values.serviceMonitor.enabled -}}
+{{- if and .Values.serviceMonitor.enabled (not (include "vm.operator.enabled" .)) -}}
 {{- $serviceMonitor := .Values.serviceMonitor -}}
 {{- $ctx := dict "helm" . "kindOverride" "vmauth" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

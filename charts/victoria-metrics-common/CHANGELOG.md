@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- `vm.operator.cr.spec` and `vm.operator.cr.labels` accept an `operator` values block, for charts that render several custom resources with separate overrides. It defaults to `.Values.operator`.
+- convert `kubernetes_sd_configs` role `endpointslices` to `endpointslice` in `vm.operator.scrape.spec`, as VMScrapeConfig doesn't accept the plural form.
 
 ## v0.4.5
 

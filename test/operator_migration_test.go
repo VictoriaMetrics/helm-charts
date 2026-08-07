@@ -6,11 +6,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"slices"
 	"sort"
 	"strings"
@@ -20,6 +21,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/wait"
+	utilyaml "k8s.io/apimachinery/pkg/util/yaml"
 )
 
 const compatName = "compat"
@@ -29,9 +31,8 @@ type migrationCase struct {
 	chart string
 	// values are passed to helm install with --set-json
 	values map[string]any
-	// manifest is the operator custom resource equivalent to values, named compatName
-	manifest string
-	// kinds are values of the app.kubernetes.io/name label on objects created by the operator for manifest
+	// kinds are values of the app.kubernetes.io/name label on objects created by the operator
+	// for custom resources the chart renders with operator.enabled
 	kinds []string
 	// workloadKinds are the kinds the operator creates a workload for; defaults to kinds
 	workloadKinds []string
@@ -43,13 +44,7 @@ var migrationCases = []migrationCase{
 	{
 		chart:  "victoria-metrics-single",
 		values: map[string]any{"server.mode": "deployment"},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMSingle
-spec:
-  storage: {resources: {requests: {storage: 16Gi}}}
-`,
-		kinds: []string{"vmsingle"},
+		kinds:  []string{"vmsingle"},
 		// the operator listens on 8429 and keeps 8428 as a Service alias; changing the port would restart the storage pod
 		ignore: []string{
 			"Deployment/vmsingle-compat container[vmsingle].port=",
@@ -59,35 +54,17 @@ spec:
 	{
 		chart:  "victoria-logs-single",
 		values: map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VLSingle
-spec:
-  storage: {resources: {requests: {storage: 10Gi}}}
-`,
-		kinds: []string{"vlsingle"},
+		kinds:  []string{"vlsingle"},
 	},
 	{
 		chart:  "victoria-traces-single",
 		values: map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VTSingle
-spec:
-  storage: {resources: {requests: {storage: 10Gi}}}
-`,
-		kinds: []string{"vtsingle"},
+		kinds:  []string{"vtsingle"},
 	},
 	{
 		chart:  "victoria-metrics-agent",
 		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:8428/api/v1/write"}}, "service.enabled": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMAgent
-spec:
-  remoteWrite: [{url: "http://x:8428/api/v1/write"}]
-`,
-		kinds: []string{"vmagent"},
+		kinds:  []string{"vmagent"},
 		ignore: []string{
 			"Deployment/vmagent-compat container=config-reloader",
 			"Deployment/vmagent-compat container[config-reloader]",
@@ -96,55 +73,41 @@ spec:
 		},
 	},
 	{
-		chart:  "victoria-logs-agent",
-		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:9428"}}, "service.enabled": true, "podManagementPolicy": "Parallel"},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VLAgent
-spec:
-  rollingUpdateStrategy: RollingUpdate
-  remoteWrite: [{url: "http://x:9428/internal/insert"}]
-`,
+		chart: "victoria-logs-agent",
+		values: map[string]any{
+			"remoteWrite":                         []any{map[string]any{"url": "http://x:9428"}},
+			"service.enabled":                     true,
+			"podManagementPolicy":                 "Parallel",
+			"operator.spec.rollingUpdateStrategy": "RollingUpdate",
+		},
 		kinds: []string{"vlagent"},
 	},
 	{
-		chart:  "victoria-traces-agent",
-		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:10428"}}, "podManagementPolicy": "Parallel"},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VTAgent
-spec:
-  rollingUpdateStrategy: RollingUpdate
-  remoteWrite: [{url: "http://x:10428/insert/native"}]
-`,
+		chart: "victoria-traces-agent",
+		values: map[string]any{
+			"remoteWrite":                         []any{map[string]any{"url": "http://x:10428"}},
+			"podManagementPolicy":                 "Parallel",
+			"operator.spec.rollingUpdateStrategy": "RollingUpdate",
+		},
 		kinds: []string{"vtagent"},
 	},
 	{
 		chart: "victoria-metrics-alert",
 		values: map[string]any{
-			"server.datasource.url":            "http://x:8428",
-			"alertmanager.enabled":             true,
-			"alertmanager.replicaCount":        2,
-			"alertmanager.mode":                "statefulSet",
-			"server.notifier.alertmanager.url": "",
+			"server.datasource.url":                            "http://x:8428",
+			"alertmanager.enabled":                             true,
+			"alertmanager.replicaCount":                        2,
+			"alertmanager.mode":                                "statefulSet",
+			"server.notifier.alertmanager.url":                 "",
+			"operator.alertmanager.spec.rollingUpdateStrategy": "RollingUpdate",
 		},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMAlert
-spec:
-  datasource: {url: "http://x:8428"}
-  notifier: {url: "http://x:9093"}
----
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMAlertmanager
-spec:
-  rollingUpdateStrategy: RollingUpdate
-  replicaCount: 2
-`,
 		kinds: []string{"vmalert", "vmalertmanager"},
 		ignore: []string{
 			"Deployment/vmalert-compat volume=config",
 			"Deployment/vmalert-compat volume=tls-assets",
+			"Deployment/vmalert-compat container=config-reloader",
+			"Deployment/vmalert-compat container[config-reloader]",
+			"Deployment/vmalert-compat volume=rules-src-0",
 			"StatefulSet/vmalertmanager-compat container=config-reloader",
 			"StatefulSet/vmalertmanager-compat container[config-reloader]",
 			"StatefulSet/vmalertmanager-compat volume=tls-assets",
@@ -153,101 +116,53 @@ spec:
 	{
 		chart:  "victoria-metrics-auth",
 		values: map[string]any{"config.unauthorized_user.url_prefix": "http://x:8428"},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMAuth
-spec:
-  unauthorizedUserAccessSpec:
-    url_prefix: ["http://x:8428"]
-`,
-		kinds: []string{"vmauth"},
+		kinds:  []string{"vmauth"},
 		ignore: []string{
 			"Deployment/vmauth-compat container=config-reloader",
 			"Deployment/vmauth-compat container[config-reloader]",
+			"Deployment/vmauth-compat volume=config",
+			"Deployment/vmauth-compat volume=config-out",
 		},
 	}, {
 		chart: "victoria-metrics-cluster",
 		// the chart runs vmselect as a Deployment by default, the operator always as a StatefulSet
-		values: map[string]any{"serviceAccount.create": true, "vmselect.mode": "statefulSet"},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMCluster
-spec:
-  retentionPeriod: "1"
-  vmstorage:
-    replicaCount: 2
-    rollingUpdateStrategy: RollingUpdate
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 8Gi}}}}}
-  vmselect:
-    replicaCount: 2
-    rollingUpdateStrategy: RollingUpdate
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-  vminsert:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-`,
+		values: map[string]any{
+			"serviceAccount.create": true,
+			"vmselect.mode":         "statefulSet",
+			"operator.spec.vmstorage.rollingUpdateStrategy": "RollingUpdate",
+			"operator.spec.vmselect.rollingUpdateStrategy":  "RollingUpdate",
+		},
 		kinds:         []string{"vmcluster", "vmstorage", "vmselect", "vminsert"},
 		workloadKinds: []string{"vmstorage", "vmselect", "vminsert"},
 	},
 	{
-		chart:  "victoria-logs-cluster",
-		values: map[string]any{"serviceAccount.create": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VLCluster
-spec:
-  vlstorage:
-    replicaCount: 2
-    rollingUpdateStrategy: RollingUpdate
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
-  vlselect:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-  vlinsert:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-`,
+		chart:         "victoria-logs-cluster",
+		values:        map[string]any{"serviceAccount.create": true, "operator.spec.vlstorage.rollingUpdateStrategy": "RollingUpdate"},
 		kinds:         []string{"vlcluster", "vlstorage", "vlselect", "vlinsert"},
 		workloadKinds: []string{"vlstorage", "vlselect", "vlinsert"},
 	},
 	{
-		chart:  "victoria-traces-cluster",
-		values: map[string]any{"serviceAccount.create": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VTCluster
-spec:
-  storage:
-    replicaCount: 2
-    rollingUpdateStrategy: RollingUpdate
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
-  select:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-  insert:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-`,
+		chart:         "victoria-traces-cluster",
+		values:        map[string]any{"serviceAccount.create": true, "operator.spec.storage.rollingUpdateStrategy": "RollingUpdate"},
 		kinds:         []string{"vtcluster", "vtstorage", "vtselect", "vtinsert"},
 		workloadKinds: []string{"vtstorage", "vtselect", "vtinsert"},
 	},
 }
 
-var manifestKindRe = regexp.MustCompile(`(?m)^kind: (\w+)$`)
-
-// TestOperatorMigration checks that a release installed with `useLegacyNaming: false` can be replaced
-// by an equivalent operator custom resource and back. Pods may be restarted, and the operator may recreate
-// StatefulSets with changed claim templates, but Services, ServiceAccounts and PersistentVolumeClaims have
-// to be kept, and workloads, services, service accounts, volumes, containers and ports have to be named
-// the same way by the chart and the operator.
+// TestOperatorMigration checks that a release installed with `useLegacyNaming: false` can switch
+// to `operator.enabled: true` and back. Pods may be restarted, and the operator may recreate StatefulSets
+// with changed claim templates, but Services, ServiceAccounts and PersistentVolumeClaims have to be kept,
+// and workloads, services, service accounts, volumes, containers and ports have to be named the same way
+// by the chart and the operator.
 //
-// Chart -> operator:
-//  1. Helm release secrets are deleted, so that Helm forgets the release without deleting its objects;
-//  2. the custom resource is applied, the operator adopts objects with the same names, updating them
-//     in place or, e.g. for StatefulSets with changed claim templates, recreating them without their pods.
+// Helm prunes objects a release stops rendering, so a plain `helm upgrade` would delete the workloads
+// and their Services on the way to the operator, and the custom resource with all its children on the
+// way back. Instead, the release secrets are deleted before each switch, so that Helm forgets the release
+// without deleting its objects, and the release is installed again with `--take-ownership --force-conflicts`.
+//
+// Chart -> operator: `helm install --set operator.enabled=true` renders the custom resources, and the operator
+// adopts objects with the same names, updating them in place or, e.g. for StatefulSets with changed claim
+// templates, recreating them without their pods.
 //
 // Operator -> chart:
 //  1. the custom resource is paused, so that an in-flight reconcile doesn't put back owner references
@@ -255,7 +170,7 @@ var manifestKindRe = regexp.MustCompile(`(?m)^kind: (\w+)$`)
 //  2. `kubectl delete <cr> --cascade=orphan` removes the custom resource without deleting its children;
 //  3. fields managed by the operator are handed over to Helm's field manager, otherwise server-side apply
 //     would keep fields the chart doesn't render, e.g. an httpGet probe next to the chart's tcpSocket one;
-//  4. `helm install --take-ownership --force-conflicts` adopts the objects in place, removing such fields.
+//  4. `helm install --set operator.enabled=false` adopts the objects in place, removing such fields.
 //
 // The operator has to be running in the cluster before the test starts.
 func TestOperatorMigration(t *testing.T) {
@@ -276,10 +191,10 @@ func TestOperatorMigration(t *testing.T) {
 			defer client.CoreV1().Namespaces().Delete(ctx, namespace, metav1.DeleteOptions{})                    //nolint:errcheck
 			defer helmRun(kc, "uninstall", compatName, "--namespace", namespace, "--wait", "--ignore-not-found") //nolint:errcheck
 
-			var crKinds []string
-			for _, m := range manifestKindRe.FindAllStringSubmatch(tc.manifest, -1) {
-				crKinds = append(crKinds, m[1])
-			}
+			chartDir := filepath.Join(chartsDir, tc.chart)
+			crKinds, err := renderedCRKinds(chartDir, namespace, tc.values, tc.kinds)
+			require.NoError(t, err)
+			require.NotEmpty(t, crKinds, "chart %s renders no custom resources with operator.enabled", tc.chart)
 			workloadKinds := tc.workloadKinds
 			if workloadKinds == nil {
 				workloadKinds = tc.kinds
@@ -302,8 +217,13 @@ func TestOperatorMigration(t *testing.T) {
 					require.NoError(t, err, "%s did not become %s", k, status)
 				}
 			}
-			chartDir := filepath.Join(chartsDir, tc.chart)
-			chartArgs := migrationHelmArgs("install", chartDir, namespace, tc.values)
+			chartArgs := migrationHelmArgs(chartDir, namespace, false, tc.values)
+			operatorArgs := migrationHelmArgs(chartDir, namespace, true, tc.values)
+			forgetRelease := func() {
+				t.Helper()
+				_, err := kubectl(kc, "", "delete", "secrets", "-n", namespace, "-l", fmt.Sprintf("owner=helm,name=%s", compatName))
+				require.NoError(t, err)
+			}
 
 			out, err := helmRun(kc, chartArgs...)
 			require.NoError(t, err, "helm install failed: %s", out)
@@ -311,10 +231,9 @@ func TestOperatorMigration(t *testing.T) {
 			chartPVCs, err := releaseObjects(kc, namespace, "persistentvolumeclaims")
 			require.NoError(t, err)
 
-			_, err = kubectl(kc, "", "delete", "secrets", "-n", namespace, "-l", fmt.Sprintf("owner=helm,name=%s", compatName))
-			require.NoError(t, err)
-			_, err = kubectl(kc, compatManifest(tc.manifest), "apply", "-n", namespace, "-f", "-")
-			require.NoError(t, err)
+			forgetRelease()
+			out, err = helmRun(kc, append(operatorArgs, "--take-ownership", "--force-conflicts")...)
+			require.NoError(t, err, "helm install with operator.enabled failed: %s", out)
 			waitForStatus("operational")
 			operatorObjs := waitForRollout(t, ctx, kc, namespace, tc.kinds, workloadKinds, byOperator)
 			requireSameContract(t, operatorObjs, chartObjs, tc.ignore, "chart %s differs from the operator", tc.chart)
@@ -326,6 +245,7 @@ func TestOperatorMigration(t *testing.T) {
 				require.NoError(t, err)
 			}
 			waitForStatus("paused")
+			forgetRelease()
 			for _, k := range crKinds {
 				_, err = kubectl(kc, "", "delete", strings.ToLower(k), compatName, "-n", namespace, "--cascade=orphan")
 				require.NoError(t, err)
@@ -384,15 +304,6 @@ func mergeFields(dst, src map[string]any) {
 			dst[k] = v
 		}
 	}
-}
-
-// compatManifest names every document of manifest after compatName.
-func compatManifest(manifest string) string {
-	var docs []string
-	for _, doc := range strings.Split(manifest, "\n---\n") {
-		docs = append(docs, strings.TrimSpace(doc)+"\nmetadata:\n  name: "+compatName+"\n")
-	}
-	return strings.Join(docs, "---\n")
 }
 
 func kubectl(kubeconfig, stdin string, args ...string) ([]byte, error) {
@@ -638,19 +549,43 @@ func requireKept(t *testing.T, expected, actual []*unstructured.Unstructured) {
 	}
 }
 
-// migrationHelmArgs builds a helm install or upgrade run of the compatName release with operator naming.
-func migrationHelmArgs(verb, chartDir, namespace string, values map[string]any) []string {
-	args := []string{verb, compatName, chartDir, "--namespace", namespace, "--set", "useLegacyNaming=false"}
-	return append(args, migrationValues(values)...)
-}
-
-func migrationValues(values map[string]any) []string {
-	var args []string
+// migrationHelmArgs builds a helm install run of the compatName release with operator naming.
+func migrationHelmArgs(chartDir, namespace string, operator bool, values map[string]any) []string {
+	args := []string{"install", compatName, chartDir, "--namespace", namespace,
+		"--set", "useLegacyNaming=false", "--set", fmt.Sprintf("operator.enabled=%t", operator)}
 	for k, v := range values {
 		b, _ := json.Marshal(v)
 		args = append(args, "--set-json", k+"="+string(b))
 	}
 	return args
+}
+
+// renderedCRKinds returns kinds of operator custom resources the chart renders with operator.enabled,
+// limited to the ones named in kinds.
+func renderedCRKinds(chartDir, namespace string, values map[string]any, kinds []string) ([]string, error) {
+	args := append([]string{"template"}, migrationHelmArgs(chartDir, namespace, true, values)[1:]...)
+	cmd := exec.Command("helm", args...)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("helm %s: %w: %s", strings.Join(args, " "), err, stderr.String())
+	}
+	var crKinds []string
+	dec := utilyaml.NewYAMLOrJSONDecoder(bytes.NewReader(out), 4096)
+	for {
+		var u unstructured.Unstructured
+		if err := dec.Decode(&u.Object); err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return nil, err
+		}
+		if strings.HasPrefix(u.GetAPIVersion(), "operator.victoriametrics.com/") && slices.Contains(kinds, strings.ToLower(u.GetKind())) {
+			crKinds = append(crKinds, u.GetKind())
+		}
+	}
+	return crKinds, nil
 }
 
 // helmRun runs an arbitrary helm command against the test cluster, returning combined output.

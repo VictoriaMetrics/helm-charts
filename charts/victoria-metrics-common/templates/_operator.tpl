@@ -27,21 +27,25 @@ so the resulting objects get the same `<kind>-<name>` names the chart renders wi
 
 {{- /*
 vm.operator.cr.spec returns the custom resource spec generated from chart values (`.spec`)
-with `.Values.operator.spec` deep-merged over it.
+with `.operator.spec` deep-merged over it. `.operator` defaults to `.Values.operator`,
+charts rendering several custom resources pass a separate block for each of them.
 Usage:
 spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
 */ -}}
 {{- define "vm.operator.cr.spec" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- toYaml (mergeOverwrite (deepCopy (.spec | default dict)) (deepCopy ((($Values.operator).spec) | default dict))) -}}
+  {{- $operator := ternary .operator $Values.operator (hasKey . "operator") -}}
+  {{- toYaml (mergeOverwrite (deepCopy (.spec | default dict)) (deepCopy ((($operator).spec) | default dict))) -}}
 {{- end -}}
 
 {{- /*
-vm.operator.cr.labels returns the custom resource labels: the chart labels of the context with `.Values.operator.labels`.
+vm.operator.cr.labels returns the custom resource labels: the chart labels of the context with `.operator.labels`.
+`.operator` defaults to `.Values.operator`.
 */ -}}
 {{- define "vm.operator.cr.labels" -}}
   {{- $Values := (.helm).Values | default .Values -}}
-  {{- include "vm.labels" (merge (dict "extraLabels" ((($Values.operator).labels) | default dict)) (omit . "extraLabels")) -}}
+  {{- $operator := ternary .operator $Values.operator (hasKey . "operator") -}}
+  {{- include "vm.labels" (merge (dict "extraLabels" ((($operator).labels) | default dict)) (omit . "extraLabels" "operator")) -}}
 {{- end -}}
 
 {{- /*
@@ -406,7 +410,9 @@ Settings without a VMScrapeConfig equivalent, such as inline credentials, fail t
       {{- range $value -}}
         {{- $sd := dict -}}
         {{- range $k, $v := . -}}
-          {{- if has $k (list "role" "selectors" "attach_metadata") -}}
+          {{- if eq $k "role" -}}
+            {{- $_ := set $sd $k (ternary "endpointslice" $v (eq $v "endpointslices")) -}}
+          {{- else if has $k (list "selectors" "attach_metadata") -}}
             {{- $_ := set $sd $k $v -}}
           {{- else if eq $k "api_server" -}}
             {{- $_ := set $sd "apiServer" $v -}}

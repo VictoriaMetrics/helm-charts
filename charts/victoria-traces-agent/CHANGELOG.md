@@ -1,6 +1,7 @@
 ## Next release
 
 - add `podManagementPolicy` option for the StatefulSet. Set it to `Parallel` to match the StatefulSet created by the VictoriaMetrics operator, so that it can be adopted in place when migrating from a VTAgent custom resource.
+- add `operator.enabled` to deploy vtagent through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VTAgent` resource built from chart values instead of its own StatefulSet, Service, ServiceAccount and VPA. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-traces-agent/#victoriametrics-operator).
 
 ## v0.2.1
 

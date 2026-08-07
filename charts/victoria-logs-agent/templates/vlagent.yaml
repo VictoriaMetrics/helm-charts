@@ -1,0 +1,72 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $app := .Values }}
+{{- $ctx := dict
+    "helm" .
+    "kindOverride" "vlagent"
+}}
+{{- $pvc := $app.persistentVolume }}
+{{- if empty $app.remoteWrite }}
+  {{- fail "at least one remoteWrite configuration must be provided" }}
+{{- end }}
+{{- if $app.horizontalPodAutoscaler.enabled }}
+  {{- fail "`horizontalPodAutoscaler` is not supported by the VLAgent resource with `operator.enabled: true`; set `replicaCount` instead" }}
+{{- end }}
+{{- $appSpec := include "vm.operator.app.spec" (dict
+    "helm" .
+    "app" $app
+    "kindOverride" "vlagent"
+    "scrape" .Values.serviceMonitor
+    "scrapePath" "serviceMonitor"
+) }}
+{{- $spec := fromYaml $appSpec }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- $supportedRemoteWriteFields := list
+    "url" "basicAuth" "bearerTokenPath" "bearerTokenSecret" "headers"
+    "maxDiskUsage" "oauth2" "proxyURL" "sendTimeout" "tlsConfig"
+}}
+{{- $remoteWriteSpec := include "vm.operator.remote.write" (dict
+    "items" $app.remoteWrite
+    "defaultPath" "/insert/native"
+    "supported" $supportedRemoteWriteFields
+) }}
+{{- $_ := set $spec "remoteWrite" (fromYamlArray $remoteWriteSpec) }}
+{{- with $app.maxDiskUsagePerURL }}
+  {{- $_ := set $spec "remoteWriteSettings" (dict "maxDiskUsagePerURL" (toString .)) }}
+{{- end }}
+{{- if and (empty (index $extraArgs "syslog.listenAddr.tcp")) (empty (index $extraArgs "syslog.listenAddr.udp")) }}
+  {{- with (include "vm.operator.syslog.spec" (dict "syslog" $app.syslog)) }}
+    {{- $_ := set $spec "syslogSpec" (fromYaml .) }}
+  {{- end }}
+{{- end }}
+{{- if $pvc.enabled }}
+  {{- $volume := include "vlagent.volume.name" $ctx }}
+  {{- if $pvc.existingClaim }}
+    {{- $claim := dict
+        "name" $volume
+        "persistentVolumeClaim" (dict "claimName" (tpl $pvc.existingClaim .))
+    }}
+    {{- $_ := set $spec "volumes" (append ($spec.volumes | default list) $claim) }}
+  {{- else }}
+    {{- $template := dict
+        "metadata" (dict "name" $volume)
+        "spec" (fromYaml (include "vm.operator.storage" (dict "persistentVolume" $pvc)))
+    }}
+    {{- $_ := set $spec "storage" (dict "volumeClaimTemplate" $template) }}
+  {{- end }}
+{{- end }}
+{{- $crSpec := dict
+    "helm" .
+    "spec" $spec
+}}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VLAgent
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" $crSpec | nindent 2 }}
+{{- end }}

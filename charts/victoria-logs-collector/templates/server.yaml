@@ -1,3 +1,4 @@
+{{- if not (include "vm.operator.enabled" .) }}
 {{- $ctx := dict "helm" . "kindOverride" "vlagent-collector" }}
 {{- $storageName := include "victoria-logs-collector.volume.name" $ctx }}
 ---
@@ -104,3 +105,4 @@ spec:
             path: {{ .Values.extraArgs.tmpDataPath }}
           {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
+{{- end }}

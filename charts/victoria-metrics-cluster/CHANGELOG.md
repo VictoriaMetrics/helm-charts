@@ -1,6 +1,8 @@
 ## Next release
 
 - add `checksum/config` annotation on `vmauth` and `vminsert` pods to trigger a rollout when the chart-managed vmauth Secret or vminsert relabel ConfigMap changes. Externally managed `vmauth.configSecretName` and `vminsert.relabel.configMap` are not tracked. A `checksum/config` key set in `podAnnotations` is overridden by the generated value.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy the VictoriaMetrics cluster through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VMCluster` resource built from `vmstorage`, `vmselect` and `vminsert` values instead of its own vmstorage, vmselect and vminsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes. The bundled `vmauth` becomes the `requestsLoadBalancer`. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-metrics-cluster/#victoriametrics-operator).
 
 ## v0.54.0
 
