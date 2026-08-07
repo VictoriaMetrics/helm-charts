@@ -1,6 +1,7 @@
 ## Next release
 
 - add `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and `otlp-grpc`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
+- add `operator.enabled` to deploy vtagent through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VTAgent` resource built from chart values instead of its own StatefulSet, Service, ServiceAccount and VPA. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-traces-agent/#victoriametrics-operator).
 
 ## v0.2.0
 

@@ -27,6 +27,48 @@ This chart will do the following:
 
 {{ include "chart.uninstallSection" . }}
 
+## Resource Naming
+
+By default, this chart uses release-name based resource naming for historical reasons and
+backwards compatibility with existing deployments.
+
+> [!WARNING]
+> For new deployments, it is recommended to set `useLegacyNaming: false` to use operator-style
+> names (e.g. `vmanomaly-<release>`). This aligns resource names with the
+> [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) convention and
+> simplifies future migration to operator-managed resources.
+
+### VictoriaMetrics operator
+
+With `operator.enabled: true` the chart renders a [VMAnomaly](https://docs.victoriametrics.com/operator/resources/vmanomaly/) resource
+instead of its own Deployment/StatefulSet, Service, config ConfigMap, PodDisruptionBudget and VMPodScrape,
+and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) manages the workload.
+The operator must already be installed in the cluster. Operator mode always uses operator-style names, regardless of `useLegacyNaming`.
+
+The VMAnomaly is named after the release (or `fullnameOverride`), so the operator creates `vmanomaly-<release>` objects.
+Ingress and HTTPRoute are still rendered by the chart and target the `vmanomaly-<release>` Service, which the operator always creates as a headless Service on the server port.
+
+Settings without an operator equivalent fail rendering, with a message pointing to the replacement:
+
+- `replicationFactor`, which the VMAnomaly doesn't support;
+- `config.reader` and `config.writer` settings without a typed field, including inline credentials; set `operator.spec.reader` and `operator.spec.writer` instead;
+- `config.monitoring.push`; set `operator.spec.monitoring.push` instead;
+- `config.server` settings other than `addr`, `port`, `path_prefix`, `max_concurrent_tasks`, `ui_default_state` and `use_reader_connection_settings`; set `operator.spec.server` instead;
+- Service settings the operator can't apply, since it always creates a headless `ClusterIP` Service on the server port: `service.type`, node port, load balancer, external IPs, traffic and IP family settings, labels and annotations, and a `service.servicePort` different from the server port;
+- `podMonitor` `relabelings`, `metricRelabelings`, `port`, `targetPort`, `path`, `interval`, `scrapeTimeout`, `scheme`, `basicAuth` and `tlsConfig`; set `operator.spec.serviceScrapeSpec` instead;
+- `networkPolicy` labels, annotations and `extraLabels`, since the operator-managed NetworkPolicy has no custom metadata.
+
+Fields that have no chart value, or need a different value, go to `operator.spec`, which is deep-merged over the generated spec:
+
+```yaml
+operator:
+  enabled: true
+  spec:
+    logLevel: WARN
+```
+
+Probes keep the operator defaults. Switching a release to `operator.enabled: true` recreates its pods.
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.

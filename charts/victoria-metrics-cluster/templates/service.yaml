@@ -1,6 +1,6 @@
 {{- $ctx := dict "helm" . }}
 {{- range $name, $app := .Values }}
-{{- if and (kindIs "map" $app) $app.enabled ($app.service).enabled }}
+{{- if and (kindIs "map" $app) $app.enabled (not (include "vm.operator.enabled" $)) ($app.service).enabled }}
 {{- $service := $app.service }}
 {{- $_ := set $ctx "extraLabels" $service.labels }}
 {{- $_ := set $ctx "appKey" $name }}

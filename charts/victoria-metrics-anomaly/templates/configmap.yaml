@@ -1,3 +1,4 @@
+{{- if not (include "vm.operator.enabled" .) }}
 {{- $app := .Values }}
 {{- if not $app.config.reader.tenant_id -}}
   {{- $ := unset $app.config.reader "tenant_id" }}
@@ -24,3 +25,4 @@ metadata:
   {{- end }}
 data:
   config.yml: |{{ toYaml $resultingConfig | nindent 4 }}
+{{- end }}

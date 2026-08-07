@@ -1,0 +1,181 @@
+suite: operator mode
+templates:
+  - networkpolicy.yaml
+  - vtsingle.yaml
+  - server.yaml
+  - service.yaml
+  - pvc.yaml
+  - serviceaccount.yaml
+  - monitor.yaml
+  - ingress.yaml
+  - pdb.yaml
+set:
+  operator.enabled: true
+tests:
+  - it: doesn't render a VTSingle by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vtsingle.yaml
+
+  - it: renders a VTSingle instead of the chart workload
+    asserts:
+      - isKind:
+          of: VTSingle
+        template: vtsingle.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vtsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: server.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+      - isKind:
+          of: PersistentVolumeClaim
+        template: pvc.yaml
+
+  - it: converts server values into the VTSingle spec
+    set:
+      server.retentionPeriod: 30d
+      server.retentionDiskSpaceUsage: 10
+      server.resources.limits.memory: 1Gi
+      server.extraArgs:
+        foo: bar
+    asserts:
+      - equal:
+          path: spec.retentionPeriod
+          value: 30d
+        template: vtsingle.yaml
+      - equal:
+          path: spec.retentionMaxDiskSpaceUsageBytes
+          value: 10GiB
+        template: vtsingle.yaml
+      - equal:
+          path: spec.port
+          value: "10428"
+        template: vtsingle.yaml
+      - equal:
+          path: spec.resources.limits.memory
+          value: 1Gi
+        template: vtsingle.yaml
+      - equal:
+          path: spec.extraArgs.foo
+          value: bar
+        template: vtsingle.yaml
+      - equal:
+          path: spec.volumes
+          value:
+            - name: data
+              persistentVolumeClaim:
+                claimName: vtsingle-RELEASE-NAME
+        template: vtsingle.yaml
+      - equal:
+          path: spec.storageDataPath
+          value: /storage
+        template: vtsingle.yaml
+
+  - it: deep-merges operator.spec over the generated spec
+    set:
+      operator.spec:
+        logLevel: WARN
+        retentionPeriod: 90d
+    asserts:
+      - equal:
+          path: spec.logLevel
+          value: WARN
+        template: vtsingle.yaml
+      - equal:
+          path: spec.retentionPeriod
+          value: 90d
+        template: vtsingle.yaml
+
+  - it: disables the operator self-scrape unless the chart enables it
+    asserts:
+      - equal:
+          path: spec.disableSelfServiceScrape
+          value: true
+        template: vtsingle.yaml
+
+  - it: lets the operator create the VMServiceScrape
+    set:
+      server.vmServiceScrape.enabled: true
+    asserts:
+      - notExists:
+          path: spec.disableSelfServiceScrape
+        template: vtsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: points the ingress at the Service created by the operator
+    set:
+      server.ingress.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: vtsingle-RELEASE-NAME
+        template: ingress.yaml
+
+  - it: uses operator naming even with useLegacyNaming
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vtsingle.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        template: vtsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`networkPolicy.labels` is not converted"
+        template: vtsingle.yaml
+
+  - it: fails on a PodDisruptionBudget
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.maxUnavailable: 1
+    asserts:
+      - failedTemplate:
+          errorPattern: "`podDisruptionBudget` is not supported by the VTSingle resource"
+        template: vtsingle.yaml
+
+  - it: fails on more than one replica
+    set:
+      server.replicaCount: 2
+    asserts:
+      - failedTemplate:
+          errorPattern: "`server.replicaCount` greater than 1 is not supported by the VTSingle resource"
+        template: vtsingle.yaml

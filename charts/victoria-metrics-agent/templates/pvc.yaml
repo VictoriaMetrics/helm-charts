@@ -1,6 +1,6 @@
 {{- $app := .Values }}
 {{- $pvc := $app.persistentVolume }}
-{{- if and $pvc.enabled (not $pvc.existingClaim) (eq $app.mode "deployment") }}
+{{- if and $pvc.enabled (not $pvc.existingClaim) (or (eq $app.mode "deployment") (and (include "vm.operator.enabled" .) (ne $app.mode "statefulSet"))) }}
 {{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

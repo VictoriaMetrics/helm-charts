@@ -1,3 +1,4 @@
+{{- if not (include "vm.operator.enabled" .) }}
 {{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
@@ -37,4 +38,5 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 data: {{ . | nindent 2 }}
+{{- end }}
 {{- end }}

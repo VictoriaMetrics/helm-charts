@@ -1,4 +1,4 @@
-{{- if .Values.rbac.create -}}
+{{- if and .Values.rbac.create (not (include "vm.operator.enabled" .)) -}}
 {{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $namespaced := .Values.rbac.namespaced }}

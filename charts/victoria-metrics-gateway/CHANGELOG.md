@@ -10,6 +10,7 @@
 
 - bump version of VM components to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0)
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.40.0
 

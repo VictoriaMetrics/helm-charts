@@ -34,9 +34,8 @@ type compatCase struct {
 	chart string
 	// values are passed to helm template with --set-json
 	values map[string]any
-	// manifest is the operator custom resource equivalent to values, named compatName
-	manifest string
-	// kinds are values of the app.kubernetes.io/name label on objects created by the operator for manifest
+	// kinds are values of the app.kubernetes.io/name label on objects created by the operator
+	// for custom resources the chart renders with operator.enabled
 	kinds []string
 	// workloadKinds are the kinds the operator creates a workload for; defaults to kinds
 	workloadKinds []string
@@ -48,13 +47,7 @@ var compatCases = []compatCase{
 	{
 		chart:  "victoria-metrics-single",
 		values: map[string]any{"server.mode": "deployment"},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMSingle
-spec:
-  storage: {resources: {requests: {storage: 16Gi}}}
-`,
-		kinds: []string{"vmsingle"},
+		kinds:  []string{"vmsingle"},
 		// the operator listens on 8429 and keeps 8428 as a Service alias; changing the port would restart the storage pod
 		ignore: []string{
 			"Deployment/vmsingle-compat container[vmsingle].port=",
@@ -64,35 +57,17 @@ spec:
 	{
 		chart:  "victoria-logs-single",
 		values: map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VLSingle
-spec:
-  storage: {resources: {requests: {storage: 10Gi}}}
-`,
-		kinds: []string{"vlsingle"},
+		kinds:  []string{"vlsingle"},
 	},
 	{
 		chart:  "victoria-traces-single",
 		values: map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VTSingle
-spec:
-  storage: {resources: {requests: {storage: 10Gi}}}
-`,
-		kinds: []string{"vtsingle"},
+		kinds:  []string{"vtsingle"},
 	},
 	{
 		chart:  "victoria-metrics-agent",
 		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:8428/api/v1/write"}}, "service.enabled": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMAgent
-spec:
-  remoteWrite: [{url: "http://x:8428/api/v1/write"}]
-`,
-		kinds: []string{"vmagent"},
+		kinds:  []string{"vmagent"},
 		ignore: []string{
 			"Deployment/vmagent-compat container=config-reloader",
 			"Deployment/vmagent-compat container[config-reloader]",
@@ -103,24 +78,12 @@ spec:
 	{
 		chart:  "victoria-logs-agent",
 		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:9428"}}, "service.enabled": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VLAgent
-spec:
-  remoteWrite: [{url: "http://x:9428/internal/insert"}]
-`,
-		kinds: []string{"vlagent"},
+		kinds:  []string{"vlagent"},
 	},
 	{
 		chart:  "victoria-traces-agent",
 		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:10428"}}},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VTAgent
-spec:
-  remoteWrite: [{url: "http://x:10428/insert/native"}]
-`,
-		kinds: []string{"vtagent"},
+		kinds:  []string{"vtagent"},
 	},
 	{
 		chart: "victoria-metrics-alert",
@@ -131,18 +94,6 @@ spec:
 			"alertmanager.mode":                "statefulSet",
 			"server.notifier.alertmanager.url": "",
 		},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMAlert
-spec:
-  datasource: {url: "http://x:8428"}
-  notifier: {url: "http://x:9093"}
----
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMAlertmanager
-spec:
-  replicaCount: 2
-`,
 		kinds: []string{"vmalert", "vmalertmanager"},
 		ignore: []string{
 			"Deployment/vmalert-compat volume=config",
@@ -155,14 +106,7 @@ spec:
 	{
 		chart:  "victoria-metrics-auth",
 		values: map[string]any{"config.unauthorized_user.url_prefix": "http://x:8428"},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMAuth
-spec:
-  unauthorizedUserAccessSpec:
-    url_prefix: ["http://x:8428"]
-`,
-		kinds: []string{"vmauth"},
+		kinds:  []string{"vmauth"},
 		ignore: []string{
 			"Deployment/vmauth-compat container=config-reloader",
 			"Deployment/vmauth-compat container[config-reloader]",
@@ -170,65 +114,19 @@ spec:
 	}, {
 		chart: "victoria-metrics-cluster",
 		// the chart runs vmselect as a Deployment by default, the operator always as a StatefulSet
-		values: map[string]any{"serviceAccount.create": true, "vmselect.mode": "statefulSet"},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMCluster
-spec:
-  retentionPeriod: "1"
-  vmstorage:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 8Gi}}}}}
-  vmselect:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-  vminsert:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-`,
+		values:        map[string]any{"serviceAccount.create": true, "vmselect.mode": "statefulSet"},
 		kinds:         []string{"vmcluster", "vmstorage", "vmselect", "vminsert"},
 		workloadKinds: []string{"vmstorage", "vmselect", "vminsert"},
 	},
 	{
-		chart:  "victoria-logs-cluster",
-		values: map[string]any{"serviceAccount.create": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VLCluster
-spec:
-  vlstorage:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
-  vlselect:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-  vlinsert:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-`,
+		chart:         "victoria-logs-cluster",
+		values:        map[string]any{"serviceAccount.create": true},
 		kinds:         []string{"vlcluster", "vlstorage", "vlselect", "vlinsert"},
 		workloadKinds: []string{"vlstorage", "vlselect", "vlinsert"},
 	},
 	{
-		chart:  "victoria-traces-cluster",
-		values: map[string]any{"serviceAccount.create": true},
-		manifest: `
-apiVersion: operator.victoriametrics.com/v1
-kind: VTCluster
-spec:
-  storage:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
-  select:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-  insert:
-    replicaCount: 2
-    resources: {requests: {cpu: 10m, memory: 32Mi}}
-`,
+		chart:         "victoria-traces-cluster",
+		values:        map[string]any{"serviceAccount.create": true},
 		kinds:         []string{"vtcluster", "vtstorage", "vtselect", "vtinsert"},
 		workloadKinds: []string{"vtstorage", "vtselect", "vtinsert"},
 	},
@@ -236,7 +134,7 @@ spec:
 
 // TestOperatorCompat checks that charts rendered with `useLegacyNaming: false` name their
 // workloads, services, service accounts, volumes, containers and ports the same way the
-// VictoriaMetrics operator does for an equivalent custom resource.
+// VictoriaMetrics operator does for the custom resources the chart renders with `operator.enabled: true`.
 //
 // The operator has to be running in the cluster before the test starts.
 func TestOperatorCompat(t *testing.T) {
@@ -256,7 +154,10 @@ func TestOperatorCompat(t *testing.T) {
 			require.NoError(t, err)
 			defer client.CoreV1().Namespaces().Delete(ctx, namespace, metav1.DeleteOptions{}) //nolint:errcheck
 
-			_, err = kubectl(kc, compatManifest(tc.manifest), "apply", "-n", namespace, "-f", "-")
+			chartDir := filepath.Join(chartsDir, tc.chart)
+			crs, err := helmTemplate(chartDir, namespace, tc.values, true)
+			require.NoError(t, err)
+			_, err = kubectl(kc, string(crs), "apply", "-n", namespace, "-f", "-")
 			require.NoError(t, err)
 
 			var operatorObjs []*unstructured.Unstructured
@@ -280,7 +181,7 @@ func TestOperatorCompat(t *testing.T) {
 			})
 			require.NoError(t, err, "operator didn't create workloads for %v", tc.kinds)
 
-			chartObjs, err := chartObjects(filepath.Join(chartsDir, tc.chart), namespace, tc.values)
+			chartObjs, err := chartObjects(chartDir, namespace, tc.values)
 			require.NoError(t, err)
 
 			expected := filterIgnored(contract(operatorObjs), tc.ignore)
@@ -299,15 +200,6 @@ func TestOperatorCompat(t *testing.T) {
 			require.Empty(t, problems, "chart %s differs from the operator:\n%s", tc.chart, strings.Join(problems, "\n"))
 		})
 	}
-}
-
-// compatManifest names every document of manifest after compatName.
-func compatManifest(manifest string) string {
-	var docs []string
-	for _, doc := range strings.Split(manifest, "\n---\n") {
-		docs = append(docs, strings.TrimSpace(doc)+"\nmetadata:\n  name: "+compatName+"\n")
-	}
-	return strings.Join(docs, "---\n")
 }
 
 func kubectl(kubeconfig, stdin string, args ...string) ([]byte, error) {
@@ -359,9 +251,10 @@ func operatorObjects(kubeconfig, namespace string, kinds []string) ([]*unstructu
 	return objs, nil
 }
 
-// chartObjects renders a chart with operator naming and returns the rendered objects.
-func chartObjects(chartDir, namespace string, values map[string]any) ([]*unstructured.Unstructured, error) {
-	args := []string{"template", compatName, chartDir, "--namespace", namespace, "--set", "useLegacyNaming=false"}
+// helmTemplate renders a chart with operator naming, as custom resources when operator is set.
+func helmTemplate(chartDir, namespace string, values map[string]any, operator bool) ([]byte, error) {
+	args := []string{"template", compatName, chartDir, "--namespace", namespace,
+		"--set", "useLegacyNaming=false", "--set", fmt.Sprintf("operator.enabled=%t", operator)}
 	for k, v := range values {
 		b, err := json.Marshal(v)
 		if err != nil {
@@ -375,6 +268,15 @@ func chartObjects(chartDir, namespace string, values map[string]any) ([]*unstruc
 	out, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("helm %s: %w: %s", strings.Join(args, " "), err, stderr.String())
+	}
+	return out, nil
+}
+
+// chartObjects renders a chart with operator naming and returns the rendered objects.
+func chartObjects(chartDir, namespace string, values map[string]any) ([]*unstructured.Unstructured, error) {
+	out, err := helmTemplate(chartDir, namespace, values, false)
+	if err != nil {
+		return nil, err
 	}
 	var objs []*unstructured.Unstructured
 	dec := utilyaml.NewYAMLOrJSONDecoder(bytes.NewReader(out), 4096)

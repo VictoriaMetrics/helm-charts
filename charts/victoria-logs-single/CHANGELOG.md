@@ -4,6 +4,8 @@
 - add `server.service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and `syslog-tcp`/`syslog-udp`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 - rename the container from `vlogs` to `vlsingle`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.
 - fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy VictoriaLogs single through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VLSingle` resource built from `server` values instead of its own workload, Service and ServiceAccount, and keeps managing the storage claim. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-logs-single/#victoriametrics-operator).
 
 ## v0.13.10
 
