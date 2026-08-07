@@ -10,6 +10,7 @@
 
 - bump version of VM components to [v1.157.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.157.0)
 - bump version of alertmanager to [v0.35.0](https://github.com/prometheus/alertmanager/releases/tag/v0.35.0)
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.53.0
 
