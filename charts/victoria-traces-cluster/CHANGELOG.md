@@ -2,6 +2,7 @@
 
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
 - fix `vtstorage.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.2.10
 

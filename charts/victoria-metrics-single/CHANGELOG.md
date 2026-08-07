@@ -5,6 +5,7 @@
 - fix pod label selector in the chart notes: repeated `-l` flags were replaced with a single comma-separated selector, since `kubectl` only honours the last `-l`.
 - fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 - rename config volumes to match the VictoriaMetrics operator: `scrapeconfig` to `config-out` and `relabelconfig` to `relabelings-assets`. Pods with scrape or relabel config enabled are restarted once on upgrade.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.48.0
 

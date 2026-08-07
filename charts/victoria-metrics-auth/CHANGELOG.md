@@ -3,6 +3,7 @@
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 - add missing `serviceAccount.automountToken` value (default `true`), so `automountServiceAccountToken` is no longer rendered empty.
 - rename the config volume from `config` to `config-out` to match the VictoriaMetrics operator. Pods are restarted once on upgrade.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.43.0
 

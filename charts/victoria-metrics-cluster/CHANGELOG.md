@@ -4,6 +4,7 @@
 - fix pod label selector in the chart notes: repeated `-l` flags were replaced with a single comma-separated selector, since `kubectl` only honours the last `-l`.
 - fix `vmselect.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 - rename the cluster native port of `vmselect` and `vminsert` from `cluster-tcp` to `clusternative`, in both the containers and the Services, matching the VictoriaMetrics operator. It is only rendered when `extraArgs.clusternativeListenAddr` is set.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.52.0
 

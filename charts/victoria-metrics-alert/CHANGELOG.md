@@ -10,6 +10,7 @@
 - rename config volumes to match the VictoriaMetrics operator: `alerts-config` to `rules-out` in vmalert and `config` to `config-out` in Alertmanager. Pods are restarted once on upgrade.
 - expose Alertmanager gossip ports (`tcp-mesh`, `udp-mesh`) on its Service in HA mode.
 - fix `alertmanager.persistentVolume.name` in `statefulSet` mode: the container mounted the default volume name instead of the overridden claim template name.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.50.0
 

@@ -94,8 +94,28 @@ Export default values of `{{ template "chart.name" . }}` chart to file `values.y
     ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
+{{- $chartName := include "chart.name" . }}
+{{- $operatorNamed := list "victoria-metrics-k8s-stack" "victoria-metrics-operator" "victoria-metrics-operator-crds" "victoria-metrics-distributed" "victoria-metrics-estimator" "victoria-traces-agent" "victoria-traces-mcp" }}
+{{- if not (has $chartName $operatorNamed) }}
 
-{{- $release := (include "chart.name" .) | replace "-" " " | initials }}
+For new installations set `useLegacyNaming: false` in ``values.yaml`` to use resource names and labels compatible with the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/):
+
+```yaml
+useLegacyNaming: false
+{{- if has $chartName (list "victoria-metrics-single" "victoria-logs-single" "victoria-traces-single") }}
+server:
+  mode: deployment
+{{- end }}
+```
+{{- if has $chartName (list "victoria-metrics-single" "victoria-logs-single" "victoria-traces-single") }}
+
+`server.mode: statefulSet` is not supported with operator-compatible naming, as the VictoriaMetrics operator runs a single-node instance as a Deployment.
+{{- end }}
+
+> Don't change `useLegacyNaming` for existing installations: resource names, labels and selectors change, so workloads have to be recreated.
+{{- end }}
+
+{{- $release := $chartName | replace "-" " " | initials }}
 
 > Consider setting `.Values.nameOverride` to a small value like `{{ $release }}` to avoid hitting resource name limits of 63 characters
 
