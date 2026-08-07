@@ -1,7 +1,7 @@
 {{- $app := .Values.server }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
-{{- if and $mode $app.enabled (hasKey $app $mode) }}
+{{- if and $mode $app.enabled (hasKey $app $mode) (not (include "vm.operator.enabled" .)) }}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vlsingle" }}
 {{- if and (eq $mode "statefulSet") (eq (include "vm.useLegacyNaming" $ctx) "false") }}

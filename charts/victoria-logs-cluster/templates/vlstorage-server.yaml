@@ -1,7 +1,7 @@
 {{- $app := merge (deepCopy .Values.vlstorage) (deepCopy .Values.common) -}}
 {{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vlstorage" $app }}
-{{- if $app.enabled -}}
+{{- if and $app.enabled (not (include "vm.operator.enabled" .)) -}}
 {{- $ctx := dict "helm" . "appKey" "vlstorage" }}
 {{- $storageName := tpl ($pvc.name | default (include "vlstorage.volume.name" $ctx)) $ctx }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

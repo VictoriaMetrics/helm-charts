@@ -1,0 +1,381 @@
+suite: operator mode
+templates:
+  - networkpolicy.yaml
+  - monitor.yaml
+  - vmcluster.yaml
+  - vmstorage-server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - pdb.yaml
+  - ingress.yaml
+  - route.yaml
+  - vmauth-server.yaml
+  - vmauth-config.yaml
+set:
+  operator.enabled: true
+tests:
+  - it: doesn't render a VMCluster by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vmcluster.yaml
+
+  - it: renders a VMCluster instead of the component workloads
+    asserts:
+      - isKind:
+          of: VMCluster
+        template: vmcluster.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vmcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: vmstorage-server.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+
+  - it: converts components with the chart's claim template name
+    set:
+      vmstorage.retentionPeriod: "30"
+      vmselect.replicaCount: 3
+      vminsert.resources.limits.memory: 1Gi
+    asserts:
+      - equal:
+          path: spec.retentionPeriod
+          value: "30"
+        template: vmcluster.yaml
+      - equal:
+          path: spec.vmstorage.storage.volumeClaimTemplate.metadata.name
+          value: vmstorage-db
+        template: vmcluster.yaml
+      - equal:
+          path: spec.vmselect.replicaCount
+          value: 3
+        template: vmcluster.yaml
+      - equal:
+          path: spec.vminsert.resources.limits.memory
+          value: 1Gi
+        template: vmcluster.yaml
+      - notExists:
+          path: spec.vmstorage.serviceAccountName
+        template: vmcluster.yaml
+
+  - it: converts component PodDisruptionBudgets and lets the operator create them
+    set:
+      vmselect.podDisruptionBudget.enabled: true
+      vmselect.podDisruptionBudget.maxUnavailable: 1
+    asserts:
+      - equal:
+          path: spec.vmselect.podDisruptionBudget
+          value:
+            maxUnavailable: 1
+        template: vmcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: pdb.yaml
+
+  - it: converts the bundled vmauth to the requests load balancer
+    set:
+      vmauth.enabled: true
+      vmauth.podDisruptionBudget.enabled: true
+      vmauth.podDisruptionBudget.minAvailable: 1
+    asserts:
+      - equal:
+          path: spec.requestsLoadBalancer.enabled
+          value: true
+        template: vmcluster.yaml
+      - equal:
+          path: spec.requestsLoadBalancer.spec.port
+          value: "8427"
+        template: vmcluster.yaml
+      - equal:
+          path: spec.requestsLoadBalancer.spec.podDisruptionBudget.minAvailable
+          value: 1
+        template: vmcluster.yaml
+      - equal:
+          path: spec.requestsLoadBalancer.spec.disableSelfServiceScrape
+          value: true
+        template: vmcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: vmauth-server.yaml
+      - hasDocuments:
+          count: 0
+        template: vmauth-config.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+      - hasDocuments:
+          count: 0
+        template: pdb.yaml
+
+  - it: routes the vmauth ingress paths to the insert and select services
+    set:
+      vmauth.enabled: true
+      vmauth.ingress.enabled: true
+      vmauth.ingress.hosts:
+        - name: a.local
+          path: /
+        - name: b.local
+          path:
+            - /select/vmui
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths
+          value:
+            - path: /insert
+              pathType: Prefix
+              backend:
+                service:
+                  name: vminsert-RELEASE-NAME
+                  port:
+                    number: 8480
+            - path: /select
+              pathType: Prefix
+              backend:
+                service:
+                  name: vmselect-RELEASE-NAME
+                  port:
+                    number: 8481
+        template: ingress.yaml
+      - equal:
+          path: spec.rules[1].http.paths[0].backend.service.name
+          value: vmselect-RELEASE-NAME
+        template: ingress.yaml
+
+  - it: fails on vmauth ingress paths outside insert and select
+    set:
+      vmauth.enabled: true
+      vmauth.ingress.enabled: true
+      vmauth.ingress.hosts:
+        - name: a.local
+          path: /insertfoo
+    asserts:
+      - failedTemplate:
+          errorPattern: "doesn't start with `/insert` or `/select`"
+        template: ingress.yaml
+
+  - it: routes the vmauth HTTPRoute to the insert and select services
+    set:
+      vmauth.enabled: true
+      vmauth.route.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules
+          value:
+            - backendRefs:
+                - name: vminsert-RELEASE-NAME
+                  port: 8480
+                  group: ""
+                  kind: Service
+                  weight: 1
+              matches:
+                - path:
+                    type: PathPrefix
+                    value: /insert
+            - backendRefs:
+                - name: vmselect-RELEASE-NAME
+                  port: 8481
+                  group: ""
+                  kind: Service
+                  weight: 1
+              matches:
+                - path:
+                    type: PathPrefix
+                    value: /select
+        template: route.yaml
+
+  - it: fails on custom vmauth HTTPRoute matches
+    set:
+      vmauth.enabled: true
+      vmauth.route.enabled: true
+      vmauth.route.matches:
+        - path:
+            type: PathPrefix
+            value: /custom
+    asserts:
+      - failedTemplate:
+          errorPattern: "`vmauth.route.matches` other than the default"
+        template: route.yaml
+
+  - it: fails on a custom vmauth config
+    set:
+      vmauth.enabled: true
+      vmauth.config:
+        unauthorized_user:
+          url_prefix: http://example
+    asserts:
+      - failedTemplate:
+          errorPattern: "`vmauth.config` and `vmauth.configSecretName` are not converted"
+        template: vmcluster.yaml
+
+  - it: fails on a vmauth vertical pod autoscaler
+    set:
+      vmauth.enabled: true
+      vmauth.verticalPodAutoscaler.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "`vmauth.verticalPodAutoscaler` is not supported"
+        template: vmcluster.yaml
+
+  - it: deep-merges operator.spec over the generated spec
+    set:
+      operator.spec:
+        vmstorage:
+          logLevel: WARN
+    asserts:
+      - equal:
+          path: spec.vmstorage.logLevel
+          value: WARN
+        template: vmcluster.yaml
+
+  - it: moves the replication factor to the VMCluster and mounts the vminsert relabel config
+    set:
+      vminsert.extraArgs.replicationFactor: 2
+      vminsert.relabel.enabled: true
+    asserts:
+      - equal:
+          path: spec.replicationFactor
+          value: 2
+        template: vmcluster.yaml
+      - notExists:
+          path: spec.vminsert.extraArgs.replicationFactor
+        template: vmcluster.yaml
+      - equal:
+          path: spec.vminsert.extraArgs.relabelConfig
+          value: /relabelconfig/relabel.yml
+        template: vmcluster.yaml
+      - contains:
+          path: spec.vminsert.volumeMounts
+          content:
+            name: relabelconfig
+            mountPath: /relabelconfig
+        template: vmcluster.yaml
+
+  - it: converts the vmselect cache and the vmstorage backup manager
+    set:
+      license.key: lic
+      vmselect.persistentVolume.enabled: true
+      vmstorage.vmbackupmanager.enabled: true
+      vmstorage.vmbackupmanager.destination: s3://bucket/vm
+    asserts:
+      - equal:
+          path: spec.vmselect.storage.volumeClaimTemplate.metadata.name
+          value: vmselect-cachedir
+        template: vmcluster.yaml
+      - equal:
+          path: spec.vmselect.cacheMountPath
+          value: /cache
+        template: vmcluster.yaml
+      - equal:
+          path: spec.vmstorage.vmBackup.destination
+          value: s3://bucket/vm
+        template: vmcluster.yaml
+
+  - it: disables the operator self-scrape while the chart scrape toggle is off
+    asserts:
+      - equal:
+          path: spec.vmselect.disableSelfServiceScrape
+          value: true
+        template: vmcluster.yaml
+
+  - it: lets the operator scrape it instead of rendering the chart scrape object
+    set:
+      vmselect.serviceMonitor.enabled: true
+    asserts:
+      - notExists:
+          path: spec.vmselect.disableSelfServiceScrape
+        template: vmcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: excludes storage nodes from insert routing like the chart
+    set:
+      vminsert.excludeStorageIDs: [0, 2]
+    asserts:
+      - equal:
+          path: spec.vmstorage.maintenanceInsertNodeIDs
+          value: [0, 2]
+        template: vmcluster.yaml
+
+  - it: mounts an existing storage claim as the data volume
+    set:
+      vmstorage.persistentVolume.existingClaim: data
+    asserts:
+      - contains:
+          path: spec.vmstorage.volumes
+          content:
+            name: vmstorage-db
+            persistentVolumeClaim:
+              claimName: data
+        template: vmcluster.yaml
+      - equal:
+          path: spec.vmstorage.storageDataPath
+          value: /storage
+        template: vmcluster.yaml
+      - notExists:
+          path: spec.vmstorage.storage
+        template: vmcluster.yaml
+
+  - it: enables storage node discovery
+    set:
+      license.key: lic
+      autoDiscovery: true
+    asserts:
+      - equal:
+          path: spec.discovery
+          value:
+            enabled: true
+        template: vmcluster.yaml
+
+  - it: mounts an existing vmselect cache claim
+    set:
+      vmselect.persistentVolume.enabled: true
+      vmselect.persistentVolume.existingClaim: cache
+    asserts:
+      - contains:
+          path: spec.vmselect.volumes
+          content:
+            name: vmselect-cachedir
+            persistentVolumeClaim:
+              claimName: cache
+        template: vmcluster.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      vmselect.networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.vmselect.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        template: vmcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      vmselect.networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`vmselect.networkPolicy.labels` is not converted"
+        template: vmcluster.yaml
+

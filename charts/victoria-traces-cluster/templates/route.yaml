@@ -5,6 +5,22 @@
 {{- $_ := set $ctx "extraLabels" $route.extraLabels }}
 {{- $_ := set $ctx "appKey" $name }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $port := $route.port | default ($app.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (($app.extraArgs | default dict).httpListenAddr | default (include "vm.addr.primary" $app.http))))) }}
+{{- $backends := list (dict "name" $fullname "port" $port "matches" $route.matches) }}
+{{- if and (eq $name "vmauth") (include "vm.operator.enabled" $) }}
+  {{- if and $route.matches (ne (toJson (fromYamlArray (tpl (toYaml $route.matches) $))) (toJson (list (dict "path" (dict "type" "PathPrefix" "value" "/"))))) }}
+    {{- fail "`vmauth.route.matches` other than the default `/` prefix is not converted with `operator.enabled: true`; set `vmauth.route.extraRules` instead" }}
+  {{- end }}
+  {{- $backends = list }}
+  {{- range $component := list "vtinsert" "vtselect" }}
+    {{- $target := index $.Values $component }}
+    {{- if $target.enabled }}
+      {{- $targetPort := $target.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (($target.extraArgs | default dict).httpListenAddr | default (include "vm.addr.primary" $target.http)))) }}
+      {{- $matches := list (dict "path" (dict "type" "PathPrefix" "value" (printf "/%s" (trimPrefix "vt" $component)))) }}
+      {{- $backends = append $backends (dict "name" (include "vm.plain.fullname" (dict "helm" $ "appKey" $component)) "port" $targetPort "matches" $matches) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
 ---
 apiVersion: {{ $route.apiVersion | default "gateway.networking.k8s.io/v1" }}
 kind: {{ $route.kind | default "HTTPRoute" }}
@@ -26,22 +42,20 @@ spec:
     {{- with $route.extraRules }}
     {{- tpl (toYaml .) $ | nindent 4 }}
     {{- end }}
+    {{- range $backend := $backends }}
     - backendRefs:
-        - name: {{ $fullname }}
-          {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr }}
-          {{- if empty $addrFlag }}
-            {{- $addrFlag = include "vm.addr.primary" $app.http }}
-          {{- end }}
-          port: {{ $route.port | default ($app.service.servicePort | default (include "vm.port.from.flag" (dict "flag" $addrFlag))) }}
+        - name: {{ $backend.name }}
+          port: {{ $backend.port }}
           group: ''
           kind: Service
           weight: 1
       {{- with $route.filters }}
       filters: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $route.matches }}
+      {{- with $backend.matches }}
       matches: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
+    {{- end }}
 
 {{- end }}
 {{- end }}

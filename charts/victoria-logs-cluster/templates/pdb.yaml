@@ -1,6 +1,6 @@
 {{- $ctx := dict "helm" . }}
 {{- range $name, $app := .Values }}
-{{- if and (kindIs "map" $app) $app.enabled ($app.podDisruptionBudget).enabled }}
+{{- if and (kindIs "map" $app) $app.enabled (not (include "vm.operator.enabled" $)) ($app.podDisruptionBudget).enabled }}
 {{- $pdb := $app.podDisruptionBudget }}
 {{- $_ := set $ctx "extraLabels" $pdb.labels }}
 {{- $_ := set $ctx "appKey" $name }}
