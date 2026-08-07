@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.90.1
+
+**Release date:** 07 Aug 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+
 - fixed sync-job silently ignoring extra fields set under `defaultRules.group.spec` (such as `params` and `interval`) and `defaultRules.rules.*.spec`. The configured values were not applied to the generated VMRule resources. See [#3149](https://github.com/VictoriaMetrics/helm-charts/issues/3149)
 
 ## v0.90.0
