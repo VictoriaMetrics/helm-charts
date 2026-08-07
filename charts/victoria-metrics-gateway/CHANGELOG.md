@@ -1,6 +1,7 @@
 ## Next release
 
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.40.0
 
