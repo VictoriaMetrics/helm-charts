@@ -1,0 +1,26 @@
+suite: useLegacyNaming tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - monitor.yaml
+tests:
+  - it: useLegacyNaming false uses operator-style name
+    set:
+      useLegacyNaming: false
+      serviceMonitor:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+
+  - it: useLegacyNaming true preserves legacy naming
+    set:
+      useLegacyNaming: true
+      serviceMonitor:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
