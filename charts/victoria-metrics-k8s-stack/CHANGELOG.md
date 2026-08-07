@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed sync-job silently ignoring extra fields set under `defaultRules.group.spec` (such as `params` and `interval`) and `defaultRules.rules.*.spec`. The configured values were not applied to the generated VMRule resources. See [#3149](https://github.com/VictoriaMetrics/helm-charts/issues/3149)
 
 ## v0.90.0
 
