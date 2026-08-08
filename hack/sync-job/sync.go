@@ -16,7 +16,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"github.com/goccy/go-yaml"
+	"go.yaml.in/yaml/v3"
 )
 
 const managedByLabel = "app.kubernetes.io/managed-by"

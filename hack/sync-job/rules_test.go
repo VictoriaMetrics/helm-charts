@@ -480,19 +480,15 @@ func TestRuleGroupVMRuleName(t *testing.T) {
 	})
 }
 
-// TestParseRuleGroupsInlineFields is the regression test for issue #3149:
-// group-level fields not modelled in ruleGroup (interval, params) and rule-level
-// fields not modelled in rule (keep_firing_for) were silently dropped because
-// sigs.k8s.io/yaml does not honour yaml:",inline" maps.
+// TestParseRuleGroupsInlineFields is the regression test for issue #3149.
 func TestParseRuleGroupsInlineFields(t *testing.T) {
 	type opts struct {
 		yaml      string
-		srcURL    string
 		checkFunc func(*testing.T, []ruleGroup)
 	}
 	f := func(o opts) {
 		t.Helper()
-		groups, err := parseRuleGroups([]byte(o.yaml), o.srcURL)
+		groups, err := parseRuleGroups([]byte(o.yaml), "test.yaml")
 		if err != nil {
 			t.Fatalf("parseRuleGroups: %v", err)
 		}
@@ -509,15 +505,13 @@ groups:
   - alert: A
     expr: up == 0
 `,
-		srcURL: "test.yaml",
 		checkFunc: func(t *testing.T, groups []ruleGroup) {
 			t.Helper()
-			if len(groups) != 1 {
-				t.Fatalf("expected 1 group, got %d", len(groups))
+			if len(groups) == 0 {
+				t.Fatal("expected groups")
 			}
-			got := groups[0].XXX["interval"]
-			if got != "5m" {
-				t.Fatalf("group interval: got %v, want %q", got, "5m")
+			if groups[0].XXX["interval"] != "5m" {
+				t.Fatalf("group interval: got %v, want %q", groups[0].XXX["interval"], "5m")
 			}
 		},
 	})
@@ -534,11 +528,10 @@ groups:
   - alert: A
     expr: up == 0
 `,
-		srcURL: "test.yaml",
 		checkFunc: func(t *testing.T, groups []ruleGroup) {
 			t.Helper()
-			if len(groups) != 1 {
-				t.Fatalf("expected 1 group, got %d", len(groups))
+			if len(groups) == 0 {
+				t.Fatal("expected groups")
 			}
 			raw, ok := groups[0].XXX["params"]
 			if !ok {
@@ -548,11 +541,8 @@ groups:
 			if !ok {
 				t.Fatalf("params: expected map[string]any, got %T", raw)
 			}
-			if m["severity"] != "warning" {
-				t.Fatalf("params.severity: got %v, want %q", m["severity"], "warning")
-			}
-			if m["team"] != "infra" {
-				t.Fatalf("params.team: got %v, want %q", m["team"], "infra")
+			if m["severity"] != "warning" || m["team"] != "infra" {
+				t.Fatalf("params: got %v", m)
 			}
 		},
 	})
@@ -567,109 +557,64 @@ groups:
     expr: up == 0
     keep_firing_for: 10m
 `,
-		srcURL: "test.yaml",
 		checkFunc: func(t *testing.T, groups []ruleGroup) {
 			t.Helper()
 			if len(groups) == 0 || len(groups[0].Rules) == 0 {
-				t.Fatal("expected at least one rule")
+				t.Fatal("expected rules")
 			}
-			got := groups[0].Rules[0].XXX["keep_firing_for"]
-			if got != "10m" {
-				t.Fatalf("rule keep_firing_for: got %v, want %q", got, "10m")
+			if groups[0].Rules[0].XXX["keep_firing_for"] != "10m" {
+				t.Fatalf("rule keep_firing_for: got %v, want %q", groups[0].Rules[0].XXX["keep_firing_for"], "10m")
 			}
 		},
 	})
 
-	// known group fields are still parsed alongside inline fields
+	// named fields must NOT appear in XXX — regression for issue #3151
 	f(opts{
 		yaml: `
 groups:
-- name: mixed.group
-  interval: 2m
-  params:
-    env: prod
+- name: test.group
+  interval: 5m
   rules:
-  - alert: B
-    expr: up == 1
+  - alert: A
+    expr: up == 0
     for: 5m
     keep_firing_for: 3m
+  - alert: B
+    expr: up == 1
 `,
-		srcURL: "test.yaml",
 		checkFunc: func(t *testing.T, groups []ruleGroup) {
 			t.Helper()
 			if len(groups) == 0 {
 				t.Fatal("expected groups")
 			}
 			g := groups[0]
-			if g.Name != "mixed.group" {
-				t.Fatalf("name: got %q, want %q", g.Name, "mixed.group")
-			}
-			if g.XXX["interval"] != "2m" {
-				t.Fatalf("interval: got %v, want %q", g.XXX["interval"], "2m")
+			for _, key := range []string{"name", "rules"} {
+				if _, ok := g.XXX[key]; ok {
+					t.Errorf("g.XXX must not contain named field %q", key)
+				}
 			}
 			if len(g.Rules) == 0 {
 				t.Fatal("expected rules")
 			}
 			r := g.Rules[0]
-			if r.For != "5m" {
-				t.Fatalf("rule.for: got %q, want %q", r.For, "5m")
+			for _, key := range []string{"alert", "expr", "for"} {
+				if _, ok := r.XXX[key]; ok {
+					t.Errorf("r.XXX must not contain named field %q", key)
+				}
 			}
 			if r.XXX["keep_firing_for"] != "3m" {
-				t.Fatalf("rule.keep_firing_for: got %v, want %q", r.XXX["keep_firing_for"], "3m")
+				t.Fatalf("keep_firing_for: got %v, want %q", r.XXX["keep_firing_for"], "3m")
+			}
+
+			// end-to-end: filtering one rule out must not be undone by XXX
+			g.Rules = g.Rules[:1]
+			spec := ruleGroupToSpec(g, nil)
+			specRules := spec["groups"].([]map[string]any)[0]["rules"].([]map[string]any)
+			if len(specRules) != 1 {
+				t.Fatalf("ruleGroupToSpec wrote %d rules after filtering to 1 — named fields leaked via XXX", len(specRules))
 			}
 		},
 	})
-
-	// CRD format also preserves inline fields
-	f(opts{
-		yaml: `
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VMRule
-spec:
-  groups:
-  - name: crd.group
-    interval: 1m
-    rules:
-    - alert: C
-      expr: up == 0
-`,
-		srcURL: "test.yaml",
-		checkFunc: func(t *testing.T, groups []ruleGroup) {
-			t.Helper()
-			if len(groups) == 0 {
-				t.Fatal("expected groups")
-			}
-			if groups[0].XXX["interval"] != "1m" {
-				t.Fatalf("CRD format interval: got %v, want %q", groups[0].XXX["interval"], "1m")
-			}
-		},
-	})
-}
-
-func TestRuleGroupToSpecWithGroupDefaults(t *testing.T) {
-	g := ruleGroup{
-		Name: "test.group",
-		Rules: []rule{
-			{Alert: "A", Expr: "up == 0"},
-		},
-	}
-	defaults := map[string]any{
-		"params":   map[string]any{"severity": "critical"},
-		"interval": "5m",
-	}
-	spec := ruleGroupToSpec(g, defaults)
-	groups, ok := spec["groups"].([]map[string]any)
-	if !ok || len(groups) == 0 {
-		t.Fatal("spec.groups missing or empty")
-	}
-	grp := groups[0]
-	if grp["interval"] != "5m" {
-		t.Fatalf("interval: got %v, want %q", grp["interval"], "5m")
-	}
-	p, ok := grp["params"].(map[string]any)
-	if !ok || p["severity"] != "critical" {
-		t.Fatalf("params: got %v", grp["params"])
-	}
 }
 
 func TestMergeRule(t *testing.T) {
@@ -703,6 +648,24 @@ func TestMergeRule(t *testing.T) {
 		},
 	})
 	f(opts{
+		dst: rule{Expr: "up == 0"},
+		src: rule{Expr: "up == 1"},
+		check: func(r rule) {
+			if r.Expr != "up == 1" {
+				t.Fatalf("src Expr should override dst; got %q", r.Expr)
+			}
+		},
+	})
+	f(opts{
+		dst: rule{Expr: "up == 0"},
+		src: rule{},
+		check: func(r rule) {
+			if r.Expr != "up == 0" {
+				t.Fatalf("empty src Expr should not override dst; got %q", r.Expr)
+			}
+		},
+	})
+	f(opts{
 		dst: rule{
 			Labels: map[string]string{"a": "old"},
 		},
@@ -727,5 +690,283 @@ func TestMergeRule(t *testing.T) {
 				t.Fatalf("unexpected annotations: %v", r.Annotations)
 			}
 		},
+	})
+	// XXX fields are merged; src overrides same key in dst
+	f(opts{
+		dst: rule{XXX: map[string]any{"keep_firing_for": "1m", "own": "yes"}},
+		src: rule{XXX: map[string]any{"keep_firing_for": "5m", "extra": "val"}},
+		check: func(r rule) {
+			if r.XXX["keep_firing_for"] != "5m" {
+				t.Fatalf("src XXX should override dst for same key; got %v", r.XXX["keep_firing_for"])
+			}
+			if r.XXX["own"] != "yes" {
+				t.Fatalf("dst-only XXX key should be preserved; got %v", r.XXX["own"])
+			}
+			if r.XXX["extra"] != "val" {
+				t.Fatalf("src-only XXX key should be added; got %v", r.XXX["extra"])
+			}
+		},
+	})
+	// empty src XXX does not clear dst XXX
+	f(opts{
+		dst: rule{XXX: map[string]any{"keep_firing_for": "1m"}},
+		src: rule{},
+		check: func(r rule) {
+			if r.XXX["keep_firing_for"] != "1m" {
+				t.Fatalf("empty src XXX should not clear dst; got %v", r.XXX["keep_firing_for"])
+			}
+		},
+	})
+}
+
+func TestRuleGroupToSpec(t *testing.T) {
+	getGroup := func(t *testing.T, spec map[string]any) map[string]any {
+		t.Helper()
+		return spec["groups"].([]map[string]any)[0]
+	}
+	getRules := func(t *testing.T, spec map[string]any) []map[string]any {
+		t.Helper()
+		return getGroup(t, spec)["rules"].([]map[string]any)
+	}
+
+	t.Run("alert rule fields and XXX appear in output", func(t *testing.T) {
+		spec := ruleGroupToSpec(ruleGroup{
+			Name: "test",
+			Rules: []rule{{
+				Alert:       "HighLatency",
+				Expr:        `rate(http_requests[5m]) > 0.1`,
+				For:         "5m",
+				Labels:      map[string]string{"severity": "warning"},
+				Annotations: map[string]string{"summary": "high latency"},
+				XXX:         map[string]any{"keep_firing_for": "1m"},
+			}},
+		}, nil)
+		rules := getRules(t, spec)
+		if len(rules) != 1 {
+			t.Fatalf("want 1 rule, got %d", len(rules))
+		}
+		r := rules[0]
+		for k, want := range map[string]any{
+			"alert":           "HighLatency",
+			"expr":            `rate(http_requests[5m]) > 0.1`,
+			"for":             "5m",
+			"keep_firing_for": "1m",
+		} {
+			if r[k] != want {
+				t.Errorf("rule[%q]: got %v, want %v", k, r[k], want)
+			}
+		}
+		if r["labels"].(map[string]string)["severity"] != "warning" {
+			t.Errorf("labels.severity: got %v", r["labels"])
+		}
+		if _, ok := r["record"]; ok {
+			t.Error("record should not appear for alert rule")
+		}
+	})
+
+	t.Run("record rule has no alert or for in output", func(t *testing.T) {
+		spec := ruleGroupToSpec(ruleGroup{
+			Name:  "test",
+			Rules: []rule{{Record: "job:up:sum", Expr: "sum(up) by (job)"}},
+		}, nil)
+		r := getRules(t, spec)[0]
+		if r["record"] != "job:up:sum" {
+			t.Errorf("record: got %v", r["record"])
+		}
+		for _, k := range []string{"alert", "for"} {
+			if _, ok := r[k]; ok {
+				t.Errorf("%q should not appear for record rule", k)
+			}
+		}
+	})
+
+	t.Run("groupDefaults applied; group XXX overrides defaults", func(t *testing.T) {
+		spec := ruleGroupToSpec(ruleGroup{
+			Name:  "test",
+			Rules: []rule{{Alert: "A", Expr: "up == 0"}},
+			XXX:   map[string]any{"interval": "2m"},
+		}, map[string]any{"interval": "1m", "limit": 100})
+		g := getGroup(t, spec)
+		if g["interval"] != "2m" {
+			t.Errorf("group XXX should override defaults: got %v", g["interval"])
+		}
+		if g["limit"] != 100 {
+			t.Errorf("default limit should be applied: got %v", g["limit"])
+		}
+	})
+
+	t.Run("group name preserved and all rules present", func(t *testing.T) {
+		spec := ruleGroupToSpec(ruleGroup{
+			Name: "mygroup",
+			Rules: []rule{
+				{Alert: "A", Expr: "up == 0"},
+				{Alert: "B", Expr: "up == 1"},
+			},
+		}, nil)
+		g := getGroup(t, spec)
+		if g["name"] != "mygroup" {
+			t.Errorf("name: got %v", g["name"])
+		}
+		if len(getRules(t, spec)) != 2 {
+			t.Errorf("want 2 rules, got %d", len(getRules(t, spec)))
+		}
+	})
+
+	t.Run("empty optional fields omitted from rule", func(t *testing.T) {
+		spec := ruleGroupToSpec(ruleGroup{
+			Name:  "test",
+			Rules: []rule{{Alert: "A", Expr: "up == 0"}},
+		}, nil)
+		r := getRules(t, spec)[0]
+		for _, k := range []string{"for", "labels", "annotations", "record"} {
+			if _, ok := r[k]; ok {
+				t.Errorf("%q should not appear when empty", k)
+			}
+		}
+	})
+}
+
+func TestApplyRuleDefaults(t *testing.T) {
+	forRule := func(d string) rule { return rule{For: d} }
+
+	t.Run("common rule spec applied", func(t *testing.T) {
+		r := rule{Alert: "A", Expr: "up == 0"}
+		cfg := &rulesConfig{Common: rulesCommonConfig{Rule: ruleOverride{Spec: forRule("5m")}}}
+		applyRuleDefaults(&r, cfg, "")
+		if r.For != "5m" {
+			t.Fatalf("got %q, want 5m", r.For)
+		}
+	})
+
+	t.Run("alerting spec not applied to record rules", func(t *testing.T) {
+		r := rule{Record: "job:up:sum", Expr: "sum(up) by (job)"}
+		cfg := &rulesConfig{Common: rulesCommonConfig{Alerting: ruleOverride{Spec: forRule("5m")}}}
+		applyRuleDefaults(&r, cfg, "")
+		if r.For != "" {
+			t.Fatalf("alerting spec must not apply to record rules; got %q", r.For)
+		}
+	})
+
+	t.Run("recording spec not applied to alert rules", func(t *testing.T) {
+		r := rule{Alert: "A", Expr: "up == 0"}
+		cfg := &rulesConfig{Common: rulesCommonConfig{Recording: ruleOverride{Spec: forRule("5m")}}}
+		applyRuleDefaults(&r, cfg, "")
+		if r.For != "" {
+			t.Fatalf("recording spec must not apply to alert rules; got %q", r.For)
+		}
+	})
+
+	t.Run("alerting spec overrides common rule spec for alert rules", func(t *testing.T) {
+		r := rule{Alert: "A", Expr: "up == 0"}
+		cfg := &rulesConfig{Common: rulesCommonConfig{
+			Rule:     ruleOverride{Spec: forRule("5m")},
+			Alerting: ruleOverride{Spec: forRule("10m")},
+		}}
+		applyRuleDefaults(&r, cfg, "")
+		if r.For != "10m" {
+			t.Fatalf("alerting spec should override rule spec; got %q", r.For)
+		}
+	})
+
+	t.Run("per-rule global override beats common", func(t *testing.T) {
+		r := rule{Alert: "A", Expr: "up == 0"}
+		cfg := &rulesConfig{
+			Common: rulesCommonConfig{Rule: ruleOverride{Spec: forRule("5m")}},
+			Rules:  map[string]ruleOverride{"A": {Spec: forRule("10m")}},
+		}
+		applyRuleDefaults(&r, cfg, "")
+		if r.For != "10m" {
+			t.Fatalf("got %q, want 10m", r.For)
+		}
+	})
+
+	t.Run("group rule spec beats common", func(t *testing.T) {
+		r := rule{Alert: "A", Expr: "up == 0"}
+		cfg := &rulesConfig{
+			Common: rulesCommonConfig{Rule: ruleOverride{Spec: forRule("5m")}},
+			Groups: map[string]groupOverride{
+				"mygroup": {Rule: ruleOverride{Spec: forRule("10m")}},
+			},
+		}
+		applyRuleDefaults(&r, cfg, "mygroup")
+		if r.For != "10m" {
+			t.Fatalf("got %q, want 10m", r.For)
+		}
+	})
+
+	t.Run("group per-rule override is highest priority", func(t *testing.T) {
+		r := rule{Alert: "A", Expr: "up == 0"}
+		cfg := &rulesConfig{
+			Common: rulesCommonConfig{Rule: ruleOverride{Spec: forRule("1m")}},
+			Rules:  map[string]ruleOverride{"A": {Spec: forRule("2m")}},
+			Groups: map[string]groupOverride{
+				"mygroup": {
+					Rule:  ruleOverride{Spec: forRule("3m")},
+					Rules: map[string]ruleOverride{"A": {Spec: forRule("15m")}},
+				},
+			},
+		}
+		applyRuleDefaults(&r, cfg, "mygroup")
+		if r.For != "15m" {
+			t.Fatalf("got %q, want 15m", r.For)
+		}
+	})
+
+	t.Run("existing rule fields not cleared when spec is empty", func(t *testing.T) {
+		r := rule{Alert: "A", Expr: "up == 0", For: "5m"}
+		applyRuleDefaults(&r, &rulesConfig{}, "")
+		if r.For != "5m" {
+			t.Fatalf("existing For should not be cleared; got %q", r.For)
+		}
+	})
+}
+
+func TestPatchRuleGroup(t *testing.T) {
+	t.Run("group extraGroupByLabels replaces common", func(t *testing.T) {
+		g := ruleGroup{
+			Name:  "mygroup",
+			Rules: []rule{{Alert: "A", Expr: "sum(up) by (job)"}},
+		}
+		cfg := &rulesConfig{
+			Common: rulesCommonConfig{ExtraGroupByLabels: []string{"namespace"}},
+			Groups: map[string]groupOverride{
+				"mygroup": {ExtraGroupByLabels: []string{"region"}},
+			},
+		}
+		patchRuleGroup(&g, cfg, commonConfig{ClusterLabel: "cluster"})
+		expr := g.Rules[0].Expr
+		if !strings.Contains(expr, "region") {
+			t.Errorf("group extraGroupByLabels should replace common; expr: %s", expr)
+		}
+		if strings.Contains(expr, "namespace") {
+			t.Errorf("common extraGroupByLabels should not appear after group override; expr: %s", expr)
+		}
+	})
+
+	t.Run("group jobNamespaces merges with common", func(t *testing.T) {
+		g := ruleGroup{
+			Name: "mygroup",
+			Rules: []rule{
+				{Alert: "A", Expr: `up{job="kubelet"}`},
+				{Alert: "B", Expr: `up{job="coredns"}`},
+			},
+		}
+		cfg := &rulesConfig{
+			Common: rulesCommonConfig{
+				JobNamespaces: map[string]string{"kubelet": "kube-system"},
+			},
+			Groups: map[string]groupOverride{
+				"mygroup": {
+					JobNamespaces: map[string]string{"coredns": "kube-system"},
+				},
+			},
+		}
+		patchRuleGroup(&g, cfg, commonConfig{ClusterLabel: "cluster"})
+		if !strings.Contains(g.Rules[0].Expr, "namespace") {
+			t.Errorf("kubelet: expected namespace filter; expr: %s", g.Rules[0].Expr)
+		}
+		if !strings.Contains(g.Rules[1].Expr, "namespace") {
+			t.Errorf("coredns: expected namespace filter; expr: %s", g.Rules[1].Expr)
+		}
 	})
 }

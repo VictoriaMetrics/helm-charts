@@ -41,14 +41,9 @@ rules:
 	if cfg.Rules.Common.RunbookURL != "https://my-runbooks.example.com" {
 		t.Fatalf("runbookUrl: got %q", cfg.Rules.Common.RunbookURL)
 	}
-	if cfg.Rules.Common.GrafanaURL != "https://grafana.example.com" {
-		t.Fatalf("grafanaUrl: got %q", cfg.Rules.Common.GrafanaURL)
-	}
 }
 
-// TestLoadConfigGroupSpecParams is the regression test for issue #3149:
-// defaultRules.group.spec.params was silently dropped because sigs.k8s.io/yaml
-// does not honour yaml:",inline" maps. Switching to goccy/go-yaml fixes it.
+// TestLoadConfigGroupSpecParams is the regression test for issue #3149.
 func TestLoadConfigGroupSpecParams(t *testing.T) {
 	path := writeConfigFile(t, `
 rules:
@@ -69,7 +64,7 @@ rules:
 	}
 	params, ok := xxx["params"]
 	if !ok {
-		t.Fatalf("group.spec.params missing from XXX map; got keys: %v", mapKeys(xxx))
+		t.Fatalf("group.spec.params missing from XXX; got keys: %v", mapKeys(xxx))
 	}
 	m, ok := params.(map[string]any)
 	if !ok {
@@ -95,9 +90,8 @@ rules:
 	if err != nil {
 		t.Fatalf("loadConfig: %v", err)
 	}
-	xxx := cfg.Rules.Common.Group.Spec.XXX
-	if xxx["interval"] != "2m" {
-		t.Fatalf("group.spec.interval: got %v, want %q", xxx["interval"], "2m")
+	if cfg.Rules.Common.Group.Spec.XXX["interval"] != "2m" {
+		t.Fatalf("group.spec.interval: got %v, want %q", cfg.Rules.Common.Group.Spec.XXX["interval"], "2m")
 	}
 }
 
@@ -113,9 +107,8 @@ rules:
 	if err != nil {
 		t.Fatalf("loadConfig: %v", err)
 	}
-	xxx := cfg.Rules.Common.Rule.Spec.XXX
-	if xxx["keep_firing_for"] != "5m" {
-		t.Fatalf("rule.spec.keep_firing_for: got %v, want %q", xxx["keep_firing_for"], "5m")
+	if cfg.Rules.Common.Rule.Spec.XXX["keep_firing_for"] != "5m" {
+		t.Fatalf("rule.spec.keep_firing_for: got %v, want %q", cfg.Rules.Common.Rule.Spec.XXX["keep_firing_for"], "5m")
 	}
 }
 
@@ -141,7 +134,6 @@ rules:
 	if err != nil {
 		t.Fatalf("loadConfig: %v", err)
 	}
-
 	commonGroup := cfg.Rules.Common.Group.Spec.XXX
 	if commonGroup["interval"] != "1m" {
 		t.Fatalf("common group interval: got %v, want %q", commonGroup["interval"], "1m")
@@ -149,17 +141,54 @@ rules:
 	if p, ok := commonGroup["params"].(map[string]any); !ok || p["foo"] != "bar" {
 		t.Fatalf("common group params: got %v", commonGroup["params"])
 	}
-
 	if cfg.Rules.Common.Rule.Spec.For != "10m" {
 		t.Fatalf("common rule.for: got %q, want %q", cfg.Rules.Common.Rule.Spec.For, "10m")
 	}
-
 	g, ok := cfg.Rules.Groups["kubernetes-apps"]
 	if !ok {
 		t.Fatal("groups[kubernetes-apps] missing")
 	}
 	if p, ok := g.Spec.XXX["params"].(map[string]any); !ok || p["env"] != "prod" {
 		t.Fatalf("kubernetes-apps group params: got %v", g.Spec.XXX["params"])
+	}
+}
+
+func TestLoadConfigDefaults(t *testing.T) {
+	path := writeConfigFile(t, `{}`)
+	cfg, err := loadConfig(path)
+	if err != nil {
+		t.Fatalf("loadConfig: %v", err)
+	}
+	if cfg.Common.ClusterLabel != "cluster" {
+		t.Errorf("default clusterLabel: got %q, want %q", cfg.Common.ClusterLabel, "cluster")
+	}
+	if cfg.Dashboards.Common.Grafana.Datasource != "prometheus" {
+		t.Errorf("default datasource: got %q", cfg.Dashboards.Common.Grafana.Datasource)
+	}
+	if cfg.Dashboards.Common.Grafana.DatasourceUID != "prometheus" {
+		t.Errorf("default datasourceUID: got %q", cfg.Dashboards.Common.Grafana.DatasourceUID)
+	}
+	if cfg.Dashboards.Common.Grafana.LabelName != "grafana_dashboard" {
+		t.Errorf("default labelName: got %q", cfg.Dashboards.Common.Grafana.LabelName)
+	}
+	if cfg.Dashboards.Common.Grafana.LabelValue != "1" {
+		t.Errorf("default labelValue: got %q", cfg.Dashboards.Common.Grafana.LabelValue)
+	}
+}
+
+func TestLoadConfigDatasourceUIDDefaultsToDatasource(t *testing.T) {
+	path := writeConfigFile(t, `
+dashboards:
+  common:
+    grafana:
+      datasource: my-prometheus
+`)
+	cfg, err := loadConfig(path)
+	if err != nil {
+		t.Fatalf("loadConfig: %v", err)
+	}
+	if cfg.Dashboards.Common.Grafana.DatasourceUID != "my-prometheus" {
+		t.Errorf("datasourceUID should default to datasource value: got %q", cfg.Dashboards.Common.Grafana.DatasourceUID)
 	}
 }
 

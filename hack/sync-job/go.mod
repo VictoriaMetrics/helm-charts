@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/VictoriaMetrics/metricsql v0.87.3-0.20260702102836-01c77e4995de
-	github.com/goccy/go-yaml v1.19.2
+	go.yaml.in/yaml/v3 v3.0.4
 	k8s.io/api v0.36.2
 	k8s.io/apimachinery v0.36.2
 	k8s.io/client-go v0.36.2
@@ -41,7 +41,6 @@ require (
 	github.com/valyala/histogram v1.2.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect

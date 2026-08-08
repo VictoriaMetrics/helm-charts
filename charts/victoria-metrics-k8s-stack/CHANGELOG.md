@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed sync-job ignoring `defaultRules.rules.<name>.enabled: false`, causing disabled rules to reappear in generated VMRule resources. See [#3151](https://github.com/VictoriaMetrics/helm-charts/issues/3151)
 
 ## v0.90.1
 
