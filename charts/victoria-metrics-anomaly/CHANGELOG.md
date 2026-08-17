@@ -1,7 +1,6 @@
 ## Next release
 
-- TODO
-
+- upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.30.2](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1302)
 ## v1.12.15
 
 **Release date:** 27 Jul 2026
