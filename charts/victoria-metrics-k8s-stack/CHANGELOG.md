@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VM components to [v1.150.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.150.0)
+- fixed sync-job deleting all rules and dashboards on upstream HTTP errors. The job now aborts on any fetch failure instead of treating missing data as orphaned resources. HTTP 429 is now retried like 5xx errors. See [#3163](https://github.com/VictoriaMetrics/helm-charts/issues/3163)
 
 ## v0.90.2
 

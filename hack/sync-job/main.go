@@ -85,8 +85,7 @@ func run(ctx context.Context, kube *syncClient, cfg *config, prune bool) error {
 	for url := range allURLs {
 		data, err := fetch(url)
 		if err != nil {
-			log.Printf("fetch %q: %v", url, err)
-			continue
+			return fmt.Errorf("fetch %q: %w", url, err)
 		}
 		rawByURL[url] = data
 	}
@@ -135,7 +134,7 @@ func fetchOnce(rawURL string) ([]byte, bool, error) {
 		data, err := io.ReadAll(resp.Body)
 		return data, false, err
 	}
-	if resp.StatusCode >= 500 {
+	if resp.StatusCode >= 500 || resp.StatusCode == http.StatusTooManyRequests {
 		return nil, true, fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
 	return nil, false, fmt.Errorf("HTTP %d", resp.StatusCode)
