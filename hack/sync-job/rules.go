@@ -77,7 +77,10 @@ func reconcileRules(ctx context.Context, kube *syncClient, cfg *rulesConfig, com
 			g.Rules = filtered
 			patchRuleGroup(&g, cfg, common)
 			vmruleName := ruleGroupVMRuleName(kube.resourcePrefix, g.Name)
-			if err := kube.applyVMRule(ctx, vmruleName, ruleGroupToSpec(g, cfg.Common.Group.Spec.XXX), cfg.Common.Labels, cfg.Common.Annotations); err != nil {
+			groupDefaults := make(map[string]any, len(cfg.Common.Group.Spec.XXX)+len(gc.Spec.XXX))
+			maps.Copy(groupDefaults, cfg.Common.Group.Spec.XXX)
+			maps.Copy(groupDefaults, gc.Spec.XXX)
+			if err := kube.applyVMRule(ctx, vmruleName, ruleGroupToSpec(g, groupDefaults), cfg.Common.Labels, cfg.Common.Annotations); err != nil {
 				log.Printf("apply vmrule %q: %v", vmruleName, err)
 				continue
 			}

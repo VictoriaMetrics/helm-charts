@@ -1,6 +1,7 @@
 package main
 
 import (
+	"maps"
 	"strings"
 	"testing"
 )
@@ -822,6 +823,36 @@ func TestRuleGroupToSpec(t *testing.T) {
 			if _, ok := r[k]; ok {
 				t.Errorf("%q should not appear when empty", k)
 			}
+		}
+	})
+
+	t.Run("common group spec applied as groupDefaults", func(t *testing.T) {
+		spec := ruleGroupToSpec(ruleGroup{
+			Name:  "test",
+			Rules: []rule{{Alert: "A", Expr: "up == 0"}},
+		}, map[string]any{"interval": "60s"})
+		g := getGroup(t, spec)
+		if g["interval"] != "60s" {
+			t.Errorf("interval: got %v, want 60s", g["interval"])
+		}
+	})
+
+	t.Run("per-group spec overrides common group spec", func(t *testing.T) {
+		commonDefaults := map[string]any{"interval": "30s", "limit": 100}
+		groupOverrides := map[string]any{"interval": "60s"}
+		merged := make(map[string]any, len(commonDefaults)+len(groupOverrides))
+		maps.Copy(merged, commonDefaults)
+		maps.Copy(merged, groupOverrides)
+		spec := ruleGroupToSpec(ruleGroup{
+			Name:  "test",
+			Rules: []rule{{Alert: "A", Expr: "up == 0"}},
+		}, merged)
+		g := getGroup(t, spec)
+		if g["interval"] != "60s" {
+			t.Errorf("interval: got %v, want 60s (per-group should override common)", g["interval"])
+		}
+		if g["limit"] != 100 {
+			t.Errorf("limit: got %v, want 100 (common should be preserved when not overridden)", g["limit"])
 		}
 	})
 }

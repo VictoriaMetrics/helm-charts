@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed sync-job ignoring `defaultRules.groups.<name>.spec` overrides (e.g. `interval`). Per-group spec fields are now merged on top of the common group spec and applied to the generated VMRule. See [#3166](https://github.com/VictoriaMetrics/helm-charts/issues/3166)
 
 ## v0.91.0
 
