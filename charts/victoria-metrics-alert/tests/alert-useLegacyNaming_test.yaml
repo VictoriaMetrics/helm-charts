@@ -1,0 +1,22 @@
+suite: useLegacyNaming tests (alert)
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - alert-service.yaml
+tests:
+  - it: useLegacyNaming false uses operator-style name
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+
+  - it: useLegacyNaming true preserves legacy naming
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
