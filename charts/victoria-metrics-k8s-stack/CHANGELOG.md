@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed sync-job `OUTPUT=-` generating malformed YAML for ConfigMap manifests. See [#3169](https://github.com/VictoriaMetrics/helm-charts/issues/3169)
 
 ## v0.91.1
 

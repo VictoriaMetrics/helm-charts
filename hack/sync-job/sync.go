@@ -11,6 +11,7 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -114,7 +115,11 @@ func (k *syncClient) applyConfigMap(ctx context.Context, name string, data map[s
 	}
 	if k.out != nil {
 		cm.TypeMeta = metav1.TypeMeta{APIVersion: "v1", Kind: "ConfigMap"}
-		k.writeManifest(cm)
+		obj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(cm)
+		if err != nil {
+			return fmt.Errorf("convert ConfigMap to unstructured: %w", err)
+		}
+		k.writeManifest(obj)
 		return nil
 	}
 	existing, err := k.cs.CoreV1().ConfigMaps(k.namespace).Get(ctx, name, metav1.GetOptions{})
