@@ -161,7 +161,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ printf "%s%s" (include "vm.plain.fullname" $ctx) $nameSuffix | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s%s" ((include "vm.plain.fullname" $ctx) | trunc (sub 63 (len $nameSuffix))) $nameSuffix | trimSuffix "-" }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with $app.service.annotations }}
