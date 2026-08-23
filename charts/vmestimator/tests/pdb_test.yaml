@@ -1,0 +1,30 @@
+suite: PodDisruptionBudget
+templates:
+  - pdb.yaml
+tests:
+  - it: keeps one single-node pod available by default
+    set:
+      single.podDisruptionBudget.enabled: true
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 1
+      - notExists:
+          path: spec.maxUnavailable
+      - notExists:
+          path: spec.unhealthyPodEvictionPolicy
+  - it: supports maxUnavailable and unhealthyPodEvictionPolicy
+    set:
+      single.podDisruptionBudget.enabled: true
+      single.podDisruptionBudget.minAvailable: null
+      single.podDisruptionBudget.maxUnavailable: 1
+      single.podDisruptionBudget.unhealthyPodEvictionPolicy: AlwaysAllow
+    asserts:
+      - notExists:
+          path: spec.minAvailable
+      - equal:
+          path: spec.maxUnavailable
+          value: 1
+      - equal:
+          path: spec.unhealthyPodEvictionPolicy
+          value: AlwaysAllow

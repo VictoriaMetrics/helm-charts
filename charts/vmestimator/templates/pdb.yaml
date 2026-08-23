@@ -3,6 +3,7 @@
 {{- range $component := $components }}
 {{- $app := index $root.Values $component }}
 {{- if $app.podDisruptionBudget.enabled }}
+{{- $pdb := $app.podDisruptionBudget }}
 {{- $ctx := dict "helm" $root "appKey" $component }}
 ---
 apiVersion: policy/v1
@@ -12,7 +13,15 @@ metadata:
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
-  minAvailable: {{ $app.podDisruptionBudget.minAvailable }}
+  {{- with $pdb.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with $pdb.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  {{- with $pdb.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . }}
+  {{- end }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
 {{- end }}

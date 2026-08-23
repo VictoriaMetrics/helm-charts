@@ -107,6 +107,10 @@ single:
     enabled: false
     # -- Minimum available pods
     minAvailable: 1
+    # -- Maximum unavailable pods
+    maxUnavailable: 0
+    # -- Policy for evicting unhealthy pods
+    unhealthyPodEvictionPolicy:
 
 storage:
   # -- Number of storage nodes in cluster mode
@@ -130,7 +134,6 @@ storage:
   extraVolumes: []
   extraVolumeMounts: []
   service:
-  service:
     # -- Service type
     type: ClusterIP
     # -- Port for remote write and selector queries
@@ -140,6 +143,8 @@ storage:
   podDisruptionBudget:
     enabled: false
     minAvailable: 1
+    maxUnavailable: 0
+    unhealthyPodEvictionPolicy:
 
 select:
   # -- Number of selector nodes in cluster mode
@@ -169,6 +174,8 @@ select:
   podDisruptionBudget:
     enabled: false
     minAvailable: 1
+    maxUnavailable: 0
+    unhealthyPodEvictionPolicy:
 
 podSecurityContext:
   enabled: true
