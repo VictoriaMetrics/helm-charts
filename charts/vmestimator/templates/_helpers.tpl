@@ -20,12 +20,12 @@
   {{- if ne $component "select" -}}
     {{- $_ := set $args "config" (printf "/etc/vmestimator/%s" $root.Values.config.key) -}}
   {{- else -}}
-    {{- $storageCtx := dict "helm" $root "appKey" "storage" -}}
-    {{- $storageName := include "vm.plain.fullname" $storageCtx -}}
-    {{- $ns := include "vm.namespace" $storageCtx -}}
+    {{- $storage := $root.Values.storage -}}
+    {{- $addrFlag := ($storage.extraArgs | default dict).httpListenAddr -}}
+    {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $storage.service.port) -}}
     {{- $nodes := list -}}
     {{- range $i := until (int $root.Values.storage.replicaCount) -}}
-      {{- $nodes = append $nodes (printf "http://%s:%v" (include "vm.fqdn" (dict "style" "plain" "helm" $root "appKey" "storage" "appIdx" $i)) $root.Values.storage.service.port) -}}
+      {{- $nodes = append $nodes (printf "http://%s:%s" (include "vm.fqdn" (dict "style" "plain" "helm" $root "appKey" "storage" "appIdx" $i)) $port) -}}
     {{- end -}}
     {{- $_ := set $args "storageNode" $nodes -}}
   {{- end -}}
@@ -38,6 +38,8 @@
   {{- $component := .component -}}
   {{- $kind := .kind -}}
   {{- $app := index $root.Values $component -}}
+  {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
+  {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
   {{- $ctx := dict "helm" $root "appKey" $component -}}
   {{- $name := include "vm.plain.fullname" $ctx -}}
   {{- $ns := include "vm.namespace" $ctx -}}
@@ -99,7 +101,7 @@ spec:
           {{- end }}
           ports:
             - name: http
-              containerPort: {{ $app.service.port }}
+              containerPort: {{ $port }}
               protocol: TCP
           {{- with (fromYaml (include "vm.probe" (dict "app" (dict "probe" $root.Values.probe "extraArgs" $app.extraArgs) "type" "readiness" "helm" $root))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
@@ -157,6 +159,8 @@ spec:
   {{- $headless := .headless | default false -}}
   {{- $nameSuffix := .nameSuffix | default "" -}}
   {{- $app := index $root.Values $component -}}
+  {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
+  {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
   {{- $ctx := dict "helm" $root "appKey" $component "extraLabels" $app.service.labels -}}
 apiVersion: v1
 kind: Service
@@ -176,7 +180,7 @@ spec:
   {{- end }}
   ports:
     - name: http
-      port: {{ $app.service.port }}
+      port: {{ $port }}
       targetPort: http
       protocol: TCP
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}

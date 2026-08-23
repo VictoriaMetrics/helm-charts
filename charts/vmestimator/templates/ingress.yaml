@@ -2,6 +2,8 @@
 {{- $component := ternary "single" "select" (eq .Values.mode "single") }}
 {{- $ctx := dict "helm" . "appKey" $component }}
 {{- $app := index .Values $component }}
+{{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr }}
+{{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -30,7 +32,7 @@ spec:
               service:
                 name: {{ include "vm.plain.fullname" $ctx }}
                 port:
-                  number: {{ $app.service.port }}
+                  number: {{ $port }}
           {{- end }}
     {{- end }}
 {{- end }}

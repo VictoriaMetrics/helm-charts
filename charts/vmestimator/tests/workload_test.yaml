@@ -11,10 +11,21 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --config=/etc/vmestimator/streams.yaml
+  - it: derives the container port from the listener
+    set:
+      single.extraArgs.httpListenAddr: ":9000"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --httpListenAddr=:9000
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 9000
   - it: renders cluster mode
     set:
       mode: cluster
       storage.replicaCount: 2
+      storage.extraArgs.httpListenAddr: ":9001"
     asserts:
       - hasDocuments:
           count: 2
@@ -26,5 +37,5 @@ tests:
         documentIndex: 1
       - contains:
           path: spec.template.spec.containers[0].args
-          content: --storageNode=http://RELEASE-NAME-vmestimator-storage-1.RELEASE-NAME-vmestimator-storage.NAMESPACE.svc.cluster.local:8490
+          content: --storageNode=http://RELEASE-NAME-vmestimator-storage-1.RELEASE-NAME-vmestimator-storage.NAMESPACE.svc.cluster.local:9001
         documentIndex: 1
