@@ -164,6 +164,7 @@ metadata:
   name: {{ printf "%s%s" ((include "vm.plain.fullname" $ctx) | trunc (int (sub 63 (len $nameSuffix)))) $nameSuffix | trimSuffix "-" }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
   {{- with $app.service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}

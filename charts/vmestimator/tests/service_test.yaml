@@ -1,0 +1,17 @@
+suite: Service
+templates:
+  - service.yaml
+tests:
+  - it: keeps metadata-only labels out of the pod selector
+    set:
+      single.service.labels.owner: networking
+    asserts:
+      - equal:
+          path: metadata.labels.owner
+          value: networking
+      - equal:
+          path: spec.selector
+          value:
+            app: single
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmestimator
