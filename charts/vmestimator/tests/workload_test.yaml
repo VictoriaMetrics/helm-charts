@@ -11,6 +11,18 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --config=/etc/vmestimator/streams.yaml
+      - matchRegex:
+          path: spec.template.metadata.annotations["checksum/config"]
+          pattern: ^[a-f0-9]{64}$
+  - it: omits the checksum for an external ConfigMap
+    set:
+      config.existingConfigMap: external-config
+    asserts:
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/config"]
+      - equal:
+          path: spec.template.spec.volumes[0].configMap.name
+          value: external-config
   - it: derives the container port from the listener
     set:
       single.extraArgs.httpListenAddr: ":9000"

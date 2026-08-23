@@ -40,6 +40,7 @@
   {{- $app := index $root.Values $component -}}
   {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
+  {{- $configChecksum := and (ne $component "select") (not $root.Values.config.existingConfigMap) -}}
   {{- $ctx := dict "helm" $root "appKey" $component -}}
   {{- $name := include "vm.plain.fullname" $ctx -}}
   {{- $ns := include "vm.namespace" $ctx -}}
@@ -59,10 +60,10 @@ spec:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
-      {{- if or (ne $component "select") $app.podAnnotations }}
+      {{- if or $configChecksum $app.podAnnotations }}
       annotations:
-        {{- if ne $component "select" }}
-        checksum/config: {{ toYaml $root.Values.config | sha256sum }}
+        {{- if $configChecksum }}
+        checksum/config: {{ toYaml $root.Values.config.data | sha256sum }}
         {{- end }}
         {{- with $app.podAnnotations }}
         {{- toYaml . | nindent 8 }}
