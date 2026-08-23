@@ -8,7 +8,7 @@ Send Prometheus remote write data to /cardinality/api/v1/write.
 {{- $selectAddrFlag := (.Values.select.extraArgs | default dict).httpListenAddr }}
 {{- $selectPort := include "vm.port.from.flag" (dict "flag" $selectAddrFlag "default" .Values.select.service.port) }}
 vmestimator selector is available at {{ include "vm.plain.fullname" (dict "helm" . "appKey" "select") }}:{{ $selectPort }}.
-{{- $storageInsert := printf "%s-insert" (include "vm.plain.fullname" (dict "helm" . "appKey" "storage")) | trunc 63 | trimSuffix "-" }}
+{{- $storageInsert := include "vmestimator.serviceName" (dict "ctx" (dict "helm" . "appKey" "storage") "nameSuffix" "-insert") }}
 {{- $storageAddrFlag := (.Values.storage.extraArgs | default dict).httpListenAddr }}
 {{- $storagePort := include "vm.port.from.flag" (dict "flag" $storageAddrFlag "default" .Values.storage.service.port) }}
 Send Prometheus remote write data to {{ $storageInsert }}:{{ $storagePort }}/cardinality/api/v1/write.

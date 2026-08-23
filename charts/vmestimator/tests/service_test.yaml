@@ -22,3 +22,12 @@ tests:
       - equal:
           path: spec.ports[0].port
           value: 9000
+  - it: preserves the insert suffix for long names
+    set:
+      mode: cluster
+      fullnameOverride: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk
+    asserts:
+      - equal:
+          path: metadata.name
+          value: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd-insert
+        documentIndex: 1

@@ -154,6 +154,11 @@ spec:
       {{- end }}
 {{- end -}}
 
+{{- define "vmestimator.serviceName" -}}
+  {{- $nameSuffix := .nameSuffix | default "" -}}
+  {{- printf "%s%s" ((include "vm.plain.fullname" .ctx) | trunc (int (sub 63 (len $nameSuffix)))) $nameSuffix | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "vmestimator.service" -}}
   {{- $root := .root -}}
   {{- $component := .component -}}
@@ -166,7 +171,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ printf "%s%s" ((include "vm.plain.fullname" $ctx) | trunc (int (sub 63 (len $nameSuffix)))) $nameSuffix | trimSuffix "-" }}
+  name: {{ include "vmestimator.serviceName" (dict "ctx" $ctx "nameSuffix" $nameSuffix) }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
