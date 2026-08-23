@@ -25,7 +25,7 @@
     {{- $ns := include "vm.namespace" $storageCtx -}}
     {{- $nodes := list -}}
     {{- range $i := until (int $root.Values.storage.replicaCount) -}}
-      {{- $nodes = append $nodes (printf "http://%s-%d.%s.%s.svc.%s:%v" $storageName $i $storageName $ns $root.Values.global.cluster.dnsDomain $root.Values.storage.service.port) -}}
+      {{- $nodes = append $nodes (printf "http://%s:%v" (include "vm.fqdn" (dict "style" "plain" "helm" $root "appKey" "storage" "appIdx" $i)) $root.Values.storage.service.port) -}}
     {{- end -}}
     {{- $_ := set $args "storageNode" $nodes -}}
   {{- end -}}
