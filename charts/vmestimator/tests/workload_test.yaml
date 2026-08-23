@@ -1,0 +1,30 @@
+suite: vmestimator workloads
+templates:
+  - workload.yaml
+tests:
+  - it: renders single mode
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --config=/etc/vmestimator/streams.yaml
+  - it: renders cluster mode
+    set:
+      mode: cluster
+      storage.replicaCount: 2
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: StatefulSet
+        documentIndex: 0
+      - isKind:
+          of: Deployment
+        documentIndex: 1
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --storageNode=http://RELEASE-NAME-vmestimator-storage-1.RELEASE-NAME-vmestimator-storage.NAMESPACE.svc.cluster.local:8490
+        documentIndex: 1

@@ -1,0 +1,19 @@
+{{- $root := . }}
+{{- $components := ternary (list "single") (list "storage" "select") (eq .Values.mode "single") }}
+{{- range $component := $components }}
+{{- $app := index $root.Values $component }}
+{{- if $app.podDisruptionBudget.enabled }}
+{{- $ctx := dict "helm" $root "appKey" $component }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "vm.plain.fullname" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec:
+  minAvailable: {{ $app.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+{{- end }}
+{{- end }}

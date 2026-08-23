@@ -1,0 +1,7 @@
+{{- if eq .Values.mode "single" }}
+vmestimator is available at {{ include "vm.plain.fullname" (dict "helm" . "appKey" "single") }}:{{ .Values.single.service.port }}.
+Send Prometheus remote write data to /cardinality/api/v1/write.
+{{- else }}
+vmestimator selector is available at {{ include "vm.plain.fullname" (dict "helm" . "appKey" "select") }}:{{ .Values.select.service.port }}.
+Send Prometheus remote write data to {{ include "vm.plain.fullname" (dict "helm" . "appKey" "storage") }}-insert:{{ .Values.storage.service.port }}/cardinality/api/v1/write.
+{{- end }}

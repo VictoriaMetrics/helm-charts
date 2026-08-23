@@ -1,0 +1,233 @@
+global:
+  # -- Image pull secrets shared by all components
+  imagePullSecrets: []
+  image:
+    # -- Image registry shared by all components
+    registry: ""
+  compatibility:
+    openshift:
+      # -- OpenShift security context compatibility mode
+      adaptSecurityContext: auto
+  cluster:
+    # -- Kubernetes cluster DNS suffix
+    dnsDomain: cluster.local
+  # -- Labels added to all resources
+  extraLabels: {}
+
+# -- Deployment mode: single or cluster
+mode: single
+
+# -- Override chart name
+nameOverride: ""
+# -- Override fully qualified chart name
+fullnameOverride: ""
+
+image:
+  # -- Image registry
+  registry: docker.io
+  # -- Image repository
+  repository: victoriametrics/vmestimator
+  # -- Image tag; defaults to Chart.appVersion
+  tag: ""
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+
+# -- Image pull secrets
+imagePullSecrets: []
+
+serviceAccount:
+  # -- Create a service account
+  create: false
+  # -- Service account name
+  name: ""
+  # -- Mount the service account token
+  automountToken: false
+  # -- Service account annotations
+  annotations: {}
+
+config:
+  # -- Existing ConfigMap containing the vmestimator configuration
+  existingConfigMap: ""
+  # -- Key in the ConfigMap containing the vmestimator configuration
+  key: streams.yaml
+  # -- vmestimator stream configuration
+  data:
+    streams:
+      - interval: 5m
+      - interval: 5m
+        group_by:
+          - job
+      - interval: 5m
+        group_by:
+          - __name__
+
+single:
+  # -- Number of single-node replicas
+  replicaCount: 1
+  # -- Additional command-line arguments
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    loggerFormat: json
+  # -- Override the container command
+  command: []
+  # -- Additional environment variables
+  env: []
+  # -- Additional environment sources
+  envFrom: []
+  # -- Pod annotations
+  podAnnotations: {}
+  # -- Pod labels
+  podLabels: {}
+  # -- Container resources
+  resources: {}
+  # -- Pod node selector
+  nodeSelector: {}
+  # -- Pod tolerations
+  tolerations: []
+  # -- Pod affinity
+  affinity: {}
+  # -- Pod topology spread constraints
+  topologySpreadConstraints: []
+  # -- Additional volumes
+  extraVolumes: []
+  # -- Additional volume mounts
+  extraVolumeMounts: []
+  service:
+    # -- Service type
+    type: ClusterIP
+    # -- Service port
+    port: 8490
+    # -- Service annotations
+    annotations: {}
+    # -- Service labels
+    labels: {}
+  podDisruptionBudget:
+    # -- Enable a PodDisruptionBudget
+    enabled: false
+    # -- Minimum available pods
+    minAvailable: 0
+
+storage:
+  # -- Number of storage nodes in cluster mode
+  replicaCount: 3
+  # -- Additional command-line arguments
+  extraArgs:
+    cardinalityMetrics.exposeAt: /cardinality/metrics
+    envflag.enable: true
+    envflag.prefix: VM_
+    loggerFormat: json
+  command: []
+  env: []
+  envFrom: []
+  podAnnotations: {}
+  podLabels: {}
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+  extraVolumes: []
+  extraVolumeMounts: []
+  service:
+    # -- Port for remote write and selector queries
+    type: ClusterIP
+    port: 8490
+    annotations: {}
+    labels: {}
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+
+select:
+  # -- Number of selector nodes in cluster mode
+  replicaCount: 2
+  # -- Additional command-line arguments
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    loggerFormat: json
+  command: []
+  env: []
+  envFrom: []
+  podAnnotations: {}
+  podLabels: {}
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+  extraVolumes: []
+  extraVolumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8490
+    annotations: {}
+    labels: {}
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+
+podSecurityContext:
+  enabled: true
+  runAsNonRoot: true
+  fsGroup: 2000
+
+securityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+probe:
+  readiness:
+    httpGet: {}
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  liveness:
+    httpGet: {}
+    initialDelaySeconds: 30
+    periodSeconds: 30
+
+serviceMonitor:
+  # -- Create a VMServiceScrape for the public single/select service
+  enabled: false
+  # -- Scrape interval
+  interval: ""
+  # -- Additional labels
+  extraLabels: {}
+  # -- Additional annotations
+  annotations: {}
+  # -- Metric relabeling rules
+  metricRelabelings: []
+
+ingress:
+  # -- Enable ingress for the public single/select service
+  enabled: false
+  # -- Ingress class name
+  className: ""
+  # -- Ingress annotations
+  annotations: {}
+  hosts:
+    - host: vmestimator.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+networkPolicy:
+  # -- Enable NetworkPolicy
+  enabled: false
+  # -- Ingress rules
+  ingress: []
+  # -- Egress rules
+  egress: []
+  # -- Additional labels
+  labels: {}
+  # -- Additional annotations
+  annotations: {}
+
+# -- Additional Kubernetes resources rendered with tpl
+extraObjects: []
