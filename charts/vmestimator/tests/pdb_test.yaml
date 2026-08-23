@@ -2,13 +2,12 @@ suite: PodDisruptionBudget
 templates:
   - pdb.yaml
 tests:
-  - it: keeps one single-node pod available by default
+  - it: omits availability fields by default
     set:
       single.podDisruptionBudget.enabled: true
     asserts:
-      - equal:
+      - notExists:
           path: spec.minAvailable
-          value: 1
       - notExists:
           path: spec.maxUnavailable
       - notExists:
@@ -16,7 +15,6 @@ tests:
   - it: supports maxUnavailable and unhealthyPodEvictionPolicy
     set:
       single.podDisruptionBudget.enabled: true
-      single.podDisruptionBudget.minAvailable: null
       single.podDisruptionBudget.maxUnavailable: 1
       single.podDisruptionBudget.unhealthyPodEvictionPolicy: AlwaysAllow
     asserts:
@@ -28,3 +26,11 @@ tests:
       - equal:
           path: spec.unhealthyPodEvictionPolicy
           value: AlwaysAllow
+  - it: rejects both availability fields
+    set:
+      single.podDisruptionBudget.enabled: true
+      single.podDisruptionBudget.minAvailable: 1
+      single.podDisruptionBudget.maxUnavailable: 1
+    asserts:
+      - failedTemplate:
+          errorMessage: ".Values.single.podDisruptionBudget.minAvailable and maxUnavailable are mutually exclusive"

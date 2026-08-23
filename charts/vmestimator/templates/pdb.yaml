@@ -4,6 +4,9 @@
 {{- $app := index $root.Values $component }}
 {{- if $app.podDisruptionBudget.enabled }}
 {{- $pdb := $app.podDisruptionBudget }}
+{{- if and $pdb.minAvailable $pdb.maxUnavailable }}
+{{- fail (printf ".Values.%s.podDisruptionBudget.minAvailable and maxUnavailable are mutually exclusive" $component) }}
+{{- end }}
 {{- $ctx := dict "helm" $root "appKey" $component }}
 ---
 apiVersion: policy/v1
