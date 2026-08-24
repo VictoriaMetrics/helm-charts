@@ -12,7 +12,7 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "vm.plain.fullname" $ctx }}
+  name: {{ include "vmestimator.fullname" (dict "root" $root "component" $component) }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:

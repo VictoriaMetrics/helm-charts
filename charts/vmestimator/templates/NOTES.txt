@@ -2,13 +2,13 @@
 {{- $app := .Values.single }}
 {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr }}
 {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) }}
-vmestimator is available at {{ include "vm.plain.fullname" (dict "helm" . "appKey" "single") }}:{{ $port }}.
+vmestimator is available at {{ include "vmestimator.fullname" (dict "root" . "component" "single") }}:{{ $port }}.
 Send Prometheus remote write data to /cardinality/api/v1/write.
 {{- else }}
 {{- $selectAddrFlag := (.Values.select.extraArgs | default dict).httpListenAddr }}
 {{- $selectPort := include "vm.port.from.flag" (dict "flag" $selectAddrFlag "default" .Values.select.service.port) }}
-vmestimator selector is available at {{ include "vm.plain.fullname" (dict "helm" . "appKey" "select") }}:{{ $selectPort }}.
-{{- $storageInsert := include "vmestimator.serviceName" (dict "ctx" (dict "helm" . "appKey" "storage") "nameSuffix" "-insert") }}
+vmestimator selector is available at {{ include "vmestimator.fullname" (dict "root" . "component" "select") }}:{{ $selectPort }}.
+{{- $storageInsert := include "vmestimator.serviceName" (dict "root" . "component" "storage" "nameSuffix" "-insert") }}
 {{- $storageAddrFlag := (.Values.storage.extraArgs | default dict).httpListenAddr }}
 {{- $storagePort := include "vm.port.from.flag" (dict "flag" $storageAddrFlag "default" .Values.storage.service.port) }}
 Send Prometheus remote write data to {{ $storageInsert }}:{{ $storagePort }}/cardinality/api/v1/write.

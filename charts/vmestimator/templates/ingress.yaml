@@ -7,7 +7,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "vm.plain.fullname" $ctx }}
+  name: {{ include "vmestimator.fullname" (dict "root" . "component" $component) }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -30,7 +30,7 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ include "vm.plain.fullname" $ctx }}
+                name: {{ include "vmestimator.fullname" (dict "root" $ "component" $component) }}
                 port:
                   number: {{ $port }}
           {{- end }}

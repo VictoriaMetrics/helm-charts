@@ -8,8 +8,35 @@
 {{- end -}}
 
 {{- define "vmestimator.configMapName" -}}
-  {{- $ctx := dict "helm" . -}}
-  {{- .Values.config.existingConfigMap | default (include "vm.fullname" $ctx) -}}
+  {{- .Values.config.existingConfigMap | default (include "vmestimator.fullname" (dict "root" .)) -}}
+{{- end -}}
+
+{{- define "vmestimator.fullname" -}}
+  {{- $root := .root -}}
+  {{- $component := .component | default "" -}}
+  {{- $ctx := dict "helm" $root "appKey" $component -}}
+  {{- if eq (include "vm.useLegacyNaming" $ctx) "true" -}}
+    {{- if $component -}}
+      {{- include "vm.plain.fullname" $ctx -}}
+    {{- else -}}
+      {{- include "vm.fullname" (dict "helm" $root) -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $name := $root.Values.fullnameOverride | default $root.Values.global.fullnameOverride -}}
+    {{- if $name -}}
+      {{- with $component }}{{- $name = printf "%s-%s" $name . -}}{{- end -}}
+    {{- else -}}
+      {{- $name = $root.Values.nameOverride | default $root.Chart.Name -}}
+      {{- with $component }}{{- $name = printf "%s-%s" $name . -}}{{- end -}}
+      {{- $name = printf "%s-%s" $name $root.Release.Name -}}
+    {{- end -}}
+    {{- $name = tpl $name $root -}}
+    {{- if or $root.Values.global.disableNameTruncation $root.Values.disableNameTruncation -}}
+      {{- $name -}}
+    {{- else -}}
+      {{- $name | trunc 63 | trimSuffix "-" -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "vmestimator.args" -}}
@@ -23,9 +50,15 @@
     {{- $storage := $root.Values.storage -}}
     {{- $addrFlag := ($storage.extraArgs | default dict).httpListenAddr -}}
     {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $storage.service.port) -}}
+    {{- $storageName := include "vmestimator.fullname" (dict "root" $root "component" "storage") -}}
+    {{- $ns := include "vm.namespace" (dict "helm" $root) -}}
     {{- $nodes := list -}}
     {{- range $i := until (int $root.Values.storage.replicaCount) -}}
-      {{- $nodes = append $nodes (printf "http://%s:%s" (include "vm.fqdn" (dict "style" "plain" "helm" $root "appKey" "storage" "appIdx" $i)) $port) -}}
+      {{- $fqdn := printf "%s-%d.%s.%s.svc" $storageName $i $storageName $ns -}}
+      {{- with $root.Values.global.cluster.dnsDomain -}}
+        {{- $fqdn = printf "%s.%s" $fqdn . -}}
+      {{- end -}}
+      {{- $nodes = append $nodes (printf "http://%s:%s" $fqdn $port) -}}
     {{- end -}}
     {{- $_ := set $args "storageNode" $nodes -}}
   {{- end -}}
@@ -42,7 +75,7 @@
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
   {{- $configChecksum := and (ne $component "select") (not $root.Values.config.existingConfigMap) -}}
   {{- $ctx := dict "helm" $root "appKey" $component -}}
-  {{- $name := include "vm.plain.fullname" $ctx -}}
+  {{- $name := include "vmestimator.fullname" (dict "root" $root "component" $component) -}}
   {{- $ns := include "vm.namespace" $ctx -}}
 apiVersion: apps/v1
 kind: {{ $kind }}
@@ -74,7 +107,7 @@ spec:
       {{- $_ := unset $ctx "extraLabels" }}
     spec:
       {{- if or $root.Values.serviceAccount.name $root.Values.serviceAccount.create }}
-      serviceAccountName: {{ tpl ($root.Values.serviceAccount.name | default (include "vm.fullname" (dict "helm" $root))) $root }}
+      serviceAccountName: {{ tpl ($root.Values.serviceAccount.name | default (include "vmestimator.fullname" (dict "root" $root))) $root }}
       automountServiceAccountToken: {{ $root.Values.serviceAccount.automountToken }}
       {{- end }}
       {{- if $root.Values.podSecurityContext.enabled }}
@@ -156,7 +189,7 @@ spec:
 
 {{- define "vmestimator.serviceName" -}}
   {{- $nameSuffix := .nameSuffix | default "" -}}
-  {{- printf "%s%s" ((include "vm.plain.fullname" .ctx) | trunc (int (sub 63 (len $nameSuffix)))) $nameSuffix | trimSuffix "-" -}}
+  {{- printf "%s%s" ((include "vmestimator.fullname" (dict "root" .root "component" .component)) | trunc (int (sub 63 (len $nameSuffix)))) $nameSuffix | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "vmestimator.service" -}}
@@ -171,7 +204,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "vmestimator.serviceName" (dict "ctx" $ctx "nameSuffix" $nameSuffix) }}
+  name: {{ include "vmestimator.serviceName" (dict "root" $root "component" $component "nameSuffix" $nameSuffix) }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}

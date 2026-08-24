@@ -1,0 +1,59 @@
+suite: useLegacyNaming tests
+templates:
+  - workload.yaml
+tests:
+  - it: single useLegacyNaming false uses type-prefixed name
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmestimator-single-RELEASE-NAME
+
+  - it: single useLegacyNaming true preserves legacy naming
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vmestimator-single
+
+  - it: storage useLegacyNaming false uses type-prefixed name
+    set:
+      mode: cluster
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        documentIndex: 0
+
+  - it: storage useLegacyNaming true preserves legacy naming
+    set:
+      mode: cluster
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vmestimator-storage
+        documentIndex: 0
+
+  - it: select useLegacyNaming false uses type-prefixed name
+    set:
+      mode: cluster
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        documentIndex: 1
+
+  - it: select useLegacyNaming true preserves legacy naming
+    set:
+      mode: cluster
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vmestimator-select
+        documentIndex: 1
