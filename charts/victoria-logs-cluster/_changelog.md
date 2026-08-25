@@ -1,6 +1,7 @@
 ---
 weight: 1
 title: CHANGELOG
+description: "Changelog for VictoriaLogs Cluster."
 menu:
   docs:
     weight: 1

@@ -1,6 +1,7 @@
 ---
 weight: 0
 title: Helm Charts
+description: "All VictoriaMetrics Helm charts. Add repo, install, and upgrade."
 menu:
   docs:
     weight: 35
