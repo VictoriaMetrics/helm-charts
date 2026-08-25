@@ -1,6 +1,7 @@
 ---
 weight: 1
 title: CHANGELOG
+description: "Release history for the VictoriaMetrics Distributed Helm chart."
 menu:
   docs:
     weight: 1

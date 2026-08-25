@@ -1,6 +1,7 @@
 ---
 weight: 99
 title: Requirements
+description: "Helm chart requirements and prerequisites."
 menu:
   docs:
     weight: 99

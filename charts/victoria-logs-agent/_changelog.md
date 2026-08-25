@@ -1,4 +1,6 @@
+---
 title: CHANGELOG
+description: "Release history for the VictoriaLogs Agent Helm chart."
 menu:
   docs:
     weight: 1
