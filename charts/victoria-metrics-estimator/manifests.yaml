@@ -1,0 +1,252 @@
+---
+# Source: vmestimator/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-vmestimator
+  namespace: infra
+  labels: 
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vmestimator
+    app.kubernetes.io/version: v0.1.15
+    helm.sh/chart: vmestimator-0.1.0
+data:
+  streams.yaml: |
+    streams:
+    - interval: 5m
+    - group_by:
+      - job
+      interval: 5m
+    - group_by:
+      - __name__
+      interval: 5m
+---
+# Source: vmestimator/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-vmestimator-storage
+  namespace: infra
+  labels: 
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vmestimator
+    app.kubernetes.io/version: v0.1.15
+    helm.sh/chart: vmestimator-0.1.0
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: http
+      port: 8490
+      targetPort: http
+      protocol: TCP
+  selector: 
+    app: storage
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: vmestimator
+---
+# Source: vmestimator/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-vmestimator-storage-insert
+  namespace: infra
+  labels: 
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vmestimator
+    app.kubernetes.io/version: v0.1.15
+    helm.sh/chart: vmestimator-0.1.0
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8490
+      targetPort: http
+      protocol: TCP
+  selector: 
+    app: storage
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: vmestimator
+---
+# Source: vmestimator/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-vmestimator-select
+  namespace: infra
+  labels: 
+    app.kubernetes.io/component: select
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vmestimator
+    app.kubernetes.io/version: v0.1.15
+    helm.sh/chart: vmestimator-0.1.0
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8490
+      targetPort: http
+      protocol: TCP
+  selector: 
+    app: select
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: vmestimator
+---
+# Source: vmestimator/templates/workload.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-vmestimator-select
+  namespace: infra
+  labels: 
+    app.kubernetes.io/component: select
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vmestimator
+    app.kubernetes.io/version: v0.1.15
+    helm.sh/chart: vmestimator-0.1.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels: 
+      app: select
+      app.kubernetes.io/instance: release-name
+      app.kubernetes.io/name: vmestimator
+  template:
+    metadata:
+      labels: 
+        app: select
+        app.kubernetes.io/component: select
+        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vmestimator
+    spec:
+      securityContext: 
+        fsGroup: 2000
+        runAsNonRoot: true
+      containers:
+        - name: vmestimator
+          securityContext: 
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          image: docker.io/victoriametrics/vmestimator:v0.1.15
+          imagePullPolicy: IfNotPresent
+          args: 
+            - --envflag.enable
+            - --envflag.prefix=VM_
+            - --httpListenAddr=:8490
+            - --loggerFormat=json
+            - --storageNode=http://release-name-vmestimator-storage-0.release-name-vmestimator-storage.infra.svc.cluster.local:8490
+            - --storageNode=http://release-name-vmestimator-storage-1.release-name-vmestimator-storage.infra.svc.cluster.local:8490
+            - --storageNode=http://release-name-vmestimator-storage-2.release-name-vmestimator-storage.infra.svc.cluster.local:8490
+          ports:
+            - name: http
+              containerPort: 8490
+              protocol: TCP
+          readinessProbe: 
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe: 
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+---
+# Source: vmestimator/templates/workload.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: release-name-vmestimator-storage
+  namespace: infra
+  labels: 
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vmestimator
+    app.kubernetes.io/version: v0.1.15
+    helm.sh/chart: vmestimator-0.1.0
+spec:
+  replicas: 3
+  serviceName: release-name-vmestimator-storage
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels: 
+      app: storage
+      app.kubernetes.io/instance: release-name
+      app.kubernetes.io/name: vmestimator
+  template:
+    metadata:
+      annotations:
+        checksum/config: 19a572c1ca666be7882c1ceecb9b39d8be6a7ff33385eca21a4c40faee5c0165
+      labels: 
+        app: storage
+        app.kubernetes.io/component: storage
+        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vmestimator
+    spec:
+      securityContext: 
+        fsGroup: 2000
+        runAsNonRoot: true
+      containers:
+        - name: vmestimator
+          securityContext: 
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          image: docker.io/victoriametrics/vmestimator:v0.1.15
+          imagePullPolicy: IfNotPresent
+          args: 
+            - --cardinalityMetrics.exposeAt=/cardinality/metrics
+            - --config=/etc/vmestimator/streams.yaml
+            - --envflag.enable
+            - --envflag.prefix=VM_
+            - --httpListenAddr=:8490
+            - --loggerFormat=json
+          ports:
+            - name: http
+              containerPort: 8490
+              protocol: TCP
+          readinessProbe: 
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe: 
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          volumeMounts:
+            - name: config
+              mountPath: /etc/vmestimator
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: release-name-vmestimator
+            items:
+              - key: streams.yaml
+                path: streams.yaml

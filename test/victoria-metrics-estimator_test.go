@@ -6,9 +6,9 @@ import (
 	"testing"
 )
 
-func TestVMEstimatorInstallDefault(t *testing.T) {
+func TestVictoriaMetricsEstimatorInstallDefault(t *testing.T) {
 	t.Parallel()
-	cp := chartInstall(t, "vmestimator", nil)
+	cp := chartInstall(t, "victoria-metrics-estimator", nil)
 	ctx := context.Background()
 	defer chartCleanup(t, ctx, cp)
 

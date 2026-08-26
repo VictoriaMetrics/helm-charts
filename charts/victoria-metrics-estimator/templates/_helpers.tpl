@@ -26,7 +26,7 @@
     {{- if $name -}}
       {{- with $component }}{{- $name = printf "%s-%s" $name . -}}{{- end -}}
     {{- else -}}
-      {{- $name = $root.Values.nameOverride | default $root.Chart.Name -}}
+      {{- $name = $root.Values.nameOverride | default "vmestimator" -}}
       {{- with $component }}{{- $name = printf "%s-%s" $name . -}}{{- end -}}
       {{- $name = printf "%s-%s" $name $root.Release.Name -}}
     {{- end -}}
