@@ -19,6 +19,13 @@
   "customManagers": [
     {
       "customType": "regex",
+      "managerFilePatterns": ["/\\.github\\/workflows\\/run-testing\\.yaml/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)\\n\\s+version: (?<currentValue>v[^\\s]+)"
+      ]
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["/charts\\/[^/]+\\/Chart\\.yaml/"],
       "matchStrings": [
         "# renovate: image=(?<depName>[^\\s]+)\\nappVersion: (?<currentValue>\\S+)"
