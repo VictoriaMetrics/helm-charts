@@ -1,5 +1,7 @@
+# renovate: image=alpine/helm
 HELM_IMAGE = alpine/helm:4.2.3
 HELM_DOCS_IMAGE = local/helm-docs:v1.14.2
+# renovate: image=quay.io/helmpack/chart-testing
 CT_IMAGE = quay.io/helmpack/chart-testing:v3.14.0
 HELM?=helm-docker
 CT?=ct-docker
