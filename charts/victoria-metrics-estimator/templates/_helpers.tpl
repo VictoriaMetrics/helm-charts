@@ -51,7 +51,7 @@
     {{- $addrFlag := ($storage.extraArgs | default dict).httpListenAddr -}}
     {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $storage.service.port) -}}
     {{- $storageName := include "vmestimator.fullname" (dict "root" $root "component" "storage") -}}
-    {{- $ns := include "vm.namespace" (dict "helm" $root) -}}
+    {{- $ns := include "vm.namespace" (dict "helm" $root "appKey" "storage") -}}
     {{- $nodes := list -}}
     {{- range $i := until (int $root.Values.storage.replicaCount) -}}
       {{- $fqdn := printf "%s-%d.%s.%s.svc" $storageName $i $storageName $ns -}}
