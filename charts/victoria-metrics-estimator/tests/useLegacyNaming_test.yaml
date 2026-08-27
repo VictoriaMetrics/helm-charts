@@ -10,13 +10,22 @@ tests:
           path: metadata.name
           value: vmestimator-single-RELEASE-NAME
 
-  - it: single useLegacyNaming true preserves legacy naming
+  - it: single useLegacyNaming true uses release-based naming
     set:
       useLegacyNaming: true
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-single
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-single
+
+  - it: fullnameOverride takes precedence
+    set:
+      useLegacyNaming: false
+      fullnameOverride: estimator
+    asserts:
+      - equal:
+          path: metadata.name
+          value: estimator-single
 
   - it: storage useLegacyNaming false uses type-prefixed name
     set:
@@ -28,14 +37,14 @@ tests:
           value: vmestimator-storage-RELEASE-NAME
         documentIndex: 0
 
-  - it: storage useLegacyNaming true preserves legacy naming
+  - it: storage useLegacyNaming true uses release-based naming
     set:
       mode: cluster
       useLegacyNaming: true
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-storage
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
         documentIndex: 0
 
   - it: select useLegacyNaming false uses type-prefixed name
@@ -48,12 +57,12 @@ tests:
           value: vmestimator-select-RELEASE-NAME
         documentIndex: 1
 
-  - it: select useLegacyNaming true preserves legacy naming
+  - it: select useLegacyNaming true uses release-based naming
     set:
       mode: cluster
       useLegacyNaming: true
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-select
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
         documentIndex: 1

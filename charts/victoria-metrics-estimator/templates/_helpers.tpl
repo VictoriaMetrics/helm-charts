@@ -14,29 +14,21 @@
 {{- define "vmestimator.fullname" -}}
   {{- $root := .root -}}
   {{- $component := .component | default "" -}}
-  {{- $ctx := dict "helm" $root "appKey" $component -}}
-  {{- if eq (include "vm.useLegacyNaming" $ctx) "true" -}}
-    {{- if $component -}}
-      {{- include "vm.plain.fullname" $ctx -}}
-    {{- else -}}
-      {{- include "vm.fullname" (dict "helm" $root) -}}
+  {{- $ctx := dict "helm" $root -}}
+  {{- $fullnameOverride := $root.Values.fullnameOverride | default $root.Values.global.fullnameOverride -}}
+  {{- if $component -}}
+    {{- $appKey := printf "vmestimator-%s" $component -}}
+    {{- $app := deepCopy (index $root.Values $component) -}}
+    {{- with $fullnameOverride -}}
+      {{- $_ := set $app "fullnameOverride" (printf "%s-%s" . $component) -}}
     {{- end -}}
-  {{- else -}}
-    {{- $name := $root.Values.fullnameOverride | default $root.Values.global.fullnameOverride -}}
-    {{- if $name -}}
-      {{- with $component }}{{- $name = printf "%s-%s" $name . -}}{{- end -}}
-    {{- else -}}
-      {{- $name = $root.Values.nameOverride | default "vmestimator" -}}
-      {{- with $component }}{{- $name = printf "%s-%s" $name . -}}{{- end -}}
-      {{- $name = printf "%s-%s" $name $root.Release.Name -}}
-    {{- end -}}
-    {{- $name = tpl $name $root -}}
-    {{- if or $root.Values.global.disableNameTruncation $root.Values.disableNameTruncation -}}
-      {{- $name -}}
-    {{- else -}}
-      {{- $name | trunc 63 | trimSuffix "-" -}}
-    {{- end -}}
+    {{- $_ := set $ctx "appKey" $appKey -}}
+    {{- $_ := set $ctx $appKey $app -}}
+  {{- else if $fullnameOverride -}}
+    {{- $_ := set $ctx "appKey" "vmestimator" -}}
+    {{- $_ := set $ctx "vmestimator" (dict "fullnameOverride" $fullnameOverride) -}}
   {{- end -}}
+  {{- include "vm.plain.fullname" $ctx -}}
 {{- end -}}
 
 {{- define "vmestimator.args" -}}
