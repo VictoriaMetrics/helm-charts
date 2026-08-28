@@ -1,6 +1,7 @@
 ## Next release
 
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.2.8
 
