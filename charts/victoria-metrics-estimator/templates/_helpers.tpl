@@ -22,6 +22,7 @@
     {{- if and $fullnameOverride (not (hasKey $app "fullnameOverride")) -}}
       {{- $_ := set $app "fullnameOverride" (printf "%s-%s" $fullnameOverride $component) -}}
     {{- end -}}
+    {{- $_ := set $root.Values $appKey $app -}}
     {{- $_ := set $ctx "appKey" $appKey -}}
     {{- $_ := set $ctx $appKey $app -}}
   {{- else if $fullnameOverride -}}

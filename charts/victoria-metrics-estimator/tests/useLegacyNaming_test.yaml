@@ -18,6 +18,15 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-single
 
+  - it: single useLegacyNaming component override takes precedence
+    set:
+      useLegacyNaming: false
+      single.useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-single
+
   - it: fullnameOverride takes precedence
     set:
       useLegacyNaming: false
