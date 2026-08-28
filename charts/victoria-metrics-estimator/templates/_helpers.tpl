@@ -19,8 +19,8 @@
   {{- if $component -}}
     {{- $appKey := printf "vmestimator-%s" $component -}}
     {{- $app := deepCopy (index $root.Values $component) -}}
-    {{- with $fullnameOverride -}}
-      {{- $_ := set $app "fullnameOverride" (printf "%s-%s" . $component) -}}
+    {{- if and $fullnameOverride (not (hasKey $app "fullnameOverride")) -}}
+      {{- $_ := set $app "fullnameOverride" (printf "%s-%s" $fullnameOverride $component) -}}
     {{- end -}}
     {{- $_ := set $ctx "appKey" $appKey -}}
     {{- $_ := set $ctx $appKey $app -}}

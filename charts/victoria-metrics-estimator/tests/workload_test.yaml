@@ -51,3 +51,11 @@ tests:
           path: spec.template.spec.containers[0].args
           content: --storageNode=http://vmestimator-storage-RELEASE-NAME-1.vmestimator-storage-RELEASE-NAME.NAMESPACE.svc.cluster.local:9001
         documentIndex: 1
+  - it: preserves component fullname overrides
+    set:
+      fullnameOverride: shared
+      single.fullnameOverride: custom-single
+    asserts:
+      - equal:
+          path: metadata.name
+          value: custom-single
