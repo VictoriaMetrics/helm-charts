@@ -1,0 +1,31 @@
+{{- $root := . }}
+{{- $components := ternary (list "single") (list "storage" "select") (eq .Values.mode "single") }}
+{{- range $component := $components }}
+{{- $app := index $root.Values $component }}
+{{- if $app.podDisruptionBudget.enabled }}
+{{- $pdb := $app.podDisruptionBudget }}
+{{- if and $pdb.minAvailable $pdb.maxUnavailable }}
+{{- fail (printf ".Values.%s.podDisruptionBudget.minAvailable and maxUnavailable are mutually exclusive" $component) }}
+{{- end }}
+{{- $ctx := dict "helm" $root "appKey" $component }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "vmestimator.fullname" (dict "root" $root "component" $component) }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec:
+  {{- with $pdb.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with $pdb.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  {{- with $pdb.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+{{- end }}
+{{- end }}

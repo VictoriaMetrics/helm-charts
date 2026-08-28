@@ -1,0 +1,38 @@
+{{- if .Values.ingress.enabled }}
+{{- $component := ternary "single" "select" (eq .Values.mode "single") }}
+{{- $ctx := dict "helm" . "appKey" $component }}
+{{- $app := index .Values $component }}
+{{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr }}
+{{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "vmestimator.fullname" (dict "root" . "component" $component) }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.ingress.tls }}
+  tls: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "vmestimator.fullname" (dict "root" $ "component" $component) }}
+                port:
+                  number: {{ $port }}
+          {{- end }}
+    {{- end }}
+{{- end }}

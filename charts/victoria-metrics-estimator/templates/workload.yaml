@@ -1,0 +1,8 @@
+{{- include "vmestimator.validate" . }}
+{{- if eq .Values.mode "single" }}
+{{ include "vmestimator.workload" (dict "root" . "component" "single" "kind" "Deployment") }}
+{{- else }}
+{{ include "vmestimator.workload" (dict "root" . "component" "storage" "kind" "StatefulSet") }}
+---
+{{ include "vmestimator.workload" (dict "root" . "component" "select" "kind" "Deployment") }}
+{{- end }}

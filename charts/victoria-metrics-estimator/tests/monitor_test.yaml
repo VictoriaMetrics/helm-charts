@@ -1,0 +1,20 @@
+suite: VMServiceScrape
+templates:
+  - monitor.yaml
+tests:
+  - it: selects the target Service without metadata-only labels
+    set:
+      serviceMonitor:
+        enabled: true
+        extraLabels:
+          owner: monitoring
+    asserts:
+      - equal:
+          path: metadata.labels.owner
+          value: monitoring
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: single
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-estimator

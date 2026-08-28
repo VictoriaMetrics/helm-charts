@@ -1,0 +1,49 @@
+---
+weight: 19
+title: victoria-metrics-estimator
+menu:
+  docs:
+    parent: helm
+    weight: 19
+    identifier: helm-victoria-metrics-estimator
+url: /helm/victoria-metrics-estimator/
+tags:
+  - metrics
+  - cardinality
+  - kubernetes
+---
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.prerequisites" . }}
+
+## Quick start
+
+Install the chart in single-node mode:
+
+```sh
+helm install vmestimator vm/victoria-metrics-estimator
+```
+
+Configure vmagent to replicate remote write traffic to:
+
+```text
+http://vmestimator-single-vmestimator:8490/cardinality/api/v1/write
+```
+
+For cluster mode:
+
+```sh
+helm install vmestimator vm/victoria-metrics-estimator --set mode=cluster
+```
+
+Send remote write traffic to the `vmestimator-storage-vmestimator-insert` service and scrape cardinality estimates from the `vmestimator-select-vmestimator` service. See the [vmestimator documentation](https://docs.victoriametrics.com/victoriametrics/vmestimator/) for architecture and vmagent configuration details.
+
+{{ include "chart.installSection" . }}
+
+{{ include "chart.uninstallSection" . }}
+
+## Parameters
+
+{{ template "chart.valuesTableHtml" . }}

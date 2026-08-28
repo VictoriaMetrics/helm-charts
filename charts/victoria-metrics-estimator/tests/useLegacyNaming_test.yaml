@@ -1,0 +1,77 @@
+suite: useLegacyNaming tests
+templates:
+  - workload.yaml
+tests:
+  - it: single useLegacyNaming false uses type-prefixed name
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmestimator-single-RELEASE-NAME
+
+  - it: single useLegacyNaming true uses release-based naming
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-single
+
+  - it: single useLegacyNaming component override takes precedence
+    set:
+      useLegacyNaming: false
+      single.useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-single
+
+  - it: fullnameOverride takes precedence
+    set:
+      useLegacyNaming: false
+      fullnameOverride: estimator
+    asserts:
+      - equal:
+          path: metadata.name
+          value: estimator-single
+
+  - it: storage useLegacyNaming false uses type-prefixed name
+    set:
+      mode: cluster
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        documentIndex: 0
+
+  - it: storage useLegacyNaming true uses release-based naming
+    set:
+      mode: cluster
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
+        documentIndex: 0
+
+  - it: select useLegacyNaming false uses type-prefixed name
+    set:
+      mode: cluster
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        documentIndex: 1
+
+  - it: select useLegacyNaming true uses release-based naming
+    set:
+      mode: cluster
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        documentIndex: 1

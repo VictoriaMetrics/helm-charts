@@ -1,0 +1,21 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- $ctx := dict "helm" . "extraLabels" .Values.networkPolicy.labels }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "vmestimator.fullname" (dict "root" .) }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.metaLabels" $ctx | nindent 4 }}
+  {{- with .Values.networkPolicy.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  podSelector:
+    matchLabels: {{ include "vm.commonLabels" (dict "helm" .) | nindent 6 }}
+  {{- with .Values.networkPolicy.ingress }}
+  ingress: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.networkPolicy.egress }}
+  egress: {{ toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
