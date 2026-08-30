@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## v0.4.1
+
+**Release date:** 30 Aug 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - fixed `vm.plain.fullname` with `useLegacyNaming: false` silently ignoring a chart-wide or `global.fullnameOverride`: a call without `appKey` now uses the override as-is, and a call with `appKey` (no matching component-scoped override) now uses it as the base, prefixed by the operator kind — matching the behavior already used for legacy naming.
 
 ## v0.4.0
