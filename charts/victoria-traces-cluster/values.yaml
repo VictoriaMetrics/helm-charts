@@ -273,8 +273,8 @@ vtselect:
     annotations: {}
     # -- Service labels
     labels: {}
-    # -- Service ClusterIP
-    clusterIP: ""
+    # -- Service ClusterIP. When unset, the Service is a regular ClusterIP Service with legacy naming and headless (`None`), as in the VictoriaMetrics operator, with operator naming
+    clusterIP:
     # -- Publish not-ready addresses. Set this to `true` together with `clusterIP: None` when vtselect is discovered via its headless service (e.g. behind vmauth balancing) before pods pass readiness checks
     publishNotReadyAddresses: false
     # -- Service external IPs. Details are [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips)
@@ -826,7 +826,8 @@ vtstorage:
     # -- Create/use Persistent Volume Claim for vtstorage component. Empty dir if false. If true,  vtstorage will create/use a Persistent Volume Claim
     enabled: true
 
-    name: vtstorage-volume
+    # -- Override Persistent Volume Claim template name. Defaults to `vtstorage-volume`, or to `vtstorage-db` when `useLegacyNaming` is `false`
+    name: ""
 
     # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
     accessModes:

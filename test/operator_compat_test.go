@@ -38,6 +38,8 @@ type compatCase struct {
 	manifest string
 	// kinds are values of the app.kubernetes.io/name label on objects created by the operator for manifest
 	kinds []string
+	// workloadKinds are the kinds the operator creates a workload for; defaults to kinds
+	workloadKinds []string
 	// ignore lists contract entries that intentionally differ, as "<kind>/<name> <field>"
 	ignore []string
 }
@@ -165,6 +167,70 @@ spec:
 			"Deployment/vmauth-compat container=config-reloader",
 			"Deployment/vmauth-compat container[config-reloader]",
 		},
+	}, {
+		chart: "victoria-metrics-cluster",
+		// the chart runs vmselect as a Deployment by default, the operator always as a StatefulSet
+		values: map[string]any{"serviceAccount.create": true, "vmselect.mode": "statefulSet"},
+		manifest: `
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMCluster
+spec:
+  retentionPeriod: "1"
+  vmstorage:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 8Gi}}}}}
+  vmselect:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+  vminsert:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+`,
+		kinds:         []string{"vmcluster", "vmstorage", "vmselect", "vminsert"},
+		workloadKinds: []string{"vmstorage", "vmselect", "vminsert"},
+	},
+	{
+		chart:  "victoria-logs-cluster",
+		values: map[string]any{"serviceAccount.create": true},
+		manifest: `
+apiVersion: operator.victoriametrics.com/v1
+kind: VLCluster
+spec:
+  vlstorage:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
+  vlselect:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+  vlinsert:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+`,
+		kinds:         []string{"vlcluster", "vlstorage", "vlselect", "vlinsert"},
+		workloadKinds: []string{"vlstorage", "vlselect", "vlinsert"},
+	},
+	{
+		chart:  "victoria-traces-cluster",
+		values: map[string]any{"serviceAccount.create": true},
+		manifest: `
+apiVersion: operator.victoriametrics.com/v1
+kind: VTCluster
+spec:
+  storage:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+    storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
+  select:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+  insert:
+    replicaCount: 2
+    resources: {requests: {cpu: 10m, memory: 32Mi}}
+`,
+		kinds:         []string{"vtcluster", "vtstorage", "vtselect", "vtinsert"},
+		workloadKinds: []string{"vtstorage", "vtselect", "vtinsert"},
 	},
 }
 
@@ -194,12 +260,16 @@ func TestOperatorCompat(t *testing.T) {
 			require.NoError(t, err)
 
 			var operatorObjs []*unstructured.Unstructured
-			err = wait.PollUntilContextTimeout(ctx, pollingInterval, resourceWaitTimeout, true, func(ctx context.Context) (bool, error) {
+			err = wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (bool, error) {
 				operatorObjs, err = operatorObjects(kc, namespace, tc.kinds)
 				if err != nil {
 					return false, nil
 				}
-				for _, k := range tc.kinds {
+				workloadKinds := tc.workloadKinds
+				if workloadKinds == nil {
+					workloadKinds = tc.kinds
+				}
+				for _, k := range workloadKinds {
 					if !slices.ContainsFunc(operatorObjs, func(o *unstructured.Unstructured) bool {
 						return isWorkload(o) && o.GetLabels()["app.kubernetes.io/name"] == k
 					}) {
@@ -266,9 +336,25 @@ func operatorObjects(kubeconfig, namespace string, kinds []string) ([]*unstructu
 	if err := json.Unmarshal(out, &list); err != nil {
 		return nil, err
 	}
+	var claimPrefixes []string
+	for _, o := range list.Items {
+		if o.GetKind() != "StatefulSet" {
+			continue
+		}
+		vcts, _, _ := unstructured.NestedSlice(o.Object, "spec", "volumeClaimTemplates")
+		for _, v := range vcts {
+			name, _, _ := unstructured.NestedString(v.(map[string]any), "metadata", "name")
+			claimPrefixes = append(claimPrefixes, name+"-"+o.GetName()+"-")
+		}
+	}
 	var objs []*unstructured.Unstructured
 	for i := range list.Items {
-		objs = append(objs, &list.Items[i])
+		o := &list.Items[i]
+		// claims created by the StatefulSet controller from volumeClaimTemplates aren't rendered by charts
+		if o.GetKind() == "PersistentVolumeClaim" && slices.ContainsFunc(claimPrefixes, func(p string) bool { return strings.HasPrefix(o.GetName(), p) }) {
+			continue
+		}
+		objs = append(objs, o)
 	}
 	return objs, nil
 }

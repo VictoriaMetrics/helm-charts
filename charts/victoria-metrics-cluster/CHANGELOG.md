@@ -2,6 +2,8 @@
 
 - fix `vmselect.persistentVolume.volumeAttributesClassName` and `vmstorage.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - fix pod label selector in the chart notes: repeated `-l` flags were replaced with a single comma-separated selector, since `kubectl` only honours the last `-l`.
+- fix `vmselect.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
+- rename the cluster native port of `vmselect` and `vminsert` from `cluster-tcp` to `clusternative`, in both the containers and the Services, matching the VictoriaMetrics operator. It is only rendered when `extraArgs.clusternativeListenAddr` is set.
 
 ## v0.52.0
 
