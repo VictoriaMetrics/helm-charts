@@ -1,6 +1,6 @@
 {{- $webhooks := .Values.admissionWebhooks }}
 {{- if $webhooks.enabled }}
-{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
+{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels "kindOverride" "vmoperator" }}
 {{- $tls := fromYaml (include "vm-operator.certs" $ctx) }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $domain := ((.Values.global).cluster).dnsDomain }}

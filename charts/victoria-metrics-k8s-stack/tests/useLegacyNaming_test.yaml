@@ -11,6 +11,8 @@ set:
 templates:
   - victoria-metrics-operator/vmagent/rbac.yaml
   - victoria-metrics-operator/vlagent/rbac.yaml
+  - victoria-metrics-operator/vmsingle/vmsingle.yml
+  - victoria-metrics-operator/vmagent/vmagent.yaml
 tests:
   - it: "resource names (default -- vm.managed.fullname defaults to operator-style prefix naming here, unlike vm.plain.fullname elsewhere)"
     asserts:
@@ -42,35 +44,18 @@ tests:
           path: kind
           value: RoleBinding
         template: victoria-metrics-operator/vlagent/rbac.yaml
-  - it: "resource names, useLegacyNaming=true"
+  - it: "useLegacyNaming: true is rejected -- vm.cr.fullname requires CR names to stay stable"
     set:
       useLegacyNaming: true
     asserts:
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-k8s-stack-vmagent
-        documentSelector:
-          path: kind
-          value: Role
-        template: victoria-metrics-operator/vmagent/rbac.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-k8s-stack-vmagent
-        documentSelector:
-          path: kind
-          value: RoleBinding
-        template: victoria-metrics-operator/vmagent/rbac.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-k8s-stack-vlagent
-        documentSelector:
-          path: kind
-          value: Role
-        template: victoria-metrics-operator/vlagent/rbac.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-k8s-stack-vlagent
-        documentSelector:
-          path: kind
-          value: RoleBinding
-        template: victoria-metrics-operator/vlagent/rbac.yaml
+      - failedTemplate:
+          errorMessage: "useLegacyNaming: true is not supported by this chart; CR names must remain stable regardless of naming style"
+        template: victoria-metrics-operator/vmsingle/vmsingle.yml
+
+  - it: "component-level useLegacyNaming: true is also rejected (vm.useLegacyNaming resolves per-appKey)"
+    set:
+      vmagent.useLegacyNaming: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "useLegacyNaming: true is not supported by this chart; CR names must remain stable regardless of naming style"
+        template: victoria-metrics-operator/vmagent/vmagent.yaml

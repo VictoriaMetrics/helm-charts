@@ -122,6 +122,7 @@ global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
     {{- $notifiers := list -}}
     {{- $appSecure := not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config) -}}
     {{- $_ := set $ctx "appKey" (list "alertmanager" "spec") -}}
+    {{- $_ := set $ctx "kindOverride" "vmalertmanager" -}}
     {{- $_ := set $ctx "appSecure" $appSecure -}}
     {{- $_ := set $ctx "appRoute" (($Values.alertmanager).spec).routePrefix -}}
     {{- $alertManagerReplicas := $Values.alertmanager.spec.replicaCount | default 1 | int -}}
@@ -470,6 +471,8 @@ global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
     {{- range $ds := $Values.defaultDatasources.alertmanager.datasources }}
       {{- $appSecure := not (empty ((($Values.alertmanager).spec).webConfig).tls_server_config) -}}
       {{- $_ := set $ctx "appKey" (list "alertmanager" "spec") -}}
+      {{- $_ := set $ctx "kindOverride" "vmalertmanager" -}}
+      {{- $_ := set $ctx "style" "managed" -}}
       {{- $_ := set $ctx "appSecure" $appSecure -}}
       {{- $_ := set $ctx "appRoute" (($Values.alertmanager).spec).routePrefix -}}
       {{- $_ := set $ds "url" (include "vm.url" $ctx) -}}

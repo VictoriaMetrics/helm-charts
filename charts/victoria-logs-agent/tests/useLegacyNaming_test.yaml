@@ -22,21 +22,21 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-victoria-logs-agent
         template: service.yaml
-  - it: "resource names, useLegacyNaming=false (currently a no-op on this chart -- server.yaml uses vm.fullname directly, not useLegacyNaming-aware; service.yaml's vm.plain.fullname has no appKey/kindOverride so it also falls back to the legacy name)"
+  - it: "resource names, useLegacyNaming=false"
     set:
       useLegacyNaming: false
     asserts:
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-victoria-logs-agent
+          value: vlagent-RELEASE-NAME
         documentSelector:
           path: metadata.name
-          value: RELEASE-NAME-victoria-logs-agent
+          value: vlagent-RELEASE-NAME
         template: server.yaml
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-victoria-logs-agent
+          value: vlagent-RELEASE-NAME
         documentSelector:
           path: metadata.name
-          value: RELEASE-NAME-victoria-logs-agent
+          value: vlagent-RELEASE-NAME
         template: service.yaml
