@@ -168,8 +168,11 @@ Returns "true", "false", or "" (not set at any level).
   {{- $_ := unset . "overrideKey" -}}
   {{- if empty $fullname -}}
     {{- if eq (include "vm.useLegacyNaming" .) "false" -}}
-      {{- $release := ((.helm).Release | default .Release).Name -}}
-      {{- $fullname = printf "%s-%s" (include "vm.operator.kind" .) $release -}}
+      {{- $base := ((.helm).Release | default .Release).Name -}}
+      {{- if .appKey -}}
+        {{- $base = $Values.fullnameOverride | default ($Values.global).fullnameOverride | default $base -}}
+      {{- end -}}
+      {{- $fullname = printf "%s-%s" (include "vm.operator.kind" .) $base -}}
     {{- else -}}
       {{- $fullname = include "vm.fullname" . -}}
       {{- with include "vm.internal.key.default" . -}}
@@ -208,6 +211,12 @@ Returns "true", "false", or "" (not set at any level).
     {{- end }}
     {{- if and (empty $key) .fallback -}}
       {{- $key = include "vm.internal.key.default" . -}}
+    {{- end -}}
+  {{- else if eq $overrideKey "fullnameOverride" -}}
+    {{- if $Values.fullnameOverride -}}
+      {{- $key = $Values.fullnameOverride -}}
+    {{- else if ($Values.global).fullnameOverride -}}
+      {{- $key = $Values.global.fullnameOverride -}}
     {{- end -}}
   {{- end -}}
   {{- $key -}}

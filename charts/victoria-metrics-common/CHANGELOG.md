@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- fixed `vm.plain.fullname` with `useLegacyNaming: false` silently ignoring a chart-wide or `global.fullnameOverride`: a call without `appKey` now uses the override as-is, and a call with `appKey` (no matching component-scoped override) now uses it as the base, prefixed by the operator kind — matching the behavior already used for legacy naming.
 
 ## v0.4.0
 
