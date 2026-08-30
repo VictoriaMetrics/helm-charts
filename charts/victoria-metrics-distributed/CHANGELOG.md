@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
+- bump `victoria-metrics-k8s-stack` dependency from `0.72.*` to `0.95.*`, which is compatible with `victoria-metrics-common` `0.4.*`. Dashboards and default alerting rules of the bundled stack are now provisioned by its sync job instead of static `ConfigMap` and `VMRule` objects.
 
 ## v0.47.0
 
