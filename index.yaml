@@ -38979,6 +38979,43 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - 'fixed `vm.plain.fullname` with `useLegacyNaming: false` silently ignoring a chart-wide or `global.fullnameOverride`: a call without `appKey` now uses the override as-is, and a call with `appKey` (no matching component-scoped override) now uses it as the base, prefixed by the operator kind — matching the behavior already used for legacy naming.'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Common Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/changelog/).
+    apiVersion: v2
+    created: "2026-08-30T20:09:09.958810698Z"
+    description: VictoriaMetrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: a104198b337994ea93ac5d4d7eb9d8e3be64121a19eb89c70d30b35e1992a1c0
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.4.1/victoria-metrics-common-0.4.1.tgz
+    version: 0.4.1
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '**breaking (chart-internal API)**: `vm.operator.kind` no longer guesses a default resource-name prefix for an appKey that isn''t already `vm`/`vl`/`vt`-prefixed; it now requires an explicit `kindOverride` and fails otherwise. `vm.managed.fullname` delegates to `vm.operator.kind` instead of duplicating its own prefix logic, so it gains the same `kindOverride` support and fail-fast behavior. All consuming charts have been updated to pass `kindOverride` where needed.'
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -84501,4 +84538,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-08-30T17:49:00.005430794Z"
+generated: "2026-08-30T20:09:09.961552181Z"
