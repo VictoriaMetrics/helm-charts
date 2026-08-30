@@ -107,9 +107,12 @@ jobs:
               export CHART_FILE="${CHART_DIR}/Chart.yaml"
               export APP_VERSION="$(yq -M '.appVersion' $CHART_FILE)"
               export CHART_VERSION="$(yq -M '.version' $CHART_FILE)"
-              
+
+              # 0.0.0 marks a chart not meant to be released (e.g. a local test-only chart)
+              if [ "$CHART_VERSION" = "0.0.0" ]; then
+                echo "Skipping $CHANGELOG: chart version is 0.0.0"
               # If version already released
-              if grep -q "^## v$CHART_VERSION$" $CHANGELOG; then
+              elif grep -q "^## v$CHART_VERSION$" $CHANGELOG; then
                 echo "There is nothing to release for $CHANGELOG"
               else
                 # Release notes file

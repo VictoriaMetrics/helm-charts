@@ -99,8 +99,8 @@ If release name contains chart name it will be used as a full name.
     {{- $fullname = include "vm.fullname" . -}}
   {{- end -}}
   {{- $isLegacy := eq (include "vm.useLegacyNaming" .) "true" -}}
-  {{- with include "vm.internal.key.default" . -}}
-    {{- $prefix := ternary . (printf "vm%s" .) (or (hasPrefix "vm" .) (hasPrefix "vl" .) (hasPrefix "vt" .)) -}}
+  {{- if include "vm.internal.key.default" . -}}
+    {{- $prefix := include "vm.operator.kind" . -}}
     {{- if $isLegacy -}}
       {{- $fullname = printf "%s-%s" $fullname $prefix -}}
     {{- else -}}
@@ -116,25 +116,19 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{- /*
-vm.operator.kind returns the operator resource-name prefix for the current
-component (e.g. "vlsingle", "vminsert", "vmalertmanager").
-Rules (checked in order):
-  1. appKey already has vm/vl/vt prefix → use as-is (cluster components)
-  2. empty appKey or "server"           → derive from chart name
-  3. other named sub-component          → chart prefix + appKey
+vm.operator.kind returns the operator resource-name prefix (e.g. "vlsingle",
+"vminsert", or an explicit .kindOverride for names that don't fit that pattern).
 */ -}}
 {{- define "vm.operator.kind" -}}
-  {{- $appKey := include "vm.internal.key.default" . -}}
-  {{- $Chart  := (.helm).Chart | default .Chart -}}
-  {{- $p := "vm" -}}
-  {{- if hasPrefix "victoria-logs" $Chart.Name -}}{{- $p = "vl" -}}{{- end -}}
-  {{- if hasPrefix "victoria-traces" $Chart.Name -}}{{- $p = "vt" -}}{{- end -}}
-  {{- if or (hasPrefix "vm" $appKey) (hasPrefix "vl" $appKey) (hasPrefix "vt" $appKey) -}}
-    {{- $appKey -}}
-  {{- else if or (empty $appKey) (eq $appKey "server") -}}
-    {{- printf "%s%s" $p (regexReplaceAll "^victoria-(metrics|logs|traces)-" $Chart.Name "") -}}
+  {{- if .kindOverride -}}
+    {{- .kindOverride -}}
   {{- else -}}
-    {{- printf "%s%s" $p $appKey -}}
+    {{- $appKey := include "vm.internal.key.default" . -}}
+    {{- if or (hasPrefix "vm" $appKey) (hasPrefix "vl" $appKey) (hasPrefix "vt" $appKey) -}}
+      {{- $appKey -}}
+    {{- else -}}
+      {{- fail (printf "vm.operator.kind: appKey %q is not vm/vl/vt-prefixed; pass an explicit \"kindOverride\" for the desired resource name" $appKey) -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
 

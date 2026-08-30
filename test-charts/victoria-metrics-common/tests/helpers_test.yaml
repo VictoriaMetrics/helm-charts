@@ -46,6 +46,7 @@ tests:
     set:
       ctx:
         appKey: test
+        kindOverride: vmtest
       test:
         name: ""
     asserts:
@@ -68,6 +69,7 @@ tests:
     set:
       ctx:
         appKey: app
+        kindOverride: vmapp
       app:
         name: test
     asserts:
@@ -90,6 +92,7 @@ tests:
     set:
       ctx:
         appKey: app
+        kindOverride: vmapp
       app:
         fullnameOverride: test
     asserts:
@@ -112,6 +115,7 @@ tests:
     set:  
       ctx:
         appKey: app
+        kindOverride: vmapp
       fullnameOverride: global
       app:
         fullnameOverride: ""
@@ -137,6 +141,7 @@ tests:
         appKey:
          - test
          - single
+        kindOverride: vmsingle
       fullnameOverride: global
       test:
         single:
@@ -163,6 +168,7 @@ tests:
         appKey:
          - test
          - single
+        kindOverride: vmsingle
       fullnameOverride: global
       test:
         single:
@@ -189,6 +195,7 @@ tests:
         appKey:
          - test
          - single
+        kindOverride: vmsingle
         test:
           single:
             name: override-1
@@ -236,6 +243,7 @@ tests:
          - test
          - single
          - spec
+        kindOverride: vmsingle
         test:
           single:
             name: override-1
@@ -263,19 +271,40 @@ tests:
           value: NAMESPACE
 
   # useLegacyNaming tests
-  - it: useLegacyNaming false without appKey uses chart-derived kind
+  - it: useLegacyNaming false without appKey and no kindOverride fails
     set:
       useLegacyNaming: false
+    asserts:
+      - failedTemplate:
+          errorMessage: 'vm.operator.kind: appKey "" is not vm/vl/vt-prefixed; pass an explicit "kindOverride" for the desired resource name'
+
+  - it: useLegacyNaming false without appKey uses the explicit kindOverride
+    set:
+      useLegacyNaming: false
+      ctx:
+        kindOverride: vmcommon
     asserts:
       - equal:
           path: vm.plain.fullname
           value: vmcommon-RELEASE-NAME
 
-  - it: useLegacyNaming false with non-operator appKey uses chart-derived kind
+  - it: useLegacyNaming false with "server" appKey and no kindOverride fails
     set:
       useLegacyNaming: false
       ctx:
         appKey: server
+      server:
+        name: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: 'vm.operator.kind: appKey "server" is not vm/vl/vt-prefixed; pass an explicit "kindOverride" for the desired resource name'
+
+  - it: useLegacyNaming false with "server" appKey uses the explicit kindOverride
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: server
+        kindOverride: vmcommon
       server:
         name: ""
     asserts:
@@ -319,11 +348,23 @@ tests:
           path: vm.plain.fullname
           value: vtstorage-RELEASE-NAME
 
-  - it: useLegacyNaming false with named sub-component prefixes with chart kind
+  - it: useLegacyNaming false with a non-vm/vl/vt-prefixed appKey and no kindOverride fails
     set:
       useLegacyNaming: false
       ctx:
         appKey: alertmanager
+      alertmanager:
+        name: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: 'vm.operator.kind: appKey "alertmanager" is not vm/vl/vt-prefixed; pass an explicit "kindOverride" for the desired resource name'
+
+  - it: useLegacyNaming false with a non-vm/vl/vt-prefixed appKey uses the explicit kindOverride
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: alertmanager
+        kindOverride: vmalertmanager
       alertmanager:
         name: ""
     asserts:
@@ -336,6 +377,7 @@ tests:
       useLegacyNaming: true
       ctx:
         appKey: server
+        kindOverride: vmserver
       server:
         name: ""
     asserts:
@@ -368,11 +410,23 @@ tests:
           path: vm.managed.fullname
           value: RELEASE-NAME-victoria-metrics-common-vlselect
 
-  - it: managed.fullname useLegacyNaming true with non-operator appKey prefixes and uses suffix style
+  - it: managed.fullname useLegacyNaming true with a non-vm/vl/vt-prefixed appKey and no kindOverride fails
     set:
       useLegacyNaming: true
       ctx:
         appKey: alertmanager
+      alertmanager:
+        name: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: 'vm.operator.kind: appKey "alertmanager" is not vm/vl/vt-prefixed; pass an explicit "kindOverride" for the desired resource name'
+
+  - it: managed.fullname useLegacyNaming true with a non-vm/vl/vt-prefixed appKey uses the explicit kindOverride
+    set:
+      useLegacyNaming: true
+      ctx:
+        appKey: alertmanager
+        kindOverride: vmalertmanager
       alertmanager:
         name: ""
     asserts:
@@ -408,6 +462,7 @@ tests:
       ctx:
         appKey:
           - mycomponent
+        kindOverride: vmmycomponent
       mycomponent:
         namespaceOverride: component-ns
     asserts:
@@ -419,6 +474,7 @@ tests:
     set:
       ctx:
         appKey: mycomponent
+        kindOverride: vmmycomponent
       mycomponent:
         namespaceOverride: component-ns
     asserts:
@@ -432,6 +488,7 @@ tests:
       ctx:
         appKey:
           - mycomponent
+        kindOverride: vmmycomponent
       mycomponent:
         namespaceOverride: component-ns
     asserts:
@@ -446,6 +503,7 @@ tests:
       ctx:
         appKey:
           - mycomponent
+        kindOverride: vmmycomponent
       mycomponent:
         namespaceOverride: component-ns
     asserts:
@@ -459,6 +517,7 @@ tests:
       ctx:
         appKey:
           - mycomponent
+        kindOverride: vmmycomponent
       mycomponent:
         enabled: false
     asserts:
@@ -471,9 +530,63 @@ tests:
       ctx:
         appKey:
           - mycomponent
+        kindOverride: vmmycomponent
       mycomponent:
         enabled: false
     asserts:
       - equal:
           path: vm.namespace
           value: NAMESPACE
+
+  # vm.operator.kind kindOverride tests
+  - it: kindOverride overrides the default kind inference for a non-operator-prefixed appKey
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: single
+        kindOverride: vmestimator-single
+      single:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: vmestimator-single-RELEASE-NAME
+
+  - it: kindOverride is ignored when a component fullnameOverride is set
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: single
+        kindOverride: vmestimator-single
+      single:
+        fullnameOverride: custom
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: custom
+
+  - it: kindOverride takes precedence even over an already vm-prefixed appKey
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: vminsert
+        kindOverride: vmestimator-insert
+      vminsert:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.plain.fullname
+          value: vmestimator-insert-RELEASE-NAME
+
+  - it: kindOverride does not affect the component label, only the resolved name
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: single
+        kindOverride: vmestimator-single
+      single:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.app.name
+          value: single

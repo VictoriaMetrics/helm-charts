@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- **breaking (chart-internal API)**: `vm.operator.kind` no longer guesses a default resource-name prefix for an appKey that isn't already `vm`/`vl`/`vt`-prefixed; it now requires an explicit `kindOverride` and fails otherwise. `vm.managed.fullname` delegates to `vm.operator.kind` instead of duplicating its own prefix logic, so it gains the same `kindOverride` support and fail-fast behavior. All consuming charts have been updated to pass `kindOverride` where needed.
 
 ## v0.3.16
 
