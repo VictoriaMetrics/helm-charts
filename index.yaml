@@ -38979,6 +38979,43 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - '**breaking (chart-internal API)**: `vm.operator.kind` no longer guesses a default resource-name prefix for an appKey that isn''t already `vm`/`vl`/`vt`-prefixed; it now requires an explicit `kindOverride` and fails otherwise. `vm.managed.fullname` delegates to `vm.operator.kind` instead of duplicating its own prefix logic, so it gains the same `kindOverride` support and fail-fast behavior. All consuming charts have been updated to pass `kindOverride` where needed.'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Common Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/changelog/).
+    apiVersion: v2
+    created: "2026-08-30T17:48:58.351590928Z"
+    description: VictoriaMetrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: 2a5eb8a057c2dae527186a724cad01a0ceb583ad5ff561364fe223969b9fd738
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.4.0/victoria-metrics-common-0.4.0.tgz
+    version: 0.4.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - 'updated `vm.namespace` to resolve per-component namespace override: when `appKey` is set in the template context, the first key is used to look up `<component>.namespaceOverride` in chart values. Component-level namespace takes precedence over chart-wide `namespaceOverride` and `global.namespaceOverride`. Enables `victoria-metrics-k8s-stack` to deploy individual CRs into separate namespaces. See [#3113](https://github.com/VictoriaMetrics/helm-charts/issues/3113)'
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -45076,6 +45113,49 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-distributed-0.1.1/victoria-metrics-distributed-0.1.1.tgz
     version: 0.1.0
+  victoria-metrics-estimator:
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-estimator
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Docs
+          url: https://docs.victoriametrics.com/victoriametrics/vmestimator/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-metrics-estimator/changelog/
+        - name: App Changelog
+          url: https://docs.victoriametrics.com/victoriametrics/vmestimator/changelog/
+    apiVersion: v2
+    appVersion: v0.1.15
+    created: "2026-08-30T17:48:58.684563196Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.3.*
+    description: A Helm chart for VictoriaMetrics vmestimator
+    digest: 1526022b3a77e4a6ee8a2e9b5cfde6cb7635811ff5bfed47bf47fc2c385c9f44
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - vmestimator
+    - cardinality
+    - kubernetes
+    - observability
+    kubeVersion: '>=1.25.0-0'
+    maintainers:
+    - name: VictoriaMetrics
+      url: https://github.com/VictoriaMetrics
+    name: victoria-metrics-estimator
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-estimator-0.0.0/victoria-metrics-estimator-0.0.0.tgz
+    version: 0.0.0
   victoria-metrics-gateway:
   - annotations:
       artifacthub.io/category: monitoring-logging
@@ -84421,4 +84501,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-08-22T08:41:50.837284572Z"
+generated: "2026-08-30T17:49:00.005430794Z"
