@@ -30,6 +30,10 @@ spec:
       runtimeClassName: {{ . }}
       {{- end }}
       serviceAccountName: {{ include "vm.fullname" $ctx }}
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

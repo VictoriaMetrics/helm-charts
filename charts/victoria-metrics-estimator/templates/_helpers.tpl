@@ -152,6 +152,10 @@ spec:
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- end }}
+      {{- with $app.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with $app.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

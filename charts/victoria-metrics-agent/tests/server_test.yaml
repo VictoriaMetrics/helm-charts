@@ -71,6 +71,28 @@ tests:
           value: platform
         template: server.yaml
         documentIndex: 0
+  - it: should render custom dnsConfig
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      dnsConfig:
+        nameservers:
+          - 1.1.1.1
+        options:
+          - name: ndots
+            value: "2"
+    asserts:
+      - equal:
+          path: spec.template.spec.dnsConfig
+          value:
+            nameservers:
+              - 1.1.1.1
+            options:
+              - name: ndots
+                value: "2"
+        template: server.yaml
+        documentIndex: 0
+
   - it: should apply global.extraAnnotations to resource metadata and pod template
     set:
       remoteWrite:

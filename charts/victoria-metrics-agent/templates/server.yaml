@@ -181,6 +181,10 @@ spec:
       {{- if and ($app.hostNetwork) (eq $mode "daemonSet") }}
       hostNetwork: true
       {{- end }}
+      {{- with $app.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if $app.dnsPolicy }}
       dnsPolicy: {{ $app.dnsPolicy }}
       {{- else if and ($app.hostNetwork) (eq $mode "daemonSet") }}
