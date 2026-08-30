@@ -415,7 +415,7 @@
     {{- $installed = append $installed $plugin }}
   {{- end -}}
   {{- $ds := .ds -}}
-  {{- toString (or (not (hasKey $ds "version")) (has $ds.type $installed)) -}}
+  {{- toString (or (not $ds.plugin) (has $ds.type $installed)) -}}
 {{- end -}}
 
 {{- /* Datasources */ -}}

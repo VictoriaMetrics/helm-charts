@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed `plugins` section missing from `GrafanaDatasource` CRs for datasources whose type requires a Grafana plugin not already listed in `grafana.plugins`. See [#3181](https://github.com/VictoriaMetrics/helm-charts/issues/3181)
 
 ## v0.91.2
 

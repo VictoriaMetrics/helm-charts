@@ -22,6 +22,9 @@ tests:
     set:
       alertmanager:
         enabled: false
+      grafana:
+        plugins:
+          - victoriametrics-logs-datasource
       vlsingle:
         enabled: true
       vmalert:
@@ -67,6 +70,9 @@ tests:
         enabled: true
       alertmanager:
         enabled: false
+      grafana:
+        plugins:
+          - victoriametrics-logs-datasource
       vlsingle:
         enabled: true
       vmalert:
@@ -80,3 +86,50 @@ tests:
       - matchRegex:
           path: data["datasource.yaml"]
           pattern: 'vlsingle-RELEASE-NAME-victoria-metrics-k8s-stack'
+
+  - it: GrafanaDatasource CR gets plugins section when plugin isn't preinstalled
+    set:
+      defaultDatasources:
+        grafanaOperator:
+          enabled: true
+      grafana:
+        forceDeployDatasource: true
+      vmsingle:
+        enabled: true
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - notExists:
+          path: spec.plugins
+        documentIndex: 0
+      - equal:
+          path: spec.plugins
+          value:
+            - name: victoriametrics-metrics-datasource
+        documentIndex: 1
+
+  - it: GrafanaDatasource CR omits plugins section when plugin is preinstalled
+    set:
+      defaultDatasources:
+        grafanaOperator:
+          enabled: true
+      grafana:
+        forceDeployDatasource: true
+        plugins:
+          - victoriametrics-metrics-datasource
+      vmsingle:
+        enabled: true
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - notExists:
+          path: spec.plugins
+        documentIndex: 1
