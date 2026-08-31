@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.67.3
+
+**Release date:** 31 Aug 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.74.1](https://img.shields.io/badge/v0.74.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0741)
+
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
 - added `global.versions` (metrics/logs/traces/anomaly/alertmanager) to populate the operator's default-version env vars (`VM_METRICS_VERSION`, `VM_LOGS_VERSION`, `VM_TRACES_VERSION`, `VM_ANOMALY_VERSION`, `VM_VMALERTMANAGER_ALERTMANAGERVERSION`); an explicit entry in `env` for the same variable still takes precedence. See [#3186](https://github.com/VictoriaMetrics/helm-charts/issues/3186)
 
