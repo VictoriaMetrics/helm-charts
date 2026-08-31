@@ -1,77 +1,193 @@
 suite: useLegacyNaming tests
+set:
+  mode: cluster
+  ingress.enabled: true
+  serviceMonitor.enabled: true
+  serviceAccount.create: true
+  networkPolicy.enabled: true
+  storage.podDisruptionBudget.enabled: true
+  select.podDisruptionBudget.enabled: true
 templates:
+  - configmap.yaml
+  - ingress.yaml
+  - monitor.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - service.yaml
+  - serviceaccount.yaml
   - workload.yaml
 tests:
-  - it: single useLegacyNaming false uses type-prefixed name
-    set:
-      useLegacyNaming: false
+  - it: "resource names (useLegacyNaming: false, default)"
     asserts:
       - equal:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
-
-  - it: single useLegacyNaming true uses release-based naming
-    set:
-      useLegacyNaming: true
-    asserts:
-      - equal:
+          value: vmestimator-RELEASE-NAME
+        documentSelector:
           path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-single
-
-  - it: single useLegacyNaming component override takes precedence
-    set:
-      useLegacyNaming: false
-      single.useLegacyNaming: true
-    asserts:
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-single
-
-  - it: fullnameOverride takes precedence
-    set:
-      useLegacyNaming: false
-      fullnameOverride: estimator
-    asserts:
-      - equal:
-          path: metadata.name
-          value: estimator-single
-
-  - it: storage useLegacyNaming false uses type-prefixed name
-    set:
-      mode: cluster
-      useLegacyNaming: false
-    asserts:
-      - equal:
-          path: metadata.name
-          value: vmestimator-storage-RELEASE-NAME
-        documentIndex: 0
-
-  - it: storage useLegacyNaming true uses release-based naming
-    set:
-      mode: cluster
-      useLegacyNaming: true
-    asserts:
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
-        documentIndex: 0
-
-  - it: select useLegacyNaming false uses type-prefixed name
-    set:
-      mode: cluster
-      useLegacyNaming: false
-    asserts:
+          value: vmestimator-RELEASE-NAME
+        template: configmap.yaml
       - equal:
           path: metadata.name
           value: vmestimator-select-RELEASE-NAME
-        documentIndex: 1
-
-  - it: select useLegacyNaming true uses release-based naming
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME-insert
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME-insert
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-RELEASE-NAME
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+        template: workload.yaml
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        template: workload.yaml
+  - it: "resource names (useLegacyNaming: true)"
     set:
-      mode: cluster
       useLegacyNaming: true
     asserts:
       - equal:
           path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator
+        template: configmap.yaml
+      - equal:
+          path: metadata.name
           value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        documentIndex: 1
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-stor-insert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-stor-insert
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
+        template: workload.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
+        template: workload.yaml

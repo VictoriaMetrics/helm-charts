@@ -66,6 +66,25 @@ spec:
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
           env:
+            {{- $envNames := dict -}}
+            {{- range .Values.env }}
+              {{- $_ := set $envNames .name true -}}
+            {{- end -}}
+            {{- $versions := ((.Values).global).versions | default dict -}}
+            {{- $versionEnv := dict
+                "VM_METRICS_VERSION" $versions.metrics
+                "VM_LOGS_VERSION" $versions.logs
+                "VM_TRACES_VERSION" $versions.traces
+                "VM_ANOMALY_VERSION" $versions.anomaly
+                "VM_VMALERTMANAGER_ALERTMANAGERVERSION" $versions.alertmanager
+            -}}
+            {{- range $name := (keys $versionEnv | sortAlpha) }}
+              {{- $value := index $versionEnv $name }}
+              {{- if and $value (not (hasKey $envNames $name)) }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+              {{- end }}
+            {{- end }}
             {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}

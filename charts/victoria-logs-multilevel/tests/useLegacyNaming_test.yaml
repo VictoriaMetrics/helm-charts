@@ -1,0 +1,307 @@
+suite: useLegacyNaming tests
+set:
+  serviceAccount.create: true
+  storageNodes[0]: http://x:9428
+  vlselect.enabled: true
+  vlselect.podDisruptionBudget.enabled: true
+  vlselect.networkPolicy.enabled: true
+  vlselect.service.enabled: true
+  vlselect.ingress.enabled: true
+  vlselect.route.enabled: true
+  vlselect.vmServiceScrape.enabled: true
+  vlselect.horizontalPodAutoscaler.enabled: true
+  vmauth.enabled: true
+  vmauth.podDisruptionBudget.enabled: true
+  vmauth.networkPolicy.enabled: true
+  vmauth.service.enabled: true
+  vmauth.ingress.enabled: true
+  vmauth.route.enabled: true
+  vmauth.vmServiceScrape.enabled: true
+  vmauth.horizontalPodAutoscaler.enabled: true
+templates:
+  - hpa.yaml
+  - ingress.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - route.yaml
+  - scrape.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - vlselect-server.yaml
+  - vmauth-config.yaml
+  - vmauth-server.yaml
+tests:
+  - it: "resource names (legacy naming, default)"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        template: scrape.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: scrape.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+        template: vlselect-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-logs-multilevel
+        template: vlselect-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: vmauth-config.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-logs-multilevel
+        template: vmauth-server.yaml
+  - it: "resource names (useLegacyNaming: false)"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        template: scrape.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: scrape.yaml
+      - equal:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vlmultilevel-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlmultilevel-RELEASE-NAME
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+        template: vlselect-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-logs-multilevel
+        template: vlselect-server.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: vmauth-config.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-logs-multilevel
+        template: vmauth-server.yaml

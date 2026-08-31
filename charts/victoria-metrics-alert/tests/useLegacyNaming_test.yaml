@@ -1,0 +1,290 @@
+suite: useLegacyNaming tests
+capabilities:
+  apiVersions:
+    - autoscaling.k8s.io/v1
+set:
+  server.datasource.url: http://x
+  server.config.alerts.groups[0].name: x
+  server.podDisruptionBudget.enabled: true
+  server.networkPolicy.enabled: true
+  server.route.enabled: true
+  server.ingress.enabled: true
+  serviceMonitor.enabled: true
+  serviceAccount.create: true
+  alertmanager.enabled: true
+  alertmanager.networkPolicy.enabled: true
+  alertmanager.route.enabled: true
+  alertmanager.ingress.enabled: true
+  alertmanager.persistentVolume.enabled: true
+  server.verticalPodAutoscaler.enabled: true
+templates:
+  - alert-configmap.yaml
+  - alert-ingress.yaml
+  - alert-networkpolicy.yaml
+  - alert-pdb.yaml
+  - alert-route.yaml
+  - alert-server.yaml
+  - alert-service.yaml
+  - alertmanager-configmap.yaml
+  - alertmanager-ingress.yaml
+  - alertmanager-networkpolicy.yaml
+  - alertmanager-pvc.yaml
+  - alertmanager-route.yaml
+  - alertmanager-server.yaml
+  - alertmanager-service.yaml
+  - monitor.yaml
+  - serviceaccount.yaml
+  - vpa.yaml
+tests:
+  - it: "resource names (legacy naming, default)"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server-alert-rules-config
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server-alert-rules-config
+        template: alert-configmap.yaml
+      - equal:
+          path: spec.template.spec.volumes[0].configMap.name
+          value: RELEASE-NAME-victoria-metrics-alert-server-alert-rules-config
+        template: alert-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        template: alert-ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        template: alert-networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        template: alert-pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        template: alert-route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        template: alert-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        template: alert-service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager-config
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager-config
+        template: alertmanager-configmap.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        template: alertmanager-ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        template: alertmanager-networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        template: alertmanager-pvc.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        template: alertmanager-route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        template: alertmanager-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        template: alertmanager-service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+        template: vpa.yaml
+  - it: "resource names (useLegacyNaming: false)"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME-alert-rules-config
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME-alert-rules-config
+        template: alert-configmap.yaml
+      - equal:
+          path: spec.template.spec.volumes[0].configMap.name
+          value: vmalert-RELEASE-NAME-alert-rules-config
+        template: alert-server.yaml
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        template: alert-ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        template: alert-networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        template: alert-pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        template: alert-route.yaml
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        template: alert-server.yaml
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        template: alert-service.yaml
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME-config
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME-config
+        template: alertmanager-configmap.yaml
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        template: alertmanager-ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        template: alertmanager-networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        template: alertmanager-pvc.yaml
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        template: alertmanager-route.yaml
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        template: alertmanager-server.yaml
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        template: alertmanager-service.yaml
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+        template: vpa.yaml

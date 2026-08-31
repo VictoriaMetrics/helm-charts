@@ -1,0 +1,564 @@
+suite: useLegacyNaming tests
+set:
+  serviceAccount.create: true
+  vmselect.enabled: true
+  vmselect.podDisruptionBudget.enabled: true
+  vmselect.networkPolicy.enabled: true
+  vmselect.service.enabled: true
+  vmselect.ingress.enabled: true
+  vmselect.route.enabled: true
+  vmselect.serviceMonitor.enabled: true
+  vmselect.horizontalPodAutoscaler.enabled: true
+  vminsert.enabled: true
+  vminsert.podDisruptionBudget.enabled: true
+  vminsert.networkPolicy.enabled: true
+  vminsert.service.enabled: true
+  vminsert.ingress.enabled: true
+  vminsert.route.enabled: true
+  vminsert.serviceMonitor.enabled: true
+  vminsert.horizontalPodAutoscaler.enabled: true
+  vmstorage.enabled: true
+  vmstorage.podDisruptionBudget.enabled: true
+  vmstorage.networkPolicy.enabled: true
+  vmstorage.service.enabled: true
+  vmstorage.ingress.enabled: true
+  vmstorage.route.enabled: true
+  vmstorage.serviceMonitor.enabled: true
+  vmstorage.horizontalPodAutoscaler.enabled: true
+  vmauth.enabled: true
+  vmauth.podDisruptionBudget.enabled: true
+  vmauth.networkPolicy.enabled: true
+  vmauth.service.enabled: true
+  vmauth.ingress.enabled: true
+  vmauth.route.enabled: true
+  vmauth.serviceMonitor.enabled: true
+  vmauth.horizontalPodAutoscaler.enabled: true
+templates:
+  - hpa.yaml
+  - ingress.yaml
+  - monitor.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - route.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - vmauth-config.yaml
+  - vmauth-server.yaml
+  - vminsert-server.yaml
+  - vmselect-server.yaml
+  - vmstorage-server.yaml
+tests:
+  - it: "resource names (legacy naming, default)"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: vmauth-config.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmauth
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: vmauth-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert
+        template: vminsert-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: vminsert-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+        template: vmselect-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: vmselect-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmstorage
+        template: vmstorage-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: vmstorage-server.yaml
+  - it: "resource names (useLegacyNaming: false)"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vmcluster-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmcluster-RELEASE-NAME
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: vmauth-config.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: vmauth-server.yaml
+      - equal:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vminsert-RELEASE-NAME
+        template: vminsert-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: vminsert-server.yaml
+      - equal:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmselect-RELEASE-NAME
+        template: vmselect-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: vmselect-server.yaml
+      - equal:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmstorage-RELEASE-NAME
+        template: vmstorage-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-cluster
+        template: vmstorage-server.yaml

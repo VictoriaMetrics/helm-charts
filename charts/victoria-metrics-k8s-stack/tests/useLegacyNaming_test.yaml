@@ -1,0 +1,76 @@
+suite: useLegacyNaming tests
+set:
+  vmagent.enabled: true
+  vlagent.enabled: true
+  vmagent.rbac.rules[0].apiGroups[0]: ""
+  vmagent.rbac.rules[0].resources[0]: pods
+  vmagent.rbac.rules[0].verbs[0]: get
+  vlagent.rbac.rules[0].apiGroups[0]: ""
+  vlagent.rbac.rules[0].resources[0]: pods
+  vlagent.rbac.rules[0].verbs[0]: get
+templates:
+  - victoria-metrics-operator/vmagent/rbac.yaml
+  - victoria-metrics-operator/vlagent/rbac.yaml
+tests:
+  - it: "resource names (default -- vm.managed.fullname defaults to operator-style prefix naming here, unlike vm.plain.fullname elsewhere)"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME-victoria-metrics-k8s-stack
+        documentSelector:
+          path: kind
+          value: Role
+        template: victoria-metrics-operator/vmagent/rbac.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME-victoria-metrics-k8s-stack
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: victoria-metrics-operator/vmagent/rbac.yaml
+      - equal:
+          path: metadata.name
+          value: vlagent-RELEASE-NAME-victoria-metrics-k8s-stack
+        documentSelector:
+          path: kind
+          value: Role
+        template: victoria-metrics-operator/vlagent/rbac.yaml
+      - equal:
+          path: metadata.name
+          value: vlagent-RELEASE-NAME-victoria-metrics-k8s-stack
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: victoria-metrics-operator/vlagent/rbac.yaml
+  - it: "resource names, useLegacyNaming=true"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack-vmagent
+        documentSelector:
+          path: kind
+          value: Role
+        template: victoria-metrics-operator/vmagent/rbac.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack-vmagent
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: victoria-metrics-operator/vmagent/rbac.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack-vlagent
+        documentSelector:
+          path: kind
+          value: Role
+        template: victoria-metrics-operator/vlagent/rbac.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack-vlagent
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: victoria-metrics-operator/vlagent/rbac.yaml

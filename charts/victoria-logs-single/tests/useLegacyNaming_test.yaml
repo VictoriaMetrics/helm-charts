@@ -1,0 +1,154 @@
+suite: useLegacyNaming tests
+set:
+  server.ingress.enabled: true
+  server.route.enabled: true
+  server.service.enabled: true
+  server.persistentVolume.enabled: true
+  server.serviceMonitor.enabled: true
+  podDisruptionBudget.enabled: true
+  networkPolicy.enabled: true
+  serviceAccount.create: true
+  server.mode: deployment
+templates:
+  - ingress.yaml
+  - monitor.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - pvc.yaml
+  - route.yaml
+  - server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+tests:
+  - it: "resource names (legacy naming, default)"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: pvc.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-single-server
+        template: serviceaccount.yaml
+  - it: "resource names (useLegacyNaming: false)"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: pvc.yaml
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: server.yaml
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vlsingle-RELEASE-NAME
+        template: serviceaccount.yaml

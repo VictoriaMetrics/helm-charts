@@ -1,0 +1,264 @@
+suite: useLegacyNaming tests
+capabilities:
+  apiVersions:
+    - autoscaling.k8s.io/v1
+set:
+  ingress.enabled: true
+  route.enabled: true
+  service.enabled: true
+  persistentVolume.enabled: true
+  podDisruptionBudget.enabled: true
+  networkPolicy.enabled: true
+  serviceAccount.create: true
+  rbac.create: true
+  remoteWrite[0].url: http://x
+  serviceMonitor.enabled: true
+  horizontalPodAutoscaler.enabled: true
+  verticalPodAutoscaler.enabled: true
+templates:
+  - configmap.yaml
+  - hpa.yaml
+  - ingress.yaml
+  - monitor.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - pvc.yaml
+  - rbac.yaml
+  - route.yaml
+  - server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - vpa.yaml
+tests:
+  - it: "resource names (legacy naming, default)"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent-config
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent-config
+        template: configmap.yaml
+      - equal:
+          path: spec.template.spec.volumes[2].configMap.name
+          value: RELEASE-NAME-victoria-metrics-agent-config
+        template: server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: vpa.yaml
+      - equal:
+          path: spec.targetRef.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: vpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent-rw
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent-rw
+        template: configmap.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: pvc.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: kind
+          value: ClusterRole
+        template: rbac.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: kind
+          value: ClusterRoleBinding
+        template: rbac.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: serviceaccount.yaml
+  - it: "resource names (useLegacyNaming: false)"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME-config
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME-config
+        template: configmap.yaml
+      - equal:
+          path: spec.template.spec.volumes[2].configMap.name
+          value: vmagent-RELEASE-NAME-config
+        template: server.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: vpa.yaml
+      - equal:
+          path: spec.targetRef.name
+          value: vmagent-RELEASE-NAME
+        template: vpa.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME-rw
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME-rw
+        template: configmap.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-agent
+        template: pvc.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: kind
+          value: ClusterRole
+        template: rbac.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: kind
+          value: ClusterRoleBinding
+        template: rbac.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: server.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmagent-RELEASE-NAME
+        template: serviceaccount.yaml

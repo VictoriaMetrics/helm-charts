@@ -1,0 +1,564 @@
+suite: useLegacyNaming tests
+set:
+  serviceAccount.create: true
+  vtselect.enabled: true
+  vtselect.podDisruptionBudget.enabled: true
+  vtselect.networkPolicy.enabled: true
+  vtselect.service.enabled: true
+  vtselect.ingress.enabled: true
+  vtselect.route.enabled: true
+  vtselect.vmServiceScrape.enabled: true
+  vtselect.horizontalPodAutoscaler.enabled: true
+  vtinsert.enabled: true
+  vtinsert.podDisruptionBudget.enabled: true
+  vtinsert.networkPolicy.enabled: true
+  vtinsert.service.enabled: true
+  vtinsert.ingress.enabled: true
+  vtinsert.route.enabled: true
+  vtinsert.vmServiceScrape.enabled: true
+  vtinsert.horizontalPodAutoscaler.enabled: true
+  vtstorage.enabled: true
+  vtstorage.podDisruptionBudget.enabled: true
+  vtstorage.networkPolicy.enabled: true
+  vtstorage.service.enabled: true
+  vtstorage.ingress.enabled: true
+  vtstorage.route.enabled: true
+  vtstorage.vmServiceScrape.enabled: true
+  vtstorage.horizontalPodAutoscaler.enabled: true
+  vmauth.enabled: true
+  vmauth.podDisruptionBudget.enabled: true
+  vmauth.networkPolicy.enabled: true
+  vmauth.service.enabled: true
+  vmauth.ingress.enabled: true
+  vmauth.route.enabled: true
+  vmauth.vmServiceScrape.enabled: true
+  vmauth.horizontalPodAutoscaler.enabled: true
+templates:
+  - hpa.yaml
+  - ingress.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - route.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - vmServiceScrape.yaml
+  - vmauth-config.yaml
+  - vmauth-server.yaml
+  - vtinsert-server.yaml
+  - vtselect-server.yaml
+  - vtstorage-server.yaml
+tests:
+  - it: "resource names (legacy naming, default)"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: vmServiceScrape.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        template: vmServiceScrape.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        template: vmServiceScrape.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        template: vmServiceScrape.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: vmauth-config.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vmauth
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-vt-cluster
+        template: vmauth-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtinsert
+        template: vtinsert-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-vt-cluster
+        template: vtinsert-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtselect
+        template: vtselect-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-vt-cluster
+        template: vtselect-server.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-vt-cluster-vtstorage
+        template: vtstorage-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-vt-cluster
+        template: vtstorage-server.yaml
+  - it: "resource names (useLegacyNaming: false)"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        template: pdb.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vtcluster-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtcluster-RELEASE-NAME
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: vmServiceScrape.yaml
+      - equal:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        template: vmServiceScrape.yaml
+      - equal:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        template: vmServiceScrape.yaml
+      - equal:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        template: vmServiceScrape.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: vmauth-config.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-vt-cluster
+        template: vmauth-server.yaml
+      - equal:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtinsert-RELEASE-NAME
+        template: vtinsert-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-vt-cluster
+        template: vtinsert-server.yaml
+      - equal:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtselect-RELEASE-NAME
+        template: vtselect-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-vt-cluster
+        template: vtselect-server.yaml
+      - equal:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vtstorage-RELEASE-NAME
+        template: vtstorage-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-vt-cluster
+        template: vtstorage-server.yaml
