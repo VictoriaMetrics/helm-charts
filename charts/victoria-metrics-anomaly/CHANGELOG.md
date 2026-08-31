@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v1.12.17
+
+**Release date:** 31 Aug 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.30.4](https://img.shields.io/badge/v1.30.4-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1304)
+
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
 - upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.30.4](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1304)
 
