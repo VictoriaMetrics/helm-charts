@@ -7,8 +7,10 @@ vm:
   fullname: {{ include "vm.fullname" . }}
   plain:
     fullname: {{ include "vm.plain.fullname" . }}
+  {{- if not .Values.skipCrFullname }}
   cr:
     fullname: {{ include "vm.cr.fullname" . }}
+  {{- end }}
   managed:
     fullname: {{ include "vm.managed.fullname" . }}
   namespace: {{ include "vm.namespace" . }}

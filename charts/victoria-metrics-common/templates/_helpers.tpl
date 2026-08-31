@@ -76,6 +76,9 @@ If release name contains chart name it will be used as a full name.
 
 {{- define "vm.cr.fullname" -}}
   {{- $Values := (.helm).Values | default .Values -}}
+  {{- if eq (include "vm.useLegacyNaming" .) "true" -}}
+    {{- fail "useLegacyNaming: true is not supported by this chart; CR names must remain stable regardless of naming style" -}}
+  {{- end -}}
   {{- $_ := set . "overrideKey" "name" -}}
   {{- $fullname := include "vm.internal.key" . -}}
   {{- $_ := unset . "overrideKey" -}}

@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- `vm.cr.fullname` now fails when `useLegacyNaming: true` is set, since CR names must stay stable regardless of naming style; consuming charts no longer need their own validation for this.
 
 ## v0.4.1
 

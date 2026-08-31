@@ -375,6 +375,7 @@ tests:
   - it: useLegacyNaming true preserves legacy naming
     set:
       useLegacyNaming: true
+      skipCrFullname: true
       ctx:
         appKey: server
         kindOverride: vmserver
@@ -389,6 +390,7 @@ tests:
   - it: managed.fullname useLegacyNaming true with operator-prefix appKey uses suffix style
     set:
       useLegacyNaming: true
+      skipCrFullname: true
       ctx:
         appKey: vminsert
       vminsert:
@@ -401,6 +403,7 @@ tests:
   - it: managed.fullname useLegacyNaming true with vl-prefix appKey uses suffix style
     set:
       useLegacyNaming: true
+      skipCrFullname: true
       ctx:
         appKey: vlselect
       vlselect:
@@ -413,6 +416,7 @@ tests:
   - it: managed.fullname useLegacyNaming true with a non-vm/vl/vt-prefixed appKey and no kindOverride fails
     set:
       useLegacyNaming: true
+      skipCrFullname: true
       ctx:
         appKey: alertmanager
       alertmanager:
@@ -424,6 +428,7 @@ tests:
   - it: managed.fullname useLegacyNaming true with a non-vm/vl/vt-prefixed appKey uses the explicit kindOverride
     set:
       useLegacyNaming: true
+      skipCrFullname: true
       ctx:
         appKey: alertmanager
         kindOverride: vmalertmanager
@@ -590,3 +595,29 @@ tests:
       - equal:
           path: vm.app.name
           value: single
+
+  # vm.cr.fullname useLegacyNaming tests
+  - it: cr.fullname fails when useLegacyNaming is true
+    set:
+      useLegacyNaming: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "useLegacyNaming: true is not supported by this chart; CR names must remain stable regardless of naming style"
+
+  - it: cr.fullname renders normally when useLegacyNaming is false
+    set:
+      useLegacyNaming: false
+      ctx:
+        appKey: vminsert
+      vminsert:
+        name: ""
+    asserts:
+      - equal:
+          path: vm.cr.fullname
+          value: RELEASE-NAME-victoria-metrics-common
+
+  - it: cr.fullname renders normally when useLegacyNaming is unset
+    asserts:
+      - equal:
+          path: vm.cr.fullname
+          value: RELEASE-NAME-victoria-metrics-common
