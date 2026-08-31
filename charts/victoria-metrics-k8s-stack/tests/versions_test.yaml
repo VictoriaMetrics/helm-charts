@@ -1,0 +1,148 @@
+suite: global.versions propagation tests
+set:
+  vlsingle.enabled: true
+  vlagent.enabled: true
+  vtsingle.enabled: true
+  alertmanager.enabled: true
+  vmalert.enabled: false
+templates:
+  - victoria-metrics-operator/vlsingle/vlsingle.yml
+  - victoria-metrics-operator/vlagent/vlagent.yaml
+  - victoria-metrics-operator/vtsingle/vtsingle.yaml
+  - victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+tests:
+  - it: "chart default global.versions populate spec.image.tag and the version label"
+    asserts:
+      - equal:
+          path: spec.image.tag
+          value: v1.52.0
+        template: victoria-metrics-operator/vlsingle/vlsingle.yml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.52.0
+        template: victoria-metrics-operator/vlsingle/vlsingle.yml
+      - equal:
+          path: spec.image.tag
+          value: v1.52.0
+        template: victoria-metrics-operator/vlagent/vlagent.yaml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.52.0
+        template: victoria-metrics-operator/vlagent/vlagent.yaml
+      - equal:
+          path: spec.image.tag
+          value: v0.9.4
+        template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v0.9.4
+        template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: spec.image.tag
+          value: v0.32.1
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+
+  - it: "custom global.versions overrides propagate to spec.image.tag and the version label"
+    set:
+      global.versions.logs: v9.9.9-logs
+      global.versions.traces: v9.9.9-traces
+      global.versions.alertmanager: v9.9.9-am
+    asserts:
+      - equal:
+          path: spec.image.tag
+          value: v9.9.9-logs
+        template: victoria-metrics-operator/vlsingle/vlsingle.yml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v9.9.9-logs
+        template: victoria-metrics-operator/vlsingle/vlsingle.yml
+      - equal:
+          path: spec.image.tag
+          value: v9.9.9-logs
+        template: victoria-metrics-operator/vlagent/vlagent.yaml
+      - equal:
+          path: spec.image.tag
+          value: v9.9.9-traces
+        template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: spec.image.tag
+          value: v9.9.9-am
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+
+  - it: "explicit spec.image.tag wins over global.versions"
+    set:
+      vlsingle.spec.image.tag: v1.1.1-explicit
+      vlagent.spec.image.tag: v1.1.1-explicit
+      vtsingle.spec.image.tag: v1.1.1-explicit
+      alertmanager.spec.image.tag: v1.1.1-explicit
+      global.versions.logs: v9.9.9-logs
+      global.versions.traces: v9.9.9-traces
+      global.versions.alertmanager: v9.9.9-am
+    asserts:
+      - equal:
+          path: spec.image.tag
+          value: v1.1.1-explicit
+        template: victoria-metrics-operator/vlsingle/vlsingle.yml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.1.1-explicit
+        template: victoria-metrics-operator/vlsingle/vlsingle.yml
+      - equal:
+          path: spec.image.tag
+          value: v1.1.1-explicit
+        template: victoria-metrics-operator/vlagent/vlagent.yaml
+      - equal:
+          path: spec.image.tag
+          value: v1.1.1-explicit
+        template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: spec.image.tag
+          value: v1.1.1-explicit
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+
+  - it: "empty global.versions leaves spec.image.tag unset (operator applies its own default); version label falls back to the chart appVersion"
+    set:
+      global.versions.logs: ""
+      global.versions.traces: ""
+      global.versions.alertmanager: ""
+    asserts:
+      - equal:
+          path: spec.image.tag
+          value: ""
+        template: victoria-metrics-operator/vlsingle/vlsingle.yml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.150.0
+        template: victoria-metrics-operator/vlsingle/vlsingle.yml
+      - equal:
+          path: spec.image.tag
+          value: ""
+        template: victoria-metrics-operator/vlagent/vlagent.yaml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.150.0
+        template: victoria-metrics-operator/vlagent/vlagent.yaml
+      - equal:
+          path: spec.image.tag
+          value: ""
+        template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v1.150.0
+        template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: spec.image.tag
+          value: ""
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml

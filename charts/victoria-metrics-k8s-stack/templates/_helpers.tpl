@@ -1,3 +1,12 @@
+{{- /*
+vm.versions.resolve resolves an image tag: an explicit .tag wins, otherwise falls back to
+global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
+*/ -}}
+{{- define "vm.versions.resolve" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- .tag | default (index (($Values.global).versions | default dict) .key) | default "" -}}
+{{- end -}}
+
 {{- define "vm.read.endpoint" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $endpoint := dict -}}
@@ -318,6 +327,10 @@
     {{- end -}}
   {{- end }}
   {{- $_ := set $spec "templates" $templates -}}
+  {{- $version := include "vm.versions.resolve" (dict "helm" .helm "tag" (($spec.image).tag) "key" "alertmanager") -}}
+  {{- with $version -}}
+    {{- $_ := set $spec "image" (mergeOverwrite ($spec.image | default dict) (dict "tag" .)) -}}
+  {{- end -}}
   {{- toYaml $spec -}}
 {{- end -}}
 
@@ -555,23 +568,36 @@
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- tpl (mergeOverwrite (deepCopy $agentValues.spec) (deepCopy $spec) | toYaml) . -}}
+  {{- $mergedSpec := mergeOverwrite (deepCopy $agentValues.spec) (deepCopy $spec) -}}
+  {{- if not (($mergedSpec.image).tag) -}}
+    {{- $version := include "vm.versions.resolve" (dict "helm" .helm "key" "logs") -}}
+    {{- with $version -}}
+      {{- $_ := set $mergedSpec "image" (mergeOverwrite ($mergedSpec.image | default dict) (dict "tag" .)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $mergedSpec | toYaml -}}
 {{- end }}
 
 {{- /* VLSingle spec */ -}}
 {{- define "vl.single.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $image := dict "tag" (include "vm.image.tag" .) }}
   {{- $extraArgs := dict -}}
   {{- if $Values.vmalert.enabled }}
     {{- $_ := set . "appKey" (list "vmalert" "spec") }}
     {{- $_ := set $extraArgs "vmalert.proxyURL" (include "vm.url" .) -}}
   {{- end -}}
-  {{- $spec := dict "extraArgs" $extraArgs "image" $image -}}
+  {{- $spec := dict "extraArgs" $extraArgs -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- tpl (deepCopy $Values.vlsingle.spec | mergeOverwrite $spec | toYaml) . -}}
+  {{- $mergedSpec := deepCopy $Values.vlsingle.spec | mergeOverwrite $spec -}}
+  {{- if not (($mergedSpec.image).tag) -}}
+    {{- $version := include "vm.versions.resolve" (dict "helm" .helm "key" "logs") -}}
+    {{- with $version -}}
+      {{- $_ := set $mergedSpec "image" (mergeOverwrite ($mergedSpec.image | default dict) (dict "tag" .)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $mergedSpec | toYaml -}}
 {{- end }}
 
 {{- /* VLCluster select spec */ -}}
@@ -670,12 +696,18 @@
 {{- /* VTSingle spec */ -}}
 {{- define "vt.single.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
-  {{- $image := dict "tag" (include "vm.image.tag" .) }}
-  {{- $spec := dict "image" $image -}}
+  {{- $spec := dict -}}
   {{- with (include "vm.license.global" .) -}}
     {{- $_ := set $spec "license" (fromYaml .) -}}
   {{- end -}}
-  {{- tpl (deepCopy $Values.vtsingle.spec | mergeOverwrite $spec | toYaml) . -}}
+  {{- $mergedSpec := deepCopy $Values.vtsingle.spec | mergeOverwrite $spec -}}
+  {{- if not (($mergedSpec.image).tag) -}}
+    {{- $version := include "vm.versions.resolve" (dict "helm" .helm "key" "traces") -}}
+    {{- with $version -}}
+      {{- $_ := set $mergedSpec "image" (mergeOverwrite ($mergedSpec.image | default dict) (dict "tag" .)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $mergedSpec | toYaml -}}
 {{- end }}
 
 {{- /* VTCluster spec */ -}}

@@ -14,6 +14,21 @@ global:
   extraLabels: {}
   # -- Annotations added to all resources
   extraAnnotations: {}
+  # -- Default component versions. Propagated automatically (as a global value) to the embedded operator chart's
+  # own `global.versions`, which it uses to populate its default-version env vars, so that CRs created outside this
+  # chart (no explicit spec.image.tag) get the same version this chart deploys. Keep in sync with the corresponding
+  # renovate-tracked tags/appVersion below.
+  versions:
+    # renovate: image=victoriametrics/victoria-metrics
+    metrics: v1.150.0
+    # renovate: image=victoriametrics/victoria-logs
+    logs: v1.52.0
+    # renovate: image=victoriametrics/victoria-traces
+    traces: v0.9.4
+    # renovate: image=victoriametrics/vmanomaly
+    anomaly: v1.30.4
+    # renovate: image=prom/alertmanager
+    alertmanager: v0.32.1
 
 # -- Override chart name
 nameOverride: ""
@@ -490,8 +505,8 @@ vlsingle:
   spec:
     port: "9428"
     image:
-      # renovate: image=victoriametrics/victoria-logs
-      tag: v1.52.0
+      # -- VictoriaLogs image tag. Defaults to `global.versions.logs` when empty.
+      tag: ""
     # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention)
     retentionPeriod: "1"
     replicaCount: 1
@@ -866,8 +881,8 @@ vlagent:
   spec:
     port: "9429"
     image:
-      # renovate: image=victoriametrics/victoria-logs
-      tag: v1.52.0
+      # -- VictoriaLogs image tag. Defaults to `global.versions.logs` when empty.
+      tag: ""
     k8sCollector:
       enabled: true
   # -- (object) VLAgent ingress configuration
@@ -938,8 +953,8 @@ vtsingle:
   spec:
     port: "10428"
     image:
-      # renovate: image=victoriametrics/victoria-traces
-      tag: v0.9.4
+      # -- VictoriaTraces image tag. Defaults to `global.versions.traces` when empty.
+      tag: ""
     # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h.
     retentionPeriod: "1"
     replicaCount: 1
@@ -1639,8 +1654,8 @@ alertmanager:
     port: "9093"
     selectAllByDefault: true
     image:
-      # renovate: image=prom/alertmanager
-      tag: v0.32.1
+      # -- Alertmanager image tag. Defaults to `global.versions.alertmanager` when empty.
+      tag: ""
     externalURL: ""
     routePrefix: /
 
