@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## v0.4.2
+
+**Release date:** 31 Aug 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - `vm.cr.fullname` now fails when `useLegacyNaming: true` is set, since CR names must stay stable regardless of naming style; consuming charts no longer need their own validation for this.
 
 ## v0.4.1
