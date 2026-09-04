@@ -1,8 +1,8 @@
 {{- $app := .Values }}
 {{- $pvc := $app.persistentVolume }}
 {{- if and $pvc.enabled (not $pvc.existingClaim) (eq $app.mode "deployment") }}
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---
 apiVersion: v1

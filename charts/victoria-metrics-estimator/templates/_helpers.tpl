@@ -5,31 +5,35 @@
   {{- if and (eq .Values.mode "cluster") (lt (int .Values.storage.replicaCount) 1) -}}
     {{- fail ".Values.storage.replicaCount must be at least 1 in cluster mode" -}}
   {{- end -}}
+  {{- if .Values.useLegacyNaming -}}
+    {{- fail "useLegacyNaming: true is not supported by the victoria-metrics-estimator chart; it only supports operator-style resource naming" -}}
+  {{- end -}}
+  {{- $components := ternary (list "single") (list "storage" "select") (eq .Values.mode "single") -}}
+  {{- range $component := $components -}}
+    {{- if (index $.Values $component).useLegacyNaming -}}
+      {{- fail (printf "%s.useLegacyNaming: true is not supported by the victoria-metrics-estimator chart; it only supports operator-style resource naming" $component) -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "vmestimator.configMapName" -}}
   {{- .Values.config.existingConfigMap | default (include "vmestimator.fullname" (dict "root" .)) -}}
 {{- end -}}
 
+{{- /*
+vmestimator.fullname resolves the fully qualified name of a chart resource.
+Pass "component" as one of "single", "storage" or "select" for a
+per-component resource, or omit it for a chart-wide shared resource
+(ConfigMap, ServiceAccount, NetworkPolicy) — the latter honors a root-level
+fullnameOverride/global.fullnameOverride, matching every other chart.
+*/ -}}
 {{- define "vmestimator.fullname" -}}
-  {{- $root := .root -}}
-  {{- $component := .component | default "" -}}
-  {{- $ctx := dict "helm" $root -}}
-  {{- $fullnameOverride := $root.Values.fullnameOverride | default $root.Values.global.fullnameOverride -}}
-  {{- if $component -}}
-    {{- $appKey := printf "vmestimator-%s" $component -}}
-    {{- $app := deepCopy (index $root.Values $component) -}}
-    {{- if and $fullnameOverride (not (hasKey $app "fullnameOverride")) -}}
-      {{- $_ := set $app "fullnameOverride" (printf "%s-%s" $fullnameOverride $component) -}}
-    {{- end -}}
-    {{- $_ := set $root.Values $appKey $app -}}
-    {{- $_ := set $ctx "appKey" $appKey -}}
-    {{- $_ := set $ctx $appKey $app -}}
-  {{- else if $fullnameOverride -}}
-    {{- $_ := set $ctx "appKey" "vmestimator" -}}
-    {{- $_ := set $ctx "vmestimator" (dict "fullnameOverride" $fullnameOverride) -}}
+  {{- if not .component -}}
+    {{- include "vm.plain.fullname" (dict "helm" .root "kindOverride" "vmestimator") -}}
+  {{- else -}}
+    {{- $kindOverrides := dict "single" "vmestimator-single" "storage" "vmestimator-storage" "select" "vmestimator-select" -}}
+    {{- include "vm.plain.fullname" (dict "helm" .root "appKey" .component "kindOverride" (index $kindOverrides .component)) -}}
   {{- end -}}
-  {{- include "vm.plain.fullname" $ctx -}}
 {{- end -}}
 
 {{- define "vmestimator.args" -}}
@@ -46,7 +50,7 @@
     {{- $storageName := include "vmestimator.fullname" (dict "root" $root "component" "storage") -}}
     {{- $ns := include "vm.namespace" (dict "helm" $root "appKey" "storage") -}}
     {{- $nodes := list -}}
-    {{- range $i := until (int $root.Values.storage.replicaCount) -}}
+    {{- range $i := until (int $storage.replicaCount) -}}
       {{- $fqdn := printf "%s-%d.%s.%s.svc" $storageName $i $storageName $ns -}}
       {{- with $root.Values.global.cluster.dnsDomain -}}
         {{- $fqdn = printf "%s.%s" $fqdn . -}}

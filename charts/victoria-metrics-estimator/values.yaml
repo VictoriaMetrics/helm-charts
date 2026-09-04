@@ -22,7 +22,8 @@ mode: single
 
 # -- Override chart name
 nameOverride: ""
-# -- Override fully qualified chart name
+# -- Override the base name used for chart-wide shared resources (ConfigMap, ServiceAccount, NetworkPolicy)
+# and, unless a component sets its own fullnameOverride, as the base for that component's resource names too
 fullnameOverride: ""
 
 image:
@@ -74,6 +75,8 @@ single:
     loggerFormat: json
   # -- Override the container command
   command: []
+  # -- Overrides the full name of the single-node component
+  fullnameOverride: ""
   # -- Additional environment variables
   env: []
   # -- Additional environment sources
@@ -127,6 +130,8 @@ storage:
     envflag.prefix: VM_
     loggerFormat: json
   command: []
+  # -- Overrides the full name of the storage component
+  fullnameOverride: ""
   env: []
   envFrom: []
   podAnnotations: {}
@@ -161,6 +166,8 @@ select:
     envflag.prefix: VM_
     loggerFormat: json
   command: []
+  # -- Overrides the full name of the select component
+  fullnameOverride: ""
   env: []
   envFrom: []
   podAnnotations: {}
