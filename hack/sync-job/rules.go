@@ -129,6 +129,7 @@ func parseRuleGroups(raw []byte, srcURL string) ([]ruleGroup, error) {
 func patchRuleGroup(g *ruleGroup, cfg *rulesConfig, common commonConfig) {
 	additionalLabels := cfg.Common.ExtraGroupByLabels
 	jobNamespaces := cfg.Common.JobNamespaces
+	labelRewrites := cfg.Common.LabelRewrites
 	if gc, ok := lookupGroup(cfg.Groups, g.Name); ok {
 		if gc.ExtraGroupByLabels != nil {
 			additionalLabels = gc.ExtraGroupByLabels
@@ -139,11 +140,25 @@ func patchRuleGroup(g *ruleGroup, cfg *rulesConfig, common commonConfig) {
 			maps.Copy(merged, gc.JobNamespaces)
 			jobNamespaces = merged
 		}
+		if len(gc.LabelRewrites) > 0 {
+			merged := make(map[string]map[string]string, len(labelRewrites)+len(gc.LabelRewrites))
+			for label, rewrites := range labelRewrites {
+				merged[label] = maps.Clone(rewrites)
+			}
+			for label, rewrites := range gc.LabelRewrites {
+				if merged[label] == nil {
+					merged[label] = maps.Clone(rewrites)
+					continue
+				}
+				maps.Copy(merged[label], rewrites)
+			}
+			labelRewrites = merged
+		}
 	}
 	for i := range g.Rules {
 		r := &g.Rules[i]
 		patchRuleAnnotations(r, cfg, common.ClusterLabel)
-		r.Expr = patchRuleExpr(r.Expr, additionalLabels, common, jobNamespaces)
+		r.Expr = patchRuleExpr(r.Expr, additionalLabels, common, jobNamespaces, labelRewrites)
 		applyRuleDefaults(r, cfg, g.Name)
 	}
 }
@@ -261,7 +276,7 @@ func patchRuleAnnotations(r *rule, cfg *rulesConfig, clusterLabel string) {
 	}
 }
 
-func patchRuleExpr(expr string, extraGroupByLabels []string, common commonConfig, jobNamespaces map[string]string) string {
+func patchRuleExpr(expr string, extraGroupByLabels []string, common commonConfig, jobNamespaces map[string]string, labelRewrites map[string]map[string]string) string {
 	if expr == "" {
 		return expr
 	}
@@ -314,6 +329,21 @@ func patchRuleExpr(expr string, extraGroupByLabels []string, common commonConfig
 				t.Modifier.Args = append(t.Modifier.Args, allGroupLabels...)
 			}
 		case *metricsql.MetricExpr:
+			if len(labelRewrites) > 0 {
+				for i, group := range t.LabelFilterss {
+					for j := range group {
+						f := &t.LabelFilterss[i][j]
+						if f.IsNegative || f.IsRegexp {
+							continue
+						}
+						if rewrites, ok := labelRewrites[f.Label]; ok {
+							if v, ok := rewrites[f.Value]; ok {
+								f.Value = v
+							}
+						}
+					}
+				}
+			}
 			if len(jobNamespaces) == 0 {
 				return
 			}

@@ -160,6 +160,7 @@ func TestPatchRuleExpr(t *testing.T) {
 		common        commonConfig
 		labels        []string
 		jobNamespaces map[string]string
+		labelRewrites map[string]map[string]string
 		want          string
 	}
 	f := func(o opts) {
@@ -167,7 +168,7 @@ func TestPatchRuleExpr(t *testing.T) {
 		if o.common.ClusterLabel == "" {
 			o.common.ClusterLabel = "cluster"
 		}
-		got := patchRuleExpr(o.expr, o.labels, o.common, o.jobNamespaces)
+		got := patchRuleExpr(o.expr, o.labels, o.common, o.jobNamespaces, o.labelRewrites)
 		if got != o.want {
 			t.Fatalf("patchRuleExpr(%q)\ngot:  %s\nwant: %s", o.expr, got, o.want)
 		}
@@ -313,6 +314,59 @@ func TestPatchRuleExpr(t *testing.T) {
 			"kubelet": "kube-system",
 		},
 		want: `up{job=~"kubelet.*"}`,
+	})
+
+	// labelRewrites — exact-match label filter values rewritten (issue: kube-prometheus
+	// selectors like job="alertmanager-main",namespace="monitoring" don't match the
+	// chart's own scrape job/namespace)
+	f(opts{
+		expr: `alertmanager_config_last_reload_successful{job="alertmanager-main",namespace="monitoring"}`,
+		labelRewrites: map[string]map[string]string{
+			"job":       {"alertmanager-main": "vmalertmanager-myrelease"},
+			"namespace": {"monitoring": "monitoring-ns"},
+		},
+		want: `alertmanager_config_last_reload_successful{job="vmalertmanager-myrelease",namespace="monitoring-ns"}`,
+	})
+	// container filter with matching value is left untouched when no rewrite is configured for it
+	f(opts{
+		expr: `up{job="alertmanager-main",container="alertmanager"}`,
+		labelRewrites: map[string]map[string]string{
+			"job": {"alertmanager-main": "vmalertmanager-myrelease"},
+		},
+		want: `up{job="vmalertmanager-myrelease",container="alertmanager"}`,
+	})
+	// regexp and negative filters are not rewritten
+	f(opts{
+		expr: `up{job=~"alertmanager.*",namespace!="monitoring"}`,
+		labelRewrites: map[string]map[string]string{
+			"job":       {"alertmanager-main": "vmalertmanager-myrelease"},
+			"namespace": {"monitoring": "monitoring-ns"},
+		},
+		want: `up{job=~"alertmanager.*",namespace!="monitoring"}`,
+	})
+	// values without a matching rewrite entry are left unchanged
+	f(opts{
+		expr: `up{job="other"}`,
+		labelRewrites: map[string]map[string]string{
+			"job": {"alertmanager-main": "vmalertmanager-myrelease"},
+		},
+		want: `up{job="other"}`,
+	})
+	// empty labelRewrites is a no-op
+	f(opts{
+		expr: `up{job="alertmanager-main"}`,
+		want: `up{job="alertmanager-main"}`,
+	})
+	// combined with jobNamespaces injection
+	f(opts{
+		expr: `up{job="alertmanager-main"}`,
+		jobNamespaces: map[string]string{
+			"vmalertmanager-myrelease": "monitoring-ns",
+		},
+		labelRewrites: map[string]map[string]string{
+			"job": {"alertmanager-main": "vmalertmanager-myrelease"},
+		},
+		want: `up{job="vmalertmanager-myrelease",namespace=~"monitoring-ns"}`,
 	})
 }
 
@@ -998,6 +1052,37 @@ func TestPatchRuleGroup(t *testing.T) {
 		}
 		if !strings.Contains(g.Rules[1].Expr, "namespace") {
 			t.Errorf("coredns: expected namespace filter; expr: %s", g.Rules[1].Expr)
+		}
+	})
+
+	t.Run("group labelRewrites merge with common", func(t *testing.T) {
+		g := ruleGroup{
+			Name: "alertmanager.rules",
+			Rules: []rule{
+				{Alert: "A", Expr: `up{job="alertmanager-main"}`},
+				{Alert: "B", Expr: `up{job="kubelet"}`},
+			},
+		}
+		cfg := &rulesConfig{
+			Common: rulesCommonConfig{
+				LabelRewrites: map[string]map[string]string{
+					"job": {"kubelet": "kubelet-common"},
+				},
+			},
+			Groups: map[string]groupOverride{
+				"alertmanager": {
+					LabelRewrites: map[string]map[string]string{
+						"job": {"alertmanager-main": "vmalertmanager-myrelease"},
+					},
+				},
+			},
+		}
+		patchRuleGroup(&g, cfg, commonConfig{ClusterLabel: "cluster"})
+		if !strings.Contains(g.Rules[0].Expr, `job="vmalertmanager-myrelease"`) {
+			t.Errorf("group labelRewrites not applied; expr: %s", g.Rules[0].Expr)
+		}
+		if !strings.Contains(g.Rules[1].Expr, `job="kubelet-common"`) {
+			t.Errorf("common labelRewrites not applied; expr: %s", g.Rules[1].Expr)
 		}
 	})
 }

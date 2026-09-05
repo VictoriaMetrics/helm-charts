@@ -231,6 +231,12 @@ defaultRules:
   # Only use for jobs whose metrics are always namespace-scoped.
   jobNamespaces: {}
 
+  # -- Rewrite exact-match label filter values in metric selectors (e.g. kube-prometheus job/namespace
+  # selectors that don't match the jobs this chart creates).
+  # Map of label name -> map of old value -> new value. Regexp and negative filters are left unchanged.
+  # Merged with per-group labelRewrites (per-group wins on per-label conflicts).
+  labelRewrites: {}
+
   # -- Common properties for VMRule groups
   group:
     spec: {}
@@ -290,6 +296,8 @@ defaultRules:
       #   annotations:
       #     dashboard: https://example.com/dashboard/1
     alertmanager.rules:
+      # Selectors in this kube-prometheus group (job="alertmanager-main", namespace="monitoring")
+      # are rewritten to the chart's own VMAlertmanager job/namespace by the sync-job config template.
       rules: {}
     general.rules:
       rules: {}
