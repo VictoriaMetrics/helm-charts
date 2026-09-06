@@ -504,6 +504,10 @@ global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
   {{- $grafanaAddr -}}
 {{- end -}}
 
+{{- define "vm-k8s-stack.alertmanager.namespace" -}}
+  {{- include "vm.namespace" (dict "helm" . "appKey" (list "alertmanager" "spec")) -}}
+{{- end -}}
+
 {{- define "vl.read.endpoint" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $endpoint := dict -}}

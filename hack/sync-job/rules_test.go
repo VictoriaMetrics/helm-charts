@@ -160,7 +160,7 @@ func TestPatchRuleExpr(t *testing.T) {
 		common        commonConfig
 		labels        []string
 		jobNamespaces map[string]string
-		labelRewrites map[string]map[string]string
+		labelRewrites map[string]labelRewrite
 		want          string
 	}
 	f := func(o opts) {
@@ -315,58 +315,93 @@ func TestPatchRuleExpr(t *testing.T) {
 		},
 		want: `up{job=~"kubelet.*"}`,
 	})
+	// a selector with no exact job filter is never touched, even if some rewrite's
+	// Match is left empty (zero value) and would otherwise equal the empty jobValue
+	f(opts{
+		expr: `up{instance=~".*"}`,
+		jobNamespaces: map[string]string{
+			"": "kube-system",
+		},
+		labelRewrites: map[string]labelRewrite{
+			"job": {Value: "vmalertmanager-.*"},
+		},
+		want: `up{instance=~".*"}`,
+	})
 
-	// labelRewrites — exact-match label filter values rewritten (issue: kube-prometheus
-	// selectors like job="alertmanager-main",namespace="monitoring" don't match the
-	// chart's own scrape job/namespace)
+	// jobNamespaces — an existing but different namespace value gets replaced
 	f(opts{
-		expr: `alertmanager_config_last_reload_successful{job="alertmanager-main",namespace="monitoring"}`,
-		labelRewrites: map[string]map[string]string{
-			"job":       {"alertmanager-main": "vmalertmanager-myrelease"},
-			"namespace": {"monitoring": "monitoring-ns"},
+		expr: `up{job="alertmanager-main",namespace="monitoring"}`,
+		jobNamespaces: map[string]string{
+			"alertmanager-main": "vm-ns",
 		},
-		want: `alertmanager_config_last_reload_successful{job="vmalertmanager-myrelease",namespace="monitoring-ns"}`,
+		want: `up{job="alertmanager-main",namespace=~"vm-ns"}`,
 	})
-	// container filter with matching value is left untouched when no rewrite is configured for it
+
+	// labelRewrites — key is the label name when Name is unset; Match must match the job exactly
 	f(opts{
-		expr: `up{job="alertmanager-main",container="alertmanager"}`,
-		labelRewrites: map[string]map[string]string{
-			"job": {"alertmanager-main": "vmalertmanager-myrelease"},
+		expr: `up{job="alertmanager-main"}`,
+		labelRewrites: map[string]labelRewrite{
+			"job": {Match: "alertmanager-main", Value: "vmalertmanager-.*"},
 		},
-		want: `up{job="vmalertmanager-myrelease",container="alertmanager"}`,
+		want: `up{job=~"vmalertmanager-.*"}`,
 	})
-	// regexp and negative filters are not rewritten
-	f(opts{
-		expr: `up{job=~"alertmanager.*",namespace!="monitoring"}`,
-		labelRewrites: map[string]map[string]string{
-			"job":       {"alertmanager-main": "vmalertmanager-myrelease"},
-			"namespace": {"monitoring": "monitoring-ns"},
-		},
-		want: `up{job=~"alertmanager.*",namespace!="monitoring"}`,
-	})
-	// values without a matching rewrite entry are left unchanged
 	f(opts{
 		expr: `up{job="other"}`,
-		labelRewrites: map[string]map[string]string{
-			"job": {"alertmanager-main": "vmalertmanager-myrelease"},
+		labelRewrites: map[string]labelRewrite{
+			"job": {Match: "alertmanager-main", Value: "vmalertmanager-.*"},
 		},
 		want: `up{job="other"}`,
 	})
-	// empty labelRewrites is a no-op
 	f(opts{
-		expr: `up{job="alertmanager-main"}`,
-		want: `up{job="alertmanager-main"}`,
+		expr: `up{job=~"alertmanager-main"}`,
+		labelRewrites: map[string]labelRewrite{
+			"job": {Match: "alertmanager-main", Value: "vmalertmanager-.*"},
+		},
+		want: `up{job=~"alertmanager-main"}`,
 	})
-	// combined with jobNamespaces injection
+	// labelRewrites — targets any label, added if absent from the selector
+	f(opts{
+		expr: `up{job="alertmanager-main",container="alertmanager"}`,
+		labelRewrites: map[string]labelRewrite{
+			"container": {Match: "alertmanager-main", Value: "alertmanager|config-reloader"},
+		},
+		want: `up{job="alertmanager-main",container=~"alertmanager|config-reloader"}`,
+	})
 	f(opts{
 		expr: `up{job="alertmanager-main"}`,
+		labelRewrites: map[string]labelRewrite{
+			"pod": {Match: "alertmanager-main", Value: "vmalertmanager-.*"},
+		},
+		want: `up{job="alertmanager-main",pod=~"vmalertmanager-.*"}`,
+	})
+	// labelRewrites — an existing regexp/negative filter for the target label is left
+	// alone; a new positive filter is appended alongside it instead of mutating it
+	f(opts{
+		expr: `up{job="alertmanager-main",container!="excluded"}`,
+		labelRewrites: map[string]labelRewrite{
+			"container": {Match: "alertmanager-main", Value: "alertmanager"},
+		},
+		want: `up{job="alertmanager-main",container!="excluded",container=~"alertmanager"}`,
+	})
+	// labelRewrites — explicit Name overrides the key, which is then just an identifier
+	f(opts{
+		expr: `up{job="alertmanager-main"}`,
+		labelRewrites: map[string]labelRewrite{
+			"anyKey": {Name: "pod", Match: "alertmanager-main", Value: "vmalertmanager-.*"},
+		},
+		want: `up{job="alertmanager-main",pod=~"vmalertmanager-.*"}`,
+	})
+
+	// labelRewrites combined with jobNamespaces — job and namespace both fixed in one pass
+	f(opts{
+		expr: `max_over_time(alertmanager_config_last_reload_successful{job="alertmanager-main",container="alertmanager",namespace="monitoring"}[5m]) == 0`,
+		labelRewrites: map[string]labelRewrite{
+			"job": {Match: "alertmanager-main", Value: "vmalertmanager-.*"},
+		},
 		jobNamespaces: map[string]string{
-			"vmalertmanager-myrelease": "monitoring-ns",
+			"alertmanager-main": "vm-ns",
 		},
-		labelRewrites: map[string]map[string]string{
-			"job": {"alertmanager-main": "vmalertmanager-myrelease"},
-		},
-		want: `up{job="vmalertmanager-myrelease",namespace=~"monitoring-ns"}`,
+		want: `max_over_time(alertmanager_config_last_reload_successful{job=~"vmalertmanager-.*",container="alertmanager",namespace=~"vm-ns"}[5m]) == 0`,
 	})
 }
 
@@ -1055,34 +1090,60 @@ func TestPatchRuleGroup(t *testing.T) {
 		}
 	})
 
-	t.Run("group labelRewrites merge with common", func(t *testing.T) {
+	t.Run("group labelRewrites merges with common by key, group wins on conflict", func(t *testing.T) {
 		g := ruleGroup{
-			Name: "alertmanager.rules",
-			Rules: []rule{
-				{Alert: "A", Expr: `up{job="alertmanager-main"}`},
-				{Alert: "B", Expr: `up{job="kubelet"}`},
-			},
+			Name:  "mygroup",
+			Rules: []rule{{Alert: "A", Expr: `up{job="foo"}`}},
 		}
 		cfg := &rulesConfig{
 			Common: rulesCommonConfig{
-				LabelRewrites: map[string]map[string]string{
-					"job": {"kubelet": "kubelet-common"},
+				LabelRewrites: map[string]labelRewrite{
+					"job": {Match: "foo", Value: "common-job"},
+					"pod": {Match: "foo", Value: "common-pod"},
 				},
 			},
 			Groups: map[string]groupOverride{
-				"alertmanager": {
-					LabelRewrites: map[string]map[string]string{
-						"job": {"alertmanager-main": "vmalertmanager-myrelease"},
+				"mygroup": {
+					LabelRewrites: map[string]labelRewrite{
+						"job": {Match: "foo", Value: "group-job"},
 					},
 				},
 			},
 		}
 		patchRuleGroup(&g, cfg, commonConfig{ClusterLabel: "cluster"})
-		if !strings.Contains(g.Rules[0].Expr, `job="vmalertmanager-myrelease"`) {
-			t.Errorf("group labelRewrites not applied; expr: %s", g.Rules[0].Expr)
+		if g.Rules[0].Expr != `up{job=~"group-job",pod=~"common-pod"}` {
+			t.Errorf("got %q", g.Rules[0].Expr)
 		}
-		if !strings.Contains(g.Rules[1].Expr, `job="kubelet-common"`) {
-			t.Errorf("common labelRewrites not applied; expr: %s", g.Rules[1].Expr)
+	})
+
+	t.Run("group labelRewrites with explicit Name adds a second rule for the same label", func(t *testing.T) {
+		g := ruleGroup{
+			Name: "mygroup",
+			Rules: []rule{
+				{Alert: "A", Expr: `up{job="foo"}`},
+				{Alert: "B", Expr: `up{job="bar"}`},
+			},
+		}
+		cfg := &rulesConfig{
+			Common: rulesCommonConfig{
+				LabelRewrites: map[string]labelRewrite{
+					"job": {Match: "foo", Value: "vmfoo"},
+				},
+			},
+			Groups: map[string]groupOverride{
+				"mygroup": {
+					LabelRewrites: map[string]labelRewrite{
+						"job2": {Name: "job", Match: "bar", Value: "vmbar"},
+					},
+				},
+			},
+		}
+		patchRuleGroup(&g, cfg, commonConfig{ClusterLabel: "cluster"})
+		if g.Rules[0].Expr != `up{job=~"vmfoo"}` {
+			t.Errorf("foo: got %q", g.Rules[0].Expr)
+		}
+		if g.Rules[1].Expr != `up{job=~"vmbar"}` {
+			t.Errorf("bar: got %q", g.Rules[1].Expr)
 		}
 	})
 }

@@ -78,7 +78,8 @@ rules:
     runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
     grafanaUrl: ""
     extraGroupByLabels: []   # extra labels appended to every by(...) modifier
-    jobNamespaces: {}        # job name → namespace regex; injects namespace filter into matching selectors
+    jobNamespaces: {}        # deprecated, use labelRewrites; job name → namespace regex; injects/replaces namespace filter into matching selectors
+    labelRewrites: {}        # keyed by an identifier; each entry is {name, match, value} (name defaults to the key)
     group: {}        # spec fields applied to every VMRule group
     rule: {}         # merged into every rule
     alerting: {}     # merged into every alerting rule
@@ -91,8 +92,10 @@ rules:
   groups:            # per-group overrides keyed by upstream group name
     kubernetes-apps:
       enabled: true
-      jobNamespaces:
-        kube-state-metrics: ".*"
+      labelRewrites:
+        namespace:
+          match: kube-state-metrics
+          value: ".*"
       rule: {}
       alerting: {}
       recording: {}
@@ -118,7 +121,8 @@ Group keys under `rules.groups` are matched against upstream group names in this
 - The `cluster` label in `by(...)` / `on(...)` modifiers is renamed to `clusterLabel`.
 - In multicluster mode, `clusterLabel` is appended to every aggregation modifier that doesn't already include it.
 - `extraGroupByLabels` are appended to every aggregation modifier.
-- `jobNamespaces` injects a `namespace=~"<regex>"` filter into metric selectors that have an exact `job="<name>"` match and no existing `namespace` filter. Only applies to jobs whose metrics always carry a namespace label; avoid using it for jobs like `kubelet` where some metrics (e.g. `up`) are not namespace-scoped.
+- `jobNamespaces` (deprecated, use `labelRewrites` targeting `namespace` instead) injects a `namespace=~"<regex>"` filter into metric selectors that have an exact `job="<name>"` match; if the selector already has a different `namespace` filter, its value is replaced (a matching value is left untouched). Only applies to jobs whose metrics always carry a namespace label; avoid using it for jobs like `kubelet` where some metrics (e.g. `up`) are not namespace-scoped.
+- `labelRewrites` entries are keyed by an identifier (the label name, unless `name` is set); for a selector whose `job` exactly matches that entry's `match`, it rewrites (or adds) `name` to `value`, as a regexp. Useful when an upstream rule group's selector doesn't match this chart's naming (e.g. kube-prometheus's `alertmanager.rules`).
 - Grafana variables (`$__rate_interval`, `$__interval`, etc.) are preserved.
 
 **Dashboards:**

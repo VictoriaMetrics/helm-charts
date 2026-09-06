@@ -1,5 +1,6 @@
 ## Next release
 
+- fixed sync-job's `alertmanager.rules` group keeping upstream kube-prometheus's `job="alertmanager-main",namespace="monitoring"` selectors, which never match this chart's VMAlertmanager. The sync-job now rewrites both to a regexp matching this chart's VMAlertmanager(s) via a new `labelRewrites` option (alongside the existing `jobNamespaces`), configurable under `defaultRules.labelRewrites` / `defaultRules.groups.<name>.labelRewrites`; values may be template expressions (e.g. `{{ .Release.Namespace }}`), rendered before use. See [#11517](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11517)
 - bump version of VM components to [v1.151.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.151.0)
 - fixed `plugins` section missing from `GrafanaDatasource` CRs for datasources whose type requires a Grafana plugin not already listed in `grafana.plugins`. See [#3181](https://github.com/VictoriaMetrics/helm-charts/issues/3181)
 - added `global.versions` (metrics/logs/traces/anomaly/alertmanager), shared automatically with the embedded operator chart's own `global.versions`, so CRs created outside this chart default to the same version the chart deploys instead of the operator's own baked-in default. See [#3186](https://github.com/VictoriaMetrics/helm-charts/issues/3186)

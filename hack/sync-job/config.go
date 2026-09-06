@@ -57,30 +57,38 @@ type ruleOverride struct {
 	Spec    rule  `yaml:"spec"`
 }
 
+// labelRewrite is keyed in LabelRewrites by an identifier; if Name is empty,
+// that key doubles as the label to rewrite.
+type labelRewrite struct {
+	Name  string `yaml:"name,omitempty"`
+	Match string `yaml:"match"`
+	Value string `yaml:"value"`
+}
+
 type groupOverride struct {
-	Enabled            *bool                     `yaml:"enabled,omitempty"`
-	Spec               ruleGroup                 `yaml:"spec,omitempty"`
-	ExtraGroupByLabels []string                  `yaml:"extraGroupByLabels,omitempty"`
-	JobNamespaces      map[string]string         `yaml:"jobNamespaces,omitempty"`
-	LabelRewrites      map[string]map[string]string `yaml:"labelRewrites,omitempty"`
-	Rule               ruleOverride              `yaml:"rule,omitempty"`
-	Alerting           ruleOverride              `yaml:"alerting,omitempty"`
-	Recording          ruleOverride              `yaml:"recording,omitempty"`
-	Rules              map[string]ruleOverride   `yaml:"rules,omitempty"`
+	Enabled            *bool                   `yaml:"enabled,omitempty"`
+	Spec               ruleGroup               `yaml:"spec,omitempty"`
+	ExtraGroupByLabels []string                `yaml:"extraGroupByLabels,omitempty"`
+	JobNamespaces      map[string]string       `yaml:"jobNamespaces,omitempty"` // Deprecated: use LabelRewrites targeting "namespace" instead.
+	LabelRewrites      map[string]labelRewrite `yaml:"labelRewrites,omitempty"`
+	Rule               ruleOverride            `yaml:"rule,omitempty"`
+	Alerting           ruleOverride            `yaml:"alerting,omitempty"`
+	Recording          ruleOverride            `yaml:"recording,omitempty"`
+	Rules              map[string]ruleOverride `yaml:"rules,omitempty"`
 }
 
 type rulesCommonConfig struct {
-	ExtraGroupByLabels []string                     `yaml:"extraGroupByLabels,omitempty"`
-	JobNamespaces      map[string]string            `yaml:"jobNamespaces,omitempty"`
-	LabelRewrites      map[string]map[string]string `yaml:"labelRewrites,omitempty"`
-	RunbookURL         string                       `yaml:"runbookUrl"`
-	GrafanaURL         string                       `yaml:"grafanaUrl"`
-	Labels             map[string]string            `yaml:"labels,omitempty"`
-	Annotations        map[string]string            `yaml:"annotations,omitempty"`
-	Group              groupOverride                `yaml:"group,omitempty"`
-	Rule               ruleOverride                 `yaml:"rule,omitempty"`
-	Alerting           ruleOverride                 `yaml:"alerting,omitempty"`
-	Recording          ruleOverride                 `yaml:"recording,omitempty"`
+	ExtraGroupByLabels []string                `yaml:"extraGroupByLabels,omitempty"`
+	JobNamespaces      map[string]string       `yaml:"jobNamespaces,omitempty"` // Deprecated: use LabelRewrites targeting "namespace" instead.
+	LabelRewrites      map[string]labelRewrite `yaml:"labelRewrites,omitempty"`
+	RunbookURL         string                  `yaml:"runbookUrl"`
+	GrafanaURL         string                  `yaml:"grafanaUrl"`
+	Labels             map[string]string       `yaml:"labels,omitempty"`
+	Annotations        map[string]string       `yaml:"annotations,omitempty"`
+	Group              groupOverride           `yaml:"group,omitempty"`
+	Rule               ruleOverride            `yaml:"rule,omitempty"`
+	Alerting           ruleOverride            `yaml:"alerting,omitempty"`
+	Recording          ruleOverride            `yaml:"recording,omitempty"`
 }
 
 type rulesConfig struct {
