@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fixed `GrafanaDatasource` plugin entries missing a required `version` field, which grafana-operator rejects. Defaults to `latest` when the datasource doesn't set one. See [#3200](https://github.com/VictoriaMetrics/helm-charts/issues/3200)
 
 ## v0.92.0
 

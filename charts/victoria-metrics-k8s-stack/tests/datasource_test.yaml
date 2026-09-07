@@ -110,6 +110,44 @@ tests:
           path: spec.plugins
           value:
             - name: victoriametrics-metrics-datasource
+              version: latest
+        documentIndex: 1
+
+  - it: GrafanaDatasource CR keeps a user-supplied plugin version
+    set:
+      defaultDatasources:
+        grafanaOperator:
+          enabled: true
+        victoriametrics:
+          datasources:
+            - name: VictoriaMetrics
+              type: prometheus
+              access: proxy
+              uid: VictoriaMetrics
+              isDefault: true
+            - name: VictoriaMetrics (DS)
+              isDefault: false
+              access: proxy
+              uid: VictoriaMetricsDS
+              type: victoriametrics-metrics-datasource
+              plugin: true
+              version: 0.25.2
+      grafana:
+        forceDeployDatasource: true
+      vmsingle:
+        enabled: true
+      alertmanager:
+        enabled: false
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - equal:
+          path: spec.plugins
+          value:
+            - name: victoriametrics-metrics-datasource
+              version: 0.25.2
         documentIndex: 1
 
   - it: GrafanaDatasource CR omits plugins section when plugin is preinstalled
