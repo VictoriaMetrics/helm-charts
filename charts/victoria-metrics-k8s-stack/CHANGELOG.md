@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.92.0
+
+**Release date:** 07 Sep 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.151.0](https://img.shields.io/badge/v1.151.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11510) ![VM Operator: 0.67.3](https://img.shields.io/badge/VM_Operator-0.67.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230673)
+
 - `defaultRules.groups[*].enabled` may now be a template expression (e.g. `{{ .Values.kubeScheduler.enabled }}`), like `defaultDashboards.dashboards[*].enabled` already was. Disabling `kubeApiServer`, `kubeControllerManager`, `kubeScheduler`, or `kubelet` now also disables their alerting rule groups, so alerts no longer fire on scrape targets that were never enabled. See [#3197](https://github.com/VictoriaMetrics/helm-charts/issues/3197)
 - fixed sync-job's `alertmanager.rules` group keeping upstream kube-prometheus's `job="alertmanager-main",namespace="monitoring"` selectors, which never match this chart's VMAlertmanager. The sync-job now rewrites both to a regexp matching this chart's VMAlertmanager(s) via a new `labelRewrites` option (alongside the existing `jobNamespaces`), configurable under `defaultRules.labelRewrites` / `defaultRules.groups.<name>.labelRewrites`; values may be template expressions (e.g. `{{ .Release.Namespace }}`), rendered before use. See [#11517](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11517)
 - bump version of VM components to [v1.151.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.151.0)
