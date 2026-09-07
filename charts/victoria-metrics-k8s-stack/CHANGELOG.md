@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.92.1
+
+**Release date:** 07 Sep 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.151.0](https://img.shields.io/badge/v1.151.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11510) ![VM Operator: 0.67.3](https://img.shields.io/badge/VM_Operator-0.67.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230673)
+
 - fixed `GrafanaDatasource` plugin entries missing a required `version` field, which grafana-operator rejects. Defaults to `latest` when the datasource doesn't set one. See [#3200](https://github.com/VictoriaMetrics/helm-charts/issues/3200)
 
 ## v0.92.0
