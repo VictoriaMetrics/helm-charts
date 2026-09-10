@@ -1,7 +1,7 @@
 {{- $app := .Values.server }}
 {{- $pvc := $app.persistentVolume }}
 {{- if and $pvc.enabled (not $pvc.existingClaim) (eq $app.mode "deployment") -}}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmsingle" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 ---

@@ -4,7 +4,7 @@
 {{- $mode := $app.mode }}
 {{- if and $mode $app.enabled (hasKey $app $mode) }}
 {{- $modeOpts := index $app $mode }}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vlsingle" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- if and (ne $mode "statefulSet") (gt (int $app.replicaCount) 1) }}
