@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- operator ClusterRole rules are now derived from `operator-role.yaml`, synced from the operator repo on release, instead of being maintained by hand. Same approach the chart already uses for CRDs via `crd.yaml`. See [#3129](https://github.com/VictoriaMetrics/helm-charts/issues/3129) and [#3102](https://github.com/VictoriaMetrics/helm-charts/issues/3102)
+- the operator ClusterRole no longer grants `escalate`, `bind`, `impersonate` or `deletecollection`, and drops unused `pods` `create`/`update` and `customresourcedefinitions` `get`/`list`. None are used by the operator. The legacy `extensions` apiGroup is kept for backwards compatibility with operator releases before v0.75.0 and will be removed once those are no longer supported
 
 ## v0.67.3
 

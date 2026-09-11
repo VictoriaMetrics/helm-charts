@@ -64,135 +64,47 @@ rules:
   - watch
   - list
 {{- end }}
+{{- /* do not add permissions here, please add a +kubebuilder:rbac marker in the operator repo */ -}}
+{{- /* these rules come from /victoria-metrics-operator/operator-role.yaml, synced on operator release */}}
+{{- $gated := dict
+      "autoscaling.k8s.io/verticalpodautoscalers"        .Values.operator.vpa_support
+      "gateway.networking.k8s.io/httproutes"             .Values.operator.gateway_support
+      "gateway.networking.k8s.io/httproutes/finalizers"  .Values.operator.gateway_support }}
+{{- $gatedGroups := list "autoscaling.k8s.io" "gateway.networking.k8s.io" }}
+{{- $opRole := required "operator-role.yaml is missing or empty" (.Files.Get "operator-role.yaml") | fromYaml }}
+{{- range $r := $opRole.rules }}
+{{- if and $r.resources (not (has "operator.victoriametrics.com" $r.apiGroups)) }}
+{{- $keep := list }}
+{{- range $res := $r.resources }}
+{{- $enabled := true }}
+{{- range $g := $r.apiGroups }}
+{{- $key := printf "%s/%s" $g $res }}
+{{- if hasKey $gated $key }}{{- $enabled = get $gated $key }}
+{{- else if has $g $gatedGroups }}{{- fail (printf "unclassified resource %q in feature-gated apiGroup %q - add it to the $gated map in templates/role.yaml" $res $g) }}
+{{- end }}
+{{- end }}
+{{- if $enabled }}{{- $keep = append $keep $res }}{{- end }}
+{{- end }}
+{{- if $keep }}
+- apiGroups: {{ toYaml $r.apiGroups | nindent 2 }}
+  resources: {{ toYaml $keep | nindent 2 }}
+  verbs: {{ toYaml $r.verbs | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- /* backwards compatibility: operator releases before v0.75.0 request the legacy */ -}}
+{{- /* extensions apiGroup when building the cluster-wide ClusterRole for VMAgent, or */ -}}
+{{- /* for VMSingle with ingestOnlyMode: false. Since the rules above no longer grant */ -}}
+{{- /* escalate, this chart must hold that permission to grant it onward. */ -}}
+{{- /* not needed for operator v0.75.0+; remove when support for older releases is dropped */}}
 - apiGroups:
-  - ""
-  resources:
-  - configmaps
-  - configmaps/finalizers
-  - endpoints
-  - events
-  - persistentvolumeclaims
-  - persistentvolumeclaims/finalizers
-  - pods
-  - pods/eviction
-  - secrets
-  - secrets/finalizers
-  - services
-  - services/finalizers
-  - serviceaccounts
-  - serviceaccounts/finalizers
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
-  - configmaps/status
-  - nodes
-  - nodes/metrics
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - daemonsets/finalizers
-  - deployments
-  - deployments/finalizers
-  - replicasets
-  - statefulsets
-  - statefulsets/finalizers
-  - statefulsets/status
-  verbs:
-  - "*"
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - "*"
-  verbs:
-  - "*"
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - clusterrolebindings
-  - clusterrolebindings/finalizers
-  - clusterroles
-  - clusterroles/finalizers
-  - roles
-  - rolebindings
-  verbs:
-  - "*"
-- apiGroups:
-  - storage.k8s.io
-  resources:
-  - storageclasses
-  verbs:
-  - list
-  - get
-  - watch
-- apiGroups:
-  - policy
-  resources:
-  - poddisruptionbudgets
-  - poddisruptionbudgets/finalizers
-  verbs:
-  - "*"
-- apiGroups:
-  - route.openshift.io
-  - image.openshift.io
-  resources:
-  - routers/metrics
-  - registry/metrics
-  verbs:
-  - get
-- apiGroups:
-  - autoscaling
-  verbs:
-  - "*"
-  resources:
-  - horizontalpodautoscalers
-- apiGroups:
-  - networking.k8s.io
+  - extensions
   resources:
   - ingresses
-  - ingresses/finalizers
-  - networkpolicies
-  verbs:
-  - "*"
-{{- if .Values.operator.gateway_support }}
-- apiGroups:
-  - gateway.networking.k8s.io
-  resources:
-  - httproutes
-  - httproutes/finalizers
-  verbs:
-  - '*'
-{{- end }}
-{{- if .Values.operator.vpa_support }}
-- apiGroups:
-  - autoscaling.k8s.io
-  verbs:
-  - "*"
-  resources:
-  - verticalpodautoscalers
-{{- end }}
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
   verbs:
   - get
-  - list
-- apiGroups:
-  - discovery.k8s.io
-  resources:
-  - endpointslices
-  verbs:
   - list
   - watch
-  - get
 {{- with $rules.admin }}
 {{ toYaml . }}
 {{- end }}
