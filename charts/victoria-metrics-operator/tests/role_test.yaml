@@ -1,0 +1,131 @@
+suite: operator role templates test
+templates:
+  - role.yaml
+tests:
+  # Snapshots. These pin the full rendered ClusterRole/Role set so that any change
+  # to the operator's permissions shows up as a reviewable diff rather than silently.
+  - it: role should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: role should match snapshot with vpa_support
+    set:
+      operator.vpa_support: true
+    asserts:
+      - matchSnapshot: {}
+  - it: role should match snapshot with gateway_support
+    set:
+      operator.gateway_support: true
+    asserts:
+      - matchSnapshot: {}
+  - it: role should match snapshot with all feature flags
+    set:
+      operator.vpa_support: true
+      operator.gateway_support: true
+    asserts:
+      - matchSnapshot: {}
+  - it: role should match snapshot with cleanup hook and aggregated roles
+    set:
+      crds.cleanup.enabled: true
+      rbac.aggregatedClusterRoles.enabled: true
+    asserts:
+      - matchSnapshot: {}
+  - it: role should match snapshot when watching own namespace only
+    set:
+      watchNamespaces:
+        - NAMESPACE
+    asserts:
+      - matchSnapshot: {}
+
+  # Capability invariants. Unlike the snapshots above these must never change:
+  # each corresponds to a permission the operator actually exercises, where
+  # losing it makes the operator hang or silently no-op rather than error.
+  - it: grants the permissions the operator needs at runtime
+    documentIndex: 1
+    asserts:
+      # networkpolicies - VictoriaMetrics/helm-charts#3129
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["networking.k8s.io"]
+            resources: ["ingresses/finalizers", "networkpolicies"]
+            verbs: ["*"]
+      # VMAuth creates an Ingress; read-only here meant it silently could not
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["networking.k8s.io"]
+            resources: ["ingresses"]
+            verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+      # vmalert rule reload patches pods; that error is logged, not returned
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
+            resources: ["pods"]
+            verbs: ["delete", "get", "list", "patch", "watch"]
+      # always-cached types need watch, or the informer parks and Get never returns
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["storage.k8s.io"]
+            resources: ["storageclasses"]
+            verbs: ["get", "list", "watch"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["discovery.k8s.io"]
+            resources: ["endpointslices"]
+            verbs: ["get", "list", "watch"]
+
+  - it: gates verticalpodautoscalers behind operator.vpa_support
+    documentIndex: 1
+    asserts:
+      - notContains:
+          path: rules
+          content:
+            apiGroups: ["autoscaling.k8s.io"]
+            resources: ["verticalpodautoscalers"]
+            verbs: ["*"]
+  - it: grants verticalpodautoscalers when operator.vpa_support is set
+    documentIndex: 1
+    set:
+      operator.vpa_support: true
+    asserts:
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["autoscaling.k8s.io"]
+            resources: ["verticalpodautoscalers"]
+            verbs: ["*"]
+
+  - it: gates httproutes behind operator.gateway_support
+    documentIndex: 1
+    asserts:
+      - notContains:
+          path: rules
+          content:
+            apiGroups: ["gateway.networking.k8s.io"]
+            resources: ["httproutes"]
+            verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  - it: grants httproutes when operator.gateway_support is set
+    documentIndex: 1
+    set:
+      operator.gateway_support: true
+    asserts:
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["gateway.networking.k8s.io"]
+            resources: ["httproutes"]
+            verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+
+
+  - it: retains the legacy extensions apiGroup for operator releases before v0.75.0
+    documentIndex: 1
+    asserts:
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["extensions"]
+            resources: ["ingresses"]
+            verbs: ["get", "list", "watch"]
