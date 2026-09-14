@@ -1,5 +1,12 @@
 suite: global.versions propagation tests
 set:
+  global:
+    versions:
+      metrics: v0.0.1
+      logs: v0.0.2
+      traces: v0.0.3
+      anomaly: v0.0.4
+      alertmanager: v0.0.5
   vlsingle.enabled: true
   vlagent.enabled: true
   vtsingle.enabled: true
@@ -15,31 +22,31 @@ tests:
     asserts:
       - equal:
           path: spec.image.tag
-          value: v1.52.0
+          value: v0.0.2
         template: victoria-metrics-operator/vlsingle/vlsingle.yml
       - equal:
           path: metadata.labels["app.kubernetes.io/version"]
-          value: v1.52.0
+          value: v0.0.2
         template: victoria-metrics-operator/vlsingle/vlsingle.yml
       - equal:
           path: spec.image.tag
-          value: v1.52.0
+          value: v0.0.2
         template: victoria-metrics-operator/vlagent/vlagent.yaml
       - equal:
           path: metadata.labels["app.kubernetes.io/version"]
-          value: v1.52.0
+          value: v0.0.2
         template: victoria-metrics-operator/vlagent/vlagent.yaml
       - equal:
           path: spec.image.tag
-          value: v0.9.4
+          value: v0.0.3
         template: victoria-metrics-operator/vtsingle/vtsingle.yaml
       - equal:
           path: metadata.labels["app.kubernetes.io/version"]
-          value: v0.9.4
+          value: v0.0.3
         template: victoria-metrics-operator/vtsingle/vtsingle.yaml
       - equal:
           path: spec.image.tag
-          value: v0.32.1
+          value: v0.0.5
         documentSelector:
           path: kind
           value: VMAlertmanager
