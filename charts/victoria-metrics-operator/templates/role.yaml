@@ -67,27 +67,18 @@ rules:
 {{- /* do not add permissions here, please add a +kubebuilder:rbac marker in the operator repo */ -}}
 {{- /* these rules come from /victoria-metrics-operator/operator-role.yaml, synced on operator release */}}
 {{- $gated := dict
-      "autoscaling.k8s.io/verticalpodautoscalers"        .Values.operator.vpa_support
-      "gateway.networking.k8s.io/httproutes"             .Values.operator.gateway_support
-      "gateway.networking.k8s.io/httproutes/finalizers"  .Values.operator.gateway_support }}
-{{- $gatedGroups := list "autoscaling.k8s.io" "gateway.networking.k8s.io" }}
+      "autoscaling.k8s.io"        .Values.operator.vpa_support
+      "gateway.networking.k8s.io" .Values.operator.gateway_support }}
 {{- $opRole := required "operator-role.yaml is missing or empty" (.Files.Get "operator-role.yaml") | fromYaml }}
 {{- range $r := $opRole.rules }}
 {{- if and $r.resources (not (has "operator.victoriametrics.com" $r.apiGroups)) }}
 {{- $keep := list }}
-{{- range $res := $r.resources }}
-{{- $enabled := true }}
 {{- range $g := $r.apiGroups }}
-{{- $key := printf "%s/%s" $g $res }}
-{{- if hasKey $gated $key }}{{- $enabled = get $gated $key }}
-{{- else if has $g $gatedGroups }}{{- fail (printf "unclassified resource %q in feature-gated apiGroup %q - add it to the $gated map in templates/role.yaml" $res $g) }}
-{{- end }}
-{{- end }}
-{{- if $enabled }}{{- $keep = append $keep $res }}{{- end }}
+{{- if or (not (hasKey $gated $g)) (get $gated $g) }}{{- $keep = append $keep $g }}{{- end }}
 {{- end }}
 {{- if $keep }}
-- apiGroups: {{ toYaml $r.apiGroups | nindent 2 }}
-  resources: {{ toYaml $keep | nindent 2 }}
+- apiGroups: {{ toYaml $keep | nindent 2 }}
+  resources: {{ toYaml $r.resources | nindent 2 }}
   verbs: {{ toYaml $r.verbs | nindent 2 }}
 {{- end }}
 {{- end }}
