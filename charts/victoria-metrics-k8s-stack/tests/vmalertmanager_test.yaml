@@ -1,0 +1,80 @@
+suite: vmalertmanager naming tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+  - victoria-metrics-operator/vmalert/vmalert.yaml
+  - victoria-metrics-operator/vmalert/notifiers.yaml
+  - grafana/datasource.yaml
+tests:
+  - it: VMAlertmanager config Secret and its spec.configSecret reference use the vmalertmanager name
+    set:
+      alertmanager:
+        enabled: true
+        spec:
+          replicaCount: 2
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+        documentIndex: 0
+      - equal:
+          path: spec.configSecret
+          value: vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+        documentIndex: 1
+
+  - it: vmalert notifier targets the vmalertmanager Service per replica
+    set:
+      alertmanager:
+        enabled: true
+        spec:
+          replicaCount: 2
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - contains:
+          path: spec.notifiers
+          content:
+            url: http://vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack-0.vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9093
+        template: victoria-metrics-operator/vmalert/vmalert.yaml
+      - contains:
+          path: spec.notifiers
+          content:
+            url: http://vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack-1.vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9093
+        template: victoria-metrics-operator/vmalert/vmalert.yaml
+
+  - it: vmalert additional notifier config secret targets the vmalertmanager Service
+    set:
+      alertmanager:
+        enabled: true
+        spec:
+          replicaCount: 2
+      vmalert:
+        additionalNotifierConfigs:
+          static_configs:
+    asserts:
+      - matchRegex:
+          path: stringData["notifier-configs.yaml"]
+          pattern: 'vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack-0\.vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack\.NAMESPACE\.svc\.cluster\.local\.:9093'
+        template: victoria-metrics-operator/vmalert/notifiers.yaml
+
+  - it: Grafana alertmanager datasource URL targets the vmalertmanager Service
+    set:
+      grafana:
+        forceDeployDatasource: true
+      alertmanager:
+        enabled: true
+      vmalert:
+        spec:
+          extraArgs:
+            notifier.blackhole: "true"
+    asserts:
+      - matchRegex:
+          path: data["datasource.yaml"]
+          pattern: 'http://vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack\.NAMESPACE\.svc\.cluster\.local\.:9093'
+        template: grafana/datasource.yaml

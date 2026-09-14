@@ -103,91 +103,10 @@ tests:
           path: metadata.name
           value: vmestimator-storage-RELEASE-NAME
         template: workload.yaml
-  - it: "resource names (useLegacyNaming: true)"
+  - it: "useLegacyNaming: true is rejected -- this chart only supports operator-style naming"
     set:
       useLegacyNaming: true
     asserts:
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator
-        template: configmap.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        template: ingress.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        template: monitor.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator
-        template: networkpolicy.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
-        template: pdb.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        template: pdb.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
-        template: service.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-stor-insert
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-stor-insert
-        template: service.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        template: service.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator
-        template: serviceaccount.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-select
-        template: workload.yaml
-      - equal:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
-        documentSelector:
-          path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-estimator-vmestimator-storage
+      - failedTemplate:
+          errorMessage: "useLegacyNaming: true is not supported by the victoria-metrics-estimator chart; it only supports operator-style resource naming"
         template: workload.yaml

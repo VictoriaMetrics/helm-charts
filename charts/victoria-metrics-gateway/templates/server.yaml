@@ -23,7 +23,7 @@
 {{- $isExtraVolumes := or $isHost (gt (len .Values.extraVolumes) 0)  -}}
 {{- $isVolumes := or $isExtraVolumes .Values.rateLimiter.enabled  (and .Values.license.secret.name .Values.license.secret.key) -}}
 
-{{- $ctx := dict "helm" . -}}
+{{- $ctx := dict "helm" . "kindOverride" "vmgateway" -}}
 {{- $fullname := include "vm.plain.fullname" $ctx -}}
 {{- $ns := include "vm.namespace" $ctx }}
 
