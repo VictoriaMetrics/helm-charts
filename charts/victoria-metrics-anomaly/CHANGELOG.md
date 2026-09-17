@@ -1,6 +1,8 @@
 ## Next release
 
-- upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.30.5](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1305)
+- upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.30.6](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1306)
+
+- experimental hardened image can be selected with `image.variant: dhi` when enterprise licensing is configured and `image.tag` is empty; the resulting tag is `v1.30.6-enterprise-dhi`. The default image retains its existing base.
 
 ## v1.12.17
 
