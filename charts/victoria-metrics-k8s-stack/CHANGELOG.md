@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VM components to [v1.152.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.152.0)
+- added `syncJob.imagePullSecrets`, falling back to `global.imagePullSecrets`. The sync-job Pod had no way to receive pull secrets, so `syncJob.image.repository` could not point at a private registry or mirror.
 
 ## v0.92.1
 
