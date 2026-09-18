@@ -179,6 +179,9 @@ syncJob:
     # renovate: image=ghcr.io/victoriametrics/sync-job
     tag: v0.0.17
     pullPolicy: IfNotPresent
+  # -- Image pull secrets for the sync-job Pod. Needed when `image.repository` points at a
+  # private registry. Falls back to `global.imagePullSecrets` when not set.
+  imagePullSecrets: []
   # -- Seconds to keep a finished job before automatic deletion
   ttlSecondsAfterFinished: 600
   # -- Delete managed resources that are no longer in the current config
