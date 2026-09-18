@@ -7,7 +7,7 @@
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "vmselect" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
-{{- $sa := include "vm.fullname" . }}
+{{- $sa := include "vm.plain.fullname" (dict "helm" . "kindOverride" "vmcluster") }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: {{ title $mode }}

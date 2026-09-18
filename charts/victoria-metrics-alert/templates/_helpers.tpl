@@ -35,6 +35,7 @@
       {{- $ctx = dict "helm" . }}
     {{- end -}}
     {{- $_ := set $ctx "appKey" "alertmanager" -}}
+    {{- $_ := set $ctx "kindOverride" "vmalertmanager" -}}
     {{- $_ := set $ctx "style" "plain" -}}
     {{- $fullname := include "vm.plain.fullname" $ctx -}}
     {{- $alertmanager := deepCopy $app }}
@@ -109,7 +110,7 @@
 {{- end }}
 
 {{- define "vmalert.args" -}}
-  {{- $ctx := . }}
+  {{- $ctx := merge (dict) . }}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.server -}}
   {{- $datasource := list (include "vmalert.fromLegacyArgs" $app.datasource | fromYaml) -}}
@@ -135,6 +136,7 @@
     {{- $alertmanager := deepCopy $Values.alertmanager }}
     {{- $_ := set $ctx "style" "plain" -}}
     {{- $_ := set $ctx "appKey" "alertmanager" -}}
+    {{- $_ := set $ctx "kindOverride" "vmalertmanager" -}}
     {{- $appSecure := not (empty ($alertmanager.webConfig).tls_server_config) -}}
     {{- $_ := set $ctx "appSecure" $appSecure -}}
     {{- $_ := set $ctx "appRoute" $alertmanager.baseURLPrefix -}}
