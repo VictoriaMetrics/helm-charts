@@ -125,8 +125,9 @@
     {{- if kindIs "slice" $notifier.url }}
       {{- $urls := $notifier.url }}
       {{- range $urls }}
-        {{- $_ := set $notifier "url" . }}
-        {{- $notifiers = append $notifiers $notifier }}
+        {{- $n := deepCopy $notifier }}
+        {{- $_ := set $n "url" . }}
+        {{- $notifiers = append $notifiers $n }}
       {{- end }}
     {{- else }}
       {{- $notifiers = append $notifiers $notifier }}
