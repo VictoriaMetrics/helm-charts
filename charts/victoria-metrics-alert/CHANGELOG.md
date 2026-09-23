@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix list-valued `server.notifier.url` rendering the last URL for every notifier instead of one notifier per URL
 
 ## v0.49.0
 

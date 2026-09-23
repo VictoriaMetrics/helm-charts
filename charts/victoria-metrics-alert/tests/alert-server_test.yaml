@@ -1,0 +1,22 @@
+suite: alert server templates test
+templates:
+  - alert-server.yaml
+  - alert-configmap.yaml
+tests:
+  - it: should render one notifier per url when notifier.url is a list
+    template: alert-server.yaml
+    set:
+      server:
+        datasource:
+          url: http://vmsingle:8428
+        notifier:
+          url:
+            - http://am-0:9093
+            - http://am-1:9093
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://am-0:9093
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://am-1:9093
