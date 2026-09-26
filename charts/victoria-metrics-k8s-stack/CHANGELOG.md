@@ -6,7 +6,7 @@
 
 **Release date:** 20 Sep 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.152.0](https://img.shields.io/badge/v1.152.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11520) ![VM Operator: 0.67.3](https://img.shields.io/badge/VM_Operator-0.67.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230673)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.152.0](https://img.shields.io/badge/v1.152.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11520) ![VM Operator: 0.67.3](https://img.shields.io/badge/VM_Operator-0.67.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0673)
 
 - bump version of VM components to [v1.152.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.152.0)
 - added `syncJob.imagePullSecrets`, falling back to `global.imagePullSecrets`. The sync-job Pod had no way to receive pull secrets, so `syncJob.image.repository` could not point at a private registry or mirror.
@@ -15,7 +15,7 @@
 
 **Release date:** 07 Sep 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.151.0](https://img.shields.io/badge/v1.151.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11510) ![VM Operator: 0.67.3](https://img.shields.io/badge/VM_Operator-0.67.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230673)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.151.0](https://img.shields.io/badge/v1.151.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11510) ![VM Operator: 0.67.3](https://img.shields.io/badge/VM_Operator-0.67.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0673)
 
 - fixed `GrafanaDatasource` plugin entries missing a required `version` field, which grafana-operator rejects. Defaults to `latest` when the datasource doesn't set one. See [#3200](https://github.com/VictoriaMetrics/helm-charts/issues/3200)
 
@@ -23,7 +23,7 @@
 
 **Release date:** 07 Sep 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.151.0](https://img.shields.io/badge/v1.151.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11510) ![VM Operator: 0.67.3](https://img.shields.io/badge/VM_Operator-0.67.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230673)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.151.0](https://img.shields.io/badge/v1.151.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11510) ![VM Operator: 0.67.3](https://img.shields.io/badge/VM_Operator-0.67.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0673)
 
 - `defaultRules.groups[*].enabled` may now be a template expression (e.g. `{{ .Values.kubeScheduler.enabled }}`), like `defaultDashboards.dashboards[*].enabled` already was. Disabling `kubeApiServer`, `kubeControllerManager`, `kubeScheduler`, or `kubelet` now also disables their alerting rule groups, so alerts no longer fire on scrape targets that were never enabled. See [#3197](https://github.com/VictoriaMetrics/helm-charts/issues/3197)
 - fixed sync-job's `alertmanager.rules` group keeping upstream kube-prometheus's `job="alertmanager-main",namespace="monitoring"` selectors, which never match this chart's VMAlertmanager. The sync-job now rewrites both to a regexp matching this chart's VMAlertmanager(s) via a new `labelRewrites` option (alongside the existing `jobNamespaces`), configurable under `defaultRules.labelRewrites` / `defaultRules.groups.<name>.labelRewrites`; values may be template expressions (e.g. `{{ .Release.Namespace }}`), rendered before use. See [#11517](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11517)
@@ -36,7 +36,7 @@
 
 **Release date:** 22 Aug 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.150.0](https://img.shields.io/badge/v1.150.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11500) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.150.0](https://img.shields.io/badge/v1.150.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11500) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0672)
 
 - fixed sync-job `OUTPUT=-` generating malformed YAML for ConfigMap manifests. See [#3169](https://github.com/VictoriaMetrics/helm-charts/issues/3169)
 
@@ -44,7 +44,7 @@
 
 **Release date:** 21 Aug 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.150.0](https://img.shields.io/badge/v1.150.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11500) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.150.0](https://img.shields.io/badge/v1.150.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11500) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0672)
 
 - fixed sync-job ignoring `defaultRules.groups.<name>.spec` overrides (e.g. `interval`). Per-group spec fields are now merged on top of the common group spec and applied to the generated VMRule. See [#3166](https://github.com/VictoriaMetrics/helm-charts/issues/3166)
 
@@ -52,7 +52,7 @@
 
 **Release date:** 17 Aug 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.150.0](https://img.shields.io/badge/v1.150.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11500) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.150.0](https://img.shields.io/badge/v1.150.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11500) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0672)
 
 - bump version of VM components to [v1.150.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.150.0)
 - fixed sync-job deleting all rules and dashboards on upstream HTTP errors. The job now aborts on any fetch failure instead of treating missing data as orphaned resources. HTTP 429 is now retried like 5xx errors. See [#3163](https://github.com/VictoriaMetrics/helm-charts/issues/3163)
@@ -61,7 +61,7 @@
 
 **Release date:** 08 Aug 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0672)
 
 - fixed sync-job ignoring `defaultRules.rules.<name>.enabled: false`, causing disabled rules to reappear in generated VMRule resources. See [#3151](https://github.com/VictoriaMetrics/helm-charts/issues/3151)
 
@@ -69,7 +69,7 @@
 
 **Release date:** 07 Aug 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0672)
 
 - fixed sync-job silently ignoring extra fields set under `defaultRules.group.spec` (such as `params` and `interval`) and `defaultRules.rules.*.spec`. The configured values were not applied to the generated VMRule resources. See [#3149](https://github.com/VictoriaMetrics/helm-charts/issues/3149)
 
@@ -77,7 +77,7 @@
 
 **Release date:** 06 Aug 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0672)
 
 - added `vldistributed` as an alternative to `vlsingle` and `vlcluster` for multi-zone VictoriaLogs deployments. Set `vldistributed.enabled: true` (mutually exclusive with `vlsingle` and `vlcluster`). The `victorialogs-cluster` dashboard and VL alert rules are enabled automatically when `vldistributed.enabled` is set.
 
@@ -85,7 +85,7 @@
 
 **Release date:** 05 Aug 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.149.0](https://img.shields.io/badge/v1.149.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11490) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0672)
 
 - bump version of VM components to [v1.149.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.149.0)
 
@@ -93,7 +93,7 @@
 
 **Release date:** 04 Aug 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.148.0](https://img.shields.io/badge/v1.148.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11480) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230672)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.148.0](https://img.shields.io/badge/v1.148.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11480) ![VM Operator: 0.67.2](https://img.shields.io/badge/VM_Operator-0.67.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0672)
 
 - added `syncJob.extraVolumes` and `syncJob.extraVolumeMounts` to allow mounting custom CA certificates into the sync-job pod. To trust a self-signed certificate, create a Secret with the CA cert, mount it via these fields, and set `SSL_CERT_FILE=/path/to/ca.crt` in `syncJob.env`. See [#3127](https://github.com/VictoriaMetrics/helm-charts/issues/3127)
 - added per-component `namespaceOverride` to all operator-managed components (`vmsingle`, `vmcluster`, `vmagent`, `vmalert`, `alertmanager`, `vmauth`, `vlsingle`, `vlcluster`, `vlagent`, `vtsingle`, `vtcluster`). Setting `<component>.namespaceOverride: <ns>` deploys that CR, its Ingress, and its HTTPRoute into a separate namespace while keeping the rest of the stack in the release namespace. Cross-component FQDNs are updated automatically. See [#3113](https://github.com/VictoriaMetrics/helm-charts/issues/3113)
@@ -103,7 +103,7 @@
 
 **Release date:** 20 Jul 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.148.0](https://img.shields.io/badge/v1.148.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11480) ![VM Operator: 0.66.3](https://img.shields.io/badge/VM_Operator-0.66.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230663)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.148.0](https://img.shields.io/badge/v1.148.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11480) ![VM Operator: 0.66.3](https://img.shields.io/badge/VM_Operator-0.66.3-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0663)
 
 - bump version of VM components to [v1.148.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.148.0)
 
@@ -111,7 +111,7 @@
 
 **Release date:** 17 Jul 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.147.0](https://img.shields.io/badge/v1.147.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11470) ![VM Operator: 0.66.2](https://img.shields.io/badge/VM_Operator-0.66.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230662)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.147.0](https://img.shields.io/badge/v1.147.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11470) ![VM Operator: 0.66.2](https://img.shields.io/badge/VM_Operator-0.66.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0662)
 
 - fix sync-job injecting `` label selectors into panel expressions for dashboards that have no cluster template variable (e.g. `k8s-resources-multicluster`), causing all panels to fail with an unresolved variable reference when `multicluster: true` and no `clusterMetric` is configured for that dashboard. See [#3099](https://github.com/VictoriaMetrics/helm-charts/issues/3099).
 
@@ -119,7 +119,7 @@
 
 **Release date:** 16 Jul 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.147.0](https://img.shields.io/badge/v1.147.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11470) ![VM Operator: 0.66.2](https://img.shields.io/badge/VM_Operator-0.66.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230662)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.147.0](https://img.shields.io/badge/v1.147.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11470) ![VM Operator: 0.66.2](https://img.shields.io/badge/VM_Operator-0.66.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0662)
 
 - fix sync-job introducing a circular `` reference into the cluster template variable's own query expression when `multicluster: true`, which prevented the variable from resolving and broke panel queries. See [#3099](https://github.com/VictoriaMetrics/helm-charts/issues/3099).
 
@@ -127,7 +127,7 @@
 
 **Release date:** 08 Jul 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.147.0](https://img.shields.io/badge/v1.147.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11470) ![VM Operator: 0.66.2](https://img.shields.io/badge/VM_Operator-0.66.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230662)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.147.0](https://img.shields.io/badge/v1.147.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11470) ![VM Operator: 0.66.2](https://img.shields.io/badge/VM_Operator-0.66.2-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0662)
 
 - bump version of VM components to [v1.147.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.147.0)
 - fixed hardcoded datasources in dashboards when datasource variable is present. See [#3079](https://github.com/VictoriaMetrics/helm-charts/issues/3079).
@@ -138,7 +138,7 @@
 
 **Release date:** 03 Jul 2026
 
-![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.146.0](https://img.shields.io/badge/v1.146.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11460) ![VM Operator: 0.65.1](https://img.shields.io/badge/VM_Operator-0.65.1-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230651)
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.146.0](https://img.shields.io/badge/v1.146.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11460) ![VM Operator: 0.65.1](https://img.shields.io/badge/VM_Operator-0.65.1-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%23v0651)
 
 - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
 - fix `vlagent` spec incorrectly delegating to `vmagent` implementation and overriding the image tag with the chart `appVersion` instead of using the VictoriaLogs image tag configured in `vlagent.spec.image.tag`
