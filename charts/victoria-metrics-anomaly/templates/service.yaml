@@ -6,7 +6,7 @@
 {{- end }}
 {{- $pvc := .Values.persistentVolume }}
 {{- $mode := ternary "statefulSet" "deployment" $pvc.enabled }}
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "kindOverride" "vmanomaly" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: v1

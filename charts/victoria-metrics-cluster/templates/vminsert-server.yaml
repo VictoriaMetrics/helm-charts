@@ -4,7 +4,7 @@
 {{- $ctx := dict "helm" . "appKey" "vminsert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $relabelConfig := include "vminsert.relabel.config.name" $ctx }}
-{{- $sa := include "vm.fullname" . }}
+{{- $sa := include "vm.plain.fullname" (dict "helm" . "kindOverride" "vmcluster") }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
