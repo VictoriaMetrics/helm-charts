@@ -1,7 +1,15 @@
 {{- $pdb := .Values.podDisruptionBudget }}
 {{- if $pdb.enabled }}
-{{- if and $pdb.minAvailable $pdb.maxUnavailable }}
+{{- /* presence checks rather than truthiness so that 0 is honoured */}}
+{{- $min := $pdb.minAvailable }}
+{{- $max := $pdb.maxUnavailable }}
+{{- $hasMin := and (not (kindIs "invalid" $min)) (ne (toString $min) "") }}
+{{- $hasMax := and (not (kindIs "invalid" $max)) (ne (toString $max) "") }}
+{{- if and $hasMin $hasMax }}
 {{- fail ".Values.podDisruptionBudget.minAvailable and maxUnavailable are mutually exclusive" }}
+{{- end }}
+{{- if not (or $hasMin $hasMax) }}
+{{- fail ".Values.podDisruptionBudget requires exactly one of minAvailable or maxUnavailable when enabled" }}
 {{- end }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
@@ -15,11 +23,11 @@ metadata:
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
 spec:
-  {{- with $pdb.minAvailable }}
-  minAvailable: {{ . }}
+  {{- if $hasMin }}
+  minAvailable: {{ $min }}
   {{- end }}
-  {{- with $pdb.maxUnavailable }}
-  maxUnavailable: {{ . }}
+  {{- if $hasMax }}
+  maxUnavailable: {{ $max }}
   {{- end }}
   {{- with $pdb.unhealthyPodEvictionPolicy }}
   unhealthyPodEvictionPolicy: {{ . }}

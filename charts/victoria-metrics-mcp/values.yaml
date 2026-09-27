@@ -126,7 +126,7 @@ service:
   annotations: {}
   # -- Service labels
   extraLabels: {}
-  # -- Service traffic distribution. Details are [here](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)
+  # -- Service traffic distribution. Requires Kubernetes 1.31 or newer; rendering fails on older clusters. Details are [here](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)
   trafficDistribution: ""
   # -- Service ClusterIP
   clusterIP: ""
@@ -276,7 +276,8 @@ horizontalPodAutoscaler:
   minReplicas: 2
   # -- Maximum replicas for HPA to use to scale the deployment
   maxReplicas: 10
-  # -- Metrics for HPA to use to scale the deployment
+  # -- Metrics for HPA to use to scale the deployment. When empty the field is omitted and
+  # Kubernetes applies its default of 80% average CPU utilization (requires CPU requests to be set)
   metrics: []
   # -- Behavior settings for scaling by the HPA
   behavior: {}
@@ -284,7 +285,7 @@ horizontalPodAutoscaler:
   labels: {}
 
 # -- Pod disruption budget. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
-# `minAvailable` and `maxUnavailable` are mutually exclusive
+# Exactly one of `minAvailable` or `maxUnavailable` must be set when enabled; `0` is a valid value
 podDisruptionBudget:
   enabled: false
   # -- min number or percentage of pods that must be available

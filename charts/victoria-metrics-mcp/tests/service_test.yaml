@@ -33,6 +33,9 @@ tests:
       - notExists:
           path: spec.loadBalancerSourceRanges
   - it: should render annotations, labels and LB options
+    capabilities:
+      majorVersion: 1
+      minorVersion: 31
     set:
       service:
         type: LoadBalancer
@@ -68,3 +71,22 @@ tests:
       - equal:
           path: spec.ipFamilyPolicy
           value: PreferDualStack
+  - it: rejects trafficDistribution on Kubernetes older than 1.31
+    capabilities:
+      majorVersion: 1
+      minorVersion: 30
+    set:
+      service.trafficDistribution: PreferClose
+    asserts:
+      - failedTemplate:
+          errorPattern: "service.trafficDistribution requires Kubernetes 1.31 or newer"
+  - it: allows trafficDistribution on Kubernetes 1.31
+    capabilities:
+      majorVersion: 1
+      minorVersion: 31
+    set:
+      service.trafficDistribution: PreferClose
+    asserts:
+      - equal:
+          path: spec.trafficDistribution
+          value: PreferClose

@@ -16,6 +16,9 @@ metadata:
 spec:
   type: {{ $service.type }}
   {{- with $service.trafficDistribution }}
+  {{- if semverCompare "<1.31.0-0" $.Capabilities.KubeVersion.Version }}
+  {{- fail (printf "service.trafficDistribution requires Kubernetes 1.31 or newer, cluster reports %s" $.Capabilities.KubeVersion.Version) }}
+  {{- end }}
   trafficDistribution: {{ . }}
   {{- end }}
   {{- with $service.clusterIP }}

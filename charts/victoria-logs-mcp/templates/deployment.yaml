@@ -41,8 +41,9 @@ spec:
       {{- with .Values.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.terminationGracePeriodSeconds }}
-      terminationGracePeriodSeconds: {{ . }}
+      {{- /* presence check rather than `with` so that 0 is honoured */}}
+      {{- if not (kindIs "invalid" .Values.terminationGracePeriodSeconds) }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- end }}
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
@@ -147,7 +148,7 @@ spec:
       topologySpreadConstraints:
         {{- range $constraint := . }}
         - {{ toYaml $constraint | nindent 10 | trim }}
-          {{- if not $constraint.labelSelector }}
+          {{- if not (hasKey $constraint "labelSelector") }}
           labelSelector:
             matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 14 }}
           {{- end }}

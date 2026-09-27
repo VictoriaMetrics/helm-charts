@@ -125,3 +125,29 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].startupProbe.failureThreshold
           value: 30
+
+  - it: honours terminationGracePeriodSeconds 0
+    set:
+      terminationGracePeriodSeconds: 0
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 0
+
+  - it: omits terminationGracePeriodSeconds when unset
+    asserts:
+      - notExists:
+          path: spec.template.spec.terminationGracePeriodSeconds
+
+  - it: keeps an explicit empty topologySpreadConstraints labelSelector
+    set:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector: {}
+    asserts:
+      - exists:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector
+      - notExists:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels

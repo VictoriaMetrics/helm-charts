@@ -18,7 +18,9 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ $fullname }}
-  metrics: {{ toYaml $hpa.metrics | nindent 4 }}
+  {{- with $hpa.metrics }}
+  metrics: {{ toYaml . | nindent 4 }}
+  {{- end }}
   {{- with $hpa.behavior }}
   behavior: {{ toYaml . | nindent 4 }}
   {{- end -}}
