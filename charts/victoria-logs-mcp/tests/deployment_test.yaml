@@ -1,0 +1,127 @@
+suite: Deployment
+templates:
+  - deployment.yaml
+set:
+  vl.entrypoint: http://vlogs:9428
+tests:
+  - it: sets replicas by default
+    set:
+      replicaCount: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+      - notExists:
+          path: spec.strategy
+
+  - it: omits replicas when HPA is enabled
+    set:
+      replicaCount: 3
+      horizontalPodAutoscaler.enabled: true
+    asserts:
+      - notExists:
+          path: spec.replicas
+
+  - it: renders strategy and terminationGracePeriodSeconds
+    set:
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 0
+      terminationGracePeriodSeconds: 120
+    asserts:
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 0
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 120
+
+  - it: defaults topologySpreadConstraints labelSelector to selector labels
+    set:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].topologyKey
+          value: topology.kubernetes.io/zone
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels["app.kubernetes.io/name"]
+          value: victoria-logs-mcp
+
+  - it: keeps an explicit topologySpreadConstraints labelSelector
+    set:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              foo: bar
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels
+          value:
+            foo: bar
+
+  - it: omits optional pod and container extras by default
+    asserts:
+      - notExists:
+          path: spec.template.spec.priorityClassName
+      - notExists:
+          path: spec.template.spec.initContainers
+      - notExists:
+          path: spec.template.spec.containers[0].envFrom
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
+      - notExists:
+          path: spec.template.spec.containers[0].lifecycle
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 1
+
+  - it: renders pod and container extras
+    set:
+      priorityClassName: high
+      initContainers:
+        - name: init
+          image: busybox
+      extraContainers:
+        - name: sidecar
+          image: sidecar:latest
+      envFrom:
+        - secretRef:
+            name: extra-env
+      lifecycle:
+        preStop:
+          exec:
+            command: ["sleep", "10"]
+      startupProbe:
+        httpGet:
+          path: /health/readiness
+          port: http
+        failureThreshold: 30
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: high
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: init
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 2
+      - equal:
+          path: spec.template.spec.containers[1].name
+          value: sidecar
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].secretRef.name
+          value: extra-env
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle.preStop.exec.command
+          value: ["sleep", "10"]
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.failureThreshold
+          value: 30

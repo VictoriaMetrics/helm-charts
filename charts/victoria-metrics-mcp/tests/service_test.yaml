@@ -20,3 +20,51 @@ tests:
       - equal:
           path: spec.ports[0].nodePort
           value: 30808
+  - it: omits optional spec fields by default
+    asserts:
+      - notExists:
+          path: metadata.annotations
+      - notExists:
+          path: spec.trafficDistribution
+      - notExists:
+          path: spec.clusterIP
+      - notExists:
+          path: spec.externalTrafficPolicy
+      - notExists:
+          path: spec.loadBalancerSourceRanges
+  - it: should render annotations, labels and LB options
+    set:
+      service:
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+        extraLabels:
+          tier: edge
+        trafficDistribution: PreferClose
+        externalTrafficPolicy: Local
+        loadBalancerSourceRanges:
+          - 10.0.0.0/8
+        ipFamilyPolicy: PreferDualStack
+    asserts:
+      - equal:
+          path: metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-type"]
+          value: nlb
+      - equal:
+          path: metadata.labels.tier
+          value: edge
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+      - equal:
+          path: spec.trafficDistribution
+          value: PreferClose
+      - equal:
+          path: spec.externalTrafficPolicy
+          value: Local
+      - equal:
+          path: spec.loadBalancerSourceRanges
+          value:
+            - 10.0.0.0/8
+      - equal:
+          path: spec.ipFamilyPolicy
+          value: PreferDualStack

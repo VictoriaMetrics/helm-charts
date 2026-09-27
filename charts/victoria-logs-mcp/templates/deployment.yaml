@@ -12,7 +12,12 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
+  {{- if not (.Values.horizontalPodAutoscaler).enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- with .Values.strategy }}
+  strategy: {{ toYaml . | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
@@ -36,6 +41,15 @@ spec:
       {{- with .Values.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ . }}
+      {{- end }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -47,6 +61,9 @@ spec:
           {{- end }}
           image: "{{ $repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: MCP_LISTEN_ADDR
               value: "0.0.0.0:{{  .Values.service.port }}"
@@ -95,12 +112,21 @@ spec:
           {{- with .Values.readinessProbe }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.startupProbe }}
+          startupProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.lifecycle }}
+          lifecycle: {{ toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end }}
+        {{- with .Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -116,4 +142,14 @@ spec:
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := . }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+          {{- if not $constraint.labelSelector }}
+          labelSelector:
+            matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 14 }}
+          {{- end }}
+        {{- end }}
       {{- end }}

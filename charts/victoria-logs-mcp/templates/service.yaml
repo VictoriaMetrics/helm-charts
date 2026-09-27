@@ -1,3 +1,4 @@
+{{- $service := .Values.service }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
@@ -6,15 +7,47 @@ kind: Service
 metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
+  {{- $_ := set $ctx "extraLabels" $service.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- with $service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ $service.type }}
+  {{- with $service.trafficDistribution }}
+  trafficDistribution: {{ . }}
+  {{- end }}
+  {{- with $service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- with $service.externalIPs }}
+  externalIPs: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- with $service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with $service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.ipFamilies }}
+  ipFamilies: {{ toYaml . | nindent 4 }}
+  {{- end }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ $service.port }}
       targetPort: http
       protocol: TCP
       name: http
-      {{- if .Values.service.nodePort }}
-      nodePort: {{ .Values.service.nodePort }}
+      {{- if $service.nodePort }}
+      nodePort: {{ $service.nodePort }}
       {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
