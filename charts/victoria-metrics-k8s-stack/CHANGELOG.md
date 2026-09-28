@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.94.0
+
+**Release date:** 28 Sep 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.152.0](https://img.shields.io/badge/v1.152.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11520) ![VM Operator: 0.68.0](https://img.shields.io/badge/VM_Operator-0.68.0-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230680)
+
 - bump operator dependency chart to version 0.68.0, which includes the new VTAgent CRD and requires updating the CRD versions. See full changelog [here](https://github.com/VictoriaMetrics/operator/releases#release-v0.75.0)
 - bump kube-state-metrics dependency chart to version 8.6.0
 - bump prometheus-node-exporter dependency chart to version 4.59.0
