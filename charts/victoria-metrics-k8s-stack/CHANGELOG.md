@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+- bump operator dependency chart to version 0.68.0, which includes the new VTAgent CRD and requires updating the CRD versions. See full changelog [here](https://github.com/VictoriaMetrics/operator/releases#release-v0.75.0)
+- bump kube-state-metrics dependency chart to version 8.6.0
+- bump prometheus-node-exporter dependency chart to version 4.59.0
+- bump grafana dependency chart to version 13.2.6
 
 ## v0.93.0
 
