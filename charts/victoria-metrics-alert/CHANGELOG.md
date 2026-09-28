@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.153.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.153.0)
 - fix list-valued `server.notifier.url` rendering the last URL for every notifier instead of one notifier per URL
 
 ## v0.49.0
