@@ -1,0 +1,95 @@
+suite: HorizontalPodAutoscaler
+templates:
+  - hpa.yaml
+  - deployment.yaml
+set:
+  vl.entrypoint: http://vlogs:9428
+tests:
+  - it: is not rendered by default
+    template: hpa.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: targets the deployment by its rendered name
+    release:
+      name: vlmcp
+    set:
+      horizontalPodAutoscaler.enabled: true
+    asserts:
+      - isKind:
+          of: HorizontalPodAutoscaler
+        template: hpa.yaml
+      - equal:
+          path: spec.scaleTargetRef.kind
+          value: Deployment
+        template: hpa.yaml
+      - equal:
+          path: spec.scaleTargetRef.apiVersion
+          value: apps/v1
+        template: hpa.yaml
+      # both names are asserted against the same literal so a change to either
+      # rendered name fails the suite
+      - equal:
+          path: spec.scaleTargetRef.name
+          value: vlmcp-victoria-logs-mcp
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vlmcp-victoria-logs-mcp
+        template: hpa.yaml
+      - isKind:
+          of: Deployment
+        template: deployment.yaml
+      - equal:
+          path: metadata.name
+          value: vlmcp-victoria-logs-mcp
+        template: deployment.yaml
+      - equal:
+          path: spec.minReplicas
+          value: 2
+        template: hpa.yaml
+      - equal:
+          path: spec.maxReplicas
+          value: 10
+        template: hpa.yaml
+
+  - it: omits metrics when empty so the Kubernetes default applies
+    template: hpa.yaml
+    set:
+      horizontalPodAutoscaler.enabled: true
+    asserts:
+      - notExists:
+          path: spec.metrics
+      - notExists:
+          path: spec.behavior
+
+  - it: renders metrics and behavior
+    template: hpa.yaml
+    set:
+      horizontalPodAutoscaler.enabled: true
+      horizontalPodAutoscaler.minReplicas: 3
+      horizontalPodAutoscaler.maxReplicas: 7
+      horizontalPodAutoscaler.metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 80
+      horizontalPodAutoscaler.behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 300
+    asserts:
+      - equal:
+          path: spec.minReplicas
+          value: 3
+      - equal:
+          path: spec.maxReplicas
+          value: 7
+      - equal:
+          path: spec.metrics[0].resource.target.averageUtilization
+          value: 80
+      - equal:
+          path: spec.behavior.scaleDown.stabilizationWindowSeconds
+          value: 300

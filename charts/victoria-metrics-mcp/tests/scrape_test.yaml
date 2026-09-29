@@ -1,0 +1,93 @@
+suite: VMServiceScrape
+templates:
+  - scrape.yaml
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders defaults into the release namespace
+    release:
+      namespace: monitoring
+    set:
+      scrape.enabled: true
+    asserts:
+      - isKind:
+          of: VMServiceScrape
+      - equal:
+          path: metadata.namespace
+          value: monitoring
+      - equal:
+          path: spec.namespaceSelector.matchNames
+          value:
+            - monitoring
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+      - equal:
+          path: spec.endpoints[0].port
+          value: http
+      - notExists:
+          path: spec.endpoints[0].interval
+      - notExists:
+          path: spec.endpoints[0].relabelConfigs
+
+  - it: renders scrape overrides
+    release:
+      namespace: monitoring
+    set:
+      scrape.enabled: true
+      scrape.namespace: vm-operator
+      scrape.path: /custom/metrics
+      scrape.scheme: https
+      scrape.interval: 15s
+      scrape.scrapeTimeout: 5s
+      scrape.extraLabels:
+        team: obs
+      scrape.annotations:
+        note: hi
+      scrape.tlsConfig:
+        insecureSkipVerify: true
+      scrape.relabelConfigs:
+        - action: labeldrop
+          regex: pod
+      scrape.metricRelabelConfigs:
+        - action: drop
+          regex: go_.*
+          source_labels: [__name__]
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: vm-operator
+      - equal:
+          path: spec.namespaceSelector.matchNames
+          value:
+            - monitoring
+      - equal:
+          path: metadata.labels.team
+          value: obs
+      - equal:
+          path: metadata.annotations.note
+          value: hi
+      - equal:
+          path: spec.endpoints[0].path
+          value: /custom/metrics
+      - equal:
+          path: spec.endpoints[0].scheme
+          value: https
+      - equal:
+          path: spec.endpoints[0].interval
+          value: 15s
+      - equal:
+          path: spec.endpoints[0].scrapeTimeout
+          value: 5s
+      - equal:
+          path: spec.endpoints[0].tlsConfig.insecureSkipVerify
+          value: true
+      - equal:
+          path: spec.endpoints[0].relabelConfigs[0].action
+          value: labeldrop
+      - equal:
+          path: spec.endpoints[0].metricRelabelConfigs[0].regex
+          value: go_.*

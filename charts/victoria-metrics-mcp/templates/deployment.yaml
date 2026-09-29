@@ -1,6 +1,9 @@
 {{- if eq .Values.mcp.mode "stdio" }}
 {{- fail "mcp.mode=stdio is not supported in Kubernetes deployments. Use 'sse' or 'http' instead." }}
 {{- end }}
+{{- if not (has .Values.vm.type (list "single" "cluster")) }}
+{{- fail (printf "vm.type=%q is not supported. Use 'single' or 'cluster' instead." .Values.vm.type) }}
+{{- end }}
 {{- $isCloud := gt (len .Values.vm.cloudAPIKey) 0 }}
 {{- $ctx := dict "helm" . }}
 {{- $fullname := include "vm.fullname" $ctx }}
@@ -13,7 +16,12 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
+  {{- if not (.Values.horizontalPodAutoscaler).enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- with .Values.strategy }}
+  strategy: {{ toYaml . | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
@@ -39,6 +47,16 @@ spec:
       {{- with .Values.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- /* presence check rather than `with` so that 0 is honoured */}}
+      {{- if not (kindIs "invalid" .Values.terminationGracePeriodSeconds) }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -53,6 +71,9 @@ spec:
           {{- with .Values.command }}
           command: {{ toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: MCP_LISTEN_ADDR
               value: "0.0.0.0:{{  .Values.service.port }}"
@@ -60,7 +81,11 @@ spec:
               value: "{{ .Values.mcp.mode }}"
             {{- if $isCloud }}
             - name: VMC_API_KEY
+              {{- if kindIs "map" .Values.vm.cloudAPIKey }}
+              valueFrom: {{ toYaml .Values.vm.cloudAPIKey | nindent 16 }}
+              {{- else }}
               value: "{{ .Values.vm.cloudAPIKey }}"
+              {{- end }}
             {{- else }}
             - name: VM_INSTANCE_ENTRYPOINT
               value: "{{ required "either .Values.vm.cloudAPIKey or .Values.vm.entrypoint should be set" .Values.vm.entrypoint }}"
@@ -108,12 +133,21 @@ spec:
           {{- with .Values.readinessProbe }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.startupProbe }}
+          startupProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.lifecycle }}
+          lifecycle: {{ toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end }}
+        {{- with .Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -129,4 +163,14 @@ spec:
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := . }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+          {{- if not (hasKey $constraint "labelSelector") }}
+          labelSelector:
+            matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 14 }}
+          {{- end }}
+        {{- end }}
       {{- end }}
