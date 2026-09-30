@@ -1,9 +1,12 @@
 {{- if eq .Values.mcp.mode "stdio" }}
 {{- fail "mcp.mode=stdio is not supported in Kubernetes deployments. Use 'sse' or 'http' instead." }}
 {{- end }}
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
-{{- $sa := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vtmcp" }}
+{{- if eq (include "vm.useLegacyNaming" $ctx) "true" }}
+{{- fail "useLegacyNaming: true is not supported by victoria-traces-mcp chart" }}
+{{- end }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $sa := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
