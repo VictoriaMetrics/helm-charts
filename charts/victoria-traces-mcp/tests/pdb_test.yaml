@@ -1,0 +1,96 @@
+suite: PodDisruptionBudget
+templates:
+  - pdb.yaml
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: rejects enabling without an availability field
+    set:
+      podDisruptionBudget.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: ".Values.podDisruptionBudget requires exactly one of minAvailable or maxUnavailable when enabled"
+
+  - it: supports maxUnavailable and unhealthyPodEvictionPolicy
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.maxUnavailable: 1
+      podDisruptionBudget.unhealthyPodEvictionPolicy: AlwaysAllow
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - notExists:
+          path: spec.minAvailable
+      - equal:
+          path: spec.maxUnavailable
+          value: 1
+      - equal:
+          path: spec.unhealthyPodEvictionPolicy
+          value: AlwaysAllow
+
+  - it: supports minAvailable
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.minAvailable: 50%
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 50%
+      - notExists:
+          path: spec.maxUnavailable
+      - notExists:
+          path: spec.unhealthyPodEvictionPolicy
+
+  - it: honours maxUnavailable 0 to forbid voluntary disruptions
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.maxUnavailable: 0
+    asserts:
+      - equal:
+          path: spec.maxUnavailable
+          value: 0
+      - notExists:
+          path: spec.minAvailable
+
+  - it: honours minAvailable 0
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.minAvailable: 0
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 0
+      - notExists:
+          path: spec.maxUnavailable
+
+  - it: rejects both availability fields
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.minAvailable: 1
+      podDisruptionBudget.maxUnavailable: 1
+    asserts:
+      - failedTemplate:
+          errorMessage: ".Values.podDisruptionBudget.minAvailable and maxUnavailable are mutually exclusive"
+
+  - it: treats 0 as set in the mutual-exclusion check
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.minAvailable: 0
+      podDisruptionBudget.maxUnavailable: 1
+    asserts:
+      - failedTemplate:
+          errorMessage: ".Values.podDisruptionBudget.minAvailable and maxUnavailable are mutually exclusive"
+
+  - it: applies extra labels
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.maxUnavailable: 1
+      podDisruptionBudget.labels:
+        foo: bar
+    asserts:
+      - equal:
+          path: metadata.labels.foo
+          value: bar

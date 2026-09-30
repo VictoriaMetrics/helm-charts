@@ -1,0 +1,48 @@
+{{- $scrape := .Values.scrape }}
+{{- if $scrape.enabled }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  {{- with $scrape.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $scrape.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  name: {{ $fullname }}
+  namespace: {{ $scrape.namespace | default $ns }}
+spec:
+  endpoints:
+    - path: {{ $scrape.path | default "/metrics" }}
+      port: http
+      {{- with $scrape.scheme }}
+      scheme: {{ . }}
+      {{- end }}
+      {{- with $scrape.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $scrape.scrapeTimeout }}
+      scrapeTimeout: {{ . }}
+      {{- end }}
+      {{- with $scrape.basicAuth }}
+      basicAuth: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with $scrape.tlsConfig }}
+      tlsConfig: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $scrape.relabelConfigs }}
+      relabelConfigs: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $scrape.metricRelabelConfigs }}
+      metricRelabelConfigs: {{ toYaml . | nindent 8 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ $ns }}
+  selector:
+    matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}
+{{- end }}

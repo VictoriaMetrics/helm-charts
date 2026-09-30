@@ -1,0 +1,150 @@
+{{- if eq .Values.mcp.mode "stdio" }}
+{{- fail "mcp.mode=stdio is not supported in Kubernetes deployments. Use 'sse' or 'http' instead." }}
+{{- end }}
+{{- $ctx := dict "helm" . }}
+{{- $fullname := include "vm.fullname" $ctx }}
+{{- $sa := include "vm.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec:
+  {{- if not (.Values.horizontalPodAutoscaler).enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- with .Values.strategy }}
+  strategy: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
+  template:
+    metadata:
+      {{- $_ := set $ctx "extraAnnotations" .Values.podAnnotations }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
+      {{- end }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
+      labels:
+        {{- include "vm.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if (.Values.serviceAccount).create }}
+      serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- /* presence check rather than `with` so that 0 is honoured */}}
+      {{- if not (kindIs "invalid" .Values.terminationGracePeriodSeconds) }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- $repo := .Values.image.repository }}
+          {{- with .Values.image.registry }}
+            {{- $repo = printf "%s/%s" . $repo }}
+          {{- end }}
+          image: "{{ $repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.envFrom }}
+          envFrom: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: MCP_LISTEN_ADDR
+              value: "0.0.0.0:{{  .Values.service.port }}"
+            - name: MCP_SERVER_MODE
+              value: "{{ .Values.mcp.mode }}"
+            - name: VT_INSTANCE_ENTRYPOINT
+              value: "{{ required ".Values.vt.entrypoint should be set" .Values.vt.entrypoint }}"
+            {{- with .Values.vt.bearerToken }}
+            - name: VT_INSTANCE_BEARER_TOKEN
+              {{- if kindIs "map" . }}
+              valueFrom: {{ toYaml . | nindent 16 }}
+              {{- else }}
+              value: "{{ . }}"
+              {{- end }}
+            {{- end }}
+            {{- with .Values.vt.headers }}
+            - name: VT_INSTANCE_HEADERS
+              value: "{{ join "," . }}"
+            {{- end }}
+            {{- with .Values.mcp.disable.tools }}
+            - name: MCP_DISABLED_TOOLS
+              value: "{{ join "," . }}"
+            {{- end }}
+            {{- with .Values.mcp.heartbeatInterval }}
+            - name: MCP_HEARTBEAT_INTERVAL
+              value: "{{ . }}"
+            {{- end }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.startupProbe }}
+          startupProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.lifecycle }}
+          lifecycle: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts: {{ toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.volumes }}
+      volumes: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := . }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+          {{- if not (hasKey $constraint "labelSelector") }}
+          labelSelector:
+            matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 14 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
