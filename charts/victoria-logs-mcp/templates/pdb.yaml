@@ -11,8 +11,8 @@
 {{- if not (or $hasMin $hasMax) }}
 {{- fail ".Values.podDisruptionBudget requires exactly one of minAvailable or maxUnavailable when enabled" }}
 {{- end }}
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vlmcp" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
