@@ -13,7 +13,7 @@ tests:
 
   - it: targets the deployment by its rendered name
     release:
-      name: vtmcp
+      name: rel
     set:
       horizontalPodAutoscaler.enabled: true
     asserts:
@@ -32,18 +32,18 @@ tests:
       # rendered name fails the suite
       - equal:
           path: spec.scaleTargetRef.name
-          value: vtmcp-victoria-traces-mcp
+          value: vtmcp-rel
         template: hpa.yaml
       - equal:
           path: metadata.name
-          value: vtmcp-victoria-traces-mcp
+          value: vtmcp-rel
         template: hpa.yaml
       - isKind:
           of: Deployment
         template: deployment.yaml
       - equal:
           path: metadata.name
-          value: vtmcp-victoria-traces-mcp
+          value: vtmcp-rel
         template: deployment.yaml
       - equal:
           path: spec.minReplicas

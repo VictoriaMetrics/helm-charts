@@ -16,7 +16,7 @@ func TestVictoriaTracesMCPInstallDefault(t *testing.T) {
 	ctx := context.Background()
 	defer chartCleanup(t, ctx, cp)
 
-	vtMCPName := fmt.Sprintf("%s-victoria-traces-mcp", cp.releaseName)
+	vtMCPName := fmt.Sprintf("vtmcp-%s", cp.releaseName)
 	waitUntilDeploymentAvailable(t, ctx, cp.client, cp.namespace, vtMCPName)
 	waitUntilServiceAvailable(t, ctx, cp.client, cp.namespace, vtMCPName)
 }
