@@ -53,6 +53,14 @@ tests:
         documentIndex: 1
   - it: preserves component fullname overrides
     set:
+      single.fullnameOverride: custom-single
+    asserts:
+      - equal:
+          path: metadata.name
+          value: custom-single
+
+  - it: component fullname override wins over the chart-level fullnameOverride
+    set:
       fullnameOverride: shared
       single.fullnameOverride: custom-single
     asserts:

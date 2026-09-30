@@ -1,0 +1,17 @@
+suite: useLegacyNaming partial render tests
+templates:
+  - service.yaml
+tests:
+  - it: "useLegacyNaming: true is rejected even when only a non-workload template is rendered"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "useLegacyNaming: true is not supported by the victoria-metrics-estimator chart; it only supports operator-style resource naming"
+  - it: "storage.useLegacyNaming: true is rejected even when only a non-workload template is rendered"
+    set:
+      mode: cluster
+      storage.useLegacyNaming: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "useLegacyNaming: true is not supported by the victoria-metrics-estimator chart; it only supports operator-style resource naming"
