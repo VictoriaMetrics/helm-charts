@@ -92,6 +92,22 @@ tests:
             name: VT_INSTANCE_BEARER_TOKEN
             value: some-token
 
+  - it: uses the configured serviceAccount.name even when create is false
+    set:
+      serviceAccount.create: false
+      serviceAccount.name: existing-sa
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: existing-sa
+
+  - it: still sets a fallback serviceAccountName when create is false and name is unset
+    set:
+      serviceAccount.create: false
+    asserts:
+      - exists:
+          path: spec.template.spec.serviceAccountName
+
   - it: omits optional pod and container extras by default
     asserts:
       - notExists:

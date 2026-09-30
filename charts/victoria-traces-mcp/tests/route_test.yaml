@@ -1,0 +1,109 @@
+suite: HTTPRoute
+templates:
+  - route.yaml
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders default parentRefs and rules into the release namespace
+    release:
+      namespace: monitoring
+    set:
+      route.enabled: true
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: metadata.namespace
+          value: monitoring
+      - equal:
+          path: spec.parentRefs[0].name
+          value: gateway
+      - equal:
+          path: spec.parentRefs[0].sectionName
+          value: http
+      - notExists:
+          path: spec.hostnames
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: RELEASE-NAME-victoria-traces-mcp
+      - equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 8080
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+      - notExists:
+          path: spec.rules[0].filters
+
+  - it: renders annotations, hostnames and filters
+    set:
+      route.enabled: true
+      route.annotations:
+        note: hi
+      route.hostnames:
+        - example.local
+      route.rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
+          filters:
+            - type: RequestHeaderModifier
+              requestHeaderModifier:
+                set:
+                  - name: My-Overwrite-Header
+                    value: this-is-the-only-value
+    asserts:
+      - equal:
+          path: metadata.annotations.note
+          value: hi
+      - equal:
+          path: spec.hostnames
+          value:
+            - example.local
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: RequestHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].name
+          value: My-Overwrite-Header
+
+  - it: renders multiple rules and parentRefs
+    set:
+      route.enabled: true
+      route.parentRefs:
+        - name: gateway-a
+          sectionName: http
+        - name: gateway-b
+          namespace: other-ns
+      route.rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /a
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /b
+    asserts:
+      - lengthEqual:
+          path: spec.parentRefs
+          count: 2
+      - equal:
+          path: spec.parentRefs[1].namespace
+          value: other-ns
+      - lengthEqual:
+          path: spec.rules
+          count: 2
+      - equal:
+          path: spec.rules[1].matches[0].path.value
+          value: /b
+      - equal:
+          path: spec.rules[1].backendRefs[0].weight
+          value: 1

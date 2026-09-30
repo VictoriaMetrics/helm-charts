@@ -36,10 +36,8 @@ spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- if (.Values.serviceAccount).create }}
       serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}
-      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
-      {{- end }}
+      automountServiceAccountToken: {{ (.Values.serviceAccount).automount | default false }}
       {{- with .Values.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}
@@ -71,28 +69,28 @@ spec:
             - name: MCP_LISTEN_ADDR
               value: "0.0.0.0:{{  .Values.service.port }}"
             - name: MCP_SERVER_MODE
-              value: "{{ .Values.mcp.mode }}"
+              value: {{ .Values.mcp.mode | quote }}
             - name: VT_INSTANCE_ENTRYPOINT
-              value: "{{ required ".Values.vt.entrypoint should be set" .Values.vt.entrypoint }}"
+              value: {{ required ".Values.vt.entrypoint should be set" .Values.vt.entrypoint | quote }}
             {{- with .Values.vt.bearerToken }}
             - name: VT_INSTANCE_BEARER_TOKEN
               {{- if kindIs "map" . }}
               valueFrom: {{ toYaml . | nindent 16 }}
               {{- else }}
-              value: "{{ . }}"
+              value: {{ . | quote }}
               {{- end }}
             {{- end }}
             {{- with .Values.vt.headers }}
             - name: VT_INSTANCE_HEADERS
-              value: "{{ join "," . }}"
+              value: {{ join "," . | quote }}
             {{- end }}
             {{- with .Values.mcp.disable.tools }}
             - name: MCP_DISABLED_TOOLS
-              value: "{{ join "," . }}"
+              value: {{ join "," . | quote }}
             {{- end }}
             {{- with .Values.mcp.heartbeatInterval }}
             - name: MCP_HEARTBEAT_INTERVAL
-              value: "{{ . }}"
+              value: {{ . | quote }}
             {{- end }}
             {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
