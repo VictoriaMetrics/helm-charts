@@ -5354,6 +5354,59 @@ entries:
   victoria-logs-mcp:
   - annotations:
       artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
+        - '**Update node 1**: due to change in label name pods will be restarted.'
+        - added `app.kubernetes.io/component` with value from custom `app` label. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
+        - add `nodePort` support for `Service` resources
+        - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
+        - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
+        - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
+        - add `horizontalPodAutoscaler` and `podDisruptionBudget` support. `replicas` is omitted from the `Deployment` when HPA is enabled. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - add `topologySpreadConstraints`, `strategy`, `terminationGracePeriodSeconds`, `priorityClassName`, `initContainers`, `extraContainers`, `envFrom`, `lifecycle`, `startupProbe` and `extraObjects` options. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - add `service.annotations`, `service.extraLabels`, `service.trafficDistribution`, `service.clusterIP`, `service.externalIPs`, `service.loadBalancerIP`, `service.loadBalancerSourceRanges`, `service.externalTrafficPolicy`, `service.healthCheckNodePort`, `service.ipFamilyPolicy` and `service.ipFamilies` options. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - 'make `VMServiceScrape` configurable: `scrape.interval`, `scrape.scrapeTimeout`, `scrape.scheme`, `scrape.path`, `scrape.tlsConfig`, `scrape.basicAuth`, `scrape.relabelConfigs`, `scrape.metricRelabelConfigs`, `scrape.extraLabels`, `scrape.annotations` and `scrape.namespace`. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)'
+        - add `serviceAccount.extraLabels`. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - fix `Ingress` missing `metadata.namespace`, so it is created in the release namespace like every other resource. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-logs-mcp
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-logs-mcp/changelog/
+      artifacthub.io/readme: |
+        # VictoriaLogs MCP Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-logs-mcp/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-logs-mcp/changelog/).
+    apiVersion: v2
+    appVersion: v1.9.0
+    created: "2026-09-30T15:52:56.791606418Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.4.*
+    description: A Helm chart for VictoriaLogs MCP server
+    digest: f0d9797dc62c0ca86ff5b4ac9c6ab0927e20c67e38029ba5a45b2e13e81f33ac
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victorialogs
+    - logs
+    - kubernetes
+    - observability
+    - mcp
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-logs-mcp
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-logs-mcp-0.2.0/victoria-logs-mcp-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: ""
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -69761,6 +69814,62 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - add ability to override container command.
+        - add `nodePort` support for `Service` resources
+        - added `global.extraLabels` and `global.extraAnnotations` to apply common labels and annotations to all workload resources and pod templates
+        - fix `VMServiceScrape` to target the correct namespace
+        - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
+        - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
+        - add `horizontalPodAutoscaler` and `podDisruptionBudget` support. `replicas` is omitted from the `Deployment` when HPA is enabled. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - add `topologySpreadConstraints`, `strategy`, `terminationGracePeriodSeconds`, `priorityClassName`, `initContainers`, `extraContainers`, `envFrom`, `lifecycle`, `startupProbe` and `extraObjects` options. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - add `service.annotations`, `service.extraLabels`, `service.trafficDistribution`, `service.clusterIP`, `service.externalIPs`, `service.loadBalancerIP`, `service.loadBalancerSourceRanges`, `service.externalTrafficPolicy`, `service.healthCheckNodePort`, `service.ipFamilyPolicy` and `service.ipFamilies` options. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - 'make `VMServiceScrape` configurable: `scrape.interval`, `scrape.scrapeTimeout`, `scrape.scheme`, `scrape.path`, `scrape.tlsConfig`, `scrape.basicAuth`, `scrape.relabelConfigs`, `scrape.metricRelabelConfigs`, `scrape.extraLabels`, `scrape.annotations` and `scrape.namespace`. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)'
+        - add `serviceAccount.extraLabels`. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - allow `vm.cloudAPIKey` to be a `valueFrom` map so the key can be sourced from a `Secret`, the same way `vm.bearerToken` already can. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - fail early on unsupported `vm.type` values, matching the existing `mcp.mode` check. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+        - fix `Ingress` missing `metadata.namespace`, so it is created in the release namespace like every other resource. See [#3229](https://github.com/VictoriaMetrics/helm-charts/issues/3229)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-mcp
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+        - name: Changelog
+          url: https://docs.victoriametrics.com/helm/victoria-metrics-mcp/changelog/
+      artifacthub.io/readme: |
+        # VictoriaMetrics MCP Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-mcp/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-mcp/changelog/).
+    apiVersion: v2
+    appVersion: v1.120.1
+    created: "2026-09-30T15:52:57.156800111Z"
+    dependencies:
+    - name: victoria-metrics-common
+      repository: oci://ghcr.io/victoriametrics/helm-charts
+      version: 0.4.*
+    description: A Helm chart for VictoriaMetrics MCP server
+    digest: c7ce3f05c08c08374430cd56f564eba5d182b7821dc3431c8da8eec2614843d0
+    home: https://github.com/VictoriaMetrics/helm-charts
+    icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+    keywords:
+    - victoriametrics
+    - metrics
+    - kubernetes
+    - observability
+    - monitoring
+    - mcp
+    kubeVersion: '>=1.25.0-0'
+    name: victoria-metrics-mcp
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: application
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-mcp-0.4.0/victoria-metrics-mcp-0.4.0.tgz
+    version: 0.4.0
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '**Update node 1**: due to change in label name pods will be restarted.'
         - added `app.kubernetes.io/component` with value from custom `app` label. See [#2785](https://github.com/VictoriaMetrics/helm-charts/issues/2785).
       artifacthub.io/license: Apache-2.0
@@ -86417,4 +86526,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-09-30T15:37:02.871276424Z"
+generated: "2026-09-30T15:52:57.306871337Z"
