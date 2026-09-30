@@ -1,0 +1,23 @@
+suite: Ingress
+templates:
+  - ingress.yaml
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: is rendered into the release namespace
+    release:
+      namespace: monitoring
+    set:
+      ingress.enabled: true
+    asserts:
+      - isKind:
+          of: Ingress
+      - equal:
+          path: metadata.namespace
+          value: monitoring
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.port.number
+          value: 8080

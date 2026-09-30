@@ -1,0 +1,324 @@
+# -- Number of replicas. Ignored when `horizontalPodAutoscaler.enabled` is true
+replicaCount: 1
+
+# -- Deployment update strategy. Details are [here](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy)
+strategy: {}
+  # type: RollingUpdate
+  # rollingUpdate:
+  #   maxSurge: 25%
+  #   maxUnavailable: 25%
+
+image:
+  registry: ghcr.io
+  repository: victoriametrics-community/mcp-victoriatraces
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  # -- Extra labels for the service account
+  extraLabels: {}
+
+# -- Name of Priority Class
+priorityClassName: ""
+
+# -- Init containers for the MCP server pod
+initContainers: []
+  # - name: example
+  #   image: example-image
+
+# -- Extra containers to run in the MCP server pod
+extraContainers: []
+  # - name: sidecar
+  #   image: sidecar-image
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+mcp:
+  # Server operation mode: http / sse
+  mode: http
+  disable:
+    # list of tool names to disable
+    tools: []
+  # Defines the heartbeat interval for the streamable-http protocol. It means the MCP server will send a heartbeat to the client through the GET connection, to keep the connection alive from being closed by the network infrastructure (e.g. gateways)
+  heartbeatInterval: 30s
+
+vt:
+  # URL to VictoriaTraces instance
+  entrypoint: ""
+  # Authentication token for VictoriaTraces API
+  bearerToken: ""
+  # Custom HTTP headers to send with requests to instances of VictoriaTraces
+  headers: []
+
+# Extra environment variables to set in the container.
+env: []
+
+# -- Specify alternative source for env variables
+envFrom: []
+  # - configMapRef:
+  #     name: special-config
+  # - secretRef:
+  #     name: special-secret
+
+# -- Container lifecycle hooks
+lifecycle: {}
+  # preStop:
+  #   exec:
+  #     command: ["sleep", "10"]
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 8080
+  # -- Service node port
+  nodePort: ""
+  # -- Service annotations
+  annotations: {}
+  # -- Service labels
+  extraLabels: {}
+  # -- Service traffic distribution. Requires Kubernetes 1.31 or newer; rendering fails on older clusters. Details are [here](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)
+  trafficDistribution: ""
+  # -- Service ClusterIP
+  clusterIP: ""
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips) for details
+  externalIPs: []
+  # -- Service load balancer IP
+  loadBalancerIP: ""
+  # -- Load balancer source range
+  loadBalancerSourceRanges: []
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  externalTrafficPolicy: ""
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  healthCheckNodePort: ""
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details
+  ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details
+  ipFamilies: []
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# -- Expose the service via gateway-api HTTPRoute
+# Requires Gateway API resources and suitable controller installed within the cluster
+# (see: https://gateway-api.sigs.k8s.io/guides/)
+route:
+  # HTTPRoute enabled.
+  enabled: false
+  # HTTPRoute annotations.
+  annotations: {}
+  # Which Gateways this Route is attached to.
+  parentRefs:
+  - name: gateway
+    sectionName: http
+    # namespace: default
+  # Hostnames matching HTTP header.
+  hostnames: []
+  # List of rules and filters applied.
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+  #   filters:
+  #   - type: RequestHeaderModifier
+  #     requestHeaderModifier:
+  #       set:
+  #       - name: My-Overwrite-Header
+  #         value: this-is-the-only-value
+  #       remove:
+  #       - User-Agent
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /echo
+  #     headers:
+  #     - name: version
+  #       value: v2
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  httpGet:
+    path: /health/liveness
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 10
+  timeoutSeconds: 1
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /health/readiness
+    port: http
+    scheme: HTTP
+  initialDelaySeconds: 10
+  timeoutSeconds: 1
+  periodSeconds: 10
+# -- Startup probe. Disabled by default
+startupProbe: {}
+  # httpGet:
+  #   path: /health/readiness
+  #   port: http
+  # failureThreshold: 30
+  # periodSeconds: 2
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+dnsConfig: {}
+
+# -- Duration in seconds the pod needs to terminate gracefully. Raise it if you
+# serve long-lived `sse` or streamable-http connections
+terminationGracePeriodSeconds:
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# -- Pod topologySpreadConstraints. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/).
+# `labelSelector` defaults to the chart's selector labels when not set
+topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: topology.kubernetes.io/zone
+  #   whenUnsatisfiable: ScheduleAnyway
+
+# -- Horizontal Pod Autoscaler. Details are [here](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+horizontalPodAutoscaler:
+  # -- Use HPA for the MCP server deployment. Disables `replicaCount`
+  enabled: false
+  # -- Minimum replicas for HPA to use to scale the deployment
+  minReplicas: 2
+  # -- Maximum replicas for HPA to use to scale the deployment
+  maxReplicas: 10
+  # -- Metrics for HPA to use to scale the deployment. When empty the field is omitted and
+  # Kubernetes applies its default of 80% average CPU utilization (requires CPU requests to be set)
+  metrics: []
+  # -- Behavior settings for scaling by the HPA
+  behavior: {}
+  # -- Extra labels for HorizontalPodAutoscaler
+  labels: {}
+
+# -- Pod disruption budget. Details are [here](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
+# Exactly one of `minAvailable` or `maxUnavailable` must be set when enabled; `0` is a valid value
+podDisruptionBudget:
+  enabled: false
+  # -- min number or percentage of pods that must be available
+  minAvailable:
+  # -- max number or percentage of pods that can be unavailable
+  maxUnavailable:
+  # -- Defines criteria when unhealthy pods should be considered for eviction
+  unhealthyPodEvictionPolicy:
+  # -- Extra labels for PodDisruptionBudget
+  labels: {}
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []
+
+# -- `VMServiceScrape` for the MCP server. Requires the VictoriaMetrics operator
+scrape:
+  enabled: false
+  # -- Namespace to create the `VMServiceScrape` in. Defaults to the release namespace
+  namespace: ""
+  # -- Extra labels for the `VMServiceScrape`
+  extraLabels: {}
+  # -- Extra annotations for the `VMServiceScrape`
+  annotations: {}
+  # -- Metrics path. Defaults to `/metrics`
+  path: ""
+  # -- HTTP scheme to use for scraping
+  scheme: ""
+  # -- Scrape interval
+  interval: ""
+  # -- Scrape timeout
+  scrapeTimeout: ""
+  # -- Basic auth params for scraping (supports helm templates)
+  basicAuth: {}
+  # -- TLS configuration to use when scraping the endpoint
+  tlsConfig: {}
+  # -- Relabel configs applied to scrape targets
+  relabelConfigs: []
+  # -- Relabel configs applied to scraped metrics
+  metricRelabelConfigs: []
+
+# -- See `kubectl explain networkpolicy.spec` for more. Details are [here](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+networkPolicy:
+  enabled: false
+  # -- Ingress rules
+  ingress: []
+  # -- Egress rules
+  egress: []
+  # -- Extra labels for NetworkPolicy
+  labels: {}
+  # -- Extra annotations for NetworkPolicy
+  annotations: {}
