@@ -151,3 +151,46 @@ tests:
           path: spec.template.spec.topologySpreadConstraints[0].labelSelector
       - notExists:
           path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels
+
+  - it: sources bearerToken from a secret when given a map
+    set:
+      vl.bearerToken:
+        secretKeyRef:
+          name: vl-token
+          key: token
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VL_INSTANCE_BEARER_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: vl-token
+                key: token
+
+  - it: keeps a plain bearerToken string inline
+    set:
+      vl.bearerToken: some-token
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VL_INSTANCE_BEARER_TOKEN
+            value: some-token
+
+  - it: uses the configured serviceAccount.name even when create is false
+    set:
+      serviceAccount.create: false
+      serviceAccount.name: existing-sa
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: existing-sa
+
+  - it: still sets a fallback serviceAccountName when create is false and name is unset
+    set:
+      serviceAccount.create: false
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-logs-mcp

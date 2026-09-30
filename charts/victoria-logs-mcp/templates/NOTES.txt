@@ -1,7 +1,7 @@
 1. Get the application URL by running these commands:
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "kindOverride" "vlmcp" }}
 {{- $ns := include "vm.namespace" $ctx }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $name := include "vm.name" $ctx }}
 {{- $release := include "vm.release" $ctx }}
 {{- if .Values.route.enabled }}
@@ -24,7 +24,7 @@
   {{- end }}
 {{- end }}
 {{- else if contains "NodePort" .Values.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ $ns }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "vm.fullname" . }})
+  export NODE_PORT=$(kubectl get --namespace {{ $ns }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ $fullname }})
   export NODE_IP=$(kubectl get nodes --namespace {{ $ns }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type }}

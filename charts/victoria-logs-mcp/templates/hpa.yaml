@@ -1,7 +1,7 @@
 {{- $hpa := .Values.horizontalPodAutoscaler }}
 {{- if $hpa.enabled }}
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vlmcp" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
