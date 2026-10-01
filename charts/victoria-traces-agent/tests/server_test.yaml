@@ -188,3 +188,34 @@ tests:
       - equal:
           path: spec.volumeClaimTemplates[0].spec.volumeAttributesClassName
           value: gold
+
+  - it: renders imagePullSecrets, preferring the chart-level value over the global one
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      global.imagePullSecrets:
+        - name: global-secret
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: global-secret
+
+  - it: chart-level imagePullSecrets override the global ones
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      global.imagePullSecrets:
+        - name: global-secret
+      imagePullSecrets:
+        - name: chart-secret
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: chart-secret
+
+  - it: does not render imagePullSecrets by default
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+    asserts:
+      - notExists:
+          path: spec.template.spec.imagePullSecrets

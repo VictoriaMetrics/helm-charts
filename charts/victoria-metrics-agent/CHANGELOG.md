@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- bump `victoria-metrics-common` dependency to `0.4.*`. Default resource names are unchanged; with `useLegacyNaming: false` the `Ingress` and `PersistentVolumeClaim` are now named `vmagent-<release>` like the rest of the resources (previously they kept the legacy name).
+- fix `persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 
 ## v0.49.0
 

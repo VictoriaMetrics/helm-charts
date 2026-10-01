@@ -2,6 +2,7 @@
 
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
+- fix `vlstorage.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 
 ## v0.2.8
 

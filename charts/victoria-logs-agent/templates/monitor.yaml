@@ -1,10 +1,12 @@
 {{- $serviceMonitor := .Values.serviceMonitor -}}
 {{- if $serviceMonitor.enabled -}}
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "kindOverride" "vlagent" }}
 {{- $port := "http" -}}
-{{- range .Values.http -}}
-  {{- if .primary -}}
-    {{- $port = .name -}}
+{{- if empty (.Values.extraArgs | default dict).httpListenAddr -}}
+  {{- range .Values.http -}}
+    {{- if .primary -}}
+      {{- $port = .name -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
 apiVersion: monitoring.coreos.com/v1
@@ -16,7 +18,7 @@ metadata:
   {{- $_ := set $ctx "extraLabels" $serviceMonitor.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
-  name: {{ include "vm.fullname" $ctx }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   {{- with $serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}

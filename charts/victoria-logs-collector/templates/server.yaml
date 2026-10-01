@@ -1,9 +1,9 @@
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "kindOverride" "vlagent-collector" }}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: {{ include "vm.fullname" $ctx }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
@@ -29,7 +29,7 @@ spec:
       {{- with .Values.runtimeClassName }}
       runtimeClassName: {{ . }}
       {{- end }}
-      serviceAccountName: {{ include "vm.fullname" $ctx }}
+      serviceAccountName: {{ include "vm.plain.fullname" $ctx }}
       {{- with .Values.dnsConfig }}
       dnsConfig:
         {{- toYaml . | nindent 8 }}
@@ -62,7 +62,7 @@ spec:
       containers:
         - name: vlagent
           image: {{ include "vm.image" $ctx }}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.securityContext.enabled }}
           securityContext: {{ omit .Values.securityContext "enabled" | toYaml | nindent 12 }}
           {{- end }}

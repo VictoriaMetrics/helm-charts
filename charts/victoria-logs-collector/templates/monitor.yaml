@@ -1,7 +1,7 @@
 {{- $app := .Values }}
 {{- if $app.podMonitor.enabled }}
 {{- $podMonitor := $app.podMonitor }}
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "kindOverride" "vlagent-collector" }}
 {{- if $podMonitor.vm }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMPodScrape
@@ -10,7 +10,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 {{- end }}
 metadata:
-  name: {{ include "vm.fullname" $ctx }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   {{- with $podMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
