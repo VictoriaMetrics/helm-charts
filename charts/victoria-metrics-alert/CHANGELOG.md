@@ -1,6 +1,12 @@
 ## Next release
 
 - fix `alertmanager.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
+- bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
+- fix Alertmanager HA mode (`alertmanager.mode: statefulSet` with `alertmanager.replicaCount` > 1): replicas didn't form a cluster and vmalert couldn't reach them, because the per-pod addresses didn't resolve. Peers and vmalert notifiers now use the per-pod DNS names of the StatefulSet governing Service. The unused `-headless` Service is removed. The upgrade is in place: the StatefulSet `serviceName` is unchanged.
+- rename Alertmanager gossip container ports from `cluster-tcp`/`cluster-udp` to `mesh-tcp`/`mesh-udp`, matching the VictoriaMetrics operator. They are only rendered in HA mode.
+- store the generated Alertmanager config in a `Secret` instead of a `ConfigMap`, as it usually contains credentials. The name is unchanged (`<alertmanager fullname>-config`), which matches the VictoriaMetrics operator with `useLegacyNaming: false`. Alertmanager pods are restarted once on upgrade. Added `alertmanager.configSecret` to use an existing `Secret`. `alertmanager.configMap` is deprecated in favour of it and still works for an existing `ConfigMap`.
+- fix `alertmanager.webConfig` being ignored: it is now stored in the generated config as `webconfig.yaml` and passed via `--web.config.file`, and probes use HTTPS when it enables TLS.
+- honour `web.listen-address` and `web.route-prefix` set via `alertmanager.extraArgs` in the Alertmanager container port and in the vmalert notifier URLs.
 
 ## v0.50.0
 

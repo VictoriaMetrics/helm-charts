@@ -1,0 +1,151 @@
+suite: alertmanager server tests
+set:
+  server.datasource.url: http://vmsingle:8428
+  alertmanager.enabled: true
+templates:
+  - alertmanager-server.yaml
+  - alertmanager-secret.yaml
+tests:
+  - it: renders a Deployment with default args, port and volumes
+    asserts:
+      - template: alertmanager-server.yaml
+        isKind:
+          of: Deployment
+      - template: alertmanager-server.yaml
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+      - template: alertmanager-server.yaml
+        equal:
+          path: spec.template.spec.containers[0].name
+          value: alertmanager
+      - template: alertmanager-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --config.file=/config/alertmanager.yaml
+      - template: alertmanager-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --storage.path=/data
+      - template: alertmanager-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --web.listen-address=0.0.0.0:9093
+      - template: alertmanager-server.yaml
+        equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: web
+              containerPort: 9093
+      - template: alertmanager-server.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            secret:
+              secretName: RELEASE-NAME-victoria-metrics-alert-alertmanager-config
+      - template: alertmanager-server.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-alert
+
+  - it: uses the PersistentVolumeClaim in deployment mode
+    set:
+      alertmanager.persistentVolume.enabled: true
+    asserts:
+      - template: alertmanager-server.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: server-volume
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-victoria-metrics-alert-alertmanager
+
+  - it: rejects HA mode for a Deployment
+    set:
+      alertmanager.replicaCount: 2
+    asserts:
+      - template: alertmanager-server.yaml
+        failedTemplate:
+          errorPattern: "Alertmanager HA mode is not supported for Deployment"
+
+  - it: renders a StatefulSet with a volume claim template in statefulSet mode
+    set:
+      alertmanager.mode: statefulSet
+      alertmanager.persistentVolume.enabled: true
+    asserts:
+      - template: alertmanager-server.yaml
+        isKind:
+          of: StatefulSet
+      - template: alertmanager-server.yaml
+        equal:
+          path: spec.serviceName
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+      - template: alertmanager-server.yaml
+        equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: server-volume
+
+  - it: mounts an existing config map when alertmanager.configMap is set
+    set:
+      alertmanager.configMap: my-am-config
+    asserts:
+      - template: alertmanager-server.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            configMap:
+              name: my-am-config
+
+  - it: mounts an existing secret when alertmanager.configSecret is set
+    set:
+      alertmanager.configSecret: my-am-secret
+    asserts:
+      - template: alertmanager-server.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            secret:
+              secretName: my-am-secret
+
+  - it: rejects configMap and configSecret set together
+    set:
+      alertmanager.configMap: my-am-config
+      alertmanager.configSecret: my-am-secret
+    asserts:
+      - template: alertmanager-server.yaml
+        failedTemplate:
+          errorMessage: only one of `alertmanager.configMap` and `alertmanager.configSecret` can be set
+
+  - it: passes the web config file and probes over HTTPS when webConfig enables TLS
+    set:
+      alertmanager.webConfig:
+        tls_server_config:
+          cert_file: /tls/tls.crt
+          key_file: /tls/tls.key
+    asserts:
+      - template: alertmanager-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --web.config.file=/config/webconfig.yaml
+      - template: alertmanager-server.yaml
+        equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.scheme
+          value: HTTPS
+      - template: alertmanager-server.yaml
+        equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.scheme
+          value: HTTPS
+
+  - it: does not pass a web config file and probes over HTTP by default
+    asserts:
+      - template: alertmanager-server.yaml
+        notContains:
+          path: spec.template.spec.containers[0].args
+          content: --web.config.file=/config/webconfig.yaml
+      - template: alertmanager-server.yaml
+        equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.scheme
+          value: HTTP

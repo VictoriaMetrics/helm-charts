@@ -1,0 +1,103 @@
+suite: vmalert server tests
+set:
+  server.datasource.url: http://vmsingle:8428
+templates:
+  - alert-server.yaml
+  - alert-configmap.yaml
+tests:
+  - it: requires a datasource url
+    set:
+      server.datasource.url: ""
+    asserts:
+      - template: alert-server.yaml
+        failedTemplate:
+          errorMessage: server.datasource.url datasource URL must be specified
+
+  - it: renders default args, port, rules volume and shared service account
+    set:
+      server.notifier.alertmanager.url: http://alertmanager:9093
+    asserts:
+      - template: alert-server.yaml
+        isKind:
+          of: Deployment
+      - template: alert-server.yaml
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server
+      - template: alert-server.yaml
+        equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - --datasource.url=http://vmsingle:8428
+            - --envflag.enable
+            - --envflag.prefix=VM_
+            - --httpListenAddr=:8880
+            - --loggerFormat=json
+            - --notifier.url=http://alertmanager:9093
+            - --rule=/config/alert-rules.yaml
+      - template: alert-server.yaml
+        equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: http
+              containerPort: 8880
+      - template: alert-server.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: alerts-config
+            configMap:
+              name: RELEASE-NAME-victoria-metrics-alert-server-alert-rules-config
+      - template: alert-server.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-alert
+
+  - it: targets the bundled alertmanager when it is enabled
+    set:
+      alertmanager.enabled: true
+    asserts:
+      - template: alert-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9093
+
+  - it: renders remote write and remote read urls
+    set:
+      server.remoteWrite.url: http://vminsert:8480/insert/0/prometheus
+      server.remoteRead.url: http://vmselect:8481/select/0/prometheus
+    asserts:
+      - template: alert-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --remoteWrite.url=http://vminsert:8480/insert/0/prometheus
+      - template: alert-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --remoteRead.url=http://vmselect:8481/select/0/prometheus
+
+  - it: still accepts the legacy server.remote.write and server.remote.read fields
+    set:
+      server.remote.write.url: http://vminsert:8480/insert/0/prometheus
+      server.remote.read.url: http://vmselect:8481/select/0/prometheus
+    asserts:
+      - template: alert-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --remoteWrite.url=http://vminsert:8480/insert/0/prometheus
+      - template: alert-server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --remoteRead.url=http://vmselect:8481/select/0/prometheus
+
+  - it: mounts an existing rules config map when server.configMap is set
+    set:
+      server.configMap: my-rules
+    asserts:
+      - template: alert-server.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: alerts-config
+            configMap:
+              name: my-rules

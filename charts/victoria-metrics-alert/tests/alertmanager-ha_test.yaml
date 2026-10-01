@@ -1,0 +1,163 @@
+suite: alertmanager HA tests
+set:
+  server.datasource.url: http://vmsingle:8428
+  alertmanager.enabled: true
+  alertmanager.mode: statefulSet
+  alertmanager.replicaCount: 3
+templates:
+  - alert-configmap.yaml
+  - alert-server.yaml
+  - alertmanager-secret.yaml
+  - alertmanager-server.yaml
+  - alertmanager-service.yaml
+tests:
+  - it: peers alertmanager replicas by their per-pod DNS names under the governing service
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cluster.peer=RELEASE-NAME-victoria-metrics-alert-alertmanager-0.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9094
+        template: alertmanager-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cluster.peer=RELEASE-NAME-victoria-metrics-alert-alertmanager-1.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9094
+        template: alertmanager-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cluster.peer=RELEASE-NAME-victoria-metrics-alert-alertmanager-2.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9094
+        template: alertmanager-server.yaml
+      - equal:
+          path: spec.serviceName
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager
+        template: alertmanager-server.yaml
+      - hasDocuments:
+          count: 1
+        template: alertmanager-service.yaml
+      - equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: web
+              containerPort: 9093
+            - name: mesh-tcp
+              containerPort: 9094
+              protocol: TCP
+            - name: mesh-udp
+              containerPort: 9094
+              protocol: UDP
+        template: alertmanager-server.yaml
+
+  - it: sends vmalert notifications to every alertmanager replica
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager-0.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9093
+        template: alert-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager-1.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9093
+        template: alert-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager-2.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9093
+        template: alert-server.yaml
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9093
+        template: alert-server.yaml
+
+  - it: honours alertmanager TLS, route prefix and listen port in the notifier urls
+    set:
+      alertmanager.listenAddress: 0.0.0.0:9999
+      alertmanager.baseURLPrefix: /am/
+      alertmanager.webConfig.tls_server_config.cert_file: /tls/tls.crt
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=https://RELEASE-NAME-victoria-metrics-alert-alertmanager-0.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9999/am
+        template: alert-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=https://RELEASE-NAME-victoria-metrics-alert-alertmanager-1.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9999/am
+        template: alert-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=https://RELEASE-NAME-victoria-metrics-alert-alertmanager-2.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9999/am
+        template: alert-server.yaml
+
+  - it: honours web.listen-address and web.route-prefix set via alertmanager.extraArgs
+    set:
+      alertmanager.extraArgs:
+        web.listen-address: 0.0.0.0:9999
+        web.route-prefix: /am
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager-0.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9999/am
+        template: alert-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager-2.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9999/am
+        template: alert-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: web
+            containerPort: 9999
+        template: alertmanager-server.yaml
+
+  - it: keeps explicitly configured notifiers
+    set:
+      server.notifier.alertmanager.url: http://external-am:9093
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - --datasource.url=http://vmsingle:8428
+            - --envflag.enable
+            - --envflag.prefix=VM_
+            - --httpListenAddr=:8880
+            - --loggerFormat=json
+            - --notifier.url=http://external-am:9093
+            - --rule=/config/alert-rules.yaml
+        template: alert-server.yaml
+
+  - it: uses a single notifier url and no peers for a single alertmanager replica
+    set:
+      alertmanager.replicaCount: 1
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9093
+        template: alert-server.yaml
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --cluster.peer=RELEASE-NAME-victoria-metrics-alert-alertmanager-0.RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9094
+        template: alertmanager-server.yaml
+
+  - it: "uses vmalertmanager-prefixed names with useLegacyNaming: false"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cluster.peer=vmalertmanager-RELEASE-NAME-0.vmalertmanager-RELEASE-NAME.NAMESPACE.svc.cluster.local.:9094
+        template: alertmanager-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cluster.peer=vmalertmanager-RELEASE-NAME-1.vmalertmanager-RELEASE-NAME.NAMESPACE.svc.cluster.local.:9094
+        template: alertmanager-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cluster.peer=vmalertmanager-RELEASE-NAME-2.vmalertmanager-RELEASE-NAME.NAMESPACE.svc.cluster.local.:9094
+        template: alertmanager-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://vmalertmanager-RELEASE-NAME-0.vmalertmanager-RELEASE-NAME.NAMESPACE.svc.cluster.local.:9093
+        template: alert-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://vmalertmanager-RELEASE-NAME-1.vmalertmanager-RELEASE-NAME.NAMESPACE.svc.cluster.local.:9093
+        template: alert-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --notifier.url=http://vmalertmanager-RELEASE-NAME-2.vmalertmanager-RELEASE-NAME.NAMESPACE.svc.cluster.local.:9093
+        template: alert-server.yaml
