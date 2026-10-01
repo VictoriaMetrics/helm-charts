@@ -1,0 +1,246 @@
+---
+weight: 21
+title: VictoriaTraces Agent
+description: "Deploy vtagent on Kubernetes."
+menu:
+  docs:
+    parent: helm
+    weight: 21
+    identifier: helm-victoria-traces-agent
+url: /helm/victoria-traces-agent/
+tags:
+  - traces
+  - kubernetes
+---
+{{ template "chart.badges" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.prerequisites" . }}
+## Quick start
+
+This Helm chart deploys [vtagent](https://docs.victoriametrics.com/victoriatraces/vtagent/) as a StatefulSet.
+It receives trace spans via [OpenTelemetry protocol](https://docs.victoriametrics.com/victoriatraces/data-ingestion/opentelemetry/)
+from cluster workloads and forwards them to the configured VictoriaTraces destinations.
+If more than one destination is specified, collected trace spans are replicated to all configured destinations.
+When a destination is unavailable, trace spans are buffered on disk and sent as soon as the destination is back.
+
+- To install single-node version of VictoriaTraces, see [these docs](https://docs.victoriametrics.com/helm/victoria-traces-single/).
+- To install a VictoriaTraces cluster, see [these docs](https://docs.victoriametrics.com/helm/victoria-traces-cluster/).
+
+## Chart configuration
+
+The simplest working configuration includes specifying the `remoteWrite` array and setting CPU and memory resources for the chart.
+
+Example of a minimal working configuration:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-traces:10428
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+```
+
+If the `url` has no path, trace spans are sent to the `/insert/native` endpoint.
+If multiple `remoteWrite` entries are defined, trace spans are replicated to all the specified destinations.
+
+### Accepting trace spans
+
+`vtagent` accepts trace spans over OTLP/HTTP on the primary HTTP listener (port `10429` by default)
+at the `/insert/opentelemetry/v1/traces` path. The chart always creates a Service for it, named `vtagent-<release>`.
+The Service is headless by default, so its DNS name resolves to the vtagent pod IPs.
+To get a regular load-balanced ClusterIP Service instead, unset `service.clusterIP`:
+
+```yaml
+service:
+  clusterIP: ""
+```
+
+To additionally accept trace spans over OTLP/gRPC, set the listen address:
+
+```yaml
+otlpGRPC:
+  listenAddr: :4317
+```
+
+The listener accepts plain-text connections unless `otlpGRPC.tls` is set. To enable TLS on the OTLP/gRPC listener:
+
+```yaml
+otlpGRPC:
+  listenAddr: :4317
+  tls: true
+  tlsCertFile: /etc/tls/tls.crt
+  tlsKeyFile: /etc/tls/tls.key
+
+extraVolumes:
+  - name: tls-certs
+    secret:
+      secretName: tls-secret
+
+extraVolumeMounts:
+  - name: tls-certs
+    mountPath: /etc/tls
+    readOnly: true
+```
+
+### On-disk buffering
+
+Trace spans that can't be delivered are buffered at the data volume, which is an `emptyDir` by default.
+The buffer of each `remoteWrite` destination is limited by `maxDiskUsagePerURL`.
+To keep the buffer across pod restarts, enable the persistent volume and size it for all the destinations:
+
+```yaml
+maxDiskUsagePerURL: 5GiB
+
+persistentVolume:
+  enabled: true
+  size: 10Gi
+```
+
+### Basic auth
+
+If you need to use basic auth, define the needed flags via environment variables as shown below:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-traces:10428
+
+env:
+  - name: VM_remoteWrite_basicAuth_password
+    valueFrom:
+      secretKeyRef:
+        name: auth-secret
+        key: VT_PASSWORD
+  - name: VM_remoteWrite_basicAuth_username
+    valueFrom:
+      secretKeyRef:
+        name: auth-secret
+        key: VT_USERNAME
+```
+
+or mount secrets into pod and reference them in remoteWrite section:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-traces:10428
+    basicAuth.username: <name>
+    basicAuth.passwordFile: /path/to/password
+
+extraVolumes:
+  - name: basic-auth-secret
+    secret:
+      secretName: basic-auth-secret
+
+extraVolumeMounts:
+  - name: basic-auth-secret
+    mountPath: /path/to
+    readOnly: true
+```
+
+### Multitenancy
+
+To define [tenant](https://docs.victoriametrics.com/victoriatraces/#multitenancy), use `ProjectID` and `AccountID` headers as shown below:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-traces:10428
+    headers:
+      ProjectID: 12
+      AccountID: 42
+```
+
+### TLS
+
+To enable TLS verification for the remoteWrite target, you can specify the `tls`-prefixed flags inside each remoteWrite entry.
+
+At a minimum, you should provide the `tlsCAFile` path so that the agent can verify the server's TLS certificate.
+This is useful when the target endpoint uses a certificate signed by a custom or self-signed Certificate Authority (CA).
+
+```yaml
+remoteWrite:
+  - url: https://victoria-traces:10428
+    tlsCAFile: "/etc/tls/ca.crt"
+
+extraVolumes:
+  - name: tls-certs
+    secret:
+      secretName: tls-secret
+
+extraVolumeMounts:
+  - name: tls-certs
+    mountPath: /etc/tls
+    readOnly: true
+```
+
+For mutual TLS (mTLS), additionally specify the client certificate and key:
+
+```yaml
+remoteWrite:
+  - url: https://victoria-traces:10428
+    tlsCAFile: "/etc/tls/ca.crt"
+    tlsCertFile: "/etc/tls/client.crt"
+    tlsKeyFile: "/etc/tls/client.key"
+```
+
+If you want to disable TLS certificate verification (not recommended in production), you can set `tlsInsecureSkipVerify` to true.
+
+```yaml
+remoteWrite:
+  - url: https://victoria-traces:10428
+    tlsInsecureSkipVerify: true
+```
+
+### Extra fields
+
+You can add custom fields to all the trace spans by including the `VT-Extra-Fields` header in `headers` section of remote write configuration.
+For example:
+
+```yaml
+remoteWrite:
+  - url: http://victoria-traces:10428
+    headers:
+      VT-Extra-Fields:
+        zone: us-east1-c
+        source: victoria-traces-agent
+```
+
+### HTTP listen address
+
+The chart configures the HTTP listen address via `.Values.http` list.
+Each entry in the list configures a separate HTTP listener.
+The primary listener (marked with `primary: true`) is the one `service.servicePort`, `service.targetPort` and the Service Monitor apply to.
+
+To enable TLS on the HTTP listener:
+
+```yaml
+http:
+  - name: https
+    primary: true
+    value: :10429
+    tls: true
+    tlsCertFile: /path/to/tls.crt
+    tlsKeyFile: /path/to/tls.key
+```
+
+### Resource naming
+
+Resources are named `vtagent-<release>`, which matches the naming used by the VictoriaMetrics operator.
+Legacy release-name based naming is not supported by this chart.
+
+{{ include "chart.installSection" . }}
+
+{{ include "chart.uninstallSection" . }}
+
+## Parameters
+
+The following tables lists the configurable parameters of the chart and their default values.
+
+Change the values according to the need of the environment in ``victoria-traces-agent/values.yaml`` file.
+
+{{ template "chart.valuesTableHtml" . }}

@@ -1,0 +1,190 @@
+suite: server tests
+templates:
+  - server.yaml
+tests:
+  - it: fails without remoteWrite
+    asserts:
+      - failedTemplate:
+          errorMessage: at least one remoteWrite configuration must be provided
+
+  - it: renders default args and ports
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: vtagent
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - --envflag.enable
+            - --envflag.prefix=VM_
+            - --httpListenAddr=:10429
+            - --loggerFormat=json
+            - --remoteWrite.maxDiskUsagePerURL=1GiB
+            - --remoteWrite.url=http://victoria-traces:10428/insert/native
+            - --tmpDataPath=/vtagent-data
+      - equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: http
+              containerPort: 10429
+              protocol: TCP
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: IfNotPresent
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: tmp-data
+            emptyDir: {}
+
+  - it: keeps an explicit remoteWrite url path and replicates to all destinations
+    set:
+      remoteWrite:
+        - url: http://vt-a:10428/custom/path
+        - url: http://vt-b:10428
+          headers:
+            AccountID: 1
+            ProjectID: 2
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --remoteWrite.url=http://vt-a:10428/custom/path
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --remoteWrite.url=http://vt-b:10428/insert/native
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --remoteWrite.headers="AccountID:1^^ProjectID:2"
+
+  - it: enables OTLP/gRPC listener with TLS
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      otlpGRPC:
+        listenAddr: :4317
+        tls: true
+        tlsCertFile: /etc/tls/tls.crt
+        tlsKeyFile: /etc/tls/tls.key
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPCListenAddr=:4317
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tls
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tlsCertFile=/etc/tls/tls.crt
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tlsKeyFile=/etc/tls/tls.key
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: otlp-grpc
+            containerPort: 4317
+            protocol: TCP
+
+  - it: disables TLS explicitly for a plain OTLP/gRPC listener, as vtagent enables it by default
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      otlpGRPC.listenAddr: :4317
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPCListenAddr=:4317
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tls=false
+
+  - it: does not pass OTLP/gRPC TLS flags when the listener is disabled
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      otlpGRPC:
+        tls: true
+        tlsCertFile: /etc/tls/tls.crt
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tls
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tls=false
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tlsCertFile=/etc/tls/tls.crt
+      - lengthEqual:
+          path: spec.template.spec.containers[0].ports
+          count: 1
+
+  - it: extraArgs.otlpGRPCListenAddr takes precedence over otlpGRPC.listenAddr
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      otlpGRPC.listenAddr: :4317
+      extraArgs.otlpGRPCListenAddr: :14317
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPCListenAddr=:14317
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPCListenAddr=:4317
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: otlp-grpc
+            containerPort: 14317
+            protocol: TCP
+
+  - it: applies otlpGRPC TLS settings when the listen address comes from extraArgs
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      extraArgs.otlpGRPCListenAddr: :4317
+      otlpGRPC:
+        tls: true
+        tlsCertFile: /etc/tls/tls.crt
+        tlsKeyFile: /etc/tls/tls.key
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tls
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tlsCertFile=/etc/tls/tls.crt
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tlsKeyFile=/etc/tls/tls.key
+
+  - it: disables OTLP/gRPC TLS explicitly when the listen address comes from extraArgs
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      extraArgs.otlpGRPCListenAddr: :4317
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --otlpGRPC.tls=false
+
+  - it: honours image.pullPolicy and persistent volume settings
+    set:
+      remoteWrite[0].url: http://victoria-traces:10428
+      image.pullPolicy: Always
+      persistentVolume:
+        enabled: true
+        size: 20Gi
+        volumeAttributesClassName: gold
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Always
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: tmp-data
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
+          value: 20Gi
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.volumeAttributesClassName
+          value: gold

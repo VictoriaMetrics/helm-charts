@@ -1,0 +1,78 @@
+{{- $service := .Values.service }}
+{{- $ctx := dict "helm" . "kindOverride" "vtagent" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+  {{- with $service.annotations }}
+  annotations: {{ toYaml . | nindent 4}}
+  {{- end }}
+  {{- $_ := set $ctx "extraLabels" $service.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+spec:
+  {{- if eq $service.type "ClusterIP" }}
+  {{- with $service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- end }}
+  {{- with $service.externalIPs }}
+  externalIPs: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- with $service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  type: {{ $service.type }}
+  {{- with $service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with $service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.internalTrafficPolicy }}
+  internalTrafficPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ . }}
+  {{- end }}
+  {{- with $service.ipFamilies }}
+  ipFamilies: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $service.trafficDistribution }}
+  trafficDistribution: {{ . }}
+  {{- end }}
+  ports:
+    {{- $extraArgs := .Values.extraArgs | default dict }}
+    {{- $httpAddr := $extraArgs.httpListenAddr -}}
+    {{- range ternary .Values.http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
+    - name: {{ .name }}
+      {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10429") }}
+      port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
+      protocol: TCP
+      targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+      {{- if and .primary $service.nodePort }}
+      nodePort: {{ $service.nodePort }}
+      {{- end }}
+    {{- end }}
+    {{- with include "vtagent.otlpGRPC.addr" . }}
+    - name: otlp-grpc
+      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
+      protocol: TCP
+      targetPort: otlp-grpc
+    {{- end }}
+    {{- range $service.extraPorts }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: {{ .protocol | default "TCP" }}
+      targetPort: {{ .targetPort }}
+    {{- end }}
+  {{- $_ := set $ctx "extraLabels" (mergeOverwrite (deepCopy (.Values.selectorLabels | default dict)) (deepCopy $service.selectorLabels)) }}
+  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
