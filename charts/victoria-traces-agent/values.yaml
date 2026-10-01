@@ -1,0 +1,332 @@
+# Default values for victoria-traces-agent.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Important helm-chart settings below, modify them with your own settings
+
+# -- Maximum disk usage per remoteWrite URL. When exceeded, old trace spans will be deleted.
+maxDiskUsagePerURL: 1GiB
+
+# -- List of trace destinations. Trace spans will be replicated to all listed destinations.
+#
+# If the url path is not specified, the trace spans will be sent to the /insert/native endpoint.
+remoteWrite: []
+  # - url: http://victoria-traces:10428
+
+  # - url: http://victoria-traces:10428
+  #   headers:
+  #     ProjectID: 0
+  #     AccountID: 0
+  #     VT-Extra-Fields:
+  #       zone: us-east1-c
+  #       source: victoria-traces-agent
+
+  # - url: https://victoria-traces:10428
+  #   tlsCAFile: "/etc/tls/ca.crt"
+  # - url: https://victoria-traces:10428
+  #   tlsInsecureSkipVerify: true
+
+persistentVolume:
+  # -- Create/use Persistent Volume Claim for vtagent. Empty dir if false
+  enabled: false
+
+  # -- Size of the volume. Should be big enough to keep buffers for all remoteWrite destinations, see `maxDiskUsagePerURL`
+  size: 10Gi
+
+  # -- Persistent volume additional labels
+  extraLabels: {}
+
+  # -- Persistent volume annotations
+  annotations: {}
+
+  # -- StorageClass to use for persistent volume claim. Empty string means default StorageClass
+  storageClassName: ""
+
+  # -- Bind Persistent Volume by labels. Must match all labels of targeted PV
+  matchLabels: {}
+
+  # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
+  accessModes:
+    - ReadWriteOnce
+
+  # -- VolumeClassAttribute to user for persistent volume
+  volumeAttributesClassName:
+
+  # -- Existing Claim name. If defined, PVC must be created manually before volume will be bound
+  existingClaim: ""
+
+# -- Replica count
+replicaCount: 1
+
+# -- Vertical Pod Autoscaler.
+# Requires VPA CRD (`autoscaling.k8s.io/v1`) to be installed in the cluster.
+# Note that VPA should not be used together with HPA on the same resource metrics (CPU/memory).
+verticalPodAutoscaler:
+  # -- Use VPA for vtagent
+  enabled: false
+  # -- List of custom recommenders to use
+  # recommenders:
+  #   - name: 'alternative'
+  # -- Update policy for VPA
+  # updatePolicy:
+  #   updateMode: "Auto"
+  #   minReplicas: 1
+  # -- Resource policy for VPA
+  # resourcePolicy:
+  #   containerPolicies:
+  #     - containerName: '*'
+  #       minAllowed:
+  #         cpu: 100m
+  #         memory: 128Mi
+  #       maxAllowed:
+  #         cpu: 1
+  #         memory: 500Mi
+  #       controlledResources: ["cpu", "memory"]
+
+# -- Horizontal Pod Autoscaler.
+horizontalPodAutoscaler:
+  # -- Use HPA for vtagent
+  enabled: false
+  # -- Maximum replicas for HPA to use to scale vtagent
+  maxReplicas: 10
+  # -- Minimum replicas for HPA to use to scale vtagent
+  minReplicas: 1
+  # -- Metric for HPA to use to scale vtagent
+  metrics: []
+
+# -- Environment variables (ex.: secret tokens)
+env: []
+  # - name: VM_remoteWrite_basicAuth_password
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: auth-secret
+  #       key: VT_PASSWORD
+
+resources:
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+image:
+  # -- Image registry
+  registry: ""
+  # -- Image repository
+  repository: victoriametrics/vtagent
+  # -- Image tag
+  tag: ""
+  # -- Image tag suffix, which is appended to `Chart.AppVersion` if no `image.tag` is defined
+  variant: ""
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+
+# Advanced helm-chart configuration below, it is recommended to pass default parameters
+
+# -- Override chart name
+nameOverride: ""
+
+# -- Override resources fullname
+fullnameOverride: ""
+
+# @ignored
+useLegacyNaming: false
+
+global:
+  # -- Image pull secrets, that can be shared across multiple helm charts
+  imagePullSecrets: []
+  image:
+    # -- Image registry, that can be shared across multiple helm charts
+    registry: ""
+  # -- Openshift security context compatibility configuration
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+  cluster:
+    # -- K8s cluster domain suffix, used for building storage pods' FQDN. Details are [here](https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/)
+    dnsDomain: cluster.local.
+  # -- Labels added to all resources
+  extraLabels: {}
+  # -- Annotations added to all resources
+  extraAnnotations: {}
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+  # -- Mount API token to pod directly. vtagent doesn't access Kubernetes API, so it is disabled by default
+  automountToken: false
+
+# -- Extra labels for Pods only
+podLabels: {}
+
+# -- Security context to be added to pod
+podSecurityContext:
+  enabled: true
+  # fsGroup: 2000
+
+# -- Security context to be added to pod's containers
+securityContext:
+  enabled: true
+  # capabilities:
+  #   drop:
+  #     - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# -- Extra Volumes for the pod
+extraVolumes: []
+  # - name: tls-certs
+  #   secret:
+  #     secretName: mtls-secret
+
+# -- Extra Volume Mounts for the container
+extraVolumeMounts: []
+  # - name: tls-certs
+  #   mountPath: /etc/mtls
+  #   readOnly: true
+
+# -- Annotations to be added to the deployment
+annotations: {}
+
+# -- Annotations to be added to pod
+podAnnotations: {}
+
+# -- Custom DNS config for pod. Details are [here](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-config)
+dnsConfig: {}
+
+# -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+nodeSelector: {}
+
+# -- Node tolerations for server scheduling to nodes with taints. Details are [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+tolerations: []
+
+# -- Pod topologySpreadConstraints
+topologySpreadConstraints: # []
+  # - maxSkew: 1
+  #   topologyKey: topology.kubernetes.io/zone
+  #   whenUnsatisfiable: DoNotSchedule
+
+# -- Pod affinity
+affinity: {}
+
+# -- Priority class to be assigned to the pod(s)
+priorityClassName: ""
+# -- Name of the [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) used to run the pod, e.g. "gvisor"
+runtimeClassName: ""
+
+serviceMonitor:
+  # -- Enable deployment of Service Monitor for vtagent. This is Prometheus operator object
+  enabled: false
+  # -- Service Monitor labels
+  extraLabels: {}
+  # -- Service Monitor annotations
+  annotations: {}
+  # -- Service Monitor relabelings
+  relabelings: []
+  # -- Basic auth params for Service Monitor
+  basicAuth: {}
+  # -- Service Monitor metricRelabelings
+  metricRelabelings: []
+  # -- Service Monitor port. Uses primary http item name by default
+  port: ""
+  # -- Service Monitor target port. Overrides port when set
+  targetPort: ""
+  # interval: 15s
+  # scrapeTimeout: 5s
+  # -- Commented. HTTP scheme to use for scraping.
+  # scheme: https
+  # -- Commented. TLS configuration to use when scraping the endpoint
+  # tlsConfig:
+  #   insecureSkipVerify: true
+
+# The Service is always created, as it is the governing Service of the vtagent StatefulSet.
+service:
+  # -- Service annotations
+  annotations: {}
+  # -- Service labels
+  extraLabels: {}
+  # -- Service ClusterIP. The Service is headless by default, which gives each vtagent pod a stable DNS name.
+  # Set it to an empty string to get a regular ClusterIP Service. It is ignored when `service.type` is not `ClusterIP`
+  clusterIP: None
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips) for details
+  externalIPs: []
+  # -- Service load balancer IP
+  loadBalancerIP: ""
+  # -- Load balancer source range
+  loadBalancerSourceRanges: []
+  # -- Service port
+  servicePort: ""
+  # -- Target port of the primary HTTP listener. Defaults to the primary `http` item name
+  targetPort: ""
+  # nodePort: 30000
+  # -- Service type
+  type: ClusterIP
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+  ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
+  ipFamilies: []
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  externalTrafficPolicy: ""
+  # -- Service internal traffic policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-policies) for details
+  internalTrafficPolicy: ""
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
+  healthCheckNodePort: ""
+  # -- Traffic Distribution. Check [Traffic distribution](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)
+  trafficDistribution: ""
+  # -- Extra selector labels common for service only
+  selectorLabels: {}
+  # -- Extra service ports
+  extraPorts: []
+
+# -- See `kubectl explain networkpolicy.spec` for more. Details are [here](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+networkPolicy:
+  enabled: false
+  # -- Policy types. When empty, they are derived from the configured `ingress` and `egress` rules.
+  # With no rules and no policy types Kubernetes treats the policy as `Ingress`, which denies all incoming traffic
+  policyTypes: []
+  # -- Ingress rules
+  ingress: []
+  # -- Egress rules
+  egress: []
+  # -- Extra labels for NetworkPolicy
+  labels: {}
+  # -- Extra annotations for NetworkPolicy
+  annotations: {}
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []
+
+# -- HTTP listen addresses configuration.
+# Each item configures an HTTP listen address with optional TLS settings.
+# Items are used for Pod ports, command line arguments and Service port generation.
+# OTLP/HTTP trace spans are accepted on the primary listener at `/insert/opentelemetry/v1/traces`.
+http:
+  - name: http
+    value: :10429
+    primary: true
+
+# OTLP/gRPC listener configuration.
+otlpGRPC:
+  # -- OTLP/gRPC listen address. The listener is disabled when empty. The recommended value is `:4317`
+  listenAddr: ""
+  # -- Enable TLS for incoming OTLP/gRPC requests. Requires `tlsCertFile` and `tlsKeyFile`. vtagent enables it by default, so the chart always passes this value explicitly
+  tls: false
+  # -- Path to file with TLS certificate for the OTLP/gRPC listener
+  tlsCertFile: ""
+  # -- Path to file with TLS key for the OTLP/gRPC listener
+  tlsKeyFile: ""
+  # -- Minimum TLS version for the OTLP/gRPC listener
+  tlsMinVersion: ""
+
+# -- VTAgent extra command line arguments
+extraArgs:
+  envflag.enable: true
+  envflag.prefix: VM_
+  loggerFormat: json

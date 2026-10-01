@@ -1,0 +1,62 @@
+suite: network policy tests
+set:
+  remoteWrite[0].url: http://victoria-traces:10428
+templates:
+  - networkpolicy.yaml
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: derives Egress-only policy type from egress rules, so ingress is not denied implicitly
+    set:
+      networkPolicy:
+        enabled: true
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 10.0.0.0/8
+    asserts:
+      - equal:
+          path: spec.policyTypes
+          value:
+            - Egress
+      - notExists:
+          path: spec.ingress
+
+  - it: derives both policy types when ingress and egress rules are set
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 10.0.0.0/8
+    asserts:
+      - equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+            - Egress
+
+  - it: explicit policyTypes take precedence over derived ones
+    set:
+      networkPolicy:
+        enabled: true
+        policyTypes:
+          - Ingress
+          - Egress
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 10.0.0.0/8
+    asserts:
+      - equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+            - Egress

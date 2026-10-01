@@ -1,0 +1,64 @@
+suite: useLegacyNaming tests
+set:
+  serviceMonitor.enabled: true
+  horizontalPodAutoscaler.enabled: true
+  horizontalPodAutoscaler.maxReplicas: 3
+  networkPolicy.enabled: true
+  remoteWrite[0].url: http://victoria-traces:10428
+templates:
+  - hpa.yaml
+  - monitor.yaml
+  - networkpolicy.yaml
+  - server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+tests:
+  - it: "resource names (default)"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vtagent-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: metadata.name
+          value: vtagent-RELEASE-NAME
+        template: monitor.yaml
+      - equal:
+          path: metadata.name
+          value: vtagent-RELEASE-NAME
+        template: networkpolicy.yaml
+      - equal:
+          path: metadata.name
+          value: vtagent-RELEASE-NAME
+        template: server.yaml
+      - equal:
+          path: metadata.name
+          value: vtagent-RELEASE-NAME
+        template: service.yaml
+      - equal:
+          path: metadata.name
+          value: vtagent-RELEASE-NAME
+        template: serviceaccount.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: vtagent-RELEASE-NAME
+        template: server.yaml
+      - equal:
+          path: spec.serviceName
+          value: vtagent-RELEASE-NAME
+        template: server.yaml
+      - equal:
+          path: spec.scaleTargetRef.name
+          value: vtagent-RELEASE-NAME
+        template: hpa.yaml
+      - equal:
+          path: spec.maxReplicas
+          value: 3
+        template: hpa.yaml
+  - it: "fails with useLegacyNaming=true"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "useLegacyNaming: true is not supported by victoria-traces-agent chart"
+        template: server.yaml
