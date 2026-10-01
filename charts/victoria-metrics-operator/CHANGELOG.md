@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.68.1
+
+**Release date:** 01 Oct 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.75.0](https://img.shields.io/badge/v0.75.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Foperator%2Fchangelog%2F%23v0750)
+
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 
 ## v0.68.0
