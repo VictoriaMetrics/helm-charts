@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix pod label selector in the chart notes: repeated `-l` flags were replaced with a single comma-separated selector, since `kubectl` only honours the last `-l`.
 
 ## v0.68.1
 

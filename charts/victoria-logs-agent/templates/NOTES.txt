@@ -1,2 +1,3 @@
+{{- $ctx := dict "helm" . "kindOverride" "vlagent" }}
 To view running VictoriaLogs agents:
-  kubectl get po -o wide -l app.kubernetes.io/name={{ include "vm.fullname" . }} -n {{ .Release.Namespace }}
+  kubectl get po -o wide -l app.kubernetes.io/name={{ include "vm.name" $ctx }},app.kubernetes.io/instance={{ include "vm.release" $ctx }} -n {{ include "vm.namespace" $ctx }}

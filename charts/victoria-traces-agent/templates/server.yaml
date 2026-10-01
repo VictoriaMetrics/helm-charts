@@ -37,6 +37,9 @@ spec:
       serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default (include "vm.plain.fullname" $ctx)) $ctx }}
       {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      {{- with (.Values.imagePullSecrets | default (.Values.global).imagePullSecrets) }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}

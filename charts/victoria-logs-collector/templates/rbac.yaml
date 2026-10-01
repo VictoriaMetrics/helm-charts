@@ -1,8 +1,8 @@
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "kindOverride" "vlagent-collector" }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "vm.fullname" $ctx }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 rules:
   - apiGroups: [""]
@@ -12,13 +12,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "vm.fullname" $ctx }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "vm.fullname" $ctx }}
+    name: {{ include "vm.plain.fullname" $ctx }}
     namespace: {{ include "vm.namespace" . }}
 roleRef:
   kind: ClusterRole
-  name: {{ include "vm.fullname" $ctx }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   apiGroup: rbac.authorization.k8s.io

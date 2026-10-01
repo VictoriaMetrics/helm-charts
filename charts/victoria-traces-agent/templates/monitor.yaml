@@ -2,9 +2,11 @@
 {{- if $serviceMonitor.enabled -}}
 {{- $ctx := dict "helm" . "kindOverride" "vtagent" }}
 {{- $port := "http" -}}
-{{- range .Values.http -}}
-  {{- if .primary -}}
-    {{- $port = .name -}}
+{{- if empty (.Values.extraArgs | default dict).httpListenAddr -}}
+  {{- range .Values.http -}}
+    {{- if .primary -}}
+      {{- $port = .name -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
 apiVersion: monitoring.coreos.com/v1

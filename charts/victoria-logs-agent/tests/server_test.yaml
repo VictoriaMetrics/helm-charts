@@ -1,0 +1,32 @@
+suite: server tests
+set:
+  remoteWrite[0].url: http://x
+templates:
+  - server.yaml
+tests:
+  - it: renders imagePullSecrets, preferring the chart-level value over the global one
+    set:
+      global.imagePullSecrets:
+        - name: global-secret
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: global-secret
+
+  - it: chart-level imagePullSecrets override the global ones
+    set:
+      global.imagePullSecrets:
+        - name: global-secret
+      imagePullSecrets:
+        - name: chart-secret
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: chart-secret
+
+  - it: does not render imagePullSecrets by default
+    asserts:
+      - notExists:
+          path: spec.template.spec.imagePullSecrets

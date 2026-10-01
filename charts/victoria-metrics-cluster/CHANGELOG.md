@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- fix `vmselect.persistentVolume.volumeAttributesClassName` and `vmstorage.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
+- fix pod label selector in the chart notes: repeated `-l` flags were replaced with a single comma-separated selector, since `kubectl` only honours the last `-l`.
 
 ## v0.52.0
 

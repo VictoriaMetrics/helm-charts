@@ -4,8 +4,8 @@
 {{- if not $app.service.enabled }}
   {{- fail "It's required to set .Values.service.enabled: true when .Values.ingress.enabled: true"}}
 {{- end }}
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress

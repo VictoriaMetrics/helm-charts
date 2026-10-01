@@ -2,6 +2,9 @@
 
 - added network policy configuration support. See [#2977](https://github.com/VictoriaMetrics/helm-charts/issues/2977)
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
+- bump `victoria-metrics-common` dependency to `0.4.*`. Default resource names are unchanged; with `useLegacyNaming: false` all resources are now named `vlagent-collector-<release>` (previously the setting had no effect on this chart).
+- fix `image.pullPolicy` being ignored: the container `imagePullPolicy` was hardcoded to `IfNotPresent`.
+- fix pod label selector in the chart notes, so the suggested `kubectl get po` command matches the collector pods.
 
 ## v0.3.7
 

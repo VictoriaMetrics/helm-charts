@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix `alertmanager.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 
 ## v0.50.0
 

@@ -1,0 +1,36 @@
+suite: service monitor tests
+set:
+  remoteWrite[0].url: http://victoria-traces:10428
+  serviceMonitor.enabled: true
+templates:
+  - monitor.yaml
+tests:
+  - it: is not rendered by default
+    set:
+      serviceMonitor.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: scrapes the primary listener port by its name
+    set:
+      http:
+        - name: web
+          primary: true
+          value: :9999
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: web
+
+  - it: scrapes the http port when the listen address comes from extraArgs, matching the Service port name
+    set:
+      extraArgs.httpListenAddr: :9999
+      http:
+        - name: web
+          primary: true
+          value: :8888
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: http
