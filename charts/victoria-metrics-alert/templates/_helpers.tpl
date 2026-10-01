@@ -13,6 +13,9 @@
   {{ with $app.baseURLPrefix }}
     {{- $_ := set $args "web.route-prefix" . -}}
   {{- end -}}
+  {{- if $app.webConfig -}}
+    {{- $_ := set $args "web.config.file" "/config/webconfig.yaml" -}}
+  {{- end -}}
   {{- $replicaCount := $app.replicaCount | default 1 | int }}
   {{- if gt $replicaCount 1 }}
     {{- $_ := set $args "cluster.listen-address" $app.cluster.listenAddress -}}
@@ -30,24 +33,13 @@
     {{- with $app.cluster.settleTimeout -}}
       {{- $_ := set $args "cluster.settle-timeout" . -}}
     {{- end -}}
-    {{- $ctx := . -}}
-    {{- if not (hasKey . "helm") -}}
-      {{- $ctx = dict "helm" . }}
-    {{- end -}}
-    {{- $_ := set $ctx "appKey" "alertmanager" -}}
-    {{- $_ := set $ctx "style" "plain" -}}
-    {{- $fullname := include "vm.plain.fullname" $ctx -}}
-    {{- $alertmanager := deepCopy $app }}
-    {{- $_ := set $alertmanager "fullnameOverride" (printf "%s-headless" $fullname) }}
-    {{- $_ := set $ctx "headless" (dict "alertmanager" $alertmanager) }}
-    {{- $_ := set $ctx "appKey" (list "headless" "alertmanager") }}
     {{- $port := include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") -}}
+    {{- $ctx := dict "helm" (.helm | default .) "appKey" "alertmanager" "kindOverride" "vmalertmanager" "style" "plain" -}}
     {{- $peers := list }}
     {{- range $idx := (until (int $replicaCount)) }}
       {{- $_ := set $ctx "appIdx" $idx }}
       {{- $peers = append $peers (printf "%s:%s" (include "vm.fqdn" $ctx) $port) -}}
     {{- end }}
-    {{- $_ := unset $ctx "appIdx" }}
     {{- $_ := set $args "cluster.peer" $peers }}
   {{- end }}
   {{- $args = mergeOverwrite $args $app.extraArgs -}}
@@ -109,7 +101,7 @@
 {{- end }}
 
 {{- define "vmalert.args" -}}
-  {{- $ctx := . }}
+  {{- $ctx := merge (dict) . }}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.server -}}
   {{- $datasource := list (include "vmalert.fromLegacyArgs" $app.datasource | fromYaml) -}}
@@ -136,18 +128,19 @@
     {{- $alertmanager := deepCopy $Values.alertmanager }}
     {{- $_ := set $ctx "style" "plain" -}}
     {{- $_ := set $ctx "appKey" "alertmanager" -}}
+    {{- $_ := set $ctx "kindOverride" "vmalertmanager" -}}
     {{- $appSecure := not (empty ($alertmanager.webConfig).tls_server_config) -}}
     {{- $_ := set $ctx "appSecure" $appSecure -}}
-    {{- $_ := set $ctx "appRoute" $alertmanager.baseURLPrefix -}}
+    {{- $_ := set $ctx "appRoute" (include "alertmanager.routePrefix" $alertmanager) -}}
     {{- if gt (int ($alertmanager.replicaCount | default 1)) 1 }}
-      {{- $fullname := include "vm.plain.fullname" $ctx -}}
-      {{- $_ := set $alertmanager "fullnameOverride" (printf "%s-headless" $fullname) }}
-      {{- $_ := set $ctx "headless" (dict "alertmanager" $alertmanager) }}
-      {{- $_ := set $ctx "appKey" (list "headless" "alertmanager") }}
+      {{- $proto := ternary "https" "http" $appSecure -}}
+      {{- $port := include "alertmanager.port" $alertmanager -}}
+      {{- $path := trimSuffix "/" (include "alertmanager.routePrefix" $alertmanager) -}}
       {{- range $idx := (until (int $alertmanager.replicaCount)) }}
         {{- $_ := set $ctx "appIdx" $idx }}
-        {{- $_ := set $notifier "url" (include "vm.url" $ctx) -}}
-        {{- $notifiers = append $notifiers $notifier }}
+        {{- $n := deepCopy $notifier }}
+        {{- $_ := set $n "url" (printf "%s://%s:%s%s" $proto (include "vm.fqdn" $ctx) $port $path) -}}
+        {{- $notifiers = append $notifiers $n }}
       {{- end }}
       {{- $_ := unset $ctx "appIdx" }}
     {{- else }}
@@ -175,5 +168,22 @@
 {{- define "alertmanager.config.name" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $fullname := include "vm.plain.fullname" . -}}
-  {{- $Values.alertmanager.configMap | default (printf "%s-config" $fullname) -}}
+  {{- $Values.alertmanager.configSecret | default (printf "%s-config" $fullname) -}}
+{{- end -}}
+
+{{- /*
+alertmanager.port returns the effective alertmanager web port.
+`web.listen-address` set via extraArgs takes precedence over `listenAddress`, as it does in alertmanager args.
+*/ -}}
+{{- define "alertmanager.port" -}}
+  {{- $addr := index (.extraArgs | default dict) "web.listen-address" | default .listenAddress -}}
+  {{- include "vm.port.from.flag" (dict "flag" $addr "default" "9093") -}}
+{{- end -}}
+
+{{- /*
+alertmanager.routePrefix returns the effective alertmanager route prefix.
+`web.route-prefix` set via extraArgs takes precedence over `baseURLPrefix`, as it does in alertmanager args.
+*/ -}}
+{{- define "alertmanager.routePrefix" -}}
+  {{- index (.extraArgs | default dict) "web.route-prefix" | default .baseURLPrefix | default "" -}}
 {{- end -}}

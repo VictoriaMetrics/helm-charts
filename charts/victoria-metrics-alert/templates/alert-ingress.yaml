@@ -1,7 +1,7 @@
 {{- $app := .Values.server }}
 {{- $ingress := $app.ingress }}
 {{- if $ingress.enabled  }}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmalert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: networking.k8s.io/v1

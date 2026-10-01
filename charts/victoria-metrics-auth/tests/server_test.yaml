@@ -1,0 +1,143 @@
+suite: server tests
+templates:
+  - server.yaml
+  - secret.yaml
+tests:
+  - it: renders a Deployment with default args, port and config volume
+    asserts:
+      - template: server.yaml
+        isKind:
+          of: Deployment
+      - template: server.yaml
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-auth
+      - template: server.yaml
+        equal:
+          path: spec.replicas
+          value: 1
+      - template: server.yaml
+        equal:
+          path: spec.template.spec.containers[0].name
+          value: vmauth
+      - template: server.yaml
+        equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - --auth.config=/config/auth.yml
+            - --envflag.enable
+            - --envflag.prefix=VM_
+            - --httpListenAddr=:8427
+            - --loggerFormat=json
+      - template: server.yaml
+        equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: http
+              containerPort: 8427
+      - template: server.yaml
+        contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: config
+            mountPath: /config
+      - template: server.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            secret:
+              secretName: RELEASE-NAME-victoria-metrics-auth
+      - template: server.yaml
+        exists:
+          path: spec.template.metadata.annotations["checksum/config"]
+      - template: server.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-auth
+      - template: server.yaml
+        equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+
+  - it: mounts an existing secret when secretName is set
+    set:
+      secretName: my-auth-config
+    asserts:
+      - template: server.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            secret:
+              secretName: my-auth-config
+
+  - it: renders a DaemonSet without replicas in daemonSet mode
+    set:
+      mode: daemonSet
+    asserts:
+      - template: server.yaml
+        isKind:
+          of: DaemonSet
+      - template: server.yaml
+        notExists:
+          path: spec.replicas
+
+  - it: uses extraArgs.httpListenAddr for the arg and the container port
+    set:
+      extraArgs.httpListenAddr: :9999
+    asserts:
+      - template: server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --httpListenAddr=:9999
+      - template: server.yaml
+        notContains:
+          path: spec.template.spec.containers[0].args
+          content: --httpListenAddr=:8427
+      - template: server.yaml
+        equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: http
+              containerPort: 9999
+
+  - it: passes the license key
+    set:
+      license.key: test-key
+    asserts:
+      - template: server.yaml
+        contains:
+          path: spec.template.spec.containers[0].args
+          content: --license=test-key
+
+  - it: chart-level imagePullSecrets override the global ones
+    set:
+      global.imagePullSecrets:
+        - name: global-secret
+      imagePullSecrets:
+        - name: chart-secret
+    asserts:
+      - template: server.yaml
+        equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: chart-secret
+
+  - it: uses an existing service account without a generated name
+    set:
+      serviceAccount.create: false
+      serviceAccount.name: existing-sa
+    asserts:
+      - template: server.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: existing-sa
+
+  - it: omits the service account when create is false and name is unset
+    set:
+      serviceAccount.create: false
+    asserts:
+      - template: server.yaml
+        notExists:
+          path: spec.template.spec.serviceAccountName

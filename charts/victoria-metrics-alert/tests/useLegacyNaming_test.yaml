@@ -25,7 +25,7 @@ templates:
   - alert-route.yaml
   - alert-server.yaml
   - alert-service.yaml
-  - alertmanager-configmap.yaml
+  - alertmanager-secret.yaml
   - alertmanager-ingress.yaml
   - alertmanager-networkpolicy.yaml
   - alertmanager-pvc.yaml
@@ -97,7 +97,7 @@ tests:
         documentSelector:
           path: metadata.name
           value: RELEASE-NAME-victoria-metrics-alert-alertmanager-config
-        template: alertmanager-configmap.yaml
+        template: alertmanager-secret.yaml
       - equal:
           path: metadata.name
           value: RELEASE-NAME-victoria-metrics-alert-alertmanager
@@ -224,7 +224,7 @@ tests:
         documentSelector:
           path: metadata.name
           value: vmalertmanager-RELEASE-NAME-config
-        template: alertmanager-configmap.yaml
+        template: alertmanager-secret.yaml
       - equal:
           path: metadata.name
           value: vmalertmanager-RELEASE-NAME

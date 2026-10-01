@@ -1,0 +1,31 @@
+suite: service tests
+templates:
+  - service.yaml
+tests:
+  - it: exposes the HTTP listener
+    asserts:
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 8427
+              protocol: TCP
+              targetPort: http
+
+  - it: honours servicePort and nodePort
+    set:
+      service.type: NodePort
+      service.servicePort: 80
+      service.nodePort: 30000
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 80
+              protocol: TCP
+              targetPort: http
+              nodePort: 30000

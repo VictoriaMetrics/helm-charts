@@ -4,10 +4,14 @@
 {{- $mode := $app.mode }}
 {{- if and $mode $app.enabled (hasKey $app $mode) -}}
 {{- $modeOpts := index $app $mode }}
-{{- $ctx := dict "helm" . "appKey" "alertmanager" }}
+{{- $ctx := dict "helm" . "appKey" "alertmanager" "kindOverride" "vmalertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $sa := include "vm.fullname" . }}
+{{- $amSecure := not (empty ($app.webConfig).tls_server_config) }}
+{{- if and $app.configMap $app.configSecret }}
+  {{- fail "only one of `alertmanager.configMap` and `alertmanager.configSecret` can be set" -}}
+{{- end }}
 {{- if and (ne $mode "statefulSet") (gt (int $app.replicaCount) 1) }}
   {{- fail "Alertmanager HA mode is not supported for Deployment. Consider switching to statefulset instead using `alertmanager.mode: statefulSet`" -}}
 {{- end }}
@@ -32,7 +36,7 @@ spec:
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}
       labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}
-      {{- $_ := set $ctx "extraAnnotations" (merge (dict "checksum/config" (include (print .Template.BasePath "/alertmanager-configmap.yaml") . | sha256sum)) (deepCopy $app.podAnnotations)) }}
+      {{- $_ := set $ctx "extraAnnotations" (merge (dict "checksum/config" (include (print .Template.BasePath "/alertmanager-secret.yaml") . | sha256sum)) (deepCopy $app.podAnnotations)) }}
       annotations: {{ include "vm.annotations" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
@@ -61,12 +65,12 @@ spec:
           args: {{ include "alertmanager.args" $ctx | nindent 12 }}
           ports:
             - name: web
-              containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.listenAddress "default" "9093") }}
+              containerPort: {{ include "alertmanager.port" $app }}
               {{- if gt (int $app.replicaCount) 1 }}
-            - name: cluster-tcp
+            - name: mesh-tcp
               containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
               protocol: TCP
-            - name: cluster-udp
+            - name: mesh-udp
               containerPort: {{ include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
               protocol: UDP
               {{- end }}
@@ -80,12 +84,21 @@ spec:
                   apiVersion: v1
                   fieldPath: status.podIP
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
+          {{- if and $amSecure .httpGet (empty (dig "readiness" "httpGet" "scheme" "" ($app.probe | default dict))) }}
+            {{- $_ := set .httpGet "scheme" "HTTPS" }}
+          {{- end }}
           readinessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "liveness"))) }}
+          {{- if and $amSecure .httpGet (empty (dig "liveness" "httpGet" "scheme" "" ($app.probe | default dict))) }}
+            {{- $_ := set .httpGet "scheme" "HTTPS" }}
+          {{- end }}
           livenessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "startup"))) }}
+          {{- if and $amSecure .httpGet (empty (dig "startup" "httpGet" "scheme" "" ($app.probe | default dict))) }}
+            {{- $_ := set .httpGet "scheme" "HTTPS" }}
+          {{- end }}
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
@@ -145,8 +158,13 @@ spec:
       volumes:
         {{- $_ := set $ctx "appKey" "alertmanager" }}
         - name: config
+          {{- if $app.configMap }}
           configMap:
-            name: {{ include "alertmanager.config.name" $ctx }}
+            name: {{ $app.configMap }}
+          {{- else }}
+          secret:
+            secretName: {{ include "alertmanager.config.name" $ctx }}
+          {{- end }}
         {{- range $app.extraHostPathMounts }}
         - name: {{ .name }}
           hostPath:

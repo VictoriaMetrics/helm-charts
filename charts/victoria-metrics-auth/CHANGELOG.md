@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+- bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
+- add missing `serviceAccount.automountToken` value (default `true`), so `automountServiceAccountToken` is no longer rendered empty.
+- with `useLegacyNaming: false` the generated config Secret is now named `vmauth-config-<release>`, matching the VictoriaMetrics operator. Names in the default legacy mode are unchanged.
 
 ## v0.43.0
 

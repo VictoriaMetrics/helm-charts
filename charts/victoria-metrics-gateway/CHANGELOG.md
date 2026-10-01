@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 
 ## v0.40.0
 

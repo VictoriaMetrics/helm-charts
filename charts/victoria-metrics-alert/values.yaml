@@ -508,10 +508,13 @@ alertmanager:
   baseURL: ""
   # -- External URL Prefix, Prefix for the internal routes of web endpoints
   baseURLPrefix: ""
-  # -- Use existing configmap if specified
-  # otherwise .config values will be used
+  # -- Deprecated: use `configSecret` instead, since alertmanager config usually contains credentials.
+  # Use existing ConfigMap with `alertmanager.yaml` if specified, otherwise a Secret is generated from `.config` values
   configMap: ""
-  # -- Alertmanager web configuration
+  # -- Use existing Secret with `alertmanager.yaml` if specified, otherwise a Secret is generated from `.config` values
+  configSecret: ""
+  # -- Alertmanager [web configuration](https://prometheus.io/docs/alerting/latest/https/). It is stored in the generated Secret
+  # as `webconfig.yaml` and passed via `--web.config.file`. An existing ConfigMap or Secret must provide this key itself
   webConfig: {}
   # -- Alertmanager configuration
   config:

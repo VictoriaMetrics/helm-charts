@@ -1,0 +1,48 @@
+suite: naming references tests
+set:
+  ingress.enabled: true
+  route.enabled: true
+templates:
+  - ingress.yaml
+  - route.yaml
+  - server.yaml
+  - secret.yaml
+tests:
+  - it: "references follow resource names (legacy naming, default)"
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: RELEASE-NAME-victoria-metrics-auth
+        template: ingress.yaml
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: RELEASE-NAME-victoria-metrics-auth
+        template: route.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-auth
+        template: server.yaml
+      - equal:
+          path: spec.template.spec.volumes[0].secret.secretName
+          value: RELEASE-NAME-victoria-metrics-auth
+        template: server.yaml
+  - it: "references follow resource names (useLegacyNaming: false)"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: vmauth-RELEASE-NAME
+        template: ingress.yaml
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: vmauth-RELEASE-NAME
+        template: route.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: vmauth-RELEASE-NAME
+        template: server.yaml
+      - equal:
+          path: spec.template.spec.volumes[0].secret.secretName
+          value: vmauth-config-RELEASE-NAME
+        template: server.yaml

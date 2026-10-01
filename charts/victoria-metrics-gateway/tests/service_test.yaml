@@ -1,0 +1,49 @@
+suite: service tests
+set:
+  license.key: test-key
+  read.url: http://vmselect:8481
+  write.url: http://vminsert:8480
+  auth.enabled: true
+templates:
+  - service.yaml
+tests:
+  - it: exposes the HTTP listener
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 8431
+              protocol: TCP
+              targetPort: http
+
+  - it: follows the primary http listener
+    set:
+      http:
+        - name: web
+          value: :9999
+          primary: true
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: web
+              port: 9999
+              protocol: TCP
+              targetPort: web
+
+  - it: extraArgs.httpListenAddr takes precedence over the http list
+    set:
+      extraArgs.httpListenAddr: :9999
+      http:
+        - name: web
+          value: :8888
+          primary: true
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 9999
+              protocol: TCP
+              targetPort: http

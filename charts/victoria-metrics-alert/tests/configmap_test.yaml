@@ -1,0 +1,88 @@
+suite: config tests
+set:
+  server.datasource.url: http://vmsingle:8428
+  alertmanager.enabled: true
+templates:
+  - alert-configmap.yaml
+  - alertmanager-secret.yaml
+tests:
+  - it: renders alerting rules
+    set:
+      server.config.alerts.groups:
+        - name: example
+          rules:
+            - alert: Up
+              expr: up == 0
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-server-alert-rules-config
+        template: alert-configmap.yaml
+      - equal:
+          path: data["alert-rules.yaml"]
+          value: |
+            groups:
+            - name: example
+              rules:
+              - alert: Up
+                expr: up == 0
+        template: alert-configmap.yaml
+
+  - it: renders the default alertmanager config
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert-alertmanager-config
+        template: alertmanager-secret.yaml
+      - isKind:
+          of: Secret
+        template: alertmanager-secret.yaml
+      - matchRegex:
+          path: data["alertmanager.yaml"]
+          decodeBase64: true
+          pattern: "receiver: devnull"
+        template: alertmanager-secret.yaml
+
+  - it: renders no generated configs when existing ones are referenced
+    set:
+      server.configMap: my-rules
+      alertmanager.configMap: my-am-config
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: alert-configmap.yaml
+      - hasDocuments:
+          count: 0
+        template: alertmanager-secret.yaml
+
+  - it: renders no alertmanager secret when an existing secret is referenced
+    set:
+      alertmanager.configSecret: my-am-secret
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: alertmanager-secret.yaml
+
+  - it: stores templates and web config in the alertmanager secret
+    set:
+      alertmanager.templates:
+        custom.tmpl: |-
+          {{ define "custom" }}hello{{ end }}
+      alertmanager.webConfig:
+        tls_server_config:
+          cert_file: /tls/tls.crt
+          key_file: /tls/tls.key
+    asserts:
+      - equal:
+          path: data["custom.tmpl"]
+          decodeBase64: true
+          value: '{{ define "custom" }}hello{{ end }}'
+        template: alertmanager-secret.yaml
+      - equal:
+          path: data["webconfig.yaml"]
+          decodeBase64: true
+          value: |-
+            tls_server_config:
+              cert_file: /tls/tls.crt
+              key_file: /tls/tls.key
+        template: alertmanager-secret.yaml
