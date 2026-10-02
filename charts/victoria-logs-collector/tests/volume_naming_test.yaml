@@ -1,0 +1,21 @@
+suite: volume naming tests
+set:
+  remoteWrite[0].url: http://x
+templates:
+  - server.yaml
+tests:
+  - it: uses the legacy volume name by default
+    asserts:
+      - exists:
+          path: spec.template.spec.volumes[?(@.name == "vl-collector-data")].hostPath
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "vl-collector-data")]
+
+  - it: "uses the operator volume name with useLegacyNaming: false"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - exists:
+          path: spec.template.spec.volumes[?(@.name == "tmp-data")].hostPath
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "tmp-data")]

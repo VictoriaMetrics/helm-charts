@@ -1,3 +1,3 @@
 {{- $ctx := dict "helm" . "kindOverride" "vtagent" }}
 To view running VictoriaTraces agents:
-  kubectl get po -o wide -l app.kubernetes.io/name={{ include "vm.name" $ctx }},app.kubernetes.io/instance={{ include "vm.release" $ctx }} -n {{ include "vm.namespace" $ctx }}
+  kubectl get po -o wide -l {{ include "vm.keyValue" (fromYaml (include "vm.selectorLabels" $ctx)) }} -n {{ include "vm.namespace" $ctx }}

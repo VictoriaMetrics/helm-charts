@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+**Update note**: resource labels were aligned with the VictoriaMetrics operator convention: `app.kubernetes.io/name: vmestimator-<component>`, `app.kubernetes.io/instance: <release>` and `app.kubernetes.io/component: monitoring`. Workload selectors are immutable, so delete the workloads together with their pods before upgrading: `kubectl delete deployment vmestimator-single-<release> -n <namespace>` in `single` mode, or `kubectl delete deployment vmestimator-select-<release> -n <namespace>` and `kubectl delete statefulset vmestimator-storage-<release> -n <namespace>` in `cluster` mode (use the actual workload names if `fullnameOverride` is set).
+
+- update common dependency 0.4.3
+- render a NetworkPolicy per component (`vmestimator-<component>-<release>`) with the same selector as the component workload, instead of a single `vmestimator-<release>` policy.
 
 ## v0.1.0
 

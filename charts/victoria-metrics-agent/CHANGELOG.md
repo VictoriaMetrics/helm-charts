@@ -1,7 +1,9 @@
 ## Next release
 
-- bump `victoria-metrics-common` dependency to `0.4.*`. Default resource names are unchanged; with `useLegacyNaming: false` the `Ingress` and `PersistentVolumeClaim` are now named `vmagent-<release>` like the rest of the resources (previously they kept the legacy name).
+- bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 - fix `persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
+- fix `persistentVolume.name` in `statefulSet` mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
+- rename config volumes to match the VictoriaMetrics operator: `scrape-config` to `config-out` and `rw-config` to `relabelings-assets`. Pods are restarted once on upgrade.
 
 ## v0.49.0
 

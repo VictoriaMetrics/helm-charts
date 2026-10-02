@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+**Update note**: resource labels were aligned with the VictoriaMetrics operator convention: `app.kubernetes.io/name: vtmcp`, `app.kubernetes.io/instance: <release>` and `app.kubernetes.io/component: monitoring`. The Deployment selector is immutable, so delete the Deployment before upgrading: `kubectl delete deployment vtmcp-<release> -n <namespace>` (use the actual Deployment name if `fullnameOverride` is set).
+
+- updated common dependency 0.4.3
 
 ## v0.1.0
 

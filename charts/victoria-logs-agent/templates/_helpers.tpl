@@ -55,3 +55,11 @@
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end }}
+
+{{- /*
+vlagent.volume.name returns the storage volume name.
+It matches the name used by the VictoriaMetrics operator when legacy naming is disabled.
+*/ -}}
+{{- define "vlagent.volume.name" -}}
+  {{- ternary "tmp-data" "vl-agent-data" (eq (include "vm.useLegacyNaming" .) "false") -}}
+{{- end -}}

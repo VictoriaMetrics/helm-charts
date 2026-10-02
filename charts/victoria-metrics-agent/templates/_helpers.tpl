@@ -58,3 +58,11 @@
   {{- $fullname := include "vm.plain.fullname" . -}}
   {{- $Values.configMap | default (printf "%s-config" $fullname) -}}
 {{- end -}}
+
+{{- /*
+vmagent.volume.name returns the storage volume name.
+It matches the name used by the VictoriaMetrics operator when legacy naming is disabled.
+*/ -}}
+{{- define "vmagent.volume.name" -}}
+  {{- ternary "persistent-queue-data" "tmpdata" (eq (include "vm.useLegacyNaming" .) "false") -}}
+{{- end -}}

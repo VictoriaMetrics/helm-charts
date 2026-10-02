@@ -1,4 +1,5 @@
 {{- $ctx := dict "helm" . "kindOverride" "vlagent-collector" }}
+{{- $storageName := include "victoria-logs-collector.volume.name" $ctx }}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -85,7 +86,7 @@ spec:
             {{- with .Values.defaultVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-            - name: vl-collector-data
+            - name: {{ $storageName }}
               mountPath: {{ $args.tmpDataPath }}
             {{- include "vm.license.mount" . | nindent 12 }}
       volumes:
@@ -95,7 +96,7 @@ spec:
         {{- with .Values.defaultVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        - name: vl-collector-data
+        - name: {{ $storageName }}
           {{- if .Values.persistence.volume }}
           {{- tpl (toYaml .Values.persistence.volume | nindent 10) $ctx }}
           {{- else }}

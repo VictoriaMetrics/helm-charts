@@ -129,3 +129,11 @@
 
   {{- toYaml (mergeOverwrite $args $Values.extraArgs) -}}
 {{- end }}
+
+{{- /*
+victoria-logs-collector.volume.name returns the storage volume name.
+It matches the name used by the VictoriaMetrics operator when legacy naming is disabled.
+*/ -}}
+{{- define "victoria-logs-collector.volume.name" -}}
+  {{- ternary "tmp-data" "vl-collector-data" (eq (include "vm.useLegacyNaming" .) "false") -}}
+{{- end -}}

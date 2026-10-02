@@ -20,7 +20,7 @@ templates:
   - alertmanager-server.yaml
   - serviceaccount.yaml
 tests:
-  - it: "references follow resource names (legacy naming, default)"
+  - it: "references follow resource names (legacy naming, default); one ServiceAccount is shared"
     asserts:
       - equal:
           path: spec.rules[0].http.paths[0].backend.service.name
@@ -42,14 +42,17 @@ tests:
           path: spec.template.spec.containers[0].args
           content: --notifier.url=http://RELEASE-NAME-victoria-metrics-alert-alertmanager.NAMESPACE.svc.cluster.local.:9093
         template: alert-server.yaml
-      - equal:
-          path: spec.template.spec.volumes[0].configMap.name
-          value: RELEASE-NAME-victoria-metrics-alert-server-alert-rules-config
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: rules-out
+            configMap:
+              name: RELEASE-NAME-victoria-metrics-alert-server-alert-rules-config
         template: alert-server.yaml
       - contains:
           path: spec.template.spec.volumes
           content:
-            name: config
+            name: config-out
             secret:
               secretName: RELEASE-NAME-victoria-metrics-alert-alertmanager-config
         template: alertmanager-server.yaml
@@ -76,7 +79,13 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-victoria-metrics-alert
         template: serviceaccount.yaml
-  - it: "references follow resource names (useLegacyNaming: false); the shared ServiceAccount keeps its release-based name"
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-alert
+      - hasDocuments:
+          count: 1
+        template: serviceaccount.yaml
+  - it: "references follow resource names (useLegacyNaming: false); each component has its own ServiceAccount"
     set:
       useLegacyNaming: false
     asserts:
@@ -100,21 +109,24 @@ tests:
           path: spec.template.spec.containers[0].args
           content: --notifier.url=http://vmalertmanager-RELEASE-NAME.NAMESPACE.svc.cluster.local.:9093
         template: alert-server.yaml
-      - equal:
-          path: spec.template.spec.volumes[0].configMap.name
-          value: vmalert-RELEASE-NAME-alert-rules-config
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: rules-out
+            configMap:
+              name: vmalert-RELEASE-NAME-alert-rules-config
         template: alert-server.yaml
       - contains:
           path: spec.template.spec.volumes
           content:
-            name: config
+            name: config-out
             secret:
               secretName: vmalertmanager-RELEASE-NAME-config
         template: alertmanager-server.yaml
       - contains:
           path: spec.template.spec.volumes
           content:
-            name: server-volume
+            name: vmalertmanager-RELEASE-NAME-db
             persistentVolumeClaim:
               claimName: vmalertmanager-RELEASE-NAME
         template: alertmanager-server.yaml
@@ -124,13 +136,66 @@ tests:
         template: alertmanager-pvc.yaml
       - equal:
           path: spec.template.spec.serviceAccountName
-          value: RELEASE-NAME-victoria-metrics-alert
+          value: vmalert-RELEASE-NAME
         template: alert-server.yaml
       - equal:
           path: spec.template.spec.serviceAccountName
-          value: RELEASE-NAME-victoria-metrics-alert
+          value: vmalertmanager-RELEASE-NAME
         template: alertmanager-server.yaml
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-alert
+          value: vmalert-RELEASE-NAME
         template: serviceaccount.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmalert-RELEASE-NAME
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        template: serviceaccount.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+      - hasDocuments:
+          count: 2
+        template: serviceaccount.yaml
+  - it: an explicit serviceAccount.name is shared by both components with operator naming
+    set:
+      useLegacyNaming: false
+      serviceAccount.name: custom-sa
+    asserts:
+      - hasDocuments:
+          count: 1
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: custom-sa
+        template: serviceaccount.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: custom-sa
+        template: alert-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: custom-sa
+        template: alertmanager-server.yaml
+  - it: an explicit serviceAccount.name is shared by both components with legacy naming
+    set:
+      useLegacyNaming: true
+      serviceAccount.name: custom-sa
+    asserts:
+      - hasDocuments:
+          count: 1
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: custom-sa
+        template: serviceaccount.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: custom-sa
+        template: alert-server.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: custom-sa
+        template: alertmanager-server.yaml

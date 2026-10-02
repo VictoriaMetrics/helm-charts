@@ -187,3 +187,29 @@ alertmanager.routePrefix returns the effective alertmanager route prefix.
 {{- define "alertmanager.routePrefix" -}}
   {{- index (.extraArgs | default dict) "web.route-prefix" | default .baseURLPrefix | default "" -}}
 {{- end -}}
+
+{{- /*
+alertmanager.volume.name returns the alertmanager storage volume name.
+It matches the name used by the VictoriaMetrics operator when legacy naming is disabled.
+*/ -}}
+{{- define "alertmanager.volume.name" -}}
+  {{- if eq (include "vm.useLegacyNaming" .) "false" -}}
+    {{- printf "%s-db" (include "vm.plain.fullname" . | trunc 60 | trimSuffix "-") -}}
+  {{- else -}}
+    server-volume
+  {{- end -}}
+{{- end -}}
+
+{{- /*
+vmalert.sa.name returns the service account name for the component of the given context.
+With legacy naming a single account is shared by vmalert and alertmanager.
+Otherwise each component gets its own account, as in the VictoriaMetrics operator.
+*/ -}}
+{{- define "vmalert.sa.name" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $default := include "vm.fullname" (.helm | default .) -}}
+  {{- if eq (include "vm.useLegacyNaming" .) "false" -}}
+    {{- $default = include "vm.plain.fullname" . -}}
+  {{- end -}}
+  {{- tpl (($Values.serviceAccount).name | default $default) . -}}
+{{- end -}}

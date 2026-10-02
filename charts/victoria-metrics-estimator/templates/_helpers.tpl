@@ -26,7 +26,7 @@
 vmestimator.fullname resolves the fully qualified name of a chart resource.
 Pass "component" as one of "single", "storage" or "select" for a
 per-component resource, or omit it for a chart-wide shared resource
-(ConfigMap, ServiceAccount, NetworkPolicy) — the latter honors a root-level
+(ConfigMap, ServiceAccount) — the latter honors a root-level
 fullnameOverride/global.fullnameOverride, matching every other chart.
 */ -}}
 {{- define "vmestimator.fullname" -}}
@@ -34,8 +34,7 @@ fullnameOverride/global.fullnameOverride, matching every other chart.
   {{- if not .component -}}
     {{- include "vm.plain.fullname" (dict "helm" .root "kindOverride" "vmestimator") -}}
   {{- else -}}
-    {{- $kindOverrides := dict "single" "vmestimator-single" "storage" "vmestimator-storage" "select" "vmestimator-select" -}}
-    {{- include "vm.plain.fullname" (dict "helm" .root "appKey" .component "kindOverride" (index $kindOverrides .component)) -}}
+    {{- include "vm.plain.fullname" (dict "helm" .root "appKey" .component "kindOverride" (include "vmestimator.kind" .component)) -}}
   {{- end -}}
 {{- end -}}
 
@@ -74,7 +73,7 @@ fullnameOverride/global.fullnameOverride, matching every other chart.
   {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
   {{- $configChecksum := and (ne $component "select") (not $root.Values.config.existingConfigMap) -}}
-  {{- $ctx := dict "helm" $root "appKey" $component -}}
+  {{- $ctx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) -}}
   {{- $name := include "vmestimator.fullname" (dict "root" $root "component" $component) -}}
   {{- $ns := include "vm.namespace" $ctx -}}
 apiVersion: apps/v1
@@ -204,7 +203,7 @@ spec:
   {{- $app := index $root.Values $component -}}
   {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
-  {{- $ctx := dict "helm" $root "appKey" $component "extraLabels" $app.service.labels -}}
+  {{- $ctx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) "extraLabels" $app.service.labels -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -227,4 +226,17 @@ spec:
       targetPort: http
       protocol: TCP
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
+{{- end -}}
+
+{{- /*
+vmestimator.kind returns the resource kind of the given component ("single", "storage" or "select"),
+or of the chart-wide shared resources when the component is empty. It is used both as the
+resource name prefix and as the `app.kubernetes.io/name` label value.
+*/ -}}
+{{- define "vmestimator.kind" -}}
+  {{- if . -}}
+    {{- printf "vmestimator-%s" . -}}
+  {{- else -}}
+    vmestimator
+  {{- end -}}
 {{- end -}}

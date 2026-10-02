@@ -1,4 +1,5 @@
 {{- $ctx := dict "helm" . "kindOverride" "vlagent" }}
+{{- $storageName := include "vlagent.volume.name" $ctx }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -105,7 +106,7 @@ spec:
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-            - name: vl-agent-data
+            - name: {{ $storageName }}
               mountPath: /vlagent-data
             {{- include "vm.license.mount" . | nindent 12 }}
       volumes:
@@ -114,12 +115,12 @@ spec:
         {{- end }}
         {{- if .Values.persistentVolume.enabled }}
           {{- if .Values.persistentVolume.existingClaim }}
-        - name: vl-agent-data
+        - name: {{ $storageName }}
           persistentVolumeClaim:
             claimName: {{ tpl .Values.persistentVolume.existingClaim $ctx }}
           {{- end }}
         {{- else }}
-        - name: vl-agent-data
+        - name: {{ $storageName }}
           emptyDir: {}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
@@ -129,7 +130,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: vl-agent-data
+        name: {{ $storageName }}
         {{- with $pvc.annotations  }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}

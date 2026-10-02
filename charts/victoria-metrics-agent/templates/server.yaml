@@ -1,10 +1,13 @@
-{{- $storageName := "tmpdata" }}
 {{- $app := .Values }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
 {{- if and $mode (hasKey $app $mode) }}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
+{{- $storageName := include "vmagent.volume.name" $ctx }}
+{{- if and (eq $mode "statefulSet") $pvc.enabled (not $pvc.existingClaim) $pvc.name }}
+  {{- $storageName = tpl $pvc.name $ctx }}
+{{- end }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
@@ -145,10 +148,10 @@ spec:
           volumeMounts:
             - name: {{ $storageName }}
               mountPath: /tmpData
-            - name: scrape-config
+            - name: config-out
               mountPath: /config/scrape
             {{- with (include "vmagent.rw.config" .) }}
-            - name: rw-config
+            - name: relabelings-assets
               mountPath: /config/rw
             {{- end }}
             {{- range $app.extraHostPathMounts }}
@@ -211,11 +214,11 @@ spec:
           {{- end }}
         {{- end }}
         {{- with (include "vmagent.rw.config" .) }}
-        - name: rw-config
+        - name: relabelings-assets
           configMap:
             name: {{ $fullname -}}-rw
         {{- end }}
-        - name: scrape-config
+        - name: config-out
           configMap:
             name: {{ include "vmagent.scrape.config.name" $ctx }}
         {{- range $app.extraHostPathMounts }}

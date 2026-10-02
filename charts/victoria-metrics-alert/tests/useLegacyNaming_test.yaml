@@ -276,10 +276,17 @@ tests:
         template: monitor.yaml
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-alert
+          value: vmalert-RELEASE-NAME
         documentSelector:
           path: metadata.name
-          value: RELEASE-NAME-victoria-metrics-alert
+          value: vmalert-RELEASE-NAME
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
+        documentSelector:
+          path: metadata.name
+          value: vmalertmanager-RELEASE-NAME
         template: serviceaccount.yaml
       - equal:
           path: metadata.name
