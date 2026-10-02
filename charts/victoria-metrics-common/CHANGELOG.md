@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- with `useLegacyNaming: false` and a known component kind (`kindOverride` or a `vm`/`vl`/`vt`-prefixed `appKey`), `vm.selectorLabels`, `vm.commonLabels`, `vm.podLabels` and `vm.labels` now render the labels used by the VictoriaMetrics operator: `app.kubernetes.io/name: <kind>`, `app.kubernetes.io/instance: <release>` and `app.kubernetes.io/component: monitoring`. Ownership labels such as `app.kubernetes.io/managed-by` are not changed. Labels are unchanged with legacy naming or when the kind is unknown. Callers must pass the same context to every label helper of a component, since selectors now depend on the kind.
 
 ## v0.4.2
 
