@@ -52,7 +52,7 @@ webhooks:
       matchExpressions:
         - key: app.kubernetes.io/name
           operator: NotIn
-          values: [{{ include "vm.name" $ }}]
+          values: [{{ index (fromYaml (include "vm.selectorLabels" (dict "helm" $ "kindOverride" "vmoperator"))) "app.kubernetes.io/name" }}]
     rules:
       - apiGroups:
           - {{ $crd.spec.group }}
