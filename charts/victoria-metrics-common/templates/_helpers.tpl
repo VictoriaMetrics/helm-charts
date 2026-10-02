@@ -255,7 +255,7 @@ Returns "true", "false", or "" (not set at any level).
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $globalLabels := deepCopy (($Values.global).extraLabels | default dict) -}}
   {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
-  {{- if and $labels.app (not (hasKey $labels "app.kubernetes.io/component")) -}}
+  {{- if and $labels.app (ne (include "vm.labels.operator" .) "true") -}}
     {{- $_ := set $labels "app.kubernetes.io/component" $labels.app -}}
   {{- end -}}
   {{- $labels = mergeOverwrite $globalLabels $labels (.extraLabels | default dict) -}}
@@ -331,6 +331,16 @@ it returns an empty string instead of failing when the kind can't be determined.
 {{- end -}}
 
 {{- /*
+vm.labels.operator returns "true" when labels follow the VictoriaMetrics operator convention:
+`useLegacyNaming: false` and a known kind.
+*/ -}}
+{{- define "vm.labels.operator" -}}
+  {{- if and (eq (include "vm.useLegacyNaming" .) "false") (include "vm.labels.kind" .) -}}
+    true
+  {{- end -}}
+{{- end -}}
+
+{{- /*
 Selector labels.
 With `useLegacyNaming: false` and a known kind the name, instance and component labels match
 the ones the VictoriaMetrics operator sets for the same component. Ownership labels
@@ -338,14 +348,12 @@ the ones the VictoriaMetrics operator sets for the same component. Ownership lab
 */ -}}
 {{- define "vm.selectorLabels" -}}
   {{- $labels := .extraLabels | default dict -}}
-  {{- $kind := "" -}}
-  {{- if eq (include "vm.useLegacyNaming" .) "false" -}}
-    {{- $kind = include "vm.labels.kind" . -}}
-  {{- end -}}
-  {{- if $kind -}}
-    {{- $_ := set $labels "app.kubernetes.io/name" $kind -}}
+  {{- if eq (include "vm.labels.operator" .) "true" -}}
+    {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.labels.kind" .) -}}
     {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
-    {{- $_ := set $labels "app.kubernetes.io/component" "monitoring" -}}
+    {{- if not (hasKey $labels "app.kubernetes.io/component") -}}
+      {{- $_ := set $labels "app.kubernetes.io/component" "monitoring" -}}
+    {{- end -}}
   {{- else -}}
     {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.name" .) -}}
     {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
@@ -358,7 +366,7 @@ the ones the VictoriaMetrics operator sets for the same component. Ownership lab
 
 {{- define "vm.commonLabels" -}}
   {{- $labels := fromYaml (include "vm.selectorLabels" . ) -}}
-  {{- if and $labels.app (not (hasKey $labels "app.kubernetes.io/component")) -}}
+  {{- if and $labels.app (ne (include "vm.labels.operator" .) "true") -}}
     {{- $_ := set $labels "app.kubernetes.io/component" $labels.app -}}
     {{- $_ := unset $labels "app" -}}
   {{- end -}}
