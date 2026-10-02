@@ -40037,6 +40037,43 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - 'with `useLegacyNaming: false` and a known component kind (`kindOverride` or a `vm`/`vl`/`vt`-prefixed `appKey`), `vm.selectorLabels`, `vm.commonLabels`, `vm.podLabels` and `vm.labels` now render the labels used by the VictoriaMetrics operator: `app.kubernetes.io/name: <kind>`, `app.kubernetes.io/instance: <release>` and `app.kubernetes.io/component: monitoring`. Ownership labels such as `app.kubernetes.io/managed-by` are not changed. Labels are unchanged with legacy naming or when the kind is unknown. Callers must pass the same context to every label helper of a component, since selectors now depend on the kind.'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Common Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/changelog/).
+    apiVersion: v2
+    created: "2026-10-02T06:22:29.669327293Z"
+    description: VictoriaMetrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: 6dc883b806544d0edb67933ed26940e79e9faf14382841854d56293a09254023
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.4.3/victoria-metrics-common-0.4.3.tgz
+    version: 0.4.3
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - '`vm.cr.fullname` now fails when `useLegacyNaming: true` is set, since CR names must stay stable regardless of naming style; consuming charts no longer need their own validation for this.'
       artifacthub.io/license: Apache-2.0
       artifacthub.io/links: |
@@ -86892,4 +86929,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-10-01T12:57:59.863984647Z"
+generated: "2026-10-02T06:22:30.059843082Z"
