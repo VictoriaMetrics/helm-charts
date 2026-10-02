@@ -26,7 +26,7 @@ spec:
   replicas: {{ $app.replicaCount }}
   {{- end }}
   selector:
-    matchLabels: {{ include "vm.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}

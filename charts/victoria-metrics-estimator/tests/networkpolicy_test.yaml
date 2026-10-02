@@ -1,0 +1,74 @@
+suite: network policy tests
+templates:
+  - networkpolicy.yaml
+tests:
+  - it: is not rendered by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: selects the pods of the single component
+    set:
+      networkPolicy.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: vmestimator-single-RELEASE-NAME
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmestimator-single
+
+  - it: renders a policy per component in cluster mode
+    set:
+      mode: cluster
+      networkPolicy.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmestimator-storage
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmestimator-select
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
+
+  - it: renders ingress and egress rules
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+        egress:
+          - to:
+              - ipBlock:
+                  cidr: 10.0.0.0/8
+    asserts:
+      - equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector: {}
+      - equal:
+          path: spec.egress
+          value:
+            - to:
+                - ipBlock:
+                    cidr: 10.0.0.0/8

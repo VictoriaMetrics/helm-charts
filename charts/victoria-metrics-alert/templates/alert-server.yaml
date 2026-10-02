@@ -10,7 +10,7 @@
 {{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmalert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
-{{- $sa := include "vm.fullname" . }}
+{{- $sa := include "vmalert.sa.name" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -42,7 +42,7 @@ spec:
       {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
       {{- if or (.Values.serviceAccount).name (.Values.serviceAccount).create }}
-      serviceAccountName: {{ tpl ((.Values.serviceAccount).name | default $sa) $ctx }}
+      serviceAccountName: {{ $sa }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
       {{- end }}
       {{- if $app.podSecurityContext.enabled }}
@@ -87,7 +87,7 @@ spec:
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: alerts-config
+            - name: rules-out
               mountPath: /config
             {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
@@ -141,7 +141,7 @@ spec:
       {{- end }}
       {{- $_ := set $ctx "appKey" "server" }}
       volumes:
-        - name: alerts-config
+        - name: rules-out
           configMap:
             name: {{ include "vmalert.rules.config.name" $ctx }}
         {{- range $app.extraHostPathMounts }}

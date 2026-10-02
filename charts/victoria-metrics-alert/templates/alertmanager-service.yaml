@@ -22,11 +22,14 @@ spec:
   trafficDistribution: {{ . }}
   {{- end }}
   type: {{ $service.type }}
-  {{- with $service.clusterIP }}
+  {{- /* headless by default with non-legacy naming, as in VictoriaMetrics operator; explicit clusterIP always wins */}}
+  {{- $headless := and (kindIs "invalid" $service.clusterIP) (eq $service.type "ClusterIP") (eq (include "vm.useLegacyNaming" $ctx) "false") }}
+  {{- $clusterIP := ternary "None" ($service.clusterIP | default "") $headless }}
+  {{- with $clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
-  {{- with $service.publishNotReadyAddresses }}
-  publishNotReadyAddresses: {{ . }}
+  {{- if or $service.publishNotReadyAddresses $headless }}
+  publishNotReadyAddresses: true
   {{- end }}
   {{- with $service.externalIPs }}
   externalIPs: {{ toYaml . | nindent 4 }}
@@ -57,5 +60,16 @@ spec:
       {{- if $service.nodePort }}
       nodePort: {{ $service.nodePort }}
       {{- end }}
+    {{- if gt (int $app.replicaCount) 1 }}
+    {{- $meshPort := include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
+    - name: tcp-mesh
+      port: {{ $meshPort }}
+      targetPort: mesh-tcp
+      protocol: TCP
+    - name: udp-mesh
+      port: {{ $meshPort }}
+      targetPort: mesh-udp
+      protocol: UDP
+    {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}

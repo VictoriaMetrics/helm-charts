@@ -1,0 +1,103 @@
+suite: alertmanager operator naming tests
+set:
+  server.datasource.url: http://vmsingle:8428
+  alertmanager.enabled: true
+templates:
+  - alertmanager-secret.yaml
+  - alertmanager-server.yaml
+  - alertmanager-service.yaml
+tests:
+  - it: keeps a regular service and the legacy volume name by default
+    set:
+      alertmanager.mode: statefulSet
+      alertmanager.persistentVolume.enabled: true
+    asserts:
+      - notExists:
+          path: spec.clusterIP
+        template: alertmanager-service.yaml
+      - notExists:
+          path: spec.publishNotReadyAddresses
+        template: alertmanager-service.yaml
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: server-volume
+        template: alertmanager-server.yaml
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "server-volume")]
+        template: alertmanager-server.yaml
+
+  - it: "renders a headless service and the operator volume name with useLegacyNaming: false"
+    set:
+      useLegacyNaming: false
+      alertmanager.mode: statefulSet
+      alertmanager.persistentVolume.enabled: true
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: None
+        template: alertmanager-service.yaml
+      - equal:
+          path: spec.publishNotReadyAddresses
+          value: true
+        template: alertmanager-service.yaml
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: vmalertmanager-RELEASE-NAME-db
+        template: alertmanager-server.yaml
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "vmalertmanager-RELEASE-NAME-db")]
+        template: alertmanager-server.yaml
+
+  - it: an explicit empty clusterIP keeps a regular service with non-legacy naming
+    set:
+      useLegacyNaming: false
+      alertmanager.service.clusterIP: ""
+    asserts:
+      - notExists:
+          path: spec.clusterIP
+        template: alertmanager-service.yaml
+
+  - it: does not force a headless service for non-ClusterIP service types
+    set:
+      useLegacyNaming: false
+      alertmanager.service.type: LoadBalancer
+    asserts:
+      - notExists:
+          path: spec.clusterIP
+        template: alertmanager-service.yaml
+
+  - it: exposes gossip ports on the service in HA mode
+    set:
+      alertmanager.mode: statefulSet
+      alertmanager.replicaCount: 3
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: web
+              port: 9093
+              targetPort: web
+              protocol: TCP
+            - name: tcp-mesh
+              port: 9094
+              targetPort: mesh-tcp
+              protocol: TCP
+            - name: udp-mesh
+              port: 9094
+              targetPort: mesh-udp
+              protocol: UDP
+        template: alertmanager-service.yaml
+
+  - it: an explicit volume name is used for both the claim template and the mount
+    set:
+      alertmanager.mode: statefulSet
+      alertmanager.persistentVolume.enabled: true
+      alertmanager.persistentVolume.name: custom-volume
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: custom-volume
+        template: alertmanager-server.yaml
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "custom-volume")]
+        template: alertmanager-server.yaml

@@ -322,9 +322,9 @@ deployment should match snapshot:
                 - mountPath: /tmpData
                   name: tmpdata
                 - mountPath: /config/scrape
-                  name: scrape-config
+                  name: config-out
                 - mountPath: /config/rw
-                  name: rw-config
+                  name: relabelings-assets
               workingDir: /
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-agent
@@ -333,10 +333,10 @@ deployment should match snapshot:
               name: tmpdata
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-rw
-              name: rw-config
+              name: relabelings-assets
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-config
-              name: scrape-config
+              name: config-out
 deployment with volume should match snapshot:
   1: |
     apiVersion: v1
@@ -661,9 +661,9 @@ deployment with volume should match snapshot:
                 - mountPath: /tmpData
                   name: tmpdata
                 - mountPath: /config/scrape
-                  name: scrape-config
+                  name: config-out
                 - mountPath: /config/rw
-                  name: rw-config
+                  name: relabelings-assets
               workingDir: /
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-agent
@@ -673,10 +673,10 @@ deployment with volume should match snapshot:
                 claimName: RELEASE-NAME-victoria-metrics-agent
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-rw
-              name: rw-config
+              name: relabelings-assets
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-config
-              name: scrape-config
+              name: config-out
 statefulset should match snapshot:
   1: |
     apiVersion: v1
@@ -1001,9 +1001,9 @@ statefulset should match snapshot:
                 - mountPath: /tmpData
                   name: tmpdata
                 - mountPath: /config/scrape
-                  name: scrape-config
+                  name: config-out
                 - mountPath: /config/rw
-                  name: rw-config
+                  name: relabelings-assets
               workingDir: /
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-agent
@@ -1012,10 +1012,10 @@ statefulset should match snapshot:
               name: tmpdata
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-rw
-              name: rw-config
+              name: relabelings-assets
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-config
-              name: scrape-config
+              name: config-out
       updateStrategy: {}
 statefulset with volume should match snapshot:
   1: |
@@ -1341,19 +1341,19 @@ statefulset with volume should match snapshot:
                 - mountPath: /tmpData
                   name: tmpdata
                 - mountPath: /config/scrape
-                  name: scrape-config
+                  name: config-out
                 - mountPath: /config/rw
-                  name: rw-config
+                  name: relabelings-assets
               workingDir: /
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-agent
           volumes:
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-rw
-              name: rw-config
+              name: relabelings-assets
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-config
-              name: scrape-config
+              name: config-out
       updateStrategy: {}
       volumeClaimTemplates:
         - apiVersion: v1
