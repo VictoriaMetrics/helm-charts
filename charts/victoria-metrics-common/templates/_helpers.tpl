@@ -123,16 +123,11 @@ vm.operator.kind returns the operator resource-name prefix (e.g. "vlsingle",
 "vminsert", or an explicit .kindOverride for names that don't fit that pattern).
 */ -}}
 {{- define "vm.operator.kind" -}}
-  {{- if .kindOverride -}}
-    {{- .kindOverride -}}
-  {{- else -}}
-    {{- $appKey := include "vm.internal.key.default" . -}}
-    {{- if or (hasPrefix "vm" $appKey) (hasPrefix "vl" $appKey) (hasPrefix "vt" $appKey) -}}
-      {{- $appKey -}}
-    {{- else -}}
-      {{- fail (printf "vm.operator.kind: appKey %q is not vm/vl/vt-prefixed; pass an explicit \"kindOverride\" for the desired resource name" $appKey) -}}
-    {{- end -}}
+  {{- $kind := include "vm.labels.kind" . -}}
+  {{- if not $kind -}}
+    {{- fail (printf "vm.operator.kind: appKey %q is not vm/vl/vt-prefixed; pass an explicit \"kindOverride\" for the desired resource name" (include "vm.internal.key.default" .)) -}}
   {{- end -}}
+  {{- $kind -}}
 {{- end -}}
 
 {{- /*
@@ -260,8 +255,8 @@ Returns "true", "false", or "" (not set at any level).
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $globalLabels := deepCopy (($Values.global).extraLabels | default dict) -}}
   {{- $labels := fromYaml (include "vm.selectorLabels" .) -}}
-  {{- with $labels.app -}}
-    {{- $_ := set $labels "app.kubernetes.io/component" . -}}
+  {{- if and $labels.app (not (hasKey $labels "app.kubernetes.io/component")) -}}
+    {{- $_ := set $labels "app.kubernetes.io/component" $labels.app -}}
   {{- end -}}
   {{- $labels = mergeOverwrite $globalLabels $labels (.extraLabels | default dict) -}}
   {{- $_ := set $labels "app.kubernetes.io/managed-by" $Release.Service -}}
@@ -319,21 +314,52 @@ Returns "true", "false", or "" (not set at any level).
   {{- $_ := unset . "fallback" -}}
 {{- end -}}
 
-{{- /* Selector labels */ -}}
+{{- /*
+vm.labels.kind returns the operator kind used in labels (e.g. "vmagent", "vmselect"),
+taken from .kindOverride or from a vm/vl/vt-prefixed appKey. Unlike vm.operator.kind
+it returns an empty string instead of failing when the kind can't be determined.
+*/ -}}
+{{- define "vm.labels.kind" -}}
+  {{- if .kindOverride -}}
+    {{- .kindOverride -}}
+  {{- else -}}
+    {{- $appKey := include "vm.internal.key.default" . -}}
+    {{- if or (hasPrefix "vm" $appKey) (hasPrefix "vl" $appKey) (hasPrefix "vt" $appKey) -}}
+      {{- $appKey -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /*
+Selector labels.
+With `useLegacyNaming: false` and a known kind the name, instance and component labels match
+the ones the VictoriaMetrics operator sets for the same component. Ownership labels
+(`managed-by`) are intentionally left as is.
+*/ -}}
 {{- define "vm.selectorLabels" -}}
   {{- $labels := .extraLabels | default dict -}}
-  {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.name" .) -}}
-  {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
-  {{- with (include "vm.app.name" .) -}}
-    {{- $_ := set $labels "app" . -}}
+  {{- $kind := "" -}}
+  {{- if eq (include "vm.useLegacyNaming" .) "false" -}}
+    {{- $kind = include "vm.labels.kind" . -}}
+  {{- end -}}
+  {{- if $kind -}}
+    {{- $_ := set $labels "app.kubernetes.io/name" $kind -}}
+    {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
+    {{- $_ := set $labels "app.kubernetes.io/component" "monitoring" -}}
+  {{- else -}}
+    {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.name" .) -}}
+    {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
+    {{- with (include "vm.app.name" .) -}}
+      {{- $_ := set $labels "app" . -}}
+    {{- end -}}
   {{- end -}}
   {{- toYaml $labels -}}
 {{- end }}
 
 {{- define "vm.commonLabels" -}}
   {{- $labels := fromYaml (include "vm.selectorLabels" . ) -}}
-  {{- with $labels.app -}}
-    {{- $_ := set $labels "app.kubernetes.io/component" . -}}
+  {{- if and $labels.app (not (hasKey $labels "app.kubernetes.io/component")) -}}
+    {{- $_ := set $labels "app.kubernetes.io/component" $labels.app -}}
     {{- $_ := unset $labels "app" -}}
   {{- end -}}
   {{- toYaml $labels -}}
