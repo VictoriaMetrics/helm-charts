@@ -1,5 +1,6 @@
 ## Next release
 
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 - upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.30.7](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1307)
 - rename the container from `model` to `vmanomaly`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.
 - fix `persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.

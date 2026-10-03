@@ -4,6 +4,7 @@
 - fix `persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - fix `persistentVolume.name` in `statefulSet` mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 - rename config volumes to match the VictoriaMetrics operator: `scrape-config` to `config-out` and `rw-config` to `relabelings-assets`. Pods are restarted once on upgrade.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v0.49.0
 
