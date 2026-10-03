@@ -16,7 +16,11 @@ metadata:
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
 spec:
-  {{- with $service.clusterIP }}
+  {{- $clusterIP := $service.clusterIP }}
+  {{- if kindIs "invalid" $clusterIP }}
+    {{- $clusterIP = ternary "None" "" (and (eq $service.type "ClusterIP") (eq (include "vm.useLegacyNaming" $ctx) "false")) }}
+  {{- end }}
+  {{- with $clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
   {{- with $service.externalIPs }}

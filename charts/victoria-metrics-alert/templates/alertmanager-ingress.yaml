@@ -36,7 +36,11 @@ spec:
             backend:
               service:
                 name: {{ $fullname }}
-                port: {{ include "vm.ingress.port" $host | nindent 18 }}
+                {{- $backend := deepCopy $host }}
+                {{- if not $backend.port }}
+                  {{- $_ := set $backend "port" (include "alertmanager.service.portName" $ctx) }}
+                {{- end }}
+                port: {{ include "vm.ingress.port" $backend | nindent 18 }}
           {{- end }}
     {{- end }}
 {{- end }}

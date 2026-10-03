@@ -26,9 +26,12 @@ spec:
     {{- $type = "ClusterIP" }}
   {{- end }}
   type: {{ $type }}
-  {{- $clusterIP := $service.clusterIP }}
   {{- if eq $type "ClusterIP" }}
-  {{- with $service.clusterIP }}
+  {{- $clusterIP := $service.clusterIP }}
+  {{- if kindIs "invalid" $clusterIP }}
+    {{- $clusterIP = ternary "" "None" (eq (include "vm.useLegacyNaming" $ctx) "false") }}
+  {{- end }}
+  {{- with $clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
   {{- end }}

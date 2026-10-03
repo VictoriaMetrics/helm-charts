@@ -154,7 +154,7 @@
   {{- $args = mergeOverwrite $args (fromYaml (include "vm.license.flag" .)) -}}
   {{- $args = mergeOverwrite $args $extraArgs -}}
   {{- if empty $extraArgs.httpListenAddr -}}
-    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" $app.http)) -}}
+    {{- $args = mergeOverwrite $args (fromYaml (include "vm.http.args" (fromYamlArray (include "vmalert.http" .)))) -}}
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
@@ -212,4 +212,30 @@ Otherwise each component gets its own account, as in the VictoriaMetrics operato
     {{- $default = include "vm.plain.fullname" . -}}
   {{- end -}}
   {{- tpl (($Values.serviceAccount).name | default $default) . -}}
+{{- end -}}
+
+{{- /*
+vmalert.http returns server.http listeners with the default listen address filled in:
+`:8080` as in the VictoriaMetrics operator with operator naming, `:8880` otherwise.
+*/ -}}
+{{- define "vmalert.http" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $default := ternary ":8080" ":8880" (eq (include "vm.useLegacyNaming" .) "false") -}}
+  {{- $http := list -}}
+  {{- range $Values.server.http -}}
+    {{- $listener := deepCopy . -}}
+    {{- if not $listener.value -}}
+      {{- $_ := set $listener "value" $default -}}
+    {{- end -}}
+    {{- $http = append $http $listener -}}
+  {{- end -}}
+  {{- toYaml $http -}}
+{{- end -}}
+
+{{- /*
+alertmanager.service.portName returns the name of the Alertmanager Service HTTP port:
+`http` as in the VictoriaMetrics operator with operator naming, `web` otherwise.
+*/ -}}
+{{- define "alertmanager.service.portName" -}}
+  {{- ternary "http" "web" (eq (include "vm.useLegacyNaming" .) "false") -}}
 {{- end -}}

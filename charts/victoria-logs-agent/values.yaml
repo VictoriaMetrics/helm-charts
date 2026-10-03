@@ -161,6 +161,19 @@ global:
   # -- Annotations added to all resources
   extraAnnotations: {}
 
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- Labels to add to the service account
+  extraLabels: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+  # -- Mount API token to pod directly. vlagent doesn't access Kubernetes API, so it is disabled by default
+  automountToken: false
+
 # -- Extra labels for Pods only
 podLabels: {}
 
@@ -252,8 +265,8 @@ service:
   annotations: {}
   # -- Service labels
   extraLabels: {}
-  # -- Service ClusterIP
-  clusterIP: ""
+  # -- Service ClusterIP. When unset, the Service is a regular ClusterIP Service with legacy naming and headless (`None`) for a `ClusterIP` Service with operator naming
+  clusterIP:
   # -- Service external IPs. Check [here](https://kubernetes.io/docs/concepts/services-networking/service/#external-ips) for details
   externalIPs: []
   # -- Service load balancer IP
