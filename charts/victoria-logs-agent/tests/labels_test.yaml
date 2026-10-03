@@ -1,0 +1,96 @@
+suite: labels and selectors
+set:
+  horizontalPodAutoscaler.enabled: true
+  horizontalPodAutoscaler.maxReplicas: 3
+  networkPolicy.enabled: true
+  remoteWrite[0].url: http://x
+  service.enabled: true
+  serviceMonitor.enabled: true
+  verticalPodAutoscaler.enabled: true
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - monitor.yaml
+  - networkpolicy.yaml
+  - server.yaml
+  - service.yaml
+  - hpa.yaml
+  - vpa.yaml
+tests:
+  - it: "selectors match pod labels with operator naming"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent
+        template: service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent
+        template: monitor.yaml
+  - it: "selectors match pod labels with legacy naming"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-agent
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-agent
+        template: service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-agent
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-agent
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-agent
+        template: monitor.yaml

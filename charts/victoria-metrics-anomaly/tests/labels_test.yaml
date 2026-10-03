@@ -1,0 +1,118 @@
+suite: labels and selectors
+set:
+  config.monitoring.pull.enabled: true
+  config.monitoring.pull.port: 8490
+  config.reader.datasource_url: http://x
+  config.reader.queries.q.expr: up
+  config.writer.datasource_url: http://x
+  ingress.enabled: true
+  license.key: dummy
+  networkPolicy.enabled: true
+  persistentVolume.enabled: true
+  podDisruptionBudget.enabled: true
+  podDisruptionBudget.minAvailable: 1
+  podMonitor.enabled: true
+  route.enabled: true
+  service.enabled: true
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - monitor.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - server.yaml
+  - service.yaml
+  - configmap.yaml
+  - ingress.yaml
+  - route.yaml
+tests:
+  - it: "selectors match pod labels with operator naming"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmanomaly
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmanomaly
+        template: pdb.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmanomaly
+        template: service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmanomaly
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmanomaly
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmanomaly
+        template: monitor.yaml
+  - it: "selectors match pod labels with legacy naming"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-anomaly
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-anomaly
+        template: pdb.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-anomaly
+        template: service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-anomaly
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-anomaly
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-anomaly
+        template: monitor.yaml

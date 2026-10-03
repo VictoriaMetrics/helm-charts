@@ -1,0 +1,117 @@
+suite: labels and selectors
+set:
+  auth.enabled: true
+  clusterMode: true
+  ingress.enabled: true
+  license.key: dummy
+  networkPolicy.enabled: true
+  podDisruptionBudget.enabled: true
+  rateLimiter.datasource.url: http://x
+  rateLimiter.enabled: true
+  read.url: http://x
+  service.enabled: true
+  serviceAccount.create: true
+  serviceMonitor.enabled: true
+  write.url: http://x
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - monitor.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - server.yaml
+  - service.yaml
+  - configmap.yaml
+  - ingress.yaml
+  - serviceaccount.yaml
+tests:
+  - it: "selectors match pod labels with operator naming"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmgateway
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmgateway
+        template: pdb.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmgateway
+        template: service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmgateway
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmgateway
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmgateway
+        template: monitor.yaml
+  - it: "selectors match pod labels with legacy naming"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-gateway
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-gateway
+        template: pdb.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-gateway
+        template: service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-gateway
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-gateway
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-gateway
+        template: monitor.yaml

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix rendering of a templated `serviceAccount.name` (e.g. `{{ .Release.Name }}-sa`), which failed with a nil pointer error.
 
 ## v0.2.9
 

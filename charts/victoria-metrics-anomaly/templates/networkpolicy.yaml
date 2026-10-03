@@ -1,10 +1,10 @@
 {{- if .Values.networkPolicy.enabled }}
 {{- $np := .Values.networkPolicy }}
-{{- $ctx := dict "helm" . }}
+{{- $ctx := dict "helm" . "kindOverride" "vmanomaly" }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "vm.fullname" $ctx }}
+  name: {{ include "vm.plain.fullname" $ctx }}
   namespace: {{ include "vm.namespace" $ctx }}
   {{- $_ := set $ctx "extraLabels" $np.labels }}
   labels: {{ include "vm.metaLabels" $ctx | nindent 4 }}

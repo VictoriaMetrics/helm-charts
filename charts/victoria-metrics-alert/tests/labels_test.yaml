@@ -1,0 +1,189 @@
+suite: labels and selectors
+set:
+  alertmanager.enabled: true
+  alertmanager.ingress.enabled: true
+  alertmanager.networkPolicy.enabled: true
+  alertmanager.persistentVolume.enabled: true
+  alertmanager.route.enabled: true
+  server.config.alerts.groups[0].name: x
+  server.datasource.url: http://x
+  server.ingress.enabled: true
+  server.networkPolicy.enabled: true
+  server.podDisruptionBudget.enabled: true
+  server.route.enabled: true
+  server.verticalPodAutoscaler.enabled: true
+  serviceAccount.create: true
+  serviceMonitor.enabled: true
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - alert-networkpolicy.yaml
+  - alert-pdb.yaml
+  - alert-server.yaml
+  - alert-service.yaml
+  - alertmanager-networkpolicy.yaml
+  - alertmanager-server.yaml
+  - alertmanager-service.yaml
+  - monitor.yaml
+  - alert-configmap.yaml
+  - alert-ingress.yaml
+  - alert-route.yaml
+  - alertmanager-secret.yaml
+  - alertmanager-ingress.yaml
+  - alertmanager-pvc.yaml
+  - alertmanager-route.yaml
+  - serviceaccount.yaml
+  - vpa.yaml
+tests:
+  - it: "selectors match pod labels with operator naming"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalert
+        template: alert-networkpolicy.yaml
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalertmanager
+        template: alertmanager-networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalert
+        template: alert-pdb.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalert
+        template: alert-service.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalertmanager
+        template: alertmanager-service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalert
+        template: alert-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalert
+        template: alert-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalertmanager
+        template: alertmanager-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalertmanager
+        template: alertmanager-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalert
+        template: monitor.yaml
+  - it: "selectors match pod labels with legacy naming"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alert-networkpolicy.yaml
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: alertmanager
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alertmanager-networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alert-pdb.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alert-service.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app: alertmanager
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alertmanager-service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alert-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alert-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: alertmanager
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alertmanager-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: alertmanager
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: alertmanager-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-metrics-alert
+        template: monitor.yaml

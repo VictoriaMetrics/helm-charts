@@ -4,8 +4,8 @@
   {{- fail "`config.monitoring.pull.port` is required and `config.monitoring.pull.enabled` should be `true`, when PodMonitor is enabled" -}}
 {{- end -}}
 {{- $podMonitor := $app.podMonitor -}}
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vmanomaly" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- if $podMonitor.vm }}
 apiVersion: operator.victoriametrics.com/v1beta1
@@ -32,7 +32,7 @@ spec:
   selector:
     matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}
   podMetricsEndpoints:
-    - port: metrics
+    - port: monitoring-http
       {{- with $podMonitor.basicAuth }}
       basicAuth: {{ toYaml . | nindent 8 }}
       {{- end }}

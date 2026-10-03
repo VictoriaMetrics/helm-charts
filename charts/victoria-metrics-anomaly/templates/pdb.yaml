@@ -1,8 +1,8 @@
 {{- $app := .Values }}
 {{- $pdb := $app.podDisruptionBudget }}
 {{- if $pdb.enabled }}
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vmanomaly" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget

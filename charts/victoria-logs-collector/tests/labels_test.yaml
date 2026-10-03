@@ -1,0 +1,78 @@
+suite: labels and selectors
+set:
+  networkPolicy.enabled: true
+  podMonitor.enabled: true
+  remoteWrite[0].url: http://x
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - monitor.yaml
+  - networkpolicy.yaml
+  - server.yaml
+  - rbac.yaml
+  - serviceaccount.yaml
+tests:
+  - it: "selectors match pod labels with operator naming"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent-collector
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent-collector
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent-collector
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlagent-collector
+        template: monitor.yaml
+  - it: "selectors match pod labels with legacy naming"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-collector
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-collector
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-collector
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-collector
+        template: monitor.yaml
