@@ -275,8 +275,8 @@ vlselect:
     labels: {}
     # -- Service type
     type: ClusterIP
-    # -- Service ClusterIP
-    clusterIP: ""
+    # -- Service ClusterIP. When unset, the Service is a regular ClusterIP Service with legacy naming and headless (`None`), as in the VictoriaMetrics operator, with operator naming
+    clusterIP:
     # -- Publish not-ready addresses. Set this to `true` together with `clusterIP: None` when vlselect is discovered via its headless service (e.g. behind vmauth balancing) before pods pass readiness checks
     publishNotReadyAddresses: false
     # -- Service nodePort # nodePort: "30471"
@@ -844,7 +844,8 @@ vlstorage:
     # -- Create/use Persistent Volume Claim for vlstorage component. Empty dir if false. If true,  vlstorage will create/use a Persistent Volume Claim
     enabled: true
 
-    name: vlstorage-volume
+    # -- Override Persistent Volume Claim template name. Defaults to `vlstorage-volume`, or to `vlstorage-db` when `useLegacyNaming` is `false`
+    name: ""
 
     # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
     accessModes:
