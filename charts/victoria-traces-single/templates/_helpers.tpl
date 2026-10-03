@@ -26,3 +26,11 @@
   {{- end -}}
   {{- toYaml (fromYaml (include "vm.args" $args)).args -}}
 {{- end -}}
+
+{{- /*
+vtsingle.volume.name returns the storage volume name.
+It matches the name used by the VictoriaMetrics operator when legacy naming is disabled.
+*/ -}}
+{{- define "vtsingle.volume.name" -}}
+  {{- ternary "data" "server-volume" (eq (include "vm.useLegacyNaming" .) "false") -}}
+{{- end -}}

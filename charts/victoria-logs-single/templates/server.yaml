@@ -1,10 +1,16 @@
-{{- $storageName := "server-volume" }}
 {{- $app := .Values.server }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
 {{- if and $mode $app.enabled (hasKey $app $mode) }}
 {{- $modeOpts := index $app $mode }}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vlsingle" }}
+{{- if and (eq $mode "statefulSet") (eq (include "vm.useLegacyNaming" $ctx) "false") }}
+  {{- fail "`server.mode: statefulSet` is not supported with `useLegacyNaming: false`. Use `server.mode: deployment`, which matches the VictoriaMetrics operator" -}}
+{{- end }}
+{{- $storageName := include "vlsingle.volume.name" $ctx }}
+{{- if and (eq $mode "statefulSet") $pvc.enabled (not $pvc.existingClaim) $pvc.name }}
+  {{- $storageName = tpl $pvc.name $ctx }}
+{{- end }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- if and (ne $mode "statefulSet") (gt (int $app.replicaCount) 1) }}
@@ -67,7 +73,7 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: vlogs
+        - name: vlsingle
           {{- if $app.securityContext.enabled }}
           securityContext: {{- include "vm.securityContext" (dict "securityContext" $app.securityContext "helm" $ctx) | nindent 12 }}
           {{- end }}

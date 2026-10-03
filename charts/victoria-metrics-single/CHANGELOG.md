@@ -1,7 +1,10 @@
 ## Next release
 
+- bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 - fix `server.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - fix pod label selector in the chart notes: repeated `-l` flags were replaced with a single comma-separated selector, since `kubectl` only honours the last `-l`.
+- fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
+- rename config volumes to match the VictoriaMetrics operator: `scrapeconfig` to `config-out` and `relabelconfig` to `relabelings-assets`. Pods with scrape or relabel config enabled are restarted once on upgrade.
 
 ## v0.48.0
 

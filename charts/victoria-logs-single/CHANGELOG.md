@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+- bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
+- rename the container from `vlogs` to `vlsingle`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.
+- fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 
 ## v0.13.10
 

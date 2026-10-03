@@ -1,7 +1,10 @@
 ## Next release
 
+- bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
 - fix `server.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
+- rename the container from `vtraces` to `vtsingle`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.
+- fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 
 ## v0.1.11
 

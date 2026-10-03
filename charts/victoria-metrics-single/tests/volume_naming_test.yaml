@@ -1,0 +1,71 @@
+suite: volume naming tests
+set:
+  server.persistentVolume.enabled: true
+templates:
+  - server.yaml
+tests:
+  - it: uses the legacy volume name by default
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: server-volume
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "server-volume")]
+
+  - it: "uses the operator volume and claim names in deployment mode with useLegacyNaming: false"
+    set:
+      useLegacyNaming: false
+      server.mode: deployment
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: metadata.name
+          value: vmsingle-RELEASE-NAME
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: data
+            persistentVolumeClaim:
+              claimName: vmsingle-RELEASE-NAME
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "data")]
+
+  - it: "rejects statefulSet mode with useLegacyNaming: false"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - failedTemplate:
+          errorMessage: "`server.mode: statefulSet` is not supported with `useLegacyNaming: false`. Use `server.mode: deployment`, which matches the VictoriaMetrics operator"
+
+  - it: names the container as the operator does
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: vmsingle
+
+  - it: an explicit volume name is used for both the claim template and the mount
+    set:
+      server.persistentVolume.name: custom-volume
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: custom-volume
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "custom-volume")]
+
+  - it: names config volumes as the operator does
+    set:
+      server.scrape.enabled: true
+      server.relabel.enabled: true
+    asserts:
+      - exists:
+          path: spec.template.spec.volumes[?(@.name == "config-out")].configMap
+      - exists:
+          path: spec.template.spec.volumes[?(@.name == "relabelings-assets")].configMap
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "config-out")]
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "relabelings-assets")]
