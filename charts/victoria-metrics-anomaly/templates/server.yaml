@@ -1,4 +1,3 @@
-{{- $storageName := "models-dump" }}
 {{- include "vm.enterprise.only" . -}}
 
 {{- if not .Values.config.reader.datasource_url -}}
@@ -13,12 +12,16 @@
   {{ fail "At least one query must be specified. You nee to add queries in `config.reader.queries` parameter in values.yaml"}}
 {{- end -}}
 
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vmanomaly" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $storageName := include "vmanomaly.volume.name" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 {{- $shardingEnabled := gt (int .Values.shardsCount) 1 }}
 {{- $pvc := .Values.persistentVolume }}
 {{- $mode := ternary "statefulSet" "deployment" (or $pvc.enabled $shardingEnabled) }}
+{{- if and (eq $mode "statefulSet") $pvc.enabled (not $pvc.existingClaim) $pvc.name }}
+  {{- $storageName = tpl $pvc.name $ctx }}
+{{- end }}
 {{- $modeOpts := index .Values $mode }}
 {{- $tag := include "vm.image.tag" $ctx | splitList "-" | first }}
 ---
@@ -57,13 +60,18 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: model
+        - name: vmanomaly
           image: {{ include "vm.image" $ctx }}
           workingDir: {{ .Values.containerWorkingDir }}
           ports:
             {{- with ((.Values.config).server).port | default 8490  }}
             - containerPort: {{ . }}
               name: http
+            {{- end }}
+            {{- $pull := ((.Values.config).monitoring).pull | default dict }}
+            {{- if and $pull.enabled $pull.port }}
+            - containerPort: {{ $pull.port }}
+              name: monitoring-http
             {{- end }}
           {{- with .Values.command }}
           command: {{ toYaml . | nindent 12 }}

@@ -1,0 +1,36 @@
+suite: ports tests
+set:
+  license.key: dummy
+  config.reader.datasource_url: http://x
+  config.writer.datasource_url: http://x
+  config.reader.queries.q.expr: up
+templates:
+  - server.yaml
+  - monitor.yaml
+  - configmap.yaml
+tests:
+  - it: exposes only the http port by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - containerPort: 8490
+              name: http
+        template: server.yaml
+
+  - it: exposes monitoring-http and scrapes it when pull monitoring is enabled
+    set:
+      config.monitoring.pull.enabled: true
+      config.monitoring.pull.port: 8491
+      podMonitor.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            containerPort: 8491
+            name: monitoring-http
+        template: server.yaml
+      - equal:
+          path: spec.podMetricsEndpoints[0].port
+          value: monitoring-http
+        template: monitor.yaml

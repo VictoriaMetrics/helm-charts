@@ -1,0 +1,263 @@
+suite: labels and selectors
+set:
+  serviceAccount.create: true
+  storageNodes[0]: http://x:9428
+  vlselect.enabled: true
+  vlselect.horizontalPodAutoscaler.enabled: true
+  vlselect.ingress.enabled: true
+  vlselect.networkPolicy.enabled: true
+  vlselect.podDisruptionBudget.enabled: true
+  vlselect.route.enabled: true
+  vlselect.service.enabled: true
+  vlselect.vmServiceScrape.enabled: true
+  vmauth.enabled: true
+  vmauth.horizontalPodAutoscaler.enabled: true
+  vmauth.ingress.enabled: true
+  vmauth.networkPolicy.enabled: true
+  vmauth.podDisruptionBudget.enabled: true
+  vmauth.route.enabled: true
+  vmauth.service.enabled: true
+  vmauth.vmServiceScrape.enabled: true
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - networkpolicy.yaml
+  - pdb.yaml
+  - scrape.yaml
+  - service.yaml
+  - vlselect-server.yaml
+  - vmauth-server.yaml
+  - hpa.yaml
+  - ingress.yaml
+  - route.yaml
+  - serviceaccount.yaml
+  - vmauth-config.yaml
+tests:
+  - it: "selectors match pod labels with operator naming"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: vlselect-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: vlselect-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: vmauth-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+  - it: "selectors match pod labels with legacy naming"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+      - equal:
+          path: spec.selector
+          value:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+      - equal:
+          path: spec.selector
+          value:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: vlselect-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: vlselect-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: vmauth-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vlselect
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-multilevel
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-multilevel-vmauth

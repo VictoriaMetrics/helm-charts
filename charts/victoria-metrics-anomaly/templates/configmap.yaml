@@ -10,8 +10,8 @@
 {{- $defaultSettings := dict "settings" (dict "restore_state" .Values.persistentVolume.enabled) }}
 {{- $resultingConfig := mergeOverwrite $defaultSettings ($app.config | default dict) }}
 
-{{- $ctx := dict "helm" . }}
-{{- $fullname := include "vm.fullname" $ctx }}
+{{- $ctx := dict "helm" . "kindOverride" "vmanomaly" }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
 ---
 apiVersion: v1
 kind: ConfigMap

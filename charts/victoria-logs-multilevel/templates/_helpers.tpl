@@ -78,3 +78,7 @@
   targetPort: {{ .targetPort }}
 {{- end }}
 {{- end -}}
+
+{{- define "vlmultilevel.sa.name" -}}
+  {{- tpl ((.Values.serviceAccount).name | default (include "vm.plain.fullname" (dict "helm" . "kindOverride" "vlmultilevel"))) . -}}
+{{- end -}}
