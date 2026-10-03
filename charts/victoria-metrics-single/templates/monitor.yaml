@@ -1,7 +1,7 @@
 {{- $app := .Values.server }}
 {{- if and $app.enabled $app.serviceMonitor.enabled -}}
 {{- $serviceMonitor := $app.serviceMonitor -}}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmsingle" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $port := "http" -}}
 {{- range $app.http -}}

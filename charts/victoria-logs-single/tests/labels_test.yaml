@@ -1,0 +1,160 @@
+suite: labels and selectors
+set:
+  networkPolicy.enabled: true
+  podDisruptionBudget.enabled: true
+  server.ingress.enabled: true
+  server.mode: deployment
+  server.persistentVolume.enabled: true
+  server.route.enabled: true
+  server.service.enabled: true
+  server.serviceMonitor.enabled: true
+  serviceAccount.create: true
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - monitor.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - server.yaml
+  - service.yaml
+  - ingress.yaml
+  - pvc.yaml
+  - route.yaml
+  - serviceaccount.yaml
+tests:
+  - it: "selectors match pod labels with operator naming"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlsingle
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlsingle
+        template: pdb.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlsingle
+        template: service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlsingle
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlsingle
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlsingle
+        template: monitor.yaml
+  - it: "selectors match pod labels with legacy naming"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-single
+        template: networkpolicy.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-single
+        template: pdb.yaml
+      - equal:
+          path: spec.selector
+          value:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-single
+        template: service.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-single
+        template: server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-single
+        template: server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-single
+        template: monitor.yaml
+  - it: "VMServiceScrape selects the Service with operator naming"
+    set:
+      useLegacyNaming: false
+      server.serviceMonitor.enabled: false
+      server.vmServiceScrape.enabled: true
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlsingle
+        template: monitor.yaml
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlsingle
+        template: service.yaml
+  - it: "VMServiceScrape selects the Service with legacy naming"
+    set:
+      useLegacyNaming: true
+      server.serviceMonitor.enabled: false
+      server.vmServiceScrape.enabled: true
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-single
+        template: monitor.yaml
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/component: server
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-single
+        template: service.yaml

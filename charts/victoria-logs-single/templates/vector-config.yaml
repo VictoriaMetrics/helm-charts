@@ -3,7 +3,7 @@
 {{- $defaultConfig := $vector.customConfigName }}
 {{- if and (or $vector.enabled $vector.customConfigNamespace) (has $defaultConfig $vector.existingConfigMaps) }}
   {{- $config := ($vector).customConfig | default dict }}
-  {{- $ctx := dict "helm" . "appKey" "server" "style" "plain" }}
+  {{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vlsingle" "style" "plain" }}
   {{- if $app.enabled }}
     {{- $port := int $app.service.servicePort -}}
     {{- range $sinkName, $sinkConfig := $config.sinks }}

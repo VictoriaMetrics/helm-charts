@@ -1,10 +1,16 @@
-{{- $storageName := "server-volume" }}
 {{- $app := .Values.server }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
 {{- if and $mode $app.enabled (hasKey $app $mode) }}
 {{- $modeOpts := index $app $mode }}
-{{- $ctx := dict "helm" . "appKey" "server" }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmsingle" }}
+{{- if and (eq $mode "statefulSet") (eq (include "vm.useLegacyNaming" $ctx) "false") }}
+  {{- fail "`server.mode: statefulSet` is not supported with `useLegacyNaming: false`. Use `server.mode: deployment`, which matches the VictoriaMetrics operator" -}}
+{{- end }}
+{{- $storageName := include "vmsingle.volume.name" $ctx }}
+{{- if and (eq $mode "statefulSet") $pvc.enabled (not $pvc.existingClaim) $pvc.name }}
+  {{- $storageName = tpl $pvc.name $ctx }}
+{{- end }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
@@ -181,11 +187,11 @@ spec:
               {{- end }}
             {{- end }}
             {{- if $app.scrape.enabled }}
-            - name: scrapeconfig
+            - name: config-out
               mountPath: /scrapeconfig
             {{- end }}
             {{- if $app.relabel.enabled }}
-            - name: relabelconfig
+            - name: relabelings-assets
               mountPath: /relabelconfig
             {{- end }}
             {{- range $app.extraHostPathMounts }}
@@ -291,12 +297,12 @@ spec:
       terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
       volumes:
         {{- if $app.scrape.enabled }}
-        - name: scrapeconfig
+        - name: config-out
           configMap:
             name: {{ include "vmsingle.scrape.config.name" $ctx }}
         {{- end }}
         {{- if $app.relabel.enabled }}
-        - name: relabelconfig
+        - name: relabelings-assets
           configMap:
             name: {{ include "vmsingle.relabel.config.name" $ctx }}
         {{- end }}
