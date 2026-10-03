@@ -18,7 +18,11 @@ spec:
   {{- with $service.trafficDistribution }}
   trafficDistribution: {{ . }}
   {{- end }}
-  {{- with $service.clusterIP }}
+  {{- $clusterIP := $service.clusterIP }}
+  {{- if kindIs "invalid" $clusterIP }}
+    {{- $clusterIP = ternary "" "None" (eq (include "vm.useLegacyNaming" $ctx) "false") }}
+  {{- end }}
+  {{- with $clusterIP }}
   clusterIP: {{ . }}
   {{- end }}
   {{- with $service.externalIPs }}
@@ -45,7 +49,7 @@ spec:
   {{- end }}
   ports:
     {{- $httpAddr := ($app.extraArgs | default dict).httpListenAddr -}}
-    {{- range ternary $app.http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
+    {{- range ternary (fromYamlArray (include "vmalert.http" $ctx)) (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
     - name: {{ .name }}
       {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "8880") }}
       port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}

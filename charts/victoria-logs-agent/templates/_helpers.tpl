@@ -63,3 +63,7 @@ It matches the name used by the VictoriaMetrics operator when legacy naming is d
 {{- define "vlagent.volume.name" -}}
   {{- ternary "tmp-data" "vl-agent-data" (eq (include "vm.useLegacyNaming" .) "false") -}}
 {{- end -}}
+
+{{- define "vlagent.sa.name" -}}
+  {{- tpl ((.Values.serviceAccount).name | default (include "vm.plain.fullname" (dict "helm" . "kindOverride" "vlagent"))) . -}}
+{{- end -}}

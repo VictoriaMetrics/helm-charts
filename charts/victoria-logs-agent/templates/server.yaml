@@ -33,6 +33,10 @@ spec:
       {{- end }}
       {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
+      {{- if or .Values.serviceAccount.name .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "vlagent.sa.name" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountToken }}
+      {{- end }}
       {{- with (.Values.imagePullSecrets | default (.Values.global).imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}

@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `serviceAccount` options. A dedicated ServiceAccount is created by default and the API token isn't mounted (`serviceAccount.automountToken: false`), as vlagent doesn't access the Kubernetes API. Pods are restarted once on upgrade.
 
 ## v0.2.10
 

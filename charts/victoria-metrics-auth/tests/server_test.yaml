@@ -39,13 +39,13 @@ tests:
         contains:
           path: spec.template.spec.containers[0].volumeMounts
           content:
-            name: config
+            name: config-out
             mountPath: /config
       - template: server.yaml
         contains:
           path: spec.template.spec.volumes
           content:
-            name: config
+            name: config-out
             secret:
               secretName: RELEASE-NAME-victoria-metrics-auth
       - template: server.yaml
@@ -68,7 +68,7 @@ tests:
         contains:
           path: spec.template.spec.volumes
           content:
-            name: config
+            name: config-out
             secret:
               secretName: my-auth-config
 

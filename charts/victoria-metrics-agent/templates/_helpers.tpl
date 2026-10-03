@@ -50,7 +50,9 @@
       {{- end -}}
     {{- end -}}
   {{- end -}}
-  {{- toYaml $rwcm -}}
+  {{- if $rwcm -}}
+    {{- toYaml $rwcm -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "vmagent.scrape.config.name" -}}

@@ -53,7 +53,7 @@ spec:
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
-    - name: web
+    - name: {{ include "alertmanager.service.portName" $ctx }}
       port: {{ $service.servicePort }}
       targetPort: web
       protocol: TCP

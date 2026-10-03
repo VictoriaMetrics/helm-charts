@@ -243,19 +243,6 @@ deployment should match snapshot:
       name: RELEASE-NAME-victoria-metrics-agent-config
       namespace: NAMESPACE
   2: |
-    apiVersion: v1
-    data: {}
-    kind: ConfigMap
-    metadata:
-      labels:
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: victoria-metrics-agent
-        app.kubernetes.io/version: 0.1.0
-        helm.sh/chart: victoria-metrics-agent-0.1.1
-      name: RELEASE-NAME-victoria-metrics-agent-rw
-      namespace: NAMESPACE
-  3: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -277,7 +264,7 @@ deployment should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: a12af7657b10525f4ee5a56c56d444490009e14fd95d9714e7a646917bc663a1
+            checksum/config: f1b5a102c026e0f9faae2bc6c5af5d0b97cb46882f3a86f8fdf84aaf6f8ee8c4
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -323,17 +310,12 @@ deployment should match snapshot:
                   name: tmpdata
                 - mountPath: /config/scrape
                   name: config-out
-                - mountPath: /config/rw
-                  name: relabelings-assets
               workingDir: /
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-agent
           volumes:
             - emptyDir: {}
               name: tmpdata
-            - configMap:
-                name: RELEASE-NAME-victoria-metrics-agent-rw
-              name: relabelings-assets
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-config
               name: config-out
@@ -582,19 +564,6 @@ deployment with volume should match snapshot:
       name: RELEASE-NAME-victoria-metrics-agent-config
       namespace: NAMESPACE
   2: |
-    apiVersion: v1
-    data: {}
-    kind: ConfigMap
-    metadata:
-      labels:
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: victoria-metrics-agent
-        app.kubernetes.io/version: 0.1.0
-        helm.sh/chart: victoria-metrics-agent-0.1.1
-      name: RELEASE-NAME-victoria-metrics-agent-rw
-      namespace: NAMESPACE
-  3: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -616,7 +585,7 @@ deployment with volume should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: a12af7657b10525f4ee5a56c56d444490009e14fd95d9714e7a646917bc663a1
+            checksum/config: f1b5a102c026e0f9faae2bc6c5af5d0b97cb46882f3a86f8fdf84aaf6f8ee8c4
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -662,8 +631,6 @@ deployment with volume should match snapshot:
                   name: tmpdata
                 - mountPath: /config/scrape
                   name: config-out
-                - mountPath: /config/rw
-                  name: relabelings-assets
               workingDir: /
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-agent
@@ -671,9 +638,6 @@ deployment with volume should match snapshot:
             - name: tmpdata
               persistentVolumeClaim:
                 claimName: RELEASE-NAME-victoria-metrics-agent
-            - configMap:
-                name: RELEASE-NAME-victoria-metrics-agent-rw
-              name: relabelings-assets
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-config
               name: config-out
@@ -922,19 +886,6 @@ statefulset should match snapshot:
       name: RELEASE-NAME-victoria-metrics-agent-config
       namespace: NAMESPACE
   2: |
-    apiVersion: v1
-    data: {}
-    kind: ConfigMap
-    metadata:
-      labels:
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: victoria-metrics-agent
-        app.kubernetes.io/version: 0.1.0
-        helm.sh/chart: victoria-metrics-agent-0.1.1
-      name: RELEASE-NAME-victoria-metrics-agent-rw
-      namespace: NAMESPACE
-  3: |
     apiVersion: apps/v1
     kind: StatefulSet
     metadata:
@@ -956,7 +907,7 @@ statefulset should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: a12af7657b10525f4ee5a56c56d444490009e14fd95d9714e7a646917bc663a1
+            checksum/config: f1b5a102c026e0f9faae2bc6c5af5d0b97cb46882f3a86f8fdf84aaf6f8ee8c4
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -1002,17 +953,12 @@ statefulset should match snapshot:
                   name: tmpdata
                 - mountPath: /config/scrape
                   name: config-out
-                - mountPath: /config/rw
-                  name: relabelings-assets
               workingDir: /
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-agent
           volumes:
             - emptyDir: {}
               name: tmpdata
-            - configMap:
-                name: RELEASE-NAME-victoria-metrics-agent-rw
-              name: relabelings-assets
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-config
               name: config-out
@@ -1262,19 +1208,6 @@ statefulset with volume should match snapshot:
       name: RELEASE-NAME-victoria-metrics-agent-config
       namespace: NAMESPACE
   2: |
-    apiVersion: v1
-    data: {}
-    kind: ConfigMap
-    metadata:
-      labels:
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: victoria-metrics-agent
-        app.kubernetes.io/version: 0.1.0
-        helm.sh/chart: victoria-metrics-agent-0.1.1
-      name: RELEASE-NAME-victoria-metrics-agent-rw
-      namespace: NAMESPACE
-  3: |
     apiVersion: apps/v1
     kind: StatefulSet
     metadata:
@@ -1296,7 +1229,7 @@ statefulset with volume should match snapshot:
       template:
         metadata:
           annotations:
-            checksum/config: a12af7657b10525f4ee5a56c56d444490009e14fd95d9714e7a646917bc663a1
+            checksum/config: f1b5a102c026e0f9faae2bc6c5af5d0b97cb46882f3a86f8fdf84aaf6f8ee8c4
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
@@ -1342,15 +1275,10 @@ statefulset with volume should match snapshot:
                   name: tmpdata
                 - mountPath: /config/scrape
                   name: config-out
-                - mountPath: /config/rw
-                  name: relabelings-assets
               workingDir: /
           securityContext: {}
           serviceAccountName: RELEASE-NAME-victoria-metrics-agent
           volumes:
-            - configMap:
-                name: RELEASE-NAME-victoria-metrics-agent-rw
-              name: relabelings-assets
             - configMap:
                 name: RELEASE-NAME-victoria-metrics-agent-config
               name: config-out

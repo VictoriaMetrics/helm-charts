@@ -98,7 +98,7 @@ spec:
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: config
+            - name: config-out
               mountPath: /config
             {{- range $app.extraHostPathMounts }}
             - name: {{ .name }}
@@ -144,7 +144,7 @@ spec:
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: config
+        - name: config-out
           secret:
             secretName: {{ $app.secretName | default (include "vmauth.config.name" $ctx) }}
         {{- range $app.extraHostPathMounts }}
