@@ -75,6 +75,47 @@ backwards compatibility with existing deployments.
 > [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) convention and
 > simplifies future migration to operator-managed resources.
 
+### VictoriaMetrics operator
+
+With `operator.enabled: true` the chart renders a [VMSingle](https://docs.victoriametrics.com/operator/resources/vmsingle/) resource
+instead of its own Deployment/StatefulSet, Service, ServiceAccount and scrape/relabel ConfigMaps,
+and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) manages the workload.
+The operator must already be installed in the cluster. Operator mode always uses operator-style names, regardless of `useLegacyNaming`.
+
+The VMSingle is named after the release (or `fullnameOverride`), so the operator creates `vmsingle-<release>` objects.
+Ingress, HTTPRoute and PodDisruptionBudget are still rendered by the chart and target them. Instead of rendering its own scrape object, the chart lets the operator create the VMServiceScrape when `server.serviceMonitor.enabled` is enabled, and disables it otherwise.
+
+The spec is built from the `server` values: image, replicas, resources, scheduling, env, extra args, volumes, containers,
+pod metadata, security context, HTTP listen port, retention period, Service settings, service account and license.
+In addition:
+
+- `networkPolicy` ingress and egress rules become the resource `networkPolicy`, and the operator creates the NetworkPolicy. Its labels and annotations can't be set;
+- the chart keeps managing the `server.persistentVolume` claim (or uses `existingClaim`) and passes it to the VMSingle as its data volume,
+  mounted at `server.persistentVolume.mountPath`. A release that ran with a chart-managed claim keeps its data after switching to the operator;
+- `server.relabel` becomes `inlineRelabelConfig`, or `relabelConfig` for `server.relabel.configMap`;
+- `server.vmbackupmanager` becomes `vmBackup`. Unlike the chart, the operator doesn't append the pod name to `destination`;
+- `server.scrape.config.scrape_configs` and `server.scrape.extraScrapeConfigs` jobs become [VMScrapeConfig](https://docs.victoriametrics.com/operator/resources/vmscrapeconfig/)
+  resources selected by the VMSingle, and `scrape_interval`, `scrape_timeout` and `external_labels` of `server.scrape.config.global`
+  become VMSingle fields. Each job keeps its `job` label.
+
+Rendering fails for settings without an operator equivalent: `server.scrape.configMap`, other `global` scrape settings,
+and scrape job options such as inline credentials (`basic_auth`, `bearer_token`) or service discovery types other than
+Kubernetes, static, file, DNS and HTTP. Create the corresponding operator resources yourself in that case.
+
+Fields that have no chart value, or need a different value, go to `operator.spec`, which is deep-merged over the generated spec:
+
+```yaml
+operator:
+  enabled: true
+  spec:
+    logLevel: WARN
+    useStrictSecurity: true
+    extraArgs:
+      search.maxUniqueTimeseries: "1000000"
+```
+
+Probes keep the operator defaults, and the HTTP port follows the primary `server.http` listener. Switching a release to `operator.enabled: true` recreates its pod.
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.

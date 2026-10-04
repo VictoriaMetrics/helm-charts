@@ -6,6 +6,7 @@
 - fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 - rename config volumes to match the VictoriaMetrics operator: `scrapeconfig` to `config-out` and `relabelconfig` to `relabelings-assets`. Pods with scrape or relabel config enabled are restarted once on upgrade.
 - added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy VictoriaMetrics single through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VMSingle` resource built from `server` values instead of its own workload, Service and ServiceAccount, keeps managing the storage claim, and converts scrape jobs into `VMScrapeConfig` resources. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-metrics-single/#victoriametrics-operator).
 
 ## v0.48.0
 

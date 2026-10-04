@@ -1,0 +1,116 @@
+{{- $app := .Values.server }}
+{{- if include "vm.operator.enabled" . }}
+{{- if empty $app.datasource.url }}
+  {{- fail "server.datasource.url datasource URL must be specified" }}
+{{- end }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmalert" }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "appKey" "server" "app" $app)) }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- $http := fromYamlArray (include "vmalert.http" $ctx) }}
+{{- $addr := $extraArgs.httpListenAddr | default (include "vm.addr.primary" $http) }}
+{{- $_ := unset $extraArgs "httpListenAddr" }}
+{{- range $flag, $value := fromYaml (include "vm.http.args" $http) }}
+  {{- if ne $flag "httpListenAddr" }}
+    {{- $_ := set $extraArgs $flag (toString $value) }}
+  {{- end }}
+{{- end }}
+{{- $_ := set $spec "port" (include "vm.port.from.flag" (dict "flag" $addr)) }}
+{{- $rulePaths := list }}
+{{- range ($app.extraArgs.rule | default list) }}
+  {{- if ne . "/config/alert-rules.yaml" }}
+    {{- $rulePaths = append $rulePaths . }}
+  {{- end }}
+{{- end }}
+{{- $_ := unset $extraArgs "rule" }}
+{{- with $app.configMap }}
+  {{- $_ := set $spec "configMaps" (append ($spec.configMaps | default list) .) }}
+  {{- $rulePaths = append $rulePaths (printf "/etc/vm/configs/%s/*" .) }}
+{{- end }}
+{{- with $rulePaths }}
+  {{- $_ := set $spec "rulePath" . }}
+{{- end }}
+{{- if $extraArgs }}
+  {{- $_ := set $spec "extraArgs" $extraArgs }}
+{{- else }}
+  {{- $_ := unset $spec "extraArgs" }}
+{{- end }}
+{{- $_ := set $spec "datasource" (fromYaml (include "vm.operator.http.endpoint" (dict "endpoint" (fromYaml (include "vmalert.fromLegacyArgs" $app.datasource)) "path" "server.datasource"))) }}
+{{- range $name, $passthrough := dict "remoteWrite" (list "concurrency" "flushInterval" "maxBatchSize" "maxQueueSize") "remoteRead" (list "lookback") }}
+  {{- $current := deepCopy ((index $app $name) | default dict) }}
+  {{- $legacy := fromYaml (include "vmalert.fromLegacyArgs" (index ($app.remote | default dict) (ternary "write" "read" (eq $name "remoteWrite")))) }}
+  {{- $merged := mergeOverwrite $current $legacy }}
+  {{- if $merged.url }}
+    {{- $_ := set $spec $name (fromYaml (include "vm.operator.http.endpoint" (dict "endpoint" $merged "path" (printf "server.%s" $name) "passthrough" $passthrough))) }}
+  {{- end }}
+{{- end }}
+{{- $notifiers := list }}
+{{- range $i, $raw := ($app.notifiers | default list) }}
+  {{- $n := mergeOverwrite (deepCopy (omit ($raw | default dict) "alertmanager")) (fromYaml (include "vmalert.fromLegacyArgs" ($raw).alertmanager)) }}
+  {{- $notifiers = append $notifiers (fromYaml (include "vm.operator.http.endpoint" (dict "endpoint" $n "path" (printf "server.notifiers[%d]" $i)))) }}
+{{- end }}
+{{- $notifier := mergeOverwrite (deepCopy (omit ($app.notifier | default dict) "alertmanager")) (fromYaml (include "vmalert.fromLegacyArgs" ($app.notifier).alertmanager)) }}
+{{- if kindIs "slice" $notifier.url }}
+  {{- range $notifier.url }}
+    {{- $notifiers = append $notifiers (fromYaml (include "vm.operator.http.endpoint" (dict "endpoint" (merge (dict "url" .) (omit $notifier "url")) "path" "server.notifier"))) }}
+  {{- end }}
+{{- else if $notifier.url }}
+  {{- $notifiers = append $notifiers (fromYaml (include "vm.operator.http.endpoint" (dict "endpoint" $notifier "path" "server.notifier"))) }}
+{{- else if .Values.alertmanager.enabled }}
+  {{- $amSelector := fromYaml (include "vm.selectorLabels" (dict "helm" . "appKey" "alertmanager" "kindOverride" "vmalertmanager")) }}
+  {{- $notifiers = append $notifiers (dict "selector" (dict "labelSelector" (dict "matchLabels" $amSelector))) }}
+{{- end }}
+{{- with $notifiers }}
+  {{- $_ := set $spec "notifiers" . }}
+{{- end }}
+{{- $selector := fromYaml (include "vm.selectorLabels" $ctx) }}
+{{- $_ := set $spec "ruleSelector" (dict "matchLabels" $selector) }}
+{{- with $app.strategy }}
+  {{- with .type }}
+    {{- $_ := set $spec "updateStrategy" . }}
+  {{- end }}
+  {{- with .rollingUpdate }}
+    {{- $_ := set $spec "rollingUpdate" . }}
+  {{- end }}
+{{- end }}
+{{- $pdb := $app.podDisruptionBudget }}
+{{- if $pdb.enabled }}
+  {{- $budget := dict }}
+  {{- range $key := list "minAvailable" "maxUnavailable" "unhealthyPodEvictionPolicy" }}
+    {{- with index $pdb $key }}
+      {{- $_ := set $budget $key . }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $spec "podDisruptionBudget" $budget }}
+{{- end }}
+{{- $vpa := $app.verticalPodAutoscaler }}
+{{- if $vpa.enabled }}
+  {{- $_ := set $spec "vpa" (omit $vpa "enabled") }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.self.scrape" (dict "scrape" .Values.serviceMonitor "path" "serviceMonitor"))) }}
+{{- with (include "vm.operator.service.spec" (dict "service" $app.service)) }}
+  {{- $_ := set $spec "serviceSpec" (fromYaml .) }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.server.networkPolicy "path" "server.networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlert
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- with $app.config.alerts.groups }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+spec:
+  groups: {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}

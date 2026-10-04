@@ -389,5 +389,20 @@ route:
         type: PathPrefix
         value: '/'
 
+# Deploy vmanomaly through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-metrics-anomaly/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VMAnomaly](https://docs.victoriametrics.com/operator/resources/vmanomaly/) resource built from chart values
+  # instead of the chart's own Deployment/StatefulSet, config ConfigMap, PodDisruptionBudget and VMPodScrape.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VMAnomaly labels
+  labels: {}
+  # -- VMAnomaly annotations
+  annotations: {}
+  # -- VMAnomaly spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VMAnomalySpec](https://docs.victoriametrics.com/operator/api/#vmanomalyspec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []

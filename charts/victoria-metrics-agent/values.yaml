@@ -823,6 +823,21 @@ probe:
   # -- Startup probe
   startup: {}
 
+# Deploy vmagent through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-metrics-agent/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VMAgent](https://docs.victoriametrics.com/operator/resources/vmagent/) resource built from chart values
+  # instead of the chart's own Deployment/StatefulSet/DaemonSet, Service, ServiceAccount, RBAC, scrape and remote write ConfigMaps, PodDisruptionBudget, HPA and VPA.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VMAgent labels
+  labels: {}
+  # -- VMAgent annotations
+  annotations: {}
+  # -- VMAgent spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VMAgentSpec](https://docs.victoriametrics.com/operator/api/#vmagentspec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 

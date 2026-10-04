@@ -532,6 +532,21 @@ vector:
             AccountID: "0"
             ProjectID: "0"
 
+# Deploy VictoriaLogs single through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-logs-single/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VLSingle](https://docs.victoriametrics.com/operator/resources/vlsingle/) resource built from `server` values
+  # instead of the chart's own Deployment/StatefulSet, Service and ServiceAccount.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VLSingle labels
+  labels: {}
+  # -- VLSingle annotations
+  annotations: {}
+  # -- VLSingle spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VLSingleSpec](https://docs.victoriametrics.com/operator/api/#vlsinglespec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 

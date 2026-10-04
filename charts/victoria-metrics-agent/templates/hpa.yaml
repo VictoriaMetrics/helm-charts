@@ -1,5 +1,5 @@
 {{- $hpa := .Values.horizontalPodAutoscaler }}
-{{- if $hpa.enabled }}
+{{- if and $hpa.enabled (not (include "vm.operator.enabled" .)) }}
 {{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

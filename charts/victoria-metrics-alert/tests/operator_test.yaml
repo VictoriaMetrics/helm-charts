@@ -1,0 +1,311 @@
+suite: operator mode
+templates:
+  - alert-networkpolicy.yaml
+  - monitor.yaml
+  - vmalert.yaml
+  - vmalertmanager.yaml
+  - alert-server.yaml
+  - alert-service.yaml
+  - alert-configmap.yaml
+  - alertmanager-server.yaml
+  - alertmanager-service.yaml
+  - alertmanager-secret.yaml
+  - alertmanager-pvc.yaml
+  - serviceaccount.yaml
+set:
+  operator.enabled: true
+  server.datasource.url: http://vmsingle:8428
+  server.config.alerts.groups:
+    - name: test
+      rules:
+        - alert: AlwaysFiring
+          expr: vector(1)
+tests:
+  - it: doesn't render operator resources by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vmalert.yaml
+
+  - it: renders a VMAlert and a VMRule instead of the chart workload
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+      - equal:
+          path: spec.groups[0].rules[0].alert
+          value: AlwaysFiring
+        documentSelector:
+          path: kind
+          value: VMRule
+        template: vmalert.yaml
+      - equal:
+          path: spec.ruleSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmalert
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+      - hasDocuments:
+          count: 0
+        template: alert-server.yaml
+      - hasDocuments:
+          count: 0
+        template: alert-service.yaml
+      - hasDocuments:
+          count: 0
+        template: alert-configmap.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+
+  - it: converts datasource, legacy remote write and notifier endpoints
+    set:
+      server.datasource.tlsInsecureSkipVerify: true
+      server.remote.write.url: http://vminsert:8480
+      server.remote.write.bearer.tokenFile: /token
+      server.notifier.alertmanager.url: http://am:9093
+    asserts:
+      - equal:
+          path: spec.datasource
+          value:
+            url: http://vmsingle:8428
+            tlsConfig:
+              insecureSkipVerify: true
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+      - equal:
+          path: spec.remoteWrite
+          value:
+            url: http://vminsert:8480
+            bearerTokenFile: /token
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+      - equal:
+          path: spec.notifiers
+          value:
+            - url: http://am:9093
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+
+  - it: rejects inline credentials
+    set:
+      server.datasource.basicAuth.password: secret
+    asserts:
+      - failedTemplate:
+          errorPattern: "`server.datasource.basicAuth.password` is not converted"
+        template: vmalert.yaml
+
+  - it: selects the bundled VMAlertmanager as notifier
+    set:
+      alertmanager.enabled: true
+    asserts:
+      - equal:
+          path: spec.notifiers
+          value:
+            - selector:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: monitoring
+                    app.kubernetes.io/instance: RELEASE-NAME
+                    app.kubernetes.io/name: vmalertmanager
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+
+  - it: mounts an existing rules ConfigMap
+    set:
+      server.configMap: my-rules
+    asserts:
+      - equal:
+          path: spec.configMaps
+          value: [my-rules]
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+      - equal:
+          path: spec.rulePath
+          value: [/etc/vm/configs/my-rules/*]
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+
+  - it: renders a VMAlertmanager with config and templates
+    set:
+      alertmanager.enabled: true
+      alertmanager.baseURL: https://am.example.com
+      alertmanager.templates:
+        custom.tmpl: x
+    asserts:
+      - isKind:
+          of: VMAlertmanager
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: vmalertmanager.yaml
+      - equal:
+          path: spec.externalURL
+          value: https://am.example.com
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: vmalertmanager.yaml
+      - exists:
+          path: spec.configRawYaml
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: vmalertmanager.yaml
+      - equal:
+          path: spec.templates
+          value:
+            - name: vmalertmanager-RELEASE-NAME-templates
+              key: custom.tmpl
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: vmalertmanager.yaml
+      - equal:
+          path: data["custom.tmpl"]
+          value: x
+        documentSelector:
+          path: kind
+          value: ConfigMap
+        template: vmalertmanager.yaml
+      - hasDocuments:
+          count: 0
+        template: alertmanager-server.yaml
+      - hasDocuments:
+          count: 0
+        template: alertmanager-secret.yaml
+      - hasDocuments:
+          count: 0
+        template: alertmanager-service.yaml
+
+  - it: references an existing Alertmanager config Secret
+    set:
+      alertmanager.enabled: true
+      alertmanager.configSecret: my-am-config
+    asserts:
+      - equal:
+          path: spec.configSecret
+          value: my-am-config
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: vmalertmanager.yaml
+      - notExists:
+          path: spec.configRawYaml
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: vmalertmanager.yaml
+
+  - it: keeps the Alertmanager claim in deployment mode
+    set:
+      alertmanager.enabled: true
+      alertmanager.persistentVolume.enabled: true
+    asserts:
+      - equal:
+          path: spec.volumes
+          value:
+            - name: vmalertmanager-RELEASE-NAME-db
+              persistentVolumeClaim:
+                claimName: vmalertmanager-RELEASE-NAME
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: vmalertmanager.yaml
+      - isKind:
+          of: PersistentVolumeClaim
+        template: alertmanager-pvc.yaml
+
+  - it: uses a claim template in statefulSet mode
+    set:
+      alertmanager.enabled: true
+      alertmanager.mode: statefulSet
+      alertmanager.persistentVolume.enabled: true
+    asserts:
+      - equal:
+          path: spec.storage.volumeClaimTemplate.metadata.name
+          value: vmalertmanager-RELEASE-NAME-db
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: vmalertmanager.yaml
+
+  - it: disables the operator self-scrape while the chart scrape toggle is off
+    asserts:
+      - equal:
+          path: spec.disableSelfServiceScrape
+          value: true
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+
+  - it: lets the operator scrape it instead of rendering the chart scrape object
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - notExists:
+          path: spec.disableSelfServiceScrape
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      server.networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        documentSelector:
+          path: kind
+          value: VMAlert
+        template: vmalert.yaml
+      - hasDocuments:
+          count: 0
+        template: alert-networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      server.networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`server.networkPolicy.labels` is not converted"
+        template: vmalert.yaml
+

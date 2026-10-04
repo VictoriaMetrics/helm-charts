@@ -68,6 +68,21 @@ extraSecrets:
   #   data: |
   #     credentials: b64_encoded_str
 
+# Deploy the VictoriaMetrics cluster through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-metrics-cluster/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VMCluster](https://docs.victoriametrics.com/operator/resources/vmcluster/) resource built from `vmstorage`, `vmselect` and `vminsert` values
+  # instead of the chart's own vmstorage, vmselect and vminsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VMCluster labels
+  labels: {}
+  # -- VMCluster annotations
+  annotations: {}
+  # -- VMCluster spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VMClusterSpec](https://docs.victoriametrics.com/operator/api/#vmclusterspec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 

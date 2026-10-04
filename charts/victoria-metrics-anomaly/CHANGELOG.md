@@ -6,6 +6,7 @@
 - fix `persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 - add the `monitoring-http` container port when `config.monitoring.pull` is enabled, matching the VictoriaMetrics operator.
 - fix `PodMonitor` scraping a non-existent `metrics` port: it now targets `monitoring-http`.
+- add `operator.enabled` to deploy vmanomaly through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VMAnomaly` resource built from chart values instead of its own Deployment/StatefulSet, Service, config ConfigMap, PodDisruptionBudget and VMPodScrape. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-metrics-anomaly/#victoriametrics-operator).
 
 ## v1.12.18
 

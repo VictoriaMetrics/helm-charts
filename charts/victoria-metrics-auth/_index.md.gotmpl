@@ -68,6 +68,37 @@ backwards compatibility with existing deployments.
 > [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) convention and
 > simplifies future migration to operator-managed resources.
 
+### VictoriaMetrics operator
+
+With `operator.enabled: true` the chart renders a [VMAuth](https://docs.victoriametrics.com/operator/resources/vmauth/) resource
+instead of its own Deployment, Service, ServiceAccount and PodDisruptionBudget,
+and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) manages the workload.
+The operator must already be installed in the cluster. Operator mode always uses operator-style names, regardless of `useLegacyNaming`.
+
+The VMAuth is named after the release (or `fullnameOverride`), so the operator creates `vmauth-<release>` objects.
+`ingressInternal` is still rendered by the chart and targets it. Instead of rendering its own scrape object, the chart lets the operator create the VMServiceScrape when `serviceMonitor.enabled` is enabled, and disables it otherwise.
+
+The spec is built from chart values: image, replicas, resources, scheduling, env, extra args, volumes, containers,
+pod metadata, security context, HTTP listen port, Service settings, service account and license. In addition:
+
+- `networkPolicy` ingress and egress rules become the resource `networkPolicy`, and the operator creates the NetworkPolicy. Its labels and annotations can't be set;
+- `ingress` becomes the VMAuth `ingress` (first host and TLS entry as `host`/`tlsSecretName`, other hosts as `extraRules`) and `route` becomes `httpRoute`; the operator creates both;
+- the chart keeps rendering `config` (or `configRaw`) into a Secret named `vmauth-<release>-config`, and the VMAuth uses it as `externalConfig`, so vmauth runs with the same config. `secretName` is referenced the same way;
+- `podDisruptionBudget` becomes a VMAuth field, and the operator creates the PodDisruptionBudget;
+- only `mode: deployment` is supported by the VMAuth.
+
+Fields that have no chart value, or need a different value, go to `operator.spec`, which is deep-merged over the generated spec:
+
+```yaml
+operator:
+  enabled: true
+  spec:
+    useProxyProtocol: true
+```
+
+Rendering fails for settings that have no operator equivalent, with a message pointing to `operator.spec`.
+Probes keep the operator defaults. Switching a release to `operator.enabled: true` recreates its pods.
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.

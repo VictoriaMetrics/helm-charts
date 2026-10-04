@@ -5,6 +5,17 @@
 {{- $_ := set $ctx "extraLabels" $ingress.extraLabels }}
 {{- $_ := set $ctx "appKey" $name }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- $balanced := and (eq $name "vmauth") (include "vm.operator.enabled" $) }}
+{{- $targets := dict }}
+{{- if $balanced }}
+  {{- range $component := list "vminsert" "vmselect" }}
+    {{- $target := index $.Values $component }}
+    {{- if $target.enabled }}
+      {{- $port := $target.service.servicePort | default (include "vm.port.from.flag" (dict "flag" (($target.extraArgs | default dict).httpListenAddr | default (include "vm.addr.primary" $target.http)))) }}
+      {{- $_ := set $targets (printf "/%s" (trimPrefix "vm" $component)) (dict "name" (include "vm.plain.fullname" (dict "helm" $ "appKey" $component)) "port" (dict "number" (int $port))) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -25,18 +36,36 @@ spec:
   rules:
     {{- range $host := $app.ingress.hosts }}
     {{- $paths := ternary (list $host.path) $host.path (kindIs "string" $host.path) }}
+    {{- $backends := list }}
+    {{- range $path := $paths }}
+      {{- if not $balanced }}
+        {{- $backends = append $backends (dict "path" $path "name" $fullname "port" (fromYaml (include "vm.ingress.port" $host))) }}
+      {{- else if eq $path "/" }}
+        {{- range $prefix, $target := $targets }}
+          {{- $backends = append $backends (merge (dict "path" $prefix) $target) }}
+        {{- end }}
+      {{- else }}
+        {{- $prefix := regexReplaceAll "^(/(insert|select))(/.*)?$" $path "${1}" }}
+        {{- if not (has $prefix (list "/insert" "/select")) }}
+          {{- fail (printf "`vmauth.ingress.hosts` path %q doesn't start with `/insert` or `/select` and is not converted with `operator.enabled: true`" $path) }}
+        {{- end }}
+        {{- with index $targets $prefix }}
+          {{- $backends = append $backends (merge (dict "path" $path) .) }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
     - host: {{ tpl $host.name $ | quote }}
       http:
         paths:
-          {{- range $path := $paths }}
-          - path: {{ $path }}
+          {{- range $backend := $backends }}
+          - path: {{ $backend.path }}
             {{- with $app.ingress.pathType }}
             pathType: {{ . }}
             {{- end }}
             backend:
               service:
-                name: {{ $fullname }}
-                port: {{ include "vm.ingress.port" $host | nindent 18 }}
+                name: {{ $backend.name }}
+                port: {{ toYaml $backend.port | nindent 18 }}
           {{- end }}
     {{- end }}
 {{- end }}

@@ -840,6 +840,21 @@ server:
     #     - target_label: __address__
     #       replacement: prometheus-blackbox-exporter:9115
 
+# Deploy VictoriaMetrics single through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-metrics-single/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VMSingle](https://docs.victoriametrics.com/operator/resources/vmsingle/) resource built from `server` values
+  # instead of the chart's own Deployment/StatefulSet, Service and ServiceAccount, and scrape jobs as VMScrapeConfig resources.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VMSingle labels
+  labels: {}
+  # -- VMSingle annotations
+  annotations: {}
+  # -- VMSingle spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VMSingleSpec](https://docs.victoriametrics.com/operator/api/#vmsinglespec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 

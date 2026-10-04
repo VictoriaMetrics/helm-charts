@@ -303,6 +303,21 @@ networkPolicy:
   # -- Extra annotations for NetworkPolicy
   annotations: {}
 
+# Deploy vtagent through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-traces-agent/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VTAgent](https://docs.victoriametrics.com/operator/resources/vtagent/) resource built from chart values
+  # instead of the chart's own StatefulSet, Service, ServiceAccount and VPA.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VTAgent labels
+  labels: {}
+  # -- VTAgent annotations
+  annotations: {}
+  # -- VTAgent spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VTAgentSpec](https://docs.victoriametrics.com/operator/api/#vtagentspec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 

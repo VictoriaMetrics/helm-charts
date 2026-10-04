@@ -6,6 +6,7 @@
 - rename config volumes to match the VictoriaMetrics operator: `scrape-config` to `config-out` and `rw-config` to `relabelings-assets`. Pods are restarted once on upgrade.
 - don't render an empty `<fullname>-rw` ConfigMap and its `relabelings-assets` volume when no remote write relabeling or other per-URL config is set. Pods are restarted once on upgrade.
 - added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy vmagent through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VMAgent` resource built from chart values instead of its own Deployment/StatefulSet/DaemonSet, Service, ServiceAccount, RBAC, scrape and remote write ConfigMaps, PodDisruptionBudget, HPA and VPA. Scrape jobs become `VMScrapeConfig` resources. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-metrics-agent/#victoriametrics-operator).
 
 ## v0.49.0
 

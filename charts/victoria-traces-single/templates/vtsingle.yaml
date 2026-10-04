@@ -1,0 +1,43 @@
+{{- $app := .Values.server }}
+{{- if and $app.enabled (include "vm.operator.enabled" .) }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vtsingle" }}
+{{- $pvc := $app.persistentVolume }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "appKey" "server" "app" $app)) }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- $addr := $extraArgs.httpListenAddr | default (include "vm.addr.primary" $app.http) }}
+{{- $_ := unset $extraArgs "httpListenAddr" }}
+{{- range $flag, $value := fromYaml (include "vm.http.args" $app.http) }}
+  {{- if ne $flag "httpListenAddr" }}
+    {{- $_ := set $extraArgs $flag (toString $value) }}
+  {{- end }}
+{{- end }}
+{{- $_ := set $spec "port" (include "vm.port.from.flag" (dict "flag" $addr)) }}
+{{- with $app.retentionPeriod }}
+  {{- $_ := set $spec "retentionPeriod" (toString .) }}
+{{- end }}
+{{- with $app.retentionDiskSpaceUsage }}
+  {{- $_ := set $spec "retentionMaxDiskSpaceUsageBytes" (ternary (printf "%dGiB" (int .)) (toString .) (gt (int .) 0)) }}
+{{- end }}
+{{- with $extraArgs }}
+  {{- $_ := set $spec "extraArgs" . }}
+{{- end }}
+{{- if $pvc.enabled }}
+  {{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.data.volume" (dict "helm" . "persistentVolume" $pvc "claim" (include "vm.plain.fullname" $ctx) "volumes" $spec.volumes))) }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.self.scrape" (dict "scrape" (ternary $app.vmServiceScrape $app.serviceMonitor (not $app.serviceMonitor.enabled)) "path" (ternary "server.vmServiceScrape" "server.serviceMonitor" (not $app.serviceMonitor.enabled))))) }}
+{{- with (include "vm.operator.service.spec" (dict "service" $app.service)) }}
+  {{- $_ := set $spec "serviceSpec" (fromYaml .) }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.networkPolicy "path" "networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VTSingle
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- end }}

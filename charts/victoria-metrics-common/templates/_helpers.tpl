@@ -156,6 +156,9 @@ Returns "true", "false", or "" (not set at any level).
       {{- end -}}
     {{- end -}}
   {{- end -}}
+  {{- if include "vm.operator.enabled" . -}}
+    {{- $result = "false" -}}
+  {{- end -}}
   {{- $result -}}
 {{- end -}}
 

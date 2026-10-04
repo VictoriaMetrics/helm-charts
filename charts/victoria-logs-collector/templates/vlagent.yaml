@@ -1,0 +1,58 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $app := .Values }}
+{{- $ctx := dict "helm" . "kindOverride" "vlagent-collector" }}
+{{- if empty $app.remoteWrite }}
+  {{- fail "at least one remoteWrite configuration must be provided" }}
+{{- end }}
+{{- if $app.fileCollector }}
+  {{- fail "`fileCollector` is not converted with `operator.enabled: true`; the VLAgent only collects Kubernetes container logs" }}
+{{- end }}
+{{- if $app.updateStrategy }}
+  {{- fail "`updateStrategy` is not converted with `operator.enabled: true`; set it in `operator.spec` instead" }}
+{{- end }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "app" $app "kindOverride" "vlagent-collector")) }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- $tmpDataPath := $extraArgs.tmpDataPath }}
+{{- $_ := unset $extraArgs "tmpDataPath" }}
+{{- with $extraArgs }}
+  {{- $_ := set $spec "extraArgs" . }}
+{{- end }}
+{{- $_ := set $spec "remoteWrite" (fromYamlArray (include "vm.operator.remote.write" (dict "items" $app.remoteWrite "defaultPath" "/insert/native" "supported" (list "url" "basicAuth" "bearerTokenPath" "bearerTokenSecret" "headers" "maxDiskUsage" "oauth2" "proxyURL" "sendTimeout" "tlsConfig")))) }}
+{{- $collector := dict "enabled" true }}
+{{- range $from, $to := dict "timeField" "timeFields" "msgField" "msgFields" "streamFields" "streamFields" "ignoreFields" "ignoreFields" "excludeFilter" "excludeFilter" "extraFields" "extraFields" }}
+  {{- with index $app.collector $from }}
+    {{- $_ := set $collector $to . }}
+  {{- end }}
+{{- end }}
+{{- range $key := list "includePodLabels" "includePodAnnotations" "includeNodeLabels" "includeNodeAnnotations" }}
+  {{- if hasKey $app.collector $key }}
+    {{- $_ := set $collector $key (index $app.collector $key) }}
+  {{- end }}
+{{- end }}
+{{- $_ := set $spec "k8sCollector" $collector }}
+{{- with $tmpDataPath }}
+  {{- $volume := dict "name" "tmp-data" }}
+  {{- if $app.persistence.volume }}
+    {{- $volume = merge $volume (fromYaml (tpl (toYaml $app.persistence.volume) $)) }}
+  {{- else }}
+    {{- $_ := set $volume "hostPath" (dict "path" .) }}
+  {{- end }}
+  {{- $_ := set $spec "tmpDataPath" . }}
+  {{- $_ := set $spec "volumes" (append ($spec.volumes | default list) $volume) }}
+  {{- $_ := set $spec "volumeMounts" (append ($spec.volumeMounts | default list) (dict "name" "tmp-data" "mountPath" .)) }}
+{{- end }}
+{{- $podMonitor := $app.podMonitor }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.self.scrape" (dict "scrape" (omit $podMonitor "vm" "extraLabels" "annotations") "path" "podMonitor"))) }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.networkPolicy "path" "networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VLAgent
+metadata:
+  name: {{ printf "collector-%s" (include "vm.operator.cr.name" $ctx) }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- end }}

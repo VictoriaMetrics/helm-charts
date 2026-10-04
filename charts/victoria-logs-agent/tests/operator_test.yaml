@@ -1,0 +1,170 @@
+suite: operator mode
+templates:
+  - networkpolicy.yaml
+  - monitor.yaml
+  - vlagent.yaml
+  - server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+set:
+  operator.enabled: true
+  remoteWrite:
+    - url: http://sink:9428
+tests:
+  - it: doesn't render a VLAgent by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vlagent.yaml
+
+  - it: renders a VLAgent instead of the chart workload
+    asserts:
+      - isKind:
+          of: VLAgent
+        template: vlagent.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vlagent.yaml
+      - hasDocuments:
+          count: 0
+        template: server.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+      - equal:
+          path: spec.port
+          value: "9429"
+        template: vlagent.yaml
+
+  - it: converts remote write like the chart does
+    set:
+      maxDiskUsagePerURL: 5GiB
+      remoteWrite:
+        - url: http://sink:9428
+          tlsInsecureSkipVerify: true
+          headers:
+            AccountID: 1
+            Extra: {zone: a}
+    asserts:
+      - equal:
+          path: spec.remoteWrite
+          value:
+            - url: http://sink:9428/insert/native
+              tlsConfig:
+                insecureSkipVerify: true
+              headers: [AccountID:1, Extra:zone=a]
+        template: vlagent.yaml
+      - equal:
+          path: spec.remoteWriteSettings.maxDiskUsagePerURL
+          value: 5GiB
+        template: vlagent.yaml
+
+  - it: rejects remote write settings the VLAgent doesn't support
+    set:
+      remoteWrite:
+        - url: http://sink:9428
+          urlRelabelConfig:
+            - action: drop
+    asserts:
+      - failedTemplate:
+          errorPattern: "`inlineUrlRelabelConfig` is not supported"
+        template: vlagent.yaml
+
+  - it: converts the persistent volume into a claim template that keeps existing claims
+    set:
+      persistentVolume.enabled: true
+      persistentVolume.size: 5Gi
+    asserts:
+      - equal:
+          path: spec.storage.volumeClaimTemplate.metadata.name
+          value: tmp-data
+        template: vlagent.yaml
+      - equal:
+          path: spec.storage.volumeClaimTemplate.spec.resources.requests.storage
+          value: 5Gi
+        template: vlagent.yaml
+
+  - it: rejects the HPA, which the VLAgent doesn't support
+    set:
+      horizontalPodAutoscaler.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "`horizontalPodAutoscaler` is not supported"
+        template: vlagent.yaml
+
+  - it: deep-merges operator.spec over the generated spec
+    set:
+      operator.spec:
+        logLevel: WARN
+    asserts:
+      - equal:
+          path: spec.logLevel
+          value: WARN
+        template: vlagent.yaml
+
+  - it: converts syslog listeners
+    set:
+      syslog.tcp:
+        - name: syslog
+          value: :514
+    asserts:
+      - equal:
+          path: spec.syslogSpec.tcpListeners
+          value:
+            - listenPort: 514
+        template: vlagent.yaml
+
+  - it: disables the operator self-scrape while the chart scrape toggle is off
+    asserts:
+      - equal:
+          path: spec.disableSelfServiceScrape
+          value: true
+        template: vlagent.yaml
+
+  - it: lets the operator scrape it instead of rendering the chart scrape object
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - notExists:
+          path: spec.disableSelfServiceScrape
+        template: vlagent.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        template: vlagent.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`networkPolicy.labels` is not converted"
+        template: vlagent.yaml
+

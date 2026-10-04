@@ -54,6 +54,21 @@ serviceAccount:
 # -- Override chart name
 nameOverride: ""
 
+# Deploy the VictoriaLogs cluster through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-logs-cluster/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VLCluster](https://docs.victoriametrics.com/operator/resources/vlcluster/) resource built from `vlstorage`, `vlselect` and `vlinsert` values
+  # instead of the chart's own vlstorage, vlselect and vlinsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VLCluster labels
+  labels: {}
+  # -- VLCluster annotations
+  annotations: {}
+  # -- VLCluster spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VLClusterSpec](https://docs.victoriametrics.com/operator/api/#vlclusterspec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 

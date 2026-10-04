@@ -54,6 +54,21 @@ serviceAccount:
 # -- Override chart name
 nameOverride: vt-cluster
 
+# Deploy the VictoriaTraces cluster through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-traces-cluster/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VTCluster](https://docs.victoriametrics.com/operator/resources/vtcluster/) resource built from `vtstorage`, `vtselect` and `vtinsert` values
+  # instead of the chart's own vtstorage, vtselect and vtinsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VTCluster labels
+  labels: {}
+  # -- VTCluster annotations
+  annotations: {}
+  # -- VTCluster spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VTClusterSpec](https://docs.victoriametrics.com/operator/api/#vtclusterspec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 
