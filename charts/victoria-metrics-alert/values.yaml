@@ -702,6 +702,21 @@ alertmanager:
   # -- Additional initContainers to initialize the pod
   initContainers: []
 
+# Deploy vmalert and Alertmanager through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-metrics-alert/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VMAlert](https://docs.victoriametrics.com/operator/resources/vmalert/) resource built from `server` and `alertmanager` values
+  # instead of the chart's own vmalert and Alertmanager Deployments/StatefulSets, Services, ServiceAccounts, rules ConfigMap, Alertmanager config Secret, PodDisruptionBudget and VPA.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VMAlert labels
+  labels: {}
+  # -- VMAlert annotations
+  annotations: {}
+  # -- VMAlert spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VMAlertSpec](https://docs.victoriametrics.com/operator/api/#vmalertspec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 

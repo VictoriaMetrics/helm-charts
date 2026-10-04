@@ -2,7 +2,7 @@
 {{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vmselect" $app }}
 {{- $mode := $app.mode }}
-{{- if and $mode $app.enabled (hasKey $app $mode) -}}
+{{- if and $mode $app.enabled (hasKey $app $mode) (not (include "vm.operator.enabled" .)) -}}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "vmselect" }}
 {{- $storageName := include "vmselect.volume.name" $ctx }}

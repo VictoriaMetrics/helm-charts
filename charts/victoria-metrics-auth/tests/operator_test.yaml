@@ -1,0 +1,197 @@
+suite: operator mode
+templates:
+  - route.yaml
+  - ingress.yaml
+  - networkpolicy.yaml
+  - monitor.yaml
+  - vmauth.yaml
+  - secret.yaml
+  - server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - pdb.yaml
+set:
+  operator.enabled: true
+tests:
+  - it: doesn't render a VMAuth by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vmauth.yaml
+
+  - it: renders a VMAuth that uses the chart config as external config
+    asserts:
+      - isKind:
+          of: VMAuth
+        template: vmauth.yaml
+      - equal:
+          path: spec.externalConfig.secretRef
+          value:
+            name: vmauth-RELEASE-NAME-config
+            key: auth.yml
+        template: vmauth.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME-config
+        template: secret.yaml
+      - hasDocuments:
+          count: 0
+        template: server.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+
+  - it: references an existing config Secret
+    set:
+      secretName: my-auth
+    asserts:
+      - equal:
+          path: spec.externalConfig.secretRef.name
+          value: my-auth
+        template: vmauth.yaml
+
+  - it: converts the PodDisruptionBudget
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.minAvailable: 1
+    asserts:
+      - equal:
+          path: spec.podDisruptionBudget
+          value:
+            minAvailable: 1
+        template: vmauth.yaml
+      - hasDocuments:
+          count: 0
+        template: pdb.yaml
+
+  - it: rejects modes the VMAuth doesn't support
+    set:
+      mode: daemonSet
+    asserts:
+      - failedTemplate:
+          errorPattern: "`mode: daemonSet` is not supported"
+        template: vmauth.yaml
+
+  - it: disables the operator self-scrape while the chart scrape toggle is off
+    asserts:
+      - equal:
+          path: spec.disableSelfServiceScrape
+          value: true
+        template: vmauth.yaml
+
+  - it: lets the operator scrape it instead of rendering the chart scrape object
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - notExists:
+          path: spec.disableSelfServiceScrape
+        template: vmauth.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        template: vmauth.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`networkPolicy.labels` is not converted"
+        template: vmauth.yaml
+
+  - it: converts the ingress and keeps only the internal one in the chart
+    set:
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - name: vmauth.example.com
+            path: [/]
+            port: http
+          - name: other.example.com
+            path: /select
+            port: http
+        tls:
+          - secretName: vmauth-tls
+            hosts: [vmauth.example.com]
+      ingressInternal.enabled: true
+    asserts:
+      - equal:
+          path: spec.ingress.host
+          value: vmauth.example.com
+        template: vmauth.yaml
+      - equal:
+          path: spec.ingress.class_name
+          value: nginx
+        template: vmauth.yaml
+      - equal:
+          path: spec.ingress.tlsSecretName
+          value: vmauth-tls
+        template: vmauth.yaml
+      - equal:
+          path: spec.ingress.extraRules[0].host
+          value: other.example.com
+        template: vmauth.yaml
+      - hasDocuments:
+          count: 1
+        template: ingress.yaml
+      - equal:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME-internal
+        template: ingress.yaml
+
+  - it: converts the HTTPRoute
+    set:
+      route:
+        enabled: true
+        parentRefs:
+          - name: gw
+        hostnames: [vmauth.example.com]
+    asserts:
+      - equal:
+          path: spec.httpRoute
+          value:
+            parentRefs:
+              - name: gw
+            hostnames: [vmauth.example.com]
+        template: vmauth.yaml
+      - hasDocuments:
+          count: 0
+        template: route.yaml
+
+  - it: rejects HTTPRoute filters
+    set:
+      route.enabled: true
+      route.filters:
+        - type: RequestHeaderModifier
+    asserts:
+      - failedTemplate:
+          errorPattern: "`route.filters` is not converted"
+        template: vmauth.yaml
+

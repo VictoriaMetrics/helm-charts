@@ -4,7 +4,7 @@
 {{- $ctx := dict "helm" . "appKey" "alertmanager" "kindOverride" "vmalertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}
-{{- if $app.enabled -}}
+{{- if and $app.enabled (not (include "vm.operator.enabled" .)) -}}
 ---
 apiVersion: v1
 kind: Service

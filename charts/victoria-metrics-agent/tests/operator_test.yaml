@@ -1,0 +1,255 @@
+suite: operator mode
+templates:
+  - networkpolicy.yaml
+  - monitor.yaml
+  - vmagent.yaml
+  - server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - configmap.yaml
+  - pvc.yaml
+  - pdb.yaml
+  - ingress.yaml
+set:
+  operator.enabled: true
+  remoteWrite:
+    - url: http://vminsert:8480/insert/0/prometheus
+tests:
+  - it: doesn't render a VMAgent by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vmagent.yaml
+
+  - it: renders a VMAgent and scrape configs instead of the chart workload
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - hasDocuments:
+          count: 0
+        template: server.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+      - hasDocuments:
+          count: 0
+        template: configmap.yaml
+      - equal:
+          path: spec.scrapeConfigSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmagent
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - isKind:
+          of: VMScrapeConfig
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-kubernetes-pods
+        template: vmagent.yaml
+
+  - it: converts remote write settings
+    set:
+      remoteWrite:
+        - url: http://vminsert:8480/insert/0/prometheus
+          tlsInsecureSkipVerify: true
+          headers: "X-Tenant:1^^X-Env:dev"
+          urlRelabelConfig:
+            - action: keep
+              source_labels: [env]
+              regex: true
+    asserts:
+      - equal:
+          path: spec.remoteWrite
+          value:
+            - url: http://vminsert:8480/insert/0/prometheus
+              tlsConfig:
+                insecureSkipVerify: true
+              headers: [X-Tenant:1, X-Env:dev]
+              inlineUrlRelabelConfig:
+                - action: keep
+                  source_labels: [env]
+                  regex: "true"
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+
+  - it: rejects inline remote write credentials
+    set:
+      remoteWrite:
+        - url: http://vminsert:8480/insert/0/prometheus
+          basicAuth.password: secret
+    asserts:
+      - failedTemplate:
+          errorPattern: "`remoteWrite\\[0\\].basicAuth.password` is not converted"
+        template: vmagent.yaml
+
+  - it: uses a volume claim template in statefulSet mode
+    set:
+      mode: statefulSet
+      persistentVolume.enabled: true
+    asserts:
+      - equal:
+          path: spec.statefulMode
+          value: true
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - equal:
+          path: spec.statefulStorage.volumeClaimTemplate.metadata.name
+          value: persistent-queue-data
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - hasDocuments:
+          count: 0
+        template: pvc.yaml
+
+  - it: mounts the chart claim as the persistent queue in deployment mode
+    set:
+      persistentVolume.enabled: true
+    asserts:
+      - equal:
+          path: spec.volumes
+          value:
+            - name: persistent-queue-data
+              persistentVolumeClaim:
+                claimName: vmagent-RELEASE-NAME
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - isKind:
+          of: PersistentVolumeClaim
+        template: pvc.yaml
+
+  - it: converts the PodDisruptionBudget and lets the operator create it
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.maxUnavailable: 1
+    asserts:
+      - equal:
+          path: spec.podDisruptionBudget
+          value:
+            maxUnavailable: 1
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - hasDocuments:
+          count: 0
+        template: pdb.yaml
+
+  - it: rejects scrape cluster mode
+    set:
+      mode: statefulSet
+      statefulSet.clusterMode: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "`statefulSet.clusterMode` is not converted"
+        template: vmagent.yaml
+
+  - it: deep-merges operator.spec over the generated spec
+    set:
+      operator.spec:
+        shardCount: 2
+        scrapeInterval: 1m
+    asserts:
+      - equal:
+          path: spec.shardCount
+          value: 2
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - equal:
+          path: spec.scrapeInterval
+          value: 1m
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+
+  - it: points the ingress at the Service created by the operator
+    set:
+      ingress.enabled: true
+      service.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: vmagent-RELEASE-NAME
+        template: ingress.yaml
+
+  - it: disables the operator self-scrape while the chart scrape toggle is off
+    asserts:
+      - equal:
+          path: spec.disableSelfServiceScrape
+          value: true
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+
+  - it: lets the operator scrape it instead of rendering the chart scrape object
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - notExists:
+          path: spec.disableSelfServiceScrape
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        documentSelector:
+          path: kind
+          value: VMAgent
+        template: vmagent.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`networkPolicy.labels` is not converted"
+        template: vmagent.yaml
+

@@ -1,6 +1,7 @@
 ## Next release
 
 - added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy the VictoriaLogs cluster through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VLCluster` resource built from `vlstorage`, `vlselect` and `vlinsert` values instead of its own vlstorage, vlselect and vlinsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes. The bundled `vmauth` becomes the `requestsLoadBalancer`. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-logs-cluster/#victoriametrics-operator).
 
 ## v0.2.9
 

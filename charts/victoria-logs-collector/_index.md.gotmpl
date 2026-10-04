@@ -370,6 +370,36 @@ remoteWrite:
 
 {{ include "chart.uninstallSection" . }}
 
+### VictoriaMetrics operator
+
+With `operator.enabled: true` the chart renders a [VLAgent](https://docs.victoriametrics.com/operator/resources/vlagent/) resource
+instead of its own DaemonSet, ServiceAccount, RBAC and VMPodScrape,
+and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) manages the workload.
+The operator must already be installed in the cluster. Operator mode always uses operator-style names, regardless of `useLegacyNaming`.
+
+The VLAgent is named `collector-<release>`, so the operator creates `vlagent-collector-<release>` objects, the names the chart uses. 
+
+The spec is built from chart values: image, replicas, resources, scheduling, env, extra args, volumes, containers,
+pod metadata, security context, HTTP listen port, Service settings, service account and license. In addition:
+
+- `networkPolicy` ingress and egress rules become the resource `networkPolicy`, and the operator creates the NetworkPolicy. Its labels and annotations can't be set;
+- `collector` settings become `k8sCollector`, and the operator mounts the node log directories itself;
+- `remoteWrite` entries become VLAgent `remoteWrite` the way the chart renders them, with `/insert/native` appended to a URL without a path;
+- the chart's `tmpDataPath` host directory (or `persistence.volume`) stays the queue and checkpoints volume, so switching to the operator keeps the read positions;
+- `podMonitor.enabled` makes the operator create the pod scrape object, instead of the chart rendering its own. `fileCollector` isn't supported by the VLAgent and fails the rendering.
+
+Fields that have no chart value, or need a different value, go to `operator.spec`, which is deep-merged over the generated spec:
+
+```yaml
+operator:
+  enabled: true
+  spec:
+    logLevel: WARN
+```
+
+Rendering fails for settings that have no operator equivalent, with a message pointing to `operator.spec`.
+Probes keep the operator defaults. Switching a release to `operator.enabled: true` recreates its pods.
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.

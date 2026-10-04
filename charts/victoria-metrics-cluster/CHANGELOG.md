@@ -5,6 +5,7 @@
 - fix `vmselect.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 - rename the cluster native port of `vmselect` and `vminsert` from `cluster-tcp` to `clusternative`, in both the containers and the Services, matching the VictoriaMetrics operator. It is only rendered when `extraArgs.clusternativeListenAddr` is set.
 - added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy the VictoriaMetrics cluster through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VMCluster` resource built from `vmstorage`, `vmselect` and `vminsert` values instead of its own vmstorage, vmselect and vminsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes. The bundled `vmauth` becomes the `requestsLoadBalancer`. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-metrics-cluster/#victoriametrics-operator).
 
 ## v0.52.0
 

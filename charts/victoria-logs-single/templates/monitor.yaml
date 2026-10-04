@@ -9,7 +9,7 @@
   {{- end -}}
 {{- end -}}
 
-{{- if and $app.enabled $app.serviceMonitor.enabled }}
+{{- if and $app.enabled $app.serviceMonitor.enabled (not (include "vm.operator.enabled" .)) }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -73,7 +73,7 @@ spec:
       {{- end }}
 {{- end }}
 
-{{- if and $app.enabled $app.vmServiceScrape.enabled }}
+{{- if and $app.enabled $app.vmServiceScrape.enabled (not (include "vm.operator.enabled" .)) }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape

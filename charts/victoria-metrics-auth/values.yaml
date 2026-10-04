@@ -399,6 +399,21 @@ configRaw: ""
 # -- Annotations for config secret
 configAnnotations: {}
 
+# Deploy vmauth through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-metrics-auth/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VMAuth](https://docs.victoriametrics.com/operator/resources/vmauth/) resource built from chart values
+  # instead of the chart's own Deployment, Service, ServiceAccount and PodDisruptionBudget.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VMAuth labels
+  labels: {}
+  # -- VMAuth annotations
+  annotations: {}
+  # -- VMAuth spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VMAuthSpec](https://docs.victoriametrics.com/operator/api/#vmauthspec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []
 

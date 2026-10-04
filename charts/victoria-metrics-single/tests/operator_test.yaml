@@ -1,0 +1,475 @@
+suite: operator mode
+templates:
+  - networkpolicy.yaml
+  - monitor.yaml
+  - vmsingle.yaml
+  - server.yaml
+  - service.yaml
+  - pvc.yaml
+  - serviceaccount.yaml
+  - ingress.yaml
+  - pdb.yaml
+set:
+  operator.enabled: true
+tests:
+  - it: doesn't render a VMSingle by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vmsingle.yaml
+
+  - it: renders a VMSingle instead of the chart workload
+    asserts:
+      - isKind:
+          of: VMSingle
+        template: vmsingle.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vmsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: server.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+      - isKind:
+          of: PersistentVolumeClaim
+        template: pvc.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+
+  - it: converts server values into the VMSingle spec
+    set:
+      server.retentionPeriod: 30d
+      server.image.tag: v1.100.0
+      server.resources.limits.memory: 1Gi
+      server.podLabels.team: observability
+      server.env:
+        - name: FOO
+          value: bar
+      server.extraArgs:
+        search.maxUniqueTimeseries: 1000
+      server.persistentVolume.size: 20Gi
+      server.persistentVolume.storageClassName: fast
+      server.service.annotations.foo: bar
+      license.key: secret-key
+    asserts:
+      - equal:
+          path: spec.image
+          value:
+            repository: victoriametrics/victoria-metrics
+            tag: v1.100.0
+            pullPolicy: IfNotPresent
+        template: vmsingle.yaml
+      - equal:
+          path: spec.retentionPeriod
+          value: 30d
+        template: vmsingle.yaml
+      - equal:
+          path: spec.port
+          value: "8428"
+        template: vmsingle.yaml
+      - equal:
+          path: spec.resources.limits.memory
+          value: 1Gi
+        template: vmsingle.yaml
+      - equal:
+          path: spec.podMetadata.labels.team
+          value: observability
+        template: vmsingle.yaml
+      - equal:
+          path: spec.extraEnvs[0].name
+          value: FOO
+        template: vmsingle.yaml
+      - equal:
+          path: spec.extraArgs["search.maxUniqueTimeseries"]
+          value: "1000"
+        template: vmsingle.yaml
+      - equal:
+          path: spec.volumes
+          value:
+            - name: data
+              persistentVolumeClaim:
+                claimName: vmsingle-RELEASE-NAME
+        template: vmsingle.yaml
+      - equal:
+          path: spec.storageDataPath
+          value: /storage
+        template: vmsingle.yaml
+      - equal:
+          path: spec.resources.requests.storage
+          value: 20Gi
+        template: pvc.yaml
+      - equal:
+          path: spec.serviceSpec
+          value:
+            useAsDefault: true
+            metadata:
+              annotations:
+                foo: bar
+            spec: {}
+        template: vmsingle.yaml
+      - equal:
+          path: spec.license
+          value:
+            key: secret-key
+        template: vmsingle.yaml
+
+  - it: uses the primary HTTP listener port
+    set:
+      server.extraArgs.httpListenAddr: :9000
+    asserts:
+      - equal:
+          path: spec.port
+          value: "9000"
+        template: vmsingle.yaml
+      - notExists:
+          path: spec.extraArgs.httpListenAddr
+        template: vmsingle.yaml
+
+  - it: deep-merges operator.spec over the generated spec
+    set:
+      server.extraArgs.foo: bar
+      operator:
+        labels:
+          team: observability
+        annotations:
+          note: managed
+        spec:
+          logLevel: WARN
+          extraArgs:
+            baz: qux
+          retentionPeriod: 90d
+    asserts:
+      - equal:
+          path: spec.extraArgs.foo
+          value: bar
+        template: vmsingle.yaml
+      - equal:
+          path: spec.extraArgs.baz
+          value: qux
+        template: vmsingle.yaml
+      - equal:
+          path: spec.logLevel
+          value: WARN
+        template: vmsingle.yaml
+      - equal:
+          path: spec.retentionPeriod
+          value: 90d
+        template: vmsingle.yaml
+      - equal:
+          path: metadata.labels.team
+          value: observability
+        template: vmsingle.yaml
+      - equal:
+          path: metadata.annotations.note
+          value: managed
+        template: vmsingle.yaml
+
+  - it: names the VMSingle after fullnameOverride
+    set:
+      fullnameOverride: metrics
+    asserts:
+      - equal:
+          path: metadata.name
+          value: metrics
+        template: vmsingle.yaml
+
+  - it: points the ingress at the Service created by the operator
+    set:
+      server.ingress.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: vmsingle-RELEASE-NAME
+        template: ingress.yaml
+
+  - it: uses the default ServiceAccount when the chart doesn't create one
+    set:
+      serviceAccount.create: false
+    asserts:
+      - equal:
+          path: spec.serviceAccountName
+          value: default
+        template: vmsingle.yaml
+
+  - it: uses operator naming even with useLegacyNaming
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vmsingle.yaml
+
+  - it: mounts an existing claim as the data volume
+    set:
+      server.persistentVolume.existingClaim: data
+    asserts:
+      - equal:
+          path: spec.volumes[0].persistentVolumeClaim.claimName
+          value: data
+        template: vmsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: pvc.yaml
+
+  - it: converts relabeling
+    set:
+      server.relabel.enabled: true
+      server.relabel.config:
+        - action: drop
+          source_labels: [job]
+          regex: true
+    asserts:
+      - equal:
+          path: spec.inlineRelabelConfig
+          value:
+            - action: drop
+              source_labels: [job]
+              regex: "true"
+        template: vmsingle.yaml
+
+  - it: references a relabel ConfigMap
+    set:
+      server.relabel.enabled: true
+      server.relabel.configMap: my-relabel
+    asserts:
+      - equal:
+          path: spec.relabelConfig
+          value:
+            name: my-relabel
+            key: relabel.yml
+        template: vmsingle.yaml
+
+  - it: converts the backup manager
+    set:
+      license.key: lic
+      server.vmbackupmanager.enabled: true
+      server.vmbackupmanager.destination: s3://bucket/vm
+      server.vmbackupmanager.disableHourly: true
+      server.vmbackupmanager.restore.onStart.enabled: true
+    asserts:
+      - equal:
+          path: spec.vmBackup.destination
+          value: s3://bucket/vm
+        template: vmsingle.yaml
+      - equal:
+          path: spec.vmBackup.disableHourly
+          value: true
+        template: vmsingle.yaml
+      - notExists:
+          path: spec.vmBackup.disableDaily
+        template: vmsingle.yaml
+      - equal:
+          path: spec.vmBackup.extraArgs.keepLastDaily
+          value: "2"
+        template: vmsingle.yaml
+      - equal:
+          path: spec.vmBackup.restore.onStart.enabled
+          value: true
+        template: vmsingle.yaml
+      - equal:
+          path: spec.vmBackup.image.repository
+          value: victoriametrics/vmbackupmanager
+        template: vmsingle.yaml
+
+  - it: converts scrape jobs into VMScrapeConfig resources selected by the VMSingle
+    set:
+      server.scrape.enabled: true
+      server.scrape.config:
+        global:
+          scrape_interval: 30s
+          external_labels:
+            cluster: test
+        scrape_configs:
+          - job_name: Nodes Cadvisor
+            scheme: https
+            metrics_path: /metrics/cadvisor
+            bearer_token_file: /token
+            tls_config:
+              ca_file: /ca.crt
+              insecure_skip_verify: true
+            kubernetes_sd_configs:
+              - role: node
+                namespaces:
+                  own_namespace: true
+            relabel_configs:
+              - action: keep
+                source_labels: [__meta_kubernetes_node_name]
+                regex: true
+      server.scrape.extraScrapeConfigs:
+        - job_name: blackbox
+          static_configs:
+            - targets: [https://example.com]
+    asserts:
+      - equal:
+          path: spec.ingestOnlyMode
+          value: false
+        documentSelector:
+          path: kind
+          value: VMSingle
+        template: vmsingle.yaml
+      - equal:
+          path: spec.scrapeInterval
+          value: 30s
+        documentSelector:
+          path: kind
+          value: VMSingle
+        template: vmsingle.yaml
+      - equal:
+          path: spec.externalLabels.cluster
+          value: test
+        documentSelector:
+          path: kind
+          value: VMSingle
+        template: vmsingle.yaml
+      - equal:
+          path: spec.scrapeConfigSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmsingle
+        documentSelector:
+          path: kind
+          value: VMSingle
+        template: vmsingle.yaml
+      - equal:
+          path: spec
+          value:
+            scheme: https
+            path: /metrics/cadvisor
+            bearerTokenFile: /token
+            tlsConfig:
+              caFile: /ca.crt
+              insecureSkipVerify: true
+            kubernetesSDConfigs:
+              - role: node
+                namespaces:
+                  ownNamespace: true
+            relabelConfigs:
+              - action: replace
+                target_label: job
+                replacement: Nodes Cadvisor
+              - action: keep
+                source_labels: [__meta_kubernetes_node_name]
+                regex: "true"
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-nodes-cadvisor
+        template: vmsingle.yaml
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmsingle
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-blackbox
+        template: vmsingle.yaml
+
+  - it: rejects a scrape config ConfigMap
+    set:
+      server.scrape.enabled: true
+      server.scrape.configMap: my-scrape
+    asserts:
+      - failedTemplate:
+          errorPattern: "`server.scrape.configMap` is not converted"
+        template: vmsingle.yaml
+
+  - it: rejects global scrape settings without an operator equivalent
+    set:
+      server.scrape.enabled: true
+      server.scrape.config:
+        global:
+          evaluation_interval: 1m
+    asserts:
+      - failedTemplate:
+          errorPattern: "`server.scrape.config.global.evaluation_interval` is not converted"
+        template: vmsingle.yaml
+
+  - it: rejects inline scrape credentials
+    set:
+      server.scrape.enabled: true
+      server.scrape.config:
+        scrape_configs:
+          - job_name: secured
+            basic_auth:
+              username: user
+              password: pass
+            static_configs:
+              - targets: [localhost:9100]
+    asserts:
+      - failedTemplate:
+          errorPattern: "scrape job \"secured\": `basic_auth` can't be converted"
+        template: vmsingle.yaml
+
+  - it: disables the operator self-scrape while the chart scrape toggle is off
+    asserts:
+      - equal:
+          path: spec.disableSelfServiceScrape
+          value: true
+        template: vmsingle.yaml
+
+  - it: lets the operator scrape it instead of rendering the chart scrape object
+    set:
+      server.serviceMonitor.enabled: true
+    asserts:
+      - notExists:
+          path: spec.disableSelfServiceScrape
+        template: vmsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        template: vmsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`networkPolicy.labels` is not converted"
+        template: vmsingle.yaml
+
+  - it: fails on a PodDisruptionBudget
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.maxUnavailable: 1
+    asserts:
+      - failedTemplate:
+          errorPattern: "`podDisruptionBudget` is not supported by the VMSingle resource"
+        template: vmsingle.yaml
+
+  - it: fails on more than one replica
+    set:
+      server.replicaCount: 2
+    asserts:
+      - failedTemplate:
+          errorPattern: "`server.replicaCount` greater than 1 is not supported by the VMSingle resource"
+        template: vmsingle.yaml

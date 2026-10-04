@@ -1,0 +1,85 @@
+{{- $app := .Values.server }}
+{{- if and $app.enabled (include "vm.operator.enabled" .) }}
+{{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmsingle" }}
+{{- if .Values.podDisruptionBudget.enabled }}
+  {{- fail "`podDisruptionBudget` is not supported by the VMSingle resource with `operator.enabled: true`; the operator runs a single pod" }}
+{{- end }}
+{{- if gt (int ($app.replicaCount | default 1)) 1 }}
+  {{- fail "`server.replicaCount` greater than 1 is not supported by the VMSingle resource with `operator.enabled: true`; the operator runs a single pod" }}
+{{- end }}
+{{- $pvc := $app.persistentVolume }}
+{{- $scrape := $app.scrape }}
+{{- if and $scrape.enabled $scrape.configMap }}
+  {{- fail "`server.scrape.configMap` is not converted to VMScrapeConfig resources with `operator.enabled: true`; set `server.scrape.config` or create VMScrapeConfig resources" }}
+{{- end }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "appKey" "server" "app" $app)) }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- $addr := $extraArgs.httpListenAddr | default (include "vm.addr.primary" $app.http) }}
+{{- $_ := unset $extraArgs "httpListenAddr" }}
+{{- range $flag, $value := fromYaml (include "vm.http.args" $app.http) }}
+  {{- if ne $flag "httpListenAddr" }}
+    {{- $_ := set $extraArgs $flag (toString $value) }}
+  {{- end }}
+{{- end }}
+{{- if $extraArgs }}
+  {{- $_ := set $spec "extraArgs" $extraArgs }}
+{{- end }}
+{{- $_ := set $spec "port" (include "vm.port.from.flag" (dict "flag" $addr "default" "8428")) }}
+{{- with $app.retentionPeriod }}
+  {{- $_ := set $spec "retentionPeriod" (toString .) }}
+{{- end }}
+{{- if $pvc.enabled }}
+  {{- $claim := $pvc.existingClaim | default $pvc.name | default (include "vm.plain.fullname" $ctx) }}
+  {{- $_ := set $spec "storageDataPath" $pvc.mountPath }}
+  {{- $_ := set $spec "volumes" (append ($spec.volumes | default list) (dict "name" "data" "persistentVolumeClaim" (dict "claimName" (tpl $claim .)))) }}
+{{- end }}
+{{- $relabel := $app.relabel }}
+{{- if $relabel.enabled }}
+  {{- if $relabel.configMap }}
+    {{- $_ := set $spec "relabelConfig" (dict "name" $relabel.configMap "key" "relabel.yml") }}
+  {{- else }}
+    {{- $_ := set $spec "inlineRelabelConfig" (fromYamlArray (include "vm.operator.relabel.configs" (dict "rules" $relabel.config))) }}
+  {{- end }}
+{{- end }}
+{{- $selector := fromYaml (include "vm.selectorLabels" $ctx) }}
+{{- $jobs := list }}
+{{- if $scrape.enabled }}
+  {{- $global := $scrape.config.global | default dict }}
+  {{- range $key, $value := $global }}
+    {{- if eq $key "scrape_interval" }}
+      {{- $_ := set $spec "scrapeInterval" $value }}
+    {{- else if eq $key "scrape_timeout" }}
+      {{- $_ := set $spec "scrapeTimeout" $value }}
+    {{- else if eq $key "external_labels" }}
+      {{- $_ := set $spec "externalLabels" $value }}
+    {{- else }}
+      {{- fail (printf "`server.scrape.config.global.%s` is not converted with `operator.enabled: true`; set it in `operator.spec`" $key) }}
+    {{- end }}
+  {{- end }}
+  {{- $jobs = concat ($scrape.config.scrape_configs | default list) ($scrape.extraScrapeConfigs | default list) }}
+  {{- $_ := set $spec "ingestOnlyMode" false }}
+  {{- $_ := set $spec "scrapeConfigSelector" (dict "matchLabels" $selector) }}
+{{- end }}
+{{- if $app.vmbackupmanager.enabled }}
+  {{- $_ := set $spec "vmBackup" (fromYaml (include "vm.operator.backup" (dict "helm" . "appKey" (list "server" "vmbackupmanager") "manager" $app.vmbackupmanager))) }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.self.scrape" (dict "scrape" $app.serviceMonitor "path" "server.serviceMonitor"))) }}
+{{- with (include "vm.operator.service.spec" (dict "service" $app.service)) }}
+  {{- $_ := set $spec "serviceSpec" (fromYaml .) }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.networkPolicy "path" "networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMSingle
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- with $jobs }}
+{{ include "vm.operator.scrape.configs" (merge (dict "jobs" . "selectorLabels" $selector) $ctx) }}
+{{- end }}
+{{- end }}

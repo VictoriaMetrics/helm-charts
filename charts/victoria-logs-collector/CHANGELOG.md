@@ -1,6 +1,5 @@
 ## Next release
-
-- TODO
+- add `operator.enabled` to deploy the collector through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VLAgent` resource built from chart values instead of its own DaemonSet, ServiceAccount, RBAC and VMPodScrape. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-logs-collector/#victoriametrics-operator).
 
 ## v0.3.8
 

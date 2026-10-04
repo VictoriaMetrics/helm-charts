@@ -1,0 +1,70 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $app := .Values }}
+{{- $ctx := dict "helm" . "kindOverride" "vtagent" }}
+{{- $pvc := $app.persistentVolume }}
+{{- if empty $app.remoteWrite }}
+  {{- fail "at least one remoteWrite configuration must be provided" }}
+{{- end }}
+{{- if $app.horizontalPodAutoscaler.enabled }}
+  {{- fail "`horizontalPodAutoscaler` is not supported by the VTAgent resource with `operator.enabled: true`; set `replicaCount` instead" }}
+{{- end }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "app" $app "kindOverride" "vtagent")) }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- $addr := $extraArgs.httpListenAddr | default (include "vm.addr.primary" $app.http) }}
+{{- $_ := unset $extraArgs "httpListenAddr" }}
+{{- range $flag, $value := fromYaml (include "vm.http.args" $app.http) }}
+  {{- if ne $flag "httpListenAddr" }}
+    {{- $_ := set $extraArgs $flag (toString $value) }}
+  {{- end }}
+{{- end }}
+{{- $_ := set $spec "port" (include "vm.port.from.flag" (dict "flag" $addr)) }}
+{{- $_ := set $spec "remoteWrite" (fromYamlArray (include "vm.operator.remote.write" (dict "items" $app.remoteWrite "defaultPath" "/insert/native" "supported" (list "url" "basicAuth" "bearerTokenPath" "bearerTokenSecret" "headers" "maxDiskUsage" "oauth2" "proxyURL" "sendTimeout" "tlsConfig" "format")))) }}
+{{- with $app.maxDiskUsagePerURL }}
+  {{- $_ := set $spec "remoteWriteSettings" (dict "maxDiskUsagePerURL" (toString .)) }}
+{{- end }}
+{{- $grpc := $app.otlpGRPC }}
+{{- with $grpc.listenAddr }}
+  {{- $grpcSpec := dict "listenPort" (int (include "vm.port.from.flag" (dict "flag" .))) }}
+  {{- if $grpc.tls }}
+    {{- $tls := dict }}
+    {{- range $from, $to := dict "tlsCertFile" "certFile" "tlsKeyFile" "keyFile" "tlsMinVersion" "minVersion" }}
+      {{- with index $grpc $from }}
+        {{- $_ := set $tls $to . }}
+      {{- end }}
+    {{- end }}
+    {{- $_ := set $grpcSpec "tlsConfig" $tls }}
+  {{- end }}
+  {{- $_ := set $spec "grpcSpec" $grpcSpec }}
+{{- end }}
+{{- with $extraArgs }}
+  {{- $_ := set $spec "extraArgs" . }}
+{{- end }}
+{{- if $pvc.enabled }}
+  {{- $volume := "tmp-data" }}
+  {{- if $pvc.existingClaim }}
+    {{- $_ := set $spec "volumes" (append ($spec.volumes | default list) (dict "name" $volume "persistentVolumeClaim" (dict "claimName" (tpl $pvc.existingClaim .)))) }}
+  {{- else }}
+    {{- $_ := set $spec "storage" (dict "volumeClaimTemplate" (dict "metadata" (dict "name" $volume) "spec" (fromYaml (include "vm.operator.storage" (dict "persistentVolume" $pvc))))) }}
+  {{- end }}
+{{- end }}
+{{- $vpa := $app.verticalPodAutoscaler }}
+{{- if $vpa.enabled }}
+  {{- $_ := set $spec "vpa" (omit $vpa "enabled") }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.self.scrape" (dict "scrape" .Values.serviceMonitor "path" "serviceMonitor"))) }}
+{{- with (include "vm.operator.service.spec" (dict "service" $app.service)) }}
+  {{- $_ := set $spec "serviceSpec" (fromYaml .) }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.networkPolicy "path" "networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VTAgent
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- end }}

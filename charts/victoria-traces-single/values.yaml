@@ -444,5 +444,20 @@ server:
     # -- VMServiceScrape target port. Overrides port when set
     targetPort: ""
 
+# Deploy VictoriaTraces single through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-traces-single/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VTSingle](https://docs.victoriametrics.com/operator/resources/vtsingle/) resource built from `server` values
+  # instead of the chart's own Deployment/StatefulSet, Service and ServiceAccount.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VTSingle labels
+  labels: {}
+  # -- VTSingle annotations
+  annotations: {}
+  # -- VTSingle spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VTSingleSpec](https://docs.victoriametrics.com/operator/api/#vtsinglespec)
+  spec: {}
+
 # -- Add extra specs dynamically to this chart
 extraObjects: []

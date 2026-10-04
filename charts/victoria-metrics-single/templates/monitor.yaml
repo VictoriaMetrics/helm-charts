@@ -1,5 +1,5 @@
 {{- $app := .Values.server }}
-{{- if and $app.enabled $app.serviceMonitor.enabled -}}
+{{- if and $app.enabled $app.serviceMonitor.enabled (not (include "vm.operator.enabled" .)) -}}
 {{- $serviceMonitor := $app.serviceMonitor -}}
 {{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmsingle" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

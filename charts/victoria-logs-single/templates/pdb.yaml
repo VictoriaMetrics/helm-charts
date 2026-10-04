@@ -1,5 +1,5 @@
 {{- $pdb := .Values.podDisruptionBudget }}
-{{- if $pdb.enabled }}
+{{- if and $pdb.enabled (not (include "vm.operator.enabled" .)) }}
 {{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vlsingle" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

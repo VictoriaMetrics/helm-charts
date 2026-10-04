@@ -1,0 +1,80 @@
+{{- $app := .Values.alertmanager }}
+{{- if and $app.enabled (include "vm.operator.enabled" .) }}
+{{- $ctx := dict "helm" . "appKey" "alertmanager" "kindOverride" "vmalertmanager" }}
+{{- $pvc := $app.persistentVolume }}
+{{- $fullname := include "vm.plain.fullname" $ctx }}
+{{- if $app.configMap }}
+  {{- fail "`alertmanager.configMap` is not converted with `operator.enabled: true`; use `alertmanager.configSecret` with an `alertmanager.yaml` key instead" }}
+{{- end }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "appKey" "alertmanager" "app" $app)) }}
+{{- $_ := set $spec "port" (include "alertmanager.port" $app) }}
+{{- with $app.retention }}
+  {{- $_ := set $spec "retention" . }}
+{{- end }}
+{{- with $app.baseURL }}
+  {{- $_ := set $spec "externalURL" . }}
+{{- end }}
+{{- with $app.baseURLPrefix }}
+  {{- $_ := set $spec "routePrefix" . }}
+{{- end }}
+{{- if $app.configSecret }}
+  {{- $_ := set $spec "configSecret" $app.configSecret }}
+{{- else }}
+  {{- $_ := set $spec "configRawYaml" (toYaml $app.config) }}
+{{- end }}
+{{- with $app.webConfig }}
+  {{- $_ := set $spec "webConfig" . }}
+{{- end }}
+{{- if $app.templates }}
+  {{- $templates := list }}
+  {{- range $key, $_ := $app.templates }}
+    {{- $templates = append $templates (dict "name" (printf "%s-templates" $fullname) "key" $key) }}
+  {{- end }}
+  {{- $_ := set $spec "templates" $templates }}
+{{- end }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- if gt (int ($app.replicaCount | default 1)) 1 }}
+  {{- range $key, $flag := dict "pushPullInterval" "cluster.pushpull-interval" "gossipInterval" "cluster.gossip-interval" "peerTimeout" "cluster.peer-timeout" "settleTimeout" "cluster.settle-timeout" }}
+    {{- with index $app.cluster $key }}
+      {{- $_ := set $extraArgs $flag (toString .) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- $_ := unset $extraArgs "web.listen-address" }}
+{{- with $extraArgs }}
+  {{- $_ := set $spec "extraArgs" . }}
+{{- end }}
+{{- $volume := include "alertmanager.volume.name" (merge (dict "claimTemplate" false) $ctx) }}
+{{- if and $pvc.enabled (eq $app.mode "statefulSet") (not $pvc.existingClaim) }}
+  {{- $_ := set $spec "storage" (dict "volumeClaimTemplate" (dict "metadata" (dict "name" $volume) "spec" (fromYaml (include "vm.operator.storage" (dict "persistentVolume" $pvc))))) }}
+{{- else if $pvc.enabled }}
+  {{- $claim := $pvc.existingClaim | default $pvc.name | default $fullname }}
+  {{- $_ := set $spec "volumes" (append ($spec.volumes | default list) (dict "name" $volume "persistentVolumeClaim" (dict "claimName" (tpl $claim .)))) }}
+{{- end }}
+{{- $_ := set $spec "disableSelfServiceScrape" true }}
+{{- with (include "vm.operator.service.spec" (dict "service" $app.service)) }}
+  {{- $_ := set $spec "serviceSpec" (fromYaml .) }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.alertmanager.networkPolicy "path" "alertmanager.networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanager
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- with $app.templates }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullname }}-templates
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+data: {{ toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}

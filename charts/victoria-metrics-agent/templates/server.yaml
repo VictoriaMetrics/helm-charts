@@ -1,7 +1,7 @@
 {{- $app := .Values }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
-{{- if and $mode (hasKey $app $mode) }}
+{{- if and $mode (hasKey $app $mode) (not (include "vm.operator.enabled" .)) }}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
 {{- $storageName := include "vmagent.volume.name" $ctx }}

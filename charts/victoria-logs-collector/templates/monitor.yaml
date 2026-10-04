@@ -1,5 +1,5 @@
 {{- $app := .Values }}
-{{- if $app.podMonitor.enabled }}
+{{- if and $app.podMonitor.enabled (not (include "vm.operator.enabled" .)) }}
 {{- $podMonitor := $app.podMonitor }}
 {{- $ctx := dict "helm" . "kindOverride" "vlagent-collector" }}
 {{- if $podMonitor.vm }}

@@ -189,6 +189,37 @@ backwards compatibility with existing deployments.
 > [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) convention and
 > simplifies future migration to operator-managed resources.
 
+### VictoriaMetrics operator
+
+With `operator.enabled: true` the chart renders a [VLSingle](https://docs.victoriametrics.com/operator/resources/vlsingle/) resource
+instead of its own Deployment/StatefulSet, Service and ServiceAccount,
+and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) manages the workload.
+The operator must already be installed in the cluster. Operator mode always uses operator-style names, regardless of `useLegacyNaming`.
+
+The VLSingle is named after the release (or `fullnameOverride`), so the operator creates `vlsingle-<release>` objects.
+Ingress and HTTPRoute are still rendered by the chart and target them. The operator runs the VLSingle as a single pod, so `podDisruptionBudget.enabled` and `server.replicaCount` greater than 1 fail rendering.
+
+The spec is built from the `server` values: image, replicas, resources, scheduling, env, extra args, volumes, containers,
+pod metadata, security context, HTTP listen port, retention, Service settings, service account and license. In addition:
+
+- `networkPolicy` ingress and egress rules become the resource `networkPolicy`, and the operator creates the NetworkPolicy. Its labels and annotations can't be set;
+- the chart keeps managing the `server.persistentVolume` claim (or uses `existingClaim`) and passes it to the VLSingle as its data volume,
+  mounted at `server.persistentVolume.mountPath`. A release that ran with a chart-managed claim keeps its data after switching to the operator;
+- `server.syslog` listeners become `syslogSpec`, and `server.retentionMaxDiskUsagePercent` an extra arg;
+- `server.vmServiceScrape.enabled` or `server.serviceMonitor.enabled` makes the operator create the VMServiceScrape for VictoriaLogs, instead of the chart rendering its own scrape object.
+
+Fields that have no chart value, or need a different value, go to `operator.spec`, which is deep-merged over the generated spec:
+
+```yaml
+operator:
+  enabled: true
+  spec:
+    logLevel: WARN
+    useStrictSecurity: true
+```
+
+Probes keep the operator defaults. Switching a release to `operator.enabled: true` recreates its pod.
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
