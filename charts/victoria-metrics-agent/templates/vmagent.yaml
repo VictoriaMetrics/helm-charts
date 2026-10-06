@@ -1,0 +1,95 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $app := .Values }}
+{{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
+{{- $pvc := $app.persistentVolume }}
+{{- if empty $app.remoteWrite }}
+  {{- fail "Please define at least one remoteWrite" }}
+{{- end }}
+{{- if and (eq $app.mode "statefulSet") $app.statefulSet.clusterMode }}
+  {{- fail "`statefulSet.clusterMode` is not converted with `operator.enabled: true`; set `operator.spec.shardCount` instead" }}
+{{- end }}
+{{- if $app.configMap }}
+  {{- fail "`configMap` is not converted to VMScrapeConfig resources with `operator.enabled: true`; set `config` or create VMScrapeConfig resources" }}
+{{- end }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "app" $app "kindOverride" "vmagent")) }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- $addr := $extraArgs.httpListenAddr | default (include "vm.addr.primary" $app.http) }}
+{{- $_ := unset $extraArgs "httpListenAddr" }}
+{{- range $flag, $value := fromYaml (include "vm.http.args" $app.http) }}
+  {{- if ne $flag "httpListenAddr" }}
+    {{- $_ := set $extraArgs $flag (toString $value) }}
+  {{- end }}
+{{- end }}
+{{- with $extraArgs }}
+  {{- $_ := set $spec "extraArgs" . }}
+{{- end }}
+{{- $_ := set $spec "port" (include "vm.port.from.flag" (dict "flag" $addr)) }}
+{{- $_ := set $spec "remoteWrite" (fromYamlArray (include "vm.operator.remote.write" (dict "items" $app.remoteWrite))) }}
+{{- if eq $app.mode "statefulSet" }}
+  {{- $_ := set $spec "statefulMode" true }}
+  {{- if and $pvc.enabled (not $pvc.existingClaim) }}
+    {{- $template := dict "metadata" (dict "name" (include "vmagent.volume.name" (dict "helm" . "claimTemplate" true))) "spec" (fromYaml (include "vm.operator.storage" (dict "persistentVolume" $pvc))) }}
+    {{- $_ := set $spec "statefulStorage" (dict "volumeClaimTemplate" $template) }}
+  {{- end }}
+{{- else if eq $app.mode "daemonSet" }}
+  {{- $_ := set $spec "daemonSetMode" true }}
+{{- end }}
+{{- if and $pvc.enabled (or $pvc.existingClaim (ne $app.mode "statefulSet")) }}
+  {{- $claim := $pvc.existingClaim | default $pvc.name | default (include "vm.plain.fullname" $ctx) }}
+  {{- $_ := set $spec "volumes" (append ($spec.volumes | default list) (dict "name" "persistent-queue-data" "persistentVolumeClaim" (dict "claimName" (tpl $claim .)))) }}
+{{- end }}
+{{- $jobs := list }}
+{{- if $app.config }}
+  {{- $config := omit $app.config "useTpl" }}
+  {{- if $app.config.useTpl }}
+    {{- $config = fromYaml (tpl (toYaml $config) .) }}
+  {{- end }}
+  {{- $scrape := fromYaml (include "vm.operator.scrape" (dict "config" $config "extra" $app.extraScrapeConfigs "path" "config")) }}
+  {{- $spec = mergeOverwrite $spec $scrape.spec }}
+  {{- $jobs = $scrape.jobs }}
+{{- end }}
+{{- $selector := fromYaml (include "vm.selectorLabels" $ctx) }}
+{{- $_ := set $spec "scrapeConfigSelector" (dict "matchLabels" $selector) }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.self.scrape" (dict "scrape" .Values.serviceMonitor "path" "serviceMonitor"))) }}
+{{- if $app.service.enabled }}
+  {{- with (include "vm.operator.service.spec" (dict "service" $app.service)) }}
+    {{- $_ := set $spec "serviceSpec" (fromYaml .) }}
+  {{- end }}
+{{- end }}
+{{- $hpa := $app.horizontalPodAutoscaler }}
+{{- if $hpa.enabled }}
+  {{- $_ := set $spec "hpa" (omit $hpa "enabled" "behavior") }}
+  {{- with $hpa.behavior }}
+    {{- $_ := set $spec.hpa "behaviour" . }}
+  {{- end }}
+{{- end }}
+{{- $vpa := $app.verticalPodAutoscaling | default $app.verticalPodAutoscaler }}
+{{- if and $vpa $vpa.enabled }}
+  {{- $_ := set $spec "vpa" (omit $vpa "enabled") }}
+{{- end }}
+{{- $pdb := $app.podDisruptionBudget }}
+{{- if $pdb.enabled }}
+  {{- $budget := dict }}
+  {{- range $key := list "minAvailable" "maxUnavailable" "unhealthyPodEvictionPolicy" }}
+    {{- with index $pdb $key }}
+      {{- $_ := set $budget $key . }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $spec "podDisruptionBudget" $budget }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.networkPolicy "path" "networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAgent
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- with $jobs }}
+{{ include "vm.operator.scrape.configs" (merge (dict "jobs" . "selectorLabels" $selector) $ctx) }}
+{{- end }}
+{{- end }}

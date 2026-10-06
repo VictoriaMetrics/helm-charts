@@ -1,0 +1,110 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $app := .Values }}
+{{- $ctx := dict "helm" . "kindOverride" "vmanomaly" }}
+{{- $pvc := $app.persistentVolume }}
+{{- include "vm.enterprise.only" . }}
+{{- if gt (int ($app.replicationFactor | default 1)) 1 }}
+  {{- fail "`replicationFactor` is not supported by the VMAnomaly resource with `operator.enabled: true`" }}
+{{- end }}
+{{- $config := mergeOverwrite (dict "settings" (dict "restore_state" $pvc.enabled)) (deepCopy ($app.config | default dict)) }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "app" $app "kindOverride" "vmanomaly")) }}
+{{- $clientKeys := dict "datasource_url" "datasourceURL" "tenant_id" "tenantID" "timeout" "timeout" "health_path" "healthPath" "bearer_token_file" "bearer" }}
+{{- $readerKeys := merge (dict "sampling_period" "samplingPeriod" "query_range_path" "queryRangePath" "extra_filters" "extraFilters" "fetch_timeout" "fetchTimeout" "processing_timeout" "processingTimeout" "query_from_last_seen_timestamp" "queryFromLastSeenTimestamp" "query_last_seen_max_lookback" "queryLastSeenMaxLookback" "latency_offset" "latencyOffset" "offset" "offset" "max_points_per_query" "maxPointsPerQuery" "series_processing_batch_size" "seriesProcessingBatchSize" "workers" "workers" "tz" "tz" "data_range" "dataRange") $clientKeys }}
+{{- $writerKeys := merge (dict "metric_format" "metricFormat" "batch_max_bytes" "batchMaxBytes" "batch_max_series" "batchMaxSeries" "connection_retry_attempts" "connectionRetryAttempts" "metric_prefix_cache_max_entries" "metricPrefixCacheMaxEntries") $clientKeys }}
+{{- range $section, $keys := dict "reader" $readerKeys "writer" $writerKeys }}
+  {{- $values := index $config $section | default dict }}
+  {{- $typed := dict }}
+  {{- range $key, $value := $values }}
+    {{- if or (kindIs "invalid" $value) (and (kindIs "string" $value) (empty $value)) }}
+    {{- else if or (eq $key "queries") (and (eq $key "class") (eq (toString $value) "vm")) }}
+    {{- else if eq $key "bearer_token_file" }}
+      {{- $_ := set $typed "bearer" (dict "bearerTokenFile" $value) }}
+    {{- else if eq $key "verify_tls" }}
+      {{- $_ := set $typed "tlsConfig" (dict "insecureSkipVerify" (not $value)) }}
+    {{- else if hasKey $keys $key }}
+      {{- $_ := set $typed (get $keys $key) $value }}
+    {{- else }}
+      {{- fail (printf "`config.%s.%s` is not converted with `operator.enabled: true`; set `operator.spec.%s` instead (credentials must reference Secrets)" $section $key $section) }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $spec $section $typed }}
+{{- end }}
+{{- with (($config.monitoring).pull) }}
+  {{- if and .enabled .port }}
+    {{- $_ := set $spec "monitoring" (dict "pull" (dict "port" (toString .port))) }}
+  {{- end }}
+{{- end }}
+{{- if (($config.monitoring).push) }}
+  {{- fail "`config.monitoring.push` is not converted with `operator.enabled: true`; set `operator.spec.monitoring.push` instead" }}
+{{- end }}
+{{- $serverKeys := dict "addr" "addr" "port" "port" "path_prefix" "pathPrefix" "max_concurrent_tasks" "maxConcurrentTasks" "ui_default_state" "uiDefaultState" "use_reader_connection_settings" "useReaderConnectionSettings" }}
+{{- $server := dict }}
+{{- range $key, $value := ($config.server | default dict) }}
+  {{- if not (hasKey $serverKeys $key) }}
+    {{- fail (printf "`config.server.%s` is not converted with `operator.enabled: true`; set `operator.spec.server` instead" $key) }}
+  {{- end }}
+  {{- if not (kindIs "invalid" $value) }}
+    {{- $_ := set $server (get $serverKeys $key) (ternary (toString $value) $value (eq $key "port")) }}
+  {{- end }}
+{{- end }}
+{{- $port := $server.port | default "8490" }}
+{{- $service := $app.service }}
+{{- if $service.enabled }}
+  {{- if ne (toString $service.servicePort) $port }}
+    {{- fail (printf "`service.servicePort` must match the server port %s with `operator.enabled: true`; the operator Service listens on the server port" $port) }}
+  {{- end }}
+  {{- range $key := list "annotations" "labels" "trafficDistribution" "externalIPs" "loadBalancerIP" "loadBalancerSourceRanges" "nodePort" "externalTrafficPolicy" "healthCheckNodePort" "ipFamilyPolicy" "ipFamilies" }}
+    {{- if index $service $key }}
+      {{- fail (printf "`service.%s` is not supported by the VMAnomaly resource with `operator.enabled: true`; the operator creates a headless Service without custom settings" $key) }}
+    {{- end }}
+  {{- end }}
+  {{- if not (has ($service.type | default "ClusterIP") (list "ClusterIP")) }}
+    {{- fail "`service.type` other than `ClusterIP` is not supported by the VMAnomaly resource with `operator.enabled: true`" }}
+  {{- end }}
+{{- end }}
+{{- with $server }}
+  {{- $_ := set $spec "server" . }}
+{{- end }}
+{{- $raw := omit $config "reader" "writer" "monitoring" "server" }}
+{{- with (($config.reader).queries) }}
+  {{- $_ := set $raw "reader" (dict "queries" .) }}
+{{- end }}
+{{- $_ := set $spec "configRawYaml" (toYaml $raw) }}
+{{- with $app.shardsCount }}
+  {{- if gt (int .) 1 }}
+    {{- $_ := set $spec "shardCount" (int .) }}
+  {{- end }}
+{{- end }}
+{{- if $pvc.enabled }}
+  {{- $volume := include "vmanomaly.volume.name" $ctx }}
+  {{- if $pvc.existingClaim }}
+    {{- $_ := set $spec "volumes" (append ($spec.volumes | default list) (dict "name" $volume "persistentVolumeClaim" (dict "claimName" (tpl $pvc.existingClaim .)))) }}
+  {{- else }}
+    {{- $_ := set $spec "storage" (dict "volumeClaimTemplate" (dict "metadata" (dict "name" $volume) "spec" (fromYaml (include "vm.operator.storage" (dict "persistentVolume" $pvc))))) }}
+  {{- end }}
+{{- end }}
+{{- $pdb := $app.podDisruptionBudget }}
+{{- if $pdb.enabled }}
+  {{- $budget := dict }}
+  {{- range $key := list "minAvailable" "maxUnavailable" "unhealthyPodEvictionPolicy" }}
+    {{- with index $pdb $key }}
+      {{- $_ := set $budget $key . }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $spec "podDisruptionBudget" $budget }}
+{{- end }}
+{{- $podMonitor := $app.podMonitor }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.self.scrape" (dict "scrape" (omit $podMonitor "vm" "extraLabels" "annotations") "path" "podMonitor"))) }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.networkPolicy "path" "networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VMAnomaly
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- end }}

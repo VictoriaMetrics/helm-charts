@@ -1,10 +1,11 @@
 {{- $app := merge (deepCopy .Values.vlstorage) (deepCopy .Values.common) -}}
 {{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vlstorage" $app }}
-{{- if $app.enabled -}}
+{{- if and $app.enabled (not (include "vm.operator.enabled" .)) -}}
 {{- $ctx := dict "helm" . "appKey" "vlstorage" }}
+{{- $storageName := tpl ($pvc.name | default (include "vlstorage.volume.name" $ctx)) $ctx }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
-{{- $sa := include "vm.fullname" . }}
+{{- $sa := include "vm.plain.fullname" (dict "helm" . "kindOverride" "vlcluster") }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
@@ -91,7 +92,7 @@ spec:
           {{- end }}
           volumeMounts:
             {{- with $pvc }}
-            - name: {{ .name }}
+            - name: {{ $storageName }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
@@ -142,7 +143,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- if or (not $pvc.enabled) $pvc.existingClaim }}
-        - name: vlstorage-volume
+        - name: {{ $storageName }}
           {{- if $pvc.enabled }}
           persistentVolumeClaim: 
             claimName: {{ $pvc.existingClaim }}
@@ -158,7 +159,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ tpl $pvc.name $ctx }}
+        name: {{ $storageName }}
         {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}

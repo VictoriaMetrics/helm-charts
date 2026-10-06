@@ -5,6 +5,8 @@
 - fix `server.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - rename the container from `vtraces` to `vtsingle`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.
 - fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy VictoriaTraces single through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VTSingle` resource built from `server` values instead of its own workload, Service and ServiceAccount, and keeps managing the storage claim. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-traces-single/#victoriametrics-operator).
 
 ## v0.1.11
 

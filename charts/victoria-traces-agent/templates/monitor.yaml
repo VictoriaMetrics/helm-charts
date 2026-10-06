@@ -1,5 +1,5 @@
 {{- $serviceMonitor := .Values.serviceMonitor -}}
-{{- if $serviceMonitor.enabled -}}
+{{- if and $serviceMonitor.enabled (not (include "vm.operator.enabled" .)) -}}
 {{- $ctx := dict "helm" . "kindOverride" "vtagent" }}
 {{- $port := "http" -}}
 {{- if empty (.Values.extraArgs | default dict).httpListenAddr -}}

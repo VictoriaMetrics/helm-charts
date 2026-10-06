@@ -182,6 +182,51 @@ vlinsert:
 
 {{ include "chart.uninstallSection" . }}
 
+## Resource Naming
+
+By default, this chart uses release-name based resource naming for historical reasons and
+backwards compatibility with existing deployments.
+
+> [!WARNING]
+> For new deployments, it is recommended to set `useLegacyNaming: false` to use operator-style
+> names (e.g. `vlinsert-<release>`). This aligns resource names with the
+> [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) convention and
+> simplifies future migration to operator-managed resources.
+
+### VictoriaMetrics operator
+
+With `operator.enabled: true` the chart renders a [VLCluster](https://docs.victoriametrics.com/operator/resources/vlcluster/) resource
+instead of its own vlstorage, vlselect and vlinsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes,
+and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) manages the workload.
+The operator must already be installed in the cluster.
+
+The VLCluster is named after the release (or `fullnameOverride`), so the operator creates `vlstorage-<release>`, `vlselect-<release>` and `vlinsert-<release>` objects.
+The bundled `vmauth` becomes the VLCluster `requestsLoadBalancer`, with its pod settings, HPA, PodDisruptionBudget, NetworkPolicy, Service and self-scrape, and the operator creates the `vlclusterlb-<release>` load balancer in front of the components. `vmauth.config`, `vmauth.configSecretName` and `vmauth.verticalPodAutoscaler` fail rendering, since the load balancer generates its own routing and has no VPA. Ingress and HTTPRoute are still rendered by the chart and target the Services the operator creates. The `vmauth` ones send `/insert` and `/select` to `vlinsert-<release>` and `vlselect-<release>`, which the operator routes through the load balancer: the HTTPRoute gets a rule per prefix, and each `vmauth.ingress.hosts` path goes to the Service matching its prefix, with `/` expanded to both. A custom `vmauth.route.matches` or an Ingress path outside `/insert` and `/select` fails rendering; use `vmauth.route.extraRules` or a component Ingress instead.
+
+The spec is built from `vlstorage`, `vlselect` and `vlinsert` values: image, replicas, resources, scheduling, env, extra args, volumes, containers,
+pod metadata, security context, HTTP listen port, Service settings, service account and license. In addition:
+
+- `networkPolicy` ingress and egress rules become the resource `networkPolicy`, and the operator creates the NetworkPolicy. Its labels and annotations can't be set;
+- each component becomes the matching component spec: image, replicas, resources, scheduling, env, extra args, volumes, HTTP listen port, Service settings, PodDisruptionBudget, HPA and VPA; service account, license and image pull secrets become cluster-wide fields;
+- `vlstorage.persistentVolume` becomes the storage claim template with the chart's claim name, so the operator reuses the existing claims;
+  `vlstorage.persistentVolume.existingClaim` is mounted as the storage volume instead;
+- `vlinsert.excludeStorageIDs` becomes `maintenanceInsertNodeIDs` of the storage component;
+- vlstorage retention settings become `vlstorage` fields and `vlinsert.syslog` listeners become `vlinsert.syslogSpec`;
+- a component's `vmServiceScrape.enabled` makes the operator create its VMServiceScrape, instead of the chart rendering its own scrape object.
+
+Fields that have no chart value, or need a different value, go to `operator.spec`, which is deep-merged over the generated spec:
+
+```yaml
+operator:
+  enabled: true
+  spec:
+    vlstorage:
+      logLevel: WARN
+```
+
+Rendering fails for settings that have no operator equivalent, with a message pointing to `operator.spec`.
+Probes keep the operator defaults. Switching a release to `operator.enabled: true` recreates its pods.
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.

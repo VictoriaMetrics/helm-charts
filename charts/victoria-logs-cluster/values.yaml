@@ -1,6 +1,13 @@
 # Default values for victoriaLogs cluster chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+# -- Use legacy naming convention (release-name based). When false, resource names
+# -- use the same convention as the operator (type-prefixed, e.g. vlinsert-<release>).
+# -- The default (`true`) exists for historical reasons and backwards compatibility with existing deployments.
+# -- For new deployments, setting this to `false` is recommended to match VictoriaMetrics operator naming
+# -- and simplify future migration to operator-managed resources.
+useLegacyNaming: true
 global:
   # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
@@ -46,6 +53,21 @@ serviceAccount:
 
 # -- Override chart name
 nameOverride: ""
+
+# Deploy the VictoriaLogs cluster through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-logs-cluster/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VLCluster](https://docs.victoriametrics.com/operator/resources/vlcluster/) resource built from `vlstorage`, `vlselect` and `vlinsert` values
+  # instead of the chart's own vlstorage, vlselect and vlinsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VLCluster labels
+  labels: {}
+  # -- VLCluster annotations
+  annotations: {}
+  # -- VLCluster spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VLClusterSpec](https://docs.victoriametrics.com/operator/api/#vlclusterspec)
+  spec: {}
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []
@@ -275,8 +297,8 @@ vlselect:
     labels: {}
     # -- Service type
     type: ClusterIP
-    # -- Service ClusterIP
-    clusterIP: ""
+    # -- Service ClusterIP. When unset, the Service is a regular ClusterIP Service with legacy naming and headless (`None`), as in the VictoriaMetrics operator, with operator naming
+    clusterIP:
     # -- Publish not-ready addresses. Set this to `true` together with `clusterIP: None` when vlselect is discovered via its headless service (e.g. behind vmauth balancing) before pods pass readiness checks
     publishNotReadyAddresses: false
     # -- Service nodePort # nodePort: "30471"
@@ -844,7 +866,8 @@ vlstorage:
     # -- Create/use Persistent Volume Claim for vlstorage component. Empty dir if false. If true,  vlstorage will create/use a Persistent Volume Claim
     enabled: true
 
-    name: vlstorage-volume
+    # -- Override Persistent Volume Claim template name. Defaults to `vlstorage-volume`, or to `vlstorage-db` when `useLegacyNaming` is `false`
+    name: ""
 
     # -- Array of access modes. Must match those of existing PV or dynamic provisioner. Details are [here](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
     accessModes:

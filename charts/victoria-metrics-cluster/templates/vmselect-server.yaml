@@ -1,13 +1,16 @@
-{{- $storageName := "cache-volume" }}
 {{- $app := merge (deepCopy .Values.vmselect) (deepCopy .Values.common) -}}
 {{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vmselect" $app }}
 {{- $mode := $app.mode }}
-{{- if and $mode $app.enabled (hasKey $app $mode) -}}
+{{- if and $mode $app.enabled (hasKey $app $mode) (not (include "vm.operator.enabled" .)) -}}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "vmselect" }}
+{{- $storageName := include "vmselect.volume.name" $ctx }}
+{{- if and (eq $mode "statefulSet") $pvc.enabled (not $pvc.existingClaim) $pvc.name }}
+  {{- $storageName = tpl $pvc.name $ctx | default $storageName }}
+{{- end }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
-{{- $sa := include "vm.fullname" . }}
+{{- $sa := include "vm.plain.fullname" (dict "helm" . "kindOverride" "vmcluster") }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: {{ title $mode }}
@@ -97,7 +100,7 @@ spec:
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "8481") }}
             {{- end }}
             {{- with $app.extraArgs.clusternativeListenAddr }}
-            - name: cluster-tcp
+            - name: clusternative
               protocol: TCP
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             {{- end }}

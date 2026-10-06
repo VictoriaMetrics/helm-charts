@@ -1,0 +1,193 @@
+suite: operator mode
+templates:
+  - networkpolicy.yaml
+  - vlsingle.yaml
+  - server.yaml
+  - service.yaml
+  - pvc.yaml
+  - serviceaccount.yaml
+  - monitor.yaml
+  - ingress.yaml
+set:
+  operator.enabled: true
+tests:
+  - it: doesn't render a VLSingle by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vlsingle.yaml
+
+  - it: renders a VLSingle instead of the chart workload
+    asserts:
+      - isKind:
+          of: VLSingle
+        template: vlsingle.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vlsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: server.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+      - isKind:
+          of: PersistentVolumeClaim
+        template: pvc.yaml
+
+  - it: converts server values into the VLSingle spec
+    set:
+      server.retentionPeriod: 30d
+      server.retentionDiskSpaceUsage: 10
+      server.resources.limits.memory: 1Gi
+      server.extraArgs:
+        foo: bar
+    asserts:
+      - equal:
+          path: spec.retentionPeriod
+          value: 30d
+        template: vlsingle.yaml
+      - equal:
+          path: spec.retentionMaxDiskSpaceUsageBytes
+          value: 10GiB
+        template: vlsingle.yaml
+      - equal:
+          path: spec.port
+          value: "9428"
+        template: vlsingle.yaml
+      - equal:
+          path: spec.resources.limits.memory
+          value: 1Gi
+        template: vlsingle.yaml
+      - equal:
+          path: spec.extraArgs.foo
+          value: bar
+        template: vlsingle.yaml
+      - equal:
+          path: spec.volumes
+          value:
+            - name: data
+              persistentVolumeClaim:
+                claimName: vlsingle-RELEASE-NAME
+        template: vlsingle.yaml
+      - equal:
+          path: spec.storageDataPath
+          value: /storage
+        template: vlsingle.yaml
+
+  - it: deep-merges operator.spec over the generated spec
+    set:
+      operator.spec:
+        logLevel: WARN
+        retentionPeriod: 90d
+    asserts:
+      - equal:
+          path: spec.logLevel
+          value: WARN
+        template: vlsingle.yaml
+      - equal:
+          path: spec.retentionPeriod
+          value: 90d
+        template: vlsingle.yaml
+
+  - it: disables the operator self-scrape unless the chart enables it
+    asserts:
+      - equal:
+          path: spec.disableSelfServiceScrape
+          value: true
+        template: vlsingle.yaml
+
+  - it: lets the operator create the VMServiceScrape
+    set:
+      server.vmServiceScrape.enabled: true
+    asserts:
+      - notExists:
+          path: spec.disableSelfServiceScrape
+        template: vlsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: points the ingress at the Service created by the operator
+    set:
+      server.ingress.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: vlsingle-RELEASE-NAME
+        template: ingress.yaml
+
+  - it: uses operator naming even with useLegacyNaming
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vlsingle.yaml
+
+  - it: converts syslog listeners
+    set:
+      server.syslog.tcp:
+        - name: syslog-tcp
+          value: :514
+          streamFields: hostname
+      server.syslog.udp:
+        - name: syslog-udp
+          value: :515
+    asserts:
+      - equal:
+          path: spec.syslogSpec
+          value:
+            tcpListeners:
+              - listenPort: 514
+                streamFields: hostname
+            udpListeners:
+              - listenPort: 515
+        template: vlsingle.yaml
+
+  - it: passes the disk usage percent retention as an extra arg
+    set:
+      server.retentionMaxDiskUsagePercent: 80
+    asserts:
+      - equal:
+          path: spec.extraArgs["retention.maxDiskUsagePercent"]
+          value: "80"
+        template: vlsingle.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        template: vlsingle.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`networkPolicy.labels` is not converted"
+        template: vlsingle.yaml
+

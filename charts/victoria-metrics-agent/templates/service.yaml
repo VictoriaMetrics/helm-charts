@@ -1,6 +1,6 @@
 {{- $app := .Values }}
 {{- $service := $app.service }}
-{{- if $service.enabled -}}
+{{- if and $service.enabled (not (include "vm.operator.enabled" .)) -}}
 {{- $ctx := dict "helm" . "kindOverride" "vmagent" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

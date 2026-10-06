@@ -1,10 +1,11 @@
 {{- $app := merge (deepCopy .Values.vmstorage) (deepCopy .Values.common) -}}
 {{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vmstorage" $app }}
-{{- if $app.enabled -}}
+{{- if and $app.enabled (not (include "vm.operator.enabled" .)) -}}
 {{- $ctx := dict "helm" . "appKey" "vmstorage" }}
+{{- $storageName := tpl ($pvc.name | default (include "vmstorage.volume.name" $ctx)) $ctx }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
-{{- $sa := include "vm.fullname" . }}
+{{- $sa := include "vm.plain.fullname" (dict "helm" . "kindOverride" "vmcluster") }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: StatefulSet
@@ -75,7 +76,7 @@ spec:
             - name: manager-http
               containerPort: 8300
           volumeMounts:
-            - name: vmstorage-volume
+            - name: {{ $storageName }}
               mountPath: {{ $pvc.mountPath }}
               subPath: {{ $pvc.subPath }}
             {{- range $manager.extraSecretMounts }}
@@ -139,7 +140,7 @@ spec:
           {{- end }}
           volumeMounts:
             {{- with $pvc }}
-            - name: {{ tpl .name $ctx }}
+            - name: {{ $storageName }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
@@ -214,7 +215,7 @@ spec:
               containerPort: 8300
           volumeMounts:
             {{- with $pvc }}
-            - name: {{ tpl .name $ctx }}
+            - name: {{ $storageName }}
               mountPath: {{ .mountPath }}
               {{- with .subPath }}
               subPath: {{ . }}
@@ -275,7 +276,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- if or (not $pvc.enabled) $pvc.existingClaim }}
-        - name: vmstorage-volume
+        - name: {{ $storageName }}
           {{- if $pvc.enabled }}
           persistentVolumeClaim: 
             claimName: {{ $pvc.existingClaim }}
@@ -291,7 +292,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: {{ tpl $pvc.name $ctx }}
+        name: {{ $storageName }}
         {{- with $pvc.annotations }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}

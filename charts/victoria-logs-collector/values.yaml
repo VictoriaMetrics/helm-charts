@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Use legacy naming convention (release-name based). When false, resource names
+# -- use the same convention as the operator (type-prefixed, e.g. vlsingle-<release>).
+useLegacyNaming: true
+
 # Important helm-chart settings below, modify them with your own settings.
 
 image:
@@ -303,6 +307,21 @@ networkPolicy:
   labels: {}
   # -- Extra annotations for NetworkPolicy
   annotations: {}
+
+# Deploy the collector through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-logs-collector/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VLAgent](https://docs.victoriametrics.com/operator/resources/vlagent/) resource built from chart values
+  # instead of the chart's own DaemonSet, ServiceAccount, RBAC and VMPodScrape.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VLAgent labels
+  labels: {}
+  # -- VLAgent annotations
+  annotations: {}
+  # -- VLAgent spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VLAgentSpec](https://docs.victoriametrics.com/operator/api/#vlagentspec)
+  spec: {}
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []

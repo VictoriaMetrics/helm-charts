@@ -13,8 +13,14 @@
 
 {{- /*
 vmauth.config.name returns the name of the generated config secret.
-It matches the operator naming (vmauth-config-<release>) when legacy naming is disabled.
+It matches the operator naming (vmauth-config-<release>) when legacy naming is disabled. With `operator.enabled`
+the operator owns that name, so the chart config passed as external config is named vmauth-<release>-config.
 */ -}}
 {{- define "vmauth.config.name" -}}
-  {{- include "vm.plain.fullname" (dict "helm" (.helm | default .) "kindOverride" "vmauth-config") -}}
+  {{- $helm := .helm | default . -}}
+  {{- if include "vm.operator.enabled" (dict "helm" $helm) -}}
+    {{- printf "%s-config" (include "vm.plain.fullname" (dict "helm" $helm "kindOverride" "vmauth")) -}}
+  {{- else -}}
+    {{- include "vm.plain.fullname" (dict "helm" $helm "kindOverride" "vmauth-config") -}}
+  {{- end -}}
 {{- end -}}

@@ -1,10 +1,12 @@
 ## Next release
 
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 - upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.30.7](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1307)
 - rename the container from `model` to `vmanomaly`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.
 - fix `persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
 - add the `monitoring-http` container port when `config.monitoring.pull` is enabled, matching the VictoriaMetrics operator.
 - fix `PodMonitor` scraping a non-existent `metrics` port: it now targets `monitoring-http`.
+- add `operator.enabled` to deploy vmanomaly through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VMAnomaly` resource built from chart values instead of its own Deployment/StatefulSet, Service, config ConfigMap, PodDisruptionBudget and VMPodScrape. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-metrics-anomaly/#victoriametrics-operator).
 
 ## v1.12.18
 

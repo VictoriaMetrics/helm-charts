@@ -1,5 +1,5 @@
 {{- $app := .Values }}
-{{- if $app.podMonitor.enabled }}
+{{- if and $app.podMonitor.enabled (not (include "vm.operator.enabled" .)) }}
 {{- if or (not ((($app.config).monitoring).pull).port) (not ((($app.config).monitoring).pull).enabled) -}}
   {{- fail "`config.monitoring.pull.port` is required and `config.monitoring.pull.enabled` should be `true`, when PodMonitor is enabled" -}}
 {{- end -}}

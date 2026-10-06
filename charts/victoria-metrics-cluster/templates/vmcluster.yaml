@@ -1,0 +1,108 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $Values := .Values }}
+{{- $ctx := dict "helm" . "kindOverride" "vmcluster" }}
+{{- $spec := dict }}
+{{- if $Values.autoDiscovery }}
+  {{- $_ := set $spec "discovery" (dict "enabled" true) }}
+{{- end }}
+{{- $sa := $Values.serviceAccount | default dict }}
+{{- if $sa.name }}
+  {{- $_ := set $spec "serviceAccountName" (tpl $sa.name .) }}
+{{- else if not $sa.create }}
+  {{- $_ := set $spec "serviceAccountName" "default" }}
+{{- end }}
+{{- with (include "vm.operator.license" .) }}
+  {{- $_ := set $spec "license" (fromYaml .) }}
+{{- end }}
+{{- with ($Values.global).imagePullSecrets }}
+  {{- $_ := set $spec "imagePullSecrets" . }}
+{{- end }}
+{{- $storage := $Values.vmstorage }}
+{{- if $storage.enabled }}
+  {{- $component := fromYaml (include "vm.operator.cluster.component" (dict "helm" . "appKey" "vmstorage" "kindOverride" "vmstorage" "app" $storage)) }}
+  {{- with $storage.retentionPeriod }}
+    {{- $_ := set $spec "retentionPeriod" (toString .) }}
+  {{- end }}
+  {{- $pvc := $storage.persistentVolume }}
+  {{- if and $pvc.enabled $pvc.existingClaim }}
+    {{- $_ := set $component "storageDataPath" $pvc.mountPath }}
+    {{- $_ := set $component "volumes" (append ($component.volumes | default list) (dict "name" "vmstorage-db" "persistentVolumeClaim" (dict "claimName" (tpl $pvc.existingClaim .)))) }}
+  {{- else if $pvc.enabled }}
+    {{- $template := dict "metadata" (dict "name" ($pvc.name | default (include "vmstorage.volume.name" (dict "helm" . "appKey" "vmstorage")))) "spec" (fromYaml (include "vm.operator.storage" (dict "persistentVolume" $pvc))) }}
+    {{- $_ := set $component "storage" (dict "volumeClaimTemplate" $template) }}
+  {{- end }}
+  {{- if ($storage.vmbackupmanager).enabled }}
+    {{- $_ := set $component "vmBackup" (fromYaml (include "vm.operator.backup" (dict "helm" . "appKey" (list "vmstorage" "vmbackupmanager") "manager" $storage.vmbackupmanager))) }}
+  {{- end }}
+  {{- $component = mergeOverwrite $component (fromYaml (include "vm.operator.self.scrape" (dict "scrape" $storage.serviceMonitor "path" "vmstorage.serviceMonitor"))) }}
+  {{- $_ := set $spec "vmstorage" $component }}
+{{- end }}
+{{- $select := $Values.vmselect }}
+{{- if $select.enabled }}
+  {{- $component := fromYaml (include "vm.operator.cluster.component" (dict "helm" . "appKey" "vmselect" "kindOverride" "vmselect" "app" $select)) }}
+  {{- with $select.cacheMountPath }}
+    {{- $_ := set $component "cacheMountPath" . }}
+  {{- end }}
+  {{- $pvc := $select.persistentVolume }}
+  {{- if and $pvc.enabled $pvc.existingClaim }}
+    {{- $_ := set $component "volumes" (append ($component.volumes | default list) (dict "name" "vmselect-cachedir" "persistentVolumeClaim" (dict "claimName" (tpl $pvc.existingClaim .)))) }}
+  {{- else if $pvc.enabled }}
+    {{- $template := dict "metadata" (dict "name" ($pvc.name | default (include "vmselect.volume.name" (dict "helm" . "appKey" "vmselect")))) "spec" (fromYaml (include "vm.operator.storage" (dict "persistentVolume" $pvc))) }}
+    {{- $_ := set $component "storage" (dict "volumeClaimTemplate" $template) }}
+  {{- end }}
+  {{- $component = mergeOverwrite $component (fromYaml (include "vm.operator.self.scrape" (dict "scrape" $select.serviceMonitor "path" "vmselect.serviceMonitor"))) }}
+  {{- $_ := set $spec "vmselect" $component }}
+{{- end }}
+{{- $insert := $Values.vminsert }}
+{{- if $insert.enabled }}
+  {{- $component := fromYaml (include "vm.operator.cluster.component" (dict "helm" . "appKey" "vminsert" "kindOverride" "vminsert" "app" $insert)) }}
+  {{- $extraArgs := $component.extraArgs | default dict }}
+  {{- with $extraArgs.replicationFactor }}
+    {{- $_ := set $spec "replicationFactor" (int .) }}
+    {{- $_ := unset $extraArgs "replicationFactor" }}
+  {{- end }}
+  {{- with $insert.excludeStorageIDs }}
+    {{- if $spec.vmstorage }}
+      {{- $ids := list }}
+      {{- range . }}
+        {{- $ids = append $ids (int .) }}
+      {{- end }}
+      {{- $_ := set $spec.vmstorage "maintenanceInsertNodeIDs" $ids }}
+    {{- end }}
+  {{- end }}
+  {{- if ($insert.relabel).enabled }}
+    {{- $relabelConfig := $insert.relabel.configMap | default (include "vminsert.relabel.config.name" (dict "helm" . "appKey" "vminsert")) }}
+    {{- $_ := set $component "volumes" (append ($component.volumes | default list) (dict "name" "relabelconfig" "configMap" (dict "name" $relabelConfig))) }}
+    {{- $_ := set $component "volumeMounts" (append ($component.volumeMounts | default list) (dict "name" "relabelconfig" "mountPath" "/relabelconfig")) }}
+    {{- $_ := set $extraArgs "relabelConfig" "/relabelconfig/relabel.yml" }}
+  {{- end }}
+  {{- if $extraArgs }}
+    {{- $_ := set $component "extraArgs" $extraArgs }}
+  {{- end }}
+  {{- $component = mergeOverwrite $component (fromYaml (include "vm.operator.self.scrape" (dict "scrape" $insert.serviceMonitor "path" "vminsert.serviceMonitor"))) }}
+  {{- $_ := set $spec "vminsert" $component }}
+{{- end }}
+{{- $auth := $Values.vmauth }}
+{{- if $auth.enabled }}
+  {{- if or $auth.config $auth.configSecretName }}
+    {{- fail "`vmauth.config` and `vmauth.configSecretName` are not converted with `operator.enabled: true`; the operator load balancer generates its own routing config, customize it in `operator.spec.requestsLoadBalancer`" }}
+  {{- end }}
+  {{- if ($auth.verticalPodAutoscaler).enabled }}
+    {{- fail "`vmauth.verticalPodAutoscaler` is not supported by the operator load balancer with `operator.enabled: true`" }}
+  {{- end }}
+  {{- $lb := fromYaml (include "vm.operator.cluster.component" (dict "helm" . "appKey" "vmauth" "kindOverride" "vmauth" "app" $auth)) }}
+  {{- $lb = mergeOverwrite $lb (fromYaml (include "vm.operator.self.scrape" (dict "scrape" $auth.serviceMonitor "path" "vmauth.serviceMonitor"))) }}
+  {{- $_ := set $spec "requestsLoadBalancer" (dict "enabled" true "spec" $lb) }}
+{{- end }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMCluster
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- end }}

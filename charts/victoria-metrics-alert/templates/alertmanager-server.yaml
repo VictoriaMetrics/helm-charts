@@ -1,7 +1,7 @@
 {{- $app := .Values.alertmanager }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
-{{- if and $mode $app.enabled (hasKey $app $mode) -}}
+{{- if and $mode $app.enabled (hasKey $app $mode) (not (include "vm.operator.enabled" .)) -}}
 {{- $modeOpts := index $app $mode }}
 {{- $ctx := dict "helm" . "appKey" "alertmanager" "kindOverride" "vmalertmanager" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}

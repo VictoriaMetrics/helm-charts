@@ -2,6 +2,8 @@
 
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
 - fix `vtstorage.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
+- add `operator.enabled` to deploy the VictoriaTraces cluster through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VTCluster` resource built from `vtstorage`, `vtselect` and `vtinsert` values instead of its own vtstorage, vtselect and vtinsert workloads, Services, ServiceAccount, PodDisruptionBudgets, HPAs, VPAs and VMServiceScrapes. The bundled `vmauth` becomes the `requestsLoadBalancer`. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-traces-cluster/#victoriametrics-operator).
 
 ## v0.2.10
 

@@ -1,6 +1,9 @@
 {{- $app := .Values }}
 {{- $ctx := dict "helm" . "kindOverride" "vmauth" }}
-{{- $ingresses := dict "" $app.ingress "internal" $app.ingressInternal }}
+{{- $ingresses := dict "internal" $app.ingressInternal }}
+{{- if not (include "vm.operator.enabled" .) }}
+  {{- $_ := set $ingresses "" $app.ingress }}
+{{- end }}
 {{- range $suffix, $ingress := $ingresses }}
 {{- if $ingress.enabled }}
 {{- $_ := set $ctx "extraLabels" $ingress.extraLabels }}

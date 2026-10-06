@@ -1,0 +1,116 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $app := .Values }}
+{{- $ctx := dict "helm" . "kindOverride" "vmauth" }}
+{{- if ne $app.mode "deployment" }}
+  {{- fail (printf "`mode: %s` is not supported by the VMAuth resource with `operator.enabled: true`; use `mode: deployment`" $app.mode) }}
+{{- end }}
+{{- $spec := fromYaml (include "vm.operator.app.spec" (dict "helm" . "app" $app "kindOverride" "vmauth")) }}
+{{- $extraArgs := $spec.extraArgs | default dict }}
+{{- $addr := $extraArgs.httpListenAddr | default (include "vm.addr.primary" $app.http) }}
+{{- $_ := unset $extraArgs "httpListenAddr" }}
+{{- range $flag, $value := fromYaml (include "vm.http.args" $app.http) }}
+  {{- if ne $flag "httpListenAddr" }}
+    {{- $_ := set $extraArgs $flag (toString $value) }}
+  {{- end }}
+{{- end }}
+{{- if $extraArgs }}
+  {{- $_ := set $spec "extraArgs" $extraArgs }}
+{{- end }}
+{{- $_ := set $spec "port" (include "vm.port.from.flag" (dict "flag" $addr)) }}
+{{- $_ := set $spec "externalConfig" (dict "secretRef" (dict "name" ($app.secretName | default (include "vmauth.config.name" $ctx)) "key" "auth.yml")) }}
+{{- with $app.deployment.spec.strategy }}
+  {{- with .type }}
+    {{- $_ := set $spec "updateStrategy" . }}
+  {{- end }}
+  {{- with .rollingUpdate }}
+    {{- $_ := set $spec "rollingUpdate" . }}
+  {{- end }}
+{{- end }}
+{{- $pdb := $app.podDisruptionBudget }}
+{{- if $pdb.enabled }}
+  {{- $budget := dict }}
+  {{- range $key := list "minAvailable" "maxUnavailable" "unhealthyPodEvictionPolicy" }}
+    {{- with index $pdb $key }}
+      {{- $_ := set $budget $key . }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $spec "podDisruptionBudget" $budget }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.self.scrape" (dict "scrape" .Values.serviceMonitor "path" "serviceMonitor"))) }}
+{{- with (include "vm.operator.service.spec" (dict "service" $app.service)) }}
+  {{- $_ := set $spec "serviceSpec" (fromYaml .) }}
+{{- end }}
+{{- $ingress := $app.ingress }}
+{{- if $ingress.enabled }}
+  {{- if and $ingress.pathType (ne $ingress.pathType "Prefix") }}
+    {{- fail "`ingress.pathType` other than `Prefix` is not converted with `operator.enabled: true`; set `operator.spec.ingress.extraRules` instead" }}
+  {{- end }}
+  {{- $spec_ingress := dict }}
+  {{- with $ingress.annotations }}
+    {{- $_ := set $spec_ingress "annotations" . }}
+  {{- end }}
+  {{- with $ingress.extraLabels }}
+    {{- $_ := set $spec_ingress "labels" . }}
+  {{- end }}
+  {{- with $ingress.ingressClassName }}
+    {{- $_ := set $spec_ingress "class_name" . }}
+  {{- end }}
+  {{- $rules := list }}
+  {{- range $i, $host := $ingress.hosts }}
+    {{- $paths := ternary (list $host.path) $host.path (kindIs "string" $host.path) }}
+    {{- if eq $i 0 }}
+      {{- $_ := set $spec_ingress "host" (tpl $host.name $) }}
+      {{- $_ := set $spec_ingress "paths" $paths }}
+    {{- else }}
+      {{- $rulePaths := list }}
+      {{- range $paths }}
+        {{- $rulePaths = append $rulePaths (dict "path" . "pathType" "Prefix" "backend" (dict "service" (dict "name" (include "vm.plain.fullname" $ctx) "port" (fromYaml (include "vm.ingress.port" $host))))) }}
+      {{- end }}
+      {{- $rules = append $rules (dict "host" (tpl $host.name $) "http" (dict "paths" $rulePaths)) }}
+    {{- end }}
+  {{- end }}
+  {{- with $rules }}
+    {{- $_ := set $spec_ingress "extraRules" . }}
+  {{- end }}
+  {{- range $i, $tls := (fromYamlArray (tpl (toYaml ($ingress.tls | default list)) $)) }}
+    {{- if eq $i 0 }}
+      {{- $_ := set $spec_ingress "tlsSecretName" $tls.secretName }}
+      {{- $_ := set $spec_ingress "tlsHosts" $tls.hosts }}
+    {{- else }}
+      {{- $_ := set $spec_ingress "extraTls" (append ($spec_ingress.extraTls | default list) $tls) }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $spec "ingress" $spec_ingress }}
+{{- end }}
+{{- $route := $app.route }}
+{{- if $route.enabled }}
+  {{- if $route.filters }}
+    {{- fail "`route.filters` is not converted with `operator.enabled: true`; set `operator.spec.httpRoute.extraRules` instead" }}
+  {{- end }}
+  {{- if and $route.matches (ne (toJson $route.matches) (toJson (list (dict "path" (dict "type" "PathPrefix" "value" "/"))))) }}
+    {{- fail "`route.matches` other than the default `/` prefix is not converted with `operator.enabled: true`; set `operator.spec.httpRoute.extraRules` instead" }}
+  {{- end }}
+  {{- $httpRoute := dict }}
+  {{- range $key := list "annotations" "parentRefs" "hostnames" "extraRules" }}
+    {{- with index $route $key }}
+      {{- $_ := set $httpRoute $key (fromYaml (tpl (toYaml (dict "v" .)) $)).v }}
+    {{- end }}
+  {{- end }}
+  {{- with $route.extraLabels }}
+    {{- $_ := set $httpRoute "labels" . }}
+  {{- end }}
+  {{- $_ := set $spec "httpRoute" $httpRoute }}
+{{- end }}
+{{- $spec = mergeOverwrite $spec (fromYaml (include "vm.operator.network.policy" (dict "networkPolicy" .Values.networkPolicy "path" "networkPolicy"))) }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" (dict "helm" . "spec" $spec) | nindent 2 }}
+{{- end }}
