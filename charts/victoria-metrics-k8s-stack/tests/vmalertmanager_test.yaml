@@ -26,6 +26,24 @@ tests:
         template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
         documentIndex: 1
 
+  - it: VMAlertmanager config Secret preserves user-supplied templates alongside the default one
+    set:
+      alertmanager:
+        enabled: true
+        config:
+          route:
+            receiver: blackhole
+          receivers:
+            - name: blackhole
+          templates:
+            - /etc/vm/configs/vm-alertmanager-templates/*.tmpl
+    asserts:
+      - matchRegex:
+          path: stringData["alertmanager.yaml"]
+          pattern: '(?s)templates:\n- /etc/vm/templates/\*\*/\*\.tmpl\n- /etc/vm/configs/vm-alertmanager-templates/\*\.tmpl'
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+        documentIndex: 0
+
   - it: vmalert notifier targets the vmalertmanager Service per replica
     set:
       alertmanager:

@@ -1,6 +1,7 @@
 ## Next release
 
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
+- BUGFIX: preserve user-supplied `.Values.alertmanager.config.templates` entries instead of overwriting them with the default `/etc/vm/templates/**/*.tmpl` glob, so custom template paths are no longer silently dropped from the generated config `Secret` (see [#3266](https://github.com/VictoriaMetrics/helm-charts/issues/3266)).
 
 ## v0.95.0
 
