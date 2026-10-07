@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- BUGFIX: render CRD manifests with `toYaml` instead of `toJson` in `templates/crd.yaml`, so each field is split across multiple indented lines instead of being emitted as a single potentially huge line. This fixes compatibility with tools like ArgoCD that can silently truncate or drop fields on very long lines (see [#3267](https://github.com/VictoriaMetrics/helm-charts/issues/3267)).
 
 ## v0.15.0
 

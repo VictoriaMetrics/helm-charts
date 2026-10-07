@@ -4,7 +4,11 @@
 {{- range $crds }}
   {{- $crd := merge (fromYaml .) $extra }}
   {{- range $attrKey, $attrValue := $crd }}
+    {{- if or (kindIs "map" $attrValue) (kindIs "slice" $attrValue) }}
+    {{- $attrKey }}:{{ toYaml $attrValue | nindent 2 }}
+    {{- else }}
     {{- $attrKey }}: {{ toJson $attrValue }}
+    {{- end }}
     {{- printf "\n" -}}
   {{ end }}
   {{- print "\n---\n" }}
