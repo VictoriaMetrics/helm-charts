@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- BUGFIX: fix `templates/route.yaml` and `templates/ingress.yaml` failing with `vm.operator.kind: appKey "alertmanager" is not vm/vl/vt-prefixed` when `alertmanager.route.enabled: true` or `alertmanager.ingress.enabled: true` is set. Regression from the `victoria-metrics-common` 0.4.* bump in v0.95.1, since `alertmanager` is the only top-level component key that isn't itself vm/vl/vt-prefixed (see [#3270](https://github.com/VictoriaMetrics/helm-charts/issues/3270)).
 
 ## v0.95.1
 

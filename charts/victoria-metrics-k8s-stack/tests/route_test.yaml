@@ -1,0 +1,44 @@
+suite: route tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - route.yaml
+tests:
+  - it: alertmanager route renders with the vmalertmanager-prefixed resource name
+    set:
+      alertmanager:
+        enabled: true
+        route:
+          enabled: true
+          hostnames:
+            - am.example.com
+    asserts:
+      - equal:
+          path: kind
+          value: HTTPRoute
+      - matchRegex:
+          path: metadata.name
+          pattern: '^vmalertmanager-'
+      - equal:
+          path: spec.hostnames[0]
+          value: am.example.com
+
+  - it: vmsingle route renders with the vmsingle-prefixed resource name
+    set:
+      vmsingle:
+        enabled: true
+        route:
+          enabled: true
+          hostnames:
+            - vm.example.com
+    asserts:
+      - equal:
+          path: kind
+          value: HTTPRoute
+      - matchRegex:
+          path: metadata.name
+          pattern: '^vmsingle-'
+      - equal:
+          path: spec.hostnames[0]
+          value: vm.example.com

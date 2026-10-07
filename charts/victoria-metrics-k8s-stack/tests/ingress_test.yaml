@@ -1,0 +1,44 @@
+suite: ingress tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - ingress.yaml
+tests:
+  - it: alertmanager ingress renders with the vmalertmanager-prefixed resource name
+    set:
+      alertmanager:
+        enabled: true
+        ingress:
+          enabled: true
+          hosts:
+            - am.example.com
+    asserts:
+      - equal:
+          path: kind
+          value: Ingress
+      - matchRegex:
+          path: metadata.name
+          pattern: '^vmalertmanager-'
+      - equal:
+          path: spec.rules[0].host
+          value: am.example.com
+
+  - it: vmsingle ingress renders with the vmsingle-prefixed resource name
+    set:
+      vmsingle:
+        enabled: true
+        ingress:
+          enabled: true
+          hosts:
+            - vm.example.com
+    asserts:
+      - equal:
+          path: kind
+          value: Ingress
+      - matchRegex:
+          path: metadata.name
+          pattern: '^vmsingle-'
+      - equal:
+          path: spec.rules[0].host
+          value: vm.example.com
