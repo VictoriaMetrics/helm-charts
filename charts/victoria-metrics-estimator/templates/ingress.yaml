@@ -1,7 +1,7 @@
 {{- if .Values.ingress.enabled }}
 {{- $component := ternary "single" "select" (eq .Values.mode "single") }}
 {{- $ctx := dict "helm" . "appKey" $component "kindOverride" (include "vmestimator.kind" $component) }}
-{{- $app := index .Values $component }}
+{{- $app := fromYaml (include "vmestimator.appValues" (dict "root" . "component" $component)) }}
 {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr }}
 {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) }}
 apiVersion: networking.k8s.io/v1

@@ -38,10 +38,41 @@ fullnameOverride/global.fullnameOverride, matching every other chart.
   {{- end -}}
 {{- end -}}
 
+{{- /*
+vmestimator.appValues resolves the configuration dict for a workload component.
+"single" falls back to "storage" for any field not set under the deprecated
+.Values.single. "storage" and "select" read their own block directly.
+*/ -}}
+{{- define "vmestimator.appValues" -}}
+  {{- $root := .root -}}
+  {{- $component := .component -}}
+  {{- if eq $component "single" -}}
+    {{- mergeOverwrite (deepCopy $root.Values.storage) (deepCopy ($root.Values.single | default dict)) | toYaml -}}
+  {{- else -}}
+    {{- index $root.Values $component | toYaml -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /*
+vmestimator.cardinalityPath resolves the effective HTTP path vmestimator exposes
+cardinality_estimate metrics at for a component.
+*/ -}}
+{{- define "vmestimator.cardinalityPath" -}}
+  {{- $root := .root -}}
+  {{- $component := .component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
+  {{- $extraArgs := $app.extraArgs | default dict -}}
+  {{- if hasKey $extraArgs "cardinalityMetrics.exposeAt" -}}
+    {{- index $extraArgs "cardinalityMetrics.exposeAt" -}}
+  {{- else -}}
+    /metrics
+  {{- end -}}
+{{- end -}}
+
 {{- define "vmestimator.args" -}}
   {{- $root := .root -}}
   {{- $component := .component -}}
-  {{- $app := index $root.Values $component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $args := dict "httpListenAddr" (printf ":%v" $app.service.port) -}}
   {{- if ne $component "select" -}}
     {{- $_ := set $args "config" (printf "/etc/vmestimator/%s" $root.Values.config.key) -}}
@@ -69,7 +100,7 @@ fullnameOverride/global.fullnameOverride, matching every other chart.
   {{- $root := .root -}}
   {{- $component := .component -}}
   {{- $kind := .kind -}}
-  {{- $app := index $root.Values $component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
   {{- $configChecksum := and (ne $component "select") (not $root.Values.config.existingConfigMap) -}}
@@ -83,7 +114,7 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
-  replicas: {{ $app.replicaCount }}
+  replicas: {{ ternary 1 $app.replicaCount (eq $component "single") }}
   {{- if eq $kind "StatefulSet" }}
   serviceName: {{ $name }}
   podManagementPolicy: Parallel
@@ -200,7 +231,7 @@ spec:
   {{- $component := .component -}}
   {{- $headless := .headless | default false -}}
   {{- $nameSuffix := .nameSuffix | default "" -}}
-  {{- $app := index $root.Values $component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
   {{- $ctx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) "extraLabels" $app.service.labels -}}

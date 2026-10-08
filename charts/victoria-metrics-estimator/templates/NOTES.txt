@@ -1,5 +1,5 @@
 {{- if eq .Values.mode "single" }}
-{{- $app := .Values.single }}
+{{- $app := fromYaml (include "vmestimator.appValues" (dict "root" . "component" "single")) }}
 {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr }}
 {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) }}
 vmestimator is available at {{ include "vmestimator.fullname" (dict "root" . "component" "single") }}:{{ $port }}.

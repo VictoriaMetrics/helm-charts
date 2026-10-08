@@ -65,63 +65,16 @@ config:
         group_by:
           - __name__
 
+# -- (object) Settings specific to the single-node component in `mode: single`. Falls back to
+# storage.* for any field not set here (replicaCount excepted: single mode always runs 1 replica)
 single:
-  # -- Number of single-node replicas
-  replicaCount: 1
-  # -- Additional command-line arguments
-  extraArgs:
-    envflag.enable: true
-    envflag.prefix: VM_
-    loggerFormat: json
-  # -- Override the container command
-  command: []
   # -- Overrides the full name of the single-node component
   fullnameOverride: ""
-  # -- Additional environment variables
-  env: []
-  # -- Additional environment sources
-  envFrom: []
-  # -- Pod annotations
-  podAnnotations: {}
-  # -- Pod labels
-  podLabels: {}
-  # -- Container resources
-  resources: {}
-  # -- Custom DNS config for pod
-  dnsConfig: {}
-  # -- Pod node selector
-  nodeSelector: {}
-  # -- Pod tolerations
-  tolerations: []
-  # -- Pod affinity
-  affinity: {}
-  # -- Pod topology spread constraints
-  topologySpreadConstraints: []
-  # -- Additional volumes
-  extraVolumes: []
-  # -- Additional volume mounts
-  extraVolumeMounts: []
-  service:
-    # -- Service type
-    type: ClusterIP
-    # -- Service port
-    port: 8490
-    # -- Service annotations
-    annotations: {}
-    # -- Service labels
-    labels: {}
-  podDisruptionBudget:
-    # -- Enable a PodDisruptionBudget
-    enabled: false
-    # -- Minimum available pods
-    minAvailable: 0
-    # -- Maximum unavailable pods
-    maxUnavailable: 0
-    # -- Policy for evicting unhealthy pods
-    unhealthyPodEvictionPolicy:
 
+# -- (object) Settings for the storage component in `mode: cluster`, and the default
+# configuration source for `mode: single` too (see single.* above)
 storage:
-  # -- Number of storage nodes in cluster mode
+  # -- Number of storage nodes in cluster mode. Ignored in single mode (always 1 replica)
   replicaCount: 3
   # -- Additional command-line arguments
   extraArgs:
