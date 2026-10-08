@@ -22,12 +22,93 @@ tests:
       - equal:
           path: spec.ports[0].port
           value: 9000
-  - it: preserves the insert suffix for long names
+  - it: cluster mode's merged storage/insert service honors a component fullnameOverride
     set:
       mode: cluster
-      storage.fullnameOverride: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk
+      storage.fullnameOverride: custom-storage
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: custom-storage
+        documentIndex: 1
+
+  - it: single mode falls back to storage.fullnameOverride like every other field (default and insert collide, which is harmless since both are backed by the same single pods)
+    set:
+      storage.fullnameOverride: custom-single
     asserts:
       - equal:
           path: metadata.name
-          value: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd-insert
+          value: custom-single
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: custom-single
+        documentIndex: 1
+
+  - it: single.fullnameOverride still takes precedence over storage.fullnameOverride
+    set:
+      storage.fullnameOverride: storage-override
+      single.fullnameOverride: single-override
+    asserts:
+      - equal:
+          path: metadata.name
+          value: single-override
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: single-override
+        documentIndex: 1
+
+  - it: single mode exposes a default and an insert service, both backed by single
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: vmestimator-RELEASE-NAME
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: vmestimator-insert-RELEASE-NAME
+        documentIndex: 1
+      - equal:
+          path: spec.selector["app.kubernetes.io/name"]
+          value: vmestimator-single
+        documentIndex: 0
+      - equal:
+          path: spec.selector["app.kubernetes.io/name"]
+          value: vmestimator-single
+        documentIndex: 1
+
+  - it: cluster mode exposes a default service backed by select and an insert service backed by storage (also the StatefulSet's governing headless Service)
+    set:
+      mode: cluster
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: vmestimator-RELEASE-NAME
+        documentIndex: 0
+      - equal:
+          path: spec.selector["app.kubernetes.io/name"]
+          value: vmestimator-select
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: vmestimator-insert-RELEASE-NAME
+        documentIndex: 1
+      - equal:
+          path: spec.type
+          value: ClusterIP
+        documentIndex: 1
+      - equal:
+          path: spec.clusterIP
+          value: None
+        documentIndex: 1
+      - equal:
+          path: spec.selector["app.kubernetes.io/name"]
+          value: vmestimator-storage
         documentIndex: 1

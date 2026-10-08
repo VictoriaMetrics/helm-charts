@@ -24,24 +24,74 @@
 
 {{- /*
 vmestimator.fullname resolves the fully qualified name of a chart resource.
-Pass "component" as one of "single", "storage" or "select" for a
-per-component resource, or omit it for a chart-wide shared resource
-(ConfigMap, ServiceAccount) — the latter honors a root-level
-fullnameOverride/global.fullnameOverride, matching every other chart.
+Pass "component" as one of "single", "storage" or "select" for a per-component
+resource, or omit it for a chart-wide shared resource (ConfigMap, ServiceAccount)
+— the latter honors a root-level fullnameOverride/global.fullnameOverride,
+matching every other chart. "name" overrides the resource's display kind
+(e.g. "" for the bare default-named service, "insert" for the insert-named
+service) independently of "component", which still drives the fullnameOverride
+lookup. It defaults to "component" when omitted.
 */ -}}
 {{- define "vmestimator.fullname" -}}
   {{- include "vmestimator.validateNaming" . -}}
   {{- if not .component -}}
     {{- include "vm.plain.fullname" (dict "helm" .root "kindOverride" "vmestimator") -}}
   {{- else -}}
-    {{- include "vm.plain.fullname" (dict "helm" .root "appKey" .component "kindOverride" (include "vmestimator.kind" .component)) -}}
+    {{- $name := .component -}}
+    {{- if hasKey . "name" -}}
+      {{- $name = .name -}}
+    {{- end -}}
+    {{- $args := dict "helm" .root "appKey" .component "kindOverride" (include "vmestimator.kind" $name) -}}
+    {{- if eq .component "single" -}}
+      {{- $_ := set $args "single" (dict "fullnameOverride" (.root.Values.storage | default dict).fullnameOverride) -}}
+    {{- end -}}
+    {{- include "vm.plain.fullname" $args -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /*
+vmestimator.appValues resolves the configuration dict for a workload component.
+"single" falls back to "storage" for any field not set under the deprecated
+.Values.single. "storage" and "select" read their own block directly.
+*/ -}}
+{{- define "vmestimator.appValues" -}}
+  {{- $root := .root -}}
+  {{- $component := .component -}}
+  {{- if eq $component "single" -}}
+    {{- mergeOverwrite (deepCopy ($root.Values.storage | default dict)) (deepCopy ($root.Values.single | default dict)) | toYaml -}}
+  {{- else if eq $component "storage" -}}
+    {{- $app := deepCopy ($root.Values.storage | default dict) -}}
+    {{- $extraArgs := $app.extraArgs | default dict -}}
+    {{- if not (hasKey $extraArgs "cardinalityMetrics.exposeAt") -}}
+      {{- $_ := set $extraArgs "cardinalityMetrics.exposeAt" "/cardinality/metrics" -}}
+      {{- $_ := set $app "extraArgs" $extraArgs -}}
+    {{- end -}}
+    {{- $app | toYaml -}}
+  {{- else -}}
+    {{- index $root.Values $component | toYaml -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /*
+vmestimator.cardinalityPath resolves the effective HTTP path vmestimator exposes
+cardinality_estimate metrics at for a component.
+*/ -}}
+{{- define "vmestimator.cardinalityPath" -}}
+  {{- $root := .root -}}
+  {{- $component := .component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
+  {{- $extraArgs := $app.extraArgs | default dict -}}
+  {{- if hasKey $extraArgs "cardinalityMetrics.exposeAt" -}}
+    {{- index $extraArgs "cardinalityMetrics.exposeAt" -}}
+  {{- else -}}
+    /metrics
   {{- end -}}
 {{- end -}}
 
 {{- define "vmestimator.args" -}}
   {{- $root := .root -}}
   {{- $component := .component -}}
-  {{- $app := index $root.Values $component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $args := dict "httpListenAddr" (printf ":%v" $app.service.port) -}}
   {{- if ne $component "select" -}}
     {{- $_ := set $args "config" (printf "/etc/vmestimator/%s" $root.Values.config.key) -}}
@@ -50,10 +100,11 @@ fullnameOverride/global.fullnameOverride, matching every other chart.
     {{- $addrFlag := ($storage.extraArgs | default dict).httpListenAddr -}}
     {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $storage.service.port) -}}
     {{- $storageName := include "vmestimator.fullname" (dict "root" $root "component" "storage") -}}
+    {{- $storageServiceName := include "vmestimator.fullname" (dict "root" $root "component" "storage" "name" "insert") -}}
     {{- $ns := include "vm.namespace" (dict "helm" $root "appKey" "storage") -}}
     {{- $nodes := list -}}
     {{- range $i := until (int $storage.replicaCount) -}}
-      {{- $fqdn := printf "%s-%d.%s.%s.svc" $storageName $i $storageName $ns -}}
+      {{- $fqdn := printf "%s-%d.%s.%s.svc" $storageName $i $storageServiceName $ns -}}
       {{- with $root.Values.global.cluster.dnsDomain -}}
         {{- $fqdn = printf "%s.%s" $fqdn . -}}
       {{- end -}}
@@ -69,7 +120,7 @@ fullnameOverride/global.fullnameOverride, matching every other chart.
   {{- $root := .root -}}
   {{- $component := .component -}}
   {{- $kind := .kind -}}
-  {{- $app := index $root.Values $component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
   {{- $configChecksum := and (ne $component "select") (not $root.Values.config.existingConfigMap) -}}
@@ -83,9 +134,9 @@ metadata:
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 spec:
-  replicas: {{ $app.replicaCount }}
+  replicas: {{ ternary 1 $app.replicaCount (eq $component "single") }}
   {{- if eq $kind "StatefulSet" }}
-  serviceName: {{ $name }}
+  serviceName: {{ include "vmestimator.fullname" (dict "root" $root "component" $component "name" "insert") }}
   podManagementPolicy: Parallel
   {{- end }}
   selector:
@@ -190,24 +241,23 @@ spec:
       {{- end }}
 {{- end -}}
 
-{{- define "vmestimator.serviceName" -}}
-  {{- $nameSuffix := .nameSuffix | default "" -}}
-  {{- printf "%s%s" ((include "vmestimator.fullname" (dict "root" .root "component" .component)) | trunc (int (sub 63 (len $nameSuffix)))) $nameSuffix | trimSuffix "-" -}}
-{{- end -}}
-
 {{- define "vmestimator.service" -}}
   {{- $root := .root -}}
   {{- $component := .component -}}
   {{- $headless := .headless | default false -}}
-  {{- $nameSuffix := .nameSuffix | default "" -}}
-  {{- $app := index $root.Values $component -}}
+  {{- $name := $component -}}
+  {{- if hasKey . "name" -}}
+    {{- $name = .name -}}
+  {{- end -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
+  {{- $selectorCtx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) -}}
   {{- $ctx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) "extraLabels" $app.service.labels -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "vmestimator.serviceName" (dict "root" $root "component" $component "nameSuffix" $nameSuffix) }}
+  name: {{ include "vmestimator.fullname" (dict "root" $root "component" $component "name" $name) }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
@@ -225,7 +275,58 @@ spec:
       port: {{ $port }}
       targetPort: http
       protocol: TCP
-  selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
+  selector: {{ include "vm.selectorLabels" $selectorCtx | nindent 4 }}
+{{- end -}}
+
+{{- define "vmestimator.monitor" -}}
+  {{- $root := .root -}}
+  {{- $component := .component -}}
+  {{- $name := $component -}}
+  {{- if hasKey . "name" -}}
+    {{- $name = .name -}}
+  {{- end -}}
+  {{- $ctx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $name) -}}
+  {{- $selectorCtx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) -}}
+  {{- $cardinalityPath := "" -}}
+  {{- if ne $component "storage" -}}
+    {{- $cardinalityPath = include "vmestimator.cardinalityPath" (dict "root" $root "component" $component) -}}
+  {{- end -}}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: {{ include "vmestimator.fullname" (dict "root" $root "component" $component "name" $name) }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  {{- $_ := set $ctx "extraLabels" $root.Values.serviceMonitor.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- with $root.Values.serviceMonitor.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  endpoints:
+    - port: http
+      path: /metrics
+      {{- with $root.Values.serviceMonitor.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $root.Values.serviceMonitor.metricRelabelings }}
+      metricRelabelConfigs: {{ toYaml . | nindent 8 }}
+      {{- end }}
+    {{- if and $cardinalityPath (ne $cardinalityPath "/metrics") }}
+    - port: http
+      path: {{ $cardinalityPath }}
+      {{- with $root.Values.serviceMonitor.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $root.Values.serviceMonitor.metricRelabelings }}
+      metricRelabelConfigs: {{ toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ include "vm.namespace" $ctx }}
+  selector:
+    matchLabels: {{ include "vm.commonLabels" $selectorCtx | nindent 6 }}
 {{- end -}}
 
 {{- /*

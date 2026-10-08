@@ -18,3 +18,112 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmestimator-single
+
+  - it: single mode scrapes only /metrics by default, unlike storage's own cardinalityMetrics.exposeAt default
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+
+  - it: single mode scrapes both /metrics and the cardinality path when storage.extraArgs sets one explicitly
+    set:
+      serviceMonitor.enabled: true
+      storage.extraArgs:
+        cardinalityMetrics.exposeAt: /cardinality/metrics
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 2
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+      - equal:
+          path: spec.endpoints[1].path
+          value: /cardinality/metrics
+
+  - it: single mode scrapes a user-supplied, non-colliding cardinality path
+    set:
+      serviceMonitor.enabled: true
+      single.extraArgs:
+        cardinalityMetrics.exposeAt: /custom/estimates
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 2
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+      - equal:
+          path: spec.endpoints[1].path
+          value: /custom/estimates
+
+  - it: cluster mode exposes a VMServiceScrape for select and one for storage, both /metrics only
+    set:
+      mode: cluster
+      serviceMonitor.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+        documentIndex: 0
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+        documentIndex: 0
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+        documentIndex: 1
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+        documentIndex: 1
+
+  - it: storage's VMServiceScrape stays /metrics only even when storage.extraArgs sets a non-default cardinality path
+    set:
+      mode: cluster
+      serviceMonitor.enabled: true
+      storage.extraArgs:
+        cardinalityMetrics.exposeAt: /custom/estimates
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+        documentIndex: 1
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+        documentIndex: 1
+
+  - it: collapses to a single endpoint when the resolved cardinality path collides with /metrics
+    set:
+      serviceMonitor.enabled: true
+      single.extraArgs:
+        cardinalityMetrics.exposeAt: /metrics
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+
+  - it: collapses to a single endpoint when cardinality metrics are explicitly disabled
+    set:
+      serviceMonitor.enabled: true
+      single.extraArgs:
+        cardinalityMetrics.exposeAt: ""
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
