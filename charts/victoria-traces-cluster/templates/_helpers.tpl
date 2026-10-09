@@ -204,3 +204,11 @@
   targetPort: {{ .targetPort }}
 {{- end }}
 {{- end -}}
+
+{{- /*
+vtstorage.volume.name returns the default storage volume name.
+It matches the name used by the VictoriaMetrics operator when legacy naming is disabled.
+*/ -}}
+{{- define "vtstorage.volume.name" -}}
+  {{- ternary "vtstorage-db" "vtstorage-volume" (eq (include "vm.useLegacyNaming" .) "false") -}}
+{{- end -}}
