@@ -18,3 +18,55 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmestimator-single
+
+  - it: single mode scrapes both /metrics and the inherited cardinality path, since they never overlap
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 2
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+      - equal:
+          path: spec.endpoints[1].path
+          value: /cardinality/metrics
+
+  - it: cluster mode's select component scrapes only /metrics, since it doesn't set cardinalityMetrics.exposeAt
+    set:
+      mode: cluster
+      serviceMonitor.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+
+  - it: collapses to a single endpoint when the resolved cardinality path collides with /metrics
+    set:
+      serviceMonitor.enabled: true
+      single.extraArgs:
+        cardinalityMetrics.exposeAt: /metrics
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+
+  - it: collapses to a single endpoint when cardinality metrics are explicitly disabled
+    set:
+      serviceMonitor.enabled: true
+      single.extraArgs:
+        cardinalityMetrics.exposeAt: ""
+    asserts:
+      - lengthEqual:
+          path: spec.endpoints
+          count: 1
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics

@@ -1,7 +1,7 @@
 {{- $root := . }}
 {{- $components := ternary (list "single") (list "storage" "select") (eq .Values.mode "single") }}
 {{- range $component := $components }}
-{{- $app := index $root.Values $component }}
+{{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) }}
 {{- if $app.podDisruptionBudget.enabled }}
 {{- $pdb := $app.podDisruptionBudget }}
 {{- if and $pdb.minAvailable $pdb.maxUnavailable }}

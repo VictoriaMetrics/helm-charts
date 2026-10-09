@@ -1,6 +1,7 @@
 ## Next release
 
-- TODO
+- `mode: single` now reads its configuration from `storage.*` by default, instead of a near-duplicate `single.*` values section. `single.*` is kept for backward compatibility: any field still set there overrides the equivalent `storage.*` field for single mode only. `single.replicaCount` (if set) is ignored either way — single mode always runs exactly 1 replica. No action is needed on upgrade; existing `single.*` overrides keep working as before.
+- the `VMServiceScrape` for `single`/`select` now scrapes a second endpoint for the resolved `cardinalityMetrics.exposeAt` path whenever it differs from `/metrics`, so cardinality estimates stay visible even though single mode now inherits `storage`'s default of moving them to `/cardinality/metrics`.
 
 ## v0.2.0
 
