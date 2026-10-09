@@ -329,7 +329,9 @@ defaultRules:
       rules: {}
       enabled: '{{ .Values.kubeApiServer.enabled }}'
     kube-prometheus-general.rules:
+      # -- Only contains count:up0/count:up1. count:up0 has no data when all targets are up, triggering RecordingRulesNoData.
       rules: {}
+      enabled: false
     kube-prometheus-node-recording.rules:
       rules: {}
     kube-scheduler.rules:
