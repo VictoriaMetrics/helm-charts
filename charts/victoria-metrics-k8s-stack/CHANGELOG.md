@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0)
 - BUGFIX: disable `kube-prometheus-general.rules` group by default. Regression from `v0.85.0` with VMRules installed by `sync-job`.  See [#3274](https://github.com/VictoriaMetrics/helm-charts/issues/3274).
 
 ## v0.95.2
