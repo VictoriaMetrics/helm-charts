@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.96.0
+
+**Release date:** 12 Oct 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.154.0](https://img.shields.io/badge/v1.154.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11540) ![VM Operator: 0.68.1](https://img.shields.io/badge/VM_Operator-0.68.1-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230681)
+
 - bump version of VM components to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0)
 - BUGFIX: disable `kube-prometheus-general.rules` group by default. Regression from `v0.85.0` with VMRules installed by `sync-job`.  See [#3274](https://github.com/VictoriaMetrics/helm-charts/issues/3274).
 
