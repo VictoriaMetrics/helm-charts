@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0)
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 - fix `persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - fix `persistentVolume.name` in `statefulSet` mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.

@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0)
 - fix `alertmanager.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 - fix Alertmanager HA mode (`alertmanager.mode: statefulSet` with `alertmanager.replicaCount` > 1): replicas didn't form a cluster and vmalert couldn't reach them, because the per-pod addresses didn't resolve. Peers and vmalert notifiers now use the per-pod DNS names of the StatefulSet governing Service. The unused `-headless` Service is removed. The upgrade is in place: the StatefulSet `serviceName` is unchanged.

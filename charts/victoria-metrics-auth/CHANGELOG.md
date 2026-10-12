@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0)
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 - add missing `serviceAccount.automountToken` value (default `true`), so `automountServiceAccountToken` is no longer rendered empty.
 - rename the config volume from `config` to `config-out` to match the VictoriaMetrics operator. Pods are restarted once on upgrade.

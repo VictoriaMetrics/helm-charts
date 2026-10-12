@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0)
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
 - fix `server.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - fix pod label selector in the chart notes: repeated `-l` flags were replaced with a single comma-separated selector, since `kubectl` only honours the last `-l`.
