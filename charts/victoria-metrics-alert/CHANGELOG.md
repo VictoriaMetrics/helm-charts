@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.51.0
+
+**Release date:** 12 Oct 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.154.0](https://img.shields.io/badge/v1.154.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11540)
+
 - bump version of VM components to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0)
 - fix `alertmanager.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
