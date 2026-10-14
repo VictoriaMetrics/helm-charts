@@ -1,0 +1,496 @@
+suite: labels and selectors
+set:
+  serviceAccount.create: true
+  vlinsert.enabled: true
+  vlinsert.horizontalPodAutoscaler.enabled: true
+  vlinsert.ingress.enabled: true
+  vlinsert.networkPolicy.enabled: true
+  vlinsert.podDisruptionBudget.enabled: true
+  vlinsert.route.enabled: true
+  vlinsert.service.enabled: true
+  vlinsert.vmServiceScrape.enabled: true
+  vlselect.enabled: true
+  vlselect.horizontalPodAutoscaler.enabled: true
+  vlselect.ingress.enabled: true
+  vlselect.networkPolicy.enabled: true
+  vlselect.podDisruptionBudget.enabled: true
+  vlselect.route.enabled: true
+  vlselect.service.enabled: true
+  vlselect.vmServiceScrape.enabled: true
+  vlstorage.enabled: true
+  vlstorage.horizontalPodAutoscaler.enabled: true
+  vlstorage.ingress.enabled: true
+  vlstorage.networkPolicy.enabled: true
+  vlstorage.podDisruptionBudget.enabled: true
+  vlstorage.route.enabled: true
+  vlstorage.service.enabled: true
+  vlstorage.vmServiceScrape.enabled: true
+  vmauth.enabled: true
+  vmauth.horizontalPodAutoscaler.enabled: true
+  vmauth.ingress.enabled: true
+  vmauth.networkPolicy.enabled: true
+  vmauth.podDisruptionBudget.enabled: true
+  vmauth.route.enabled: true
+  vmauth.service.enabled: true
+  vmauth.vmServiceScrape.enabled: true
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - networkpolicy.yaml
+  - pdb.yaml
+  - scrape.yaml
+  - service.yaml
+  - vlinsert-server.yaml
+  - vlselect-server.yaml
+  - vlstorage-server.yaml
+  - vmauth-server.yaml
+  - hpa.yaml
+  - ingress.yaml
+  - route.yaml
+  - serviceaccount.yaml
+  - vmauth-config.yaml
+tests:
+  - it: "selectors match pod labels with operator naming"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlinsert
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlinsert-RELEASE-NAME
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlstorage
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlstorage-RELEASE-NAME
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlinsert
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlinsert-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlstorage
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlstorage-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlinsert
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlinsert-RELEASE-NAME
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlstorage
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlstorage-RELEASE-NAME
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlinsert
+        template: vlinsert-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlinsert
+        template: vlinsert-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: vlselect-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: vlselect-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: vmauth-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlstorage
+        template: vlstorage-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlstorage
+        template: vlstorage-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlinsert
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlinsert-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlselect
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlselect-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vlstorage
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: vlstorage-RELEASE-NAME
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmauth
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmauth-RELEASE-NAME
+  - it: "selectors match pod labels with legacy naming"
+    set:
+      useLegacyNaming: true
+    asserts:
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: vlinsert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlselect
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: vlstorage
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: networkpolicy.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vmauth
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vlinsert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlselect
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vlstorage
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: pdb.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vmauth
+      - equal:
+          path: spec.selector
+          value:
+            app: vlinsert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      - equal:
+          path: spec.selector
+          value:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlselect
+      - equal:
+          path: spec.selector
+          value:
+            app: vlstorage
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      - equal:
+          path: spec.selector
+          value:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vmauth
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vlinsert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: vlinsert-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: vlinsert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: vlinsert-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: vlselect-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: vlselect-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: vmauth-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: vmauth-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: vlstorage
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: vlstorage-server.yaml
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app: vlstorage
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: vlstorage-server.yaml
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: vlinsert
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlinsert
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: vlselect
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlselect
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: vlstorage
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vlstorage
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: vmauth
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: victoria-logs-cluster
+        template: scrape.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-logs-cluster-vmauth

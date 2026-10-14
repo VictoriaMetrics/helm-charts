@@ -1,0 +1,50 @@
+suite: cluster native port tests
+set:
+  vmselect.extraArgs.clusternativeListenAddr: ":8401"
+  vminsert.extraArgs.clusternativeListenAddr: ":8400"
+templates:
+  - vmselect-server.yaml
+  - vminsert-server.yaml
+  - service.yaml
+tests:
+  - it: names the cluster native container port as the operator does
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: clusternative
+            protocol: TCP
+            containerPort: 8401
+        template: vmselect-server.yaml
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: clusternative
+            protocol: TCP
+            containerPort: 8400
+        template: vminsert-server.yaml
+
+  - it: exposes the cluster native port on the services
+    asserts:
+      - contains:
+          path: spec.ports
+          content:
+            name: clusternative
+            protocol: TCP
+            port: 8401
+            targetPort: clusternative
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vmselect
+      - contains:
+          path: spec.ports
+          content:
+            name: clusternative
+            protocol: TCP
+            port: 8400
+            targetPort: clusternative
+        template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-cluster-vminsert

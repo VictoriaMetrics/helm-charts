@@ -190,10 +190,10 @@
   targetPort: {{ .targetPort }}
 {{- end }}
 {{- with $extraArgs.clusternativeListenAddr }}
-- name: cluster-tcp
+- name: clusternative
   protocol: TCP
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
-  targetPort: cluster-tcp
+  targetPort: clusternative
 {{- end }}
 {{- end -}}
 
@@ -218,10 +218,10 @@
   targetPort: {{ .targetPort }}
 {{- end }}
 {{- with $extraArgs.clusternativeListenAddr }}
-- name: cluster-tcp
+- name: clusternative
   protocol: TCP
   port: {{ include "vm.port.from.flag" (dict "flag" .) }}
-  targetPort: cluster-tcp
+  targetPort: clusternative
 {{- end }}
 {{- with $extraArgs.graphiteListenAddr }}
 - name: graphite-tcp
@@ -312,4 +312,20 @@
   protocol: TCP
   targetPort: {{ .targetPort }}
 {{- end }}
+{{- end -}}
+
+{{- /*
+vmstorage.volume.name returns the default storage volume name.
+It matches the name used by the VictoriaMetrics operator when legacy naming is disabled.
+*/ -}}
+{{- define "vmstorage.volume.name" -}}
+  {{- ternary "vmstorage-db" "vmstorage-volume" (eq (include "vm.useLegacyNaming" .) "false") -}}
+{{- end -}}
+
+{{- /*
+vmselect.volume.name returns the default storage volume name.
+It matches the name used by the VictoriaMetrics operator when legacy naming is disabled.
+*/ -}}
+{{- define "vmselect.volume.name" -}}
+  {{- ternary "vmselect-cachedir" "cache-volume" (eq (include "vm.useLegacyNaming" .) "false") -}}
 {{- end -}}

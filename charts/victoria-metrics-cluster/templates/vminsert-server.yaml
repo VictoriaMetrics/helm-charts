@@ -4,7 +4,7 @@
 {{- $ctx := dict "helm" . "appKey" "vminsert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $relabelConfig := include "vminsert.relabel.config.name" $ctx }}
-{{- $sa := include "vm.fullname" . }}
+{{- $sa := include "vm.plain.fullname" (dict "helm" . "kindOverride" "vmcluster") }}
 {{- $ns := include "vm.namespace" $ctx }}
 apiVersion: apps/v1
 kind: Deployment
@@ -80,7 +80,7 @@ spec:
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .value "default" "8480") }}
             {{- end }}
             {{- with $app.extraArgs.clusternativeListenAddr }}
-            - name: cluster-tcp
+            - name: clusternative
               protocol: TCP
               containerPort: {{ include "vm.port.from.flag" (dict "flag" .) }}
             {{- end }}

@@ -1,0 +1,43 @@
+suite: volume naming tests
+set:
+templates:
+  - vlstorage-server.yaml
+tests:
+  - it: uses the legacy volume name by default
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: vlstorage-volume
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "vlstorage-volume")]
+
+  - it: "uses the operator volume name with useLegacyNaming: false"
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: vlstorage-db
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "vlstorage-db")]
+
+  - it: an explicit volume name takes precedence with operator naming
+    set:
+      vlstorage.persistentVolume.name: custom-volume
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: custom-volume
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "custom-volume")]
+
+  - it: an explicit volume name takes precedence with legacy naming
+    set:
+      vlstorage.persistentVolume.name: custom-volume
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: custom-volume
+      - exists:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name == "custom-volume")]
