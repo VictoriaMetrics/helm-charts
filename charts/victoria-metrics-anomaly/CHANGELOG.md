@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.31.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1311), fixing data fetching for peer-group models in periodic deployments.
 
 ## v1.12.19
 
