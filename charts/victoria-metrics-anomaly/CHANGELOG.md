@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v1.12.20
+
+**Release date:** 15 Oct 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.31.1](https://img.shields.io/badge/v1.31.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fanomaly-detection%2Fchangelog%2F%23v1311)
+
 - upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.31.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1311), fixing data fetching for peer-group models in periodic deployments.
 
 ## v1.12.19
