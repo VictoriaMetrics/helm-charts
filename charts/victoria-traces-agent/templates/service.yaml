@@ -49,29 +49,54 @@ spec:
   trafficDistribution: {{ . }}
   {{- end }}
   ports:
+    {{- $overrides := $service.portOverrides | default dict }}
     {{- $extraArgs := .Values.extraArgs | default dict }}
     {{- $httpAddr := $extraArgs.httpListenAddr -}}
     {{- range ternary .Values.http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
+    {{- $override := dig .name dict $overrides }}
     - name: {{ .name }}
       {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "10429") }}
-      port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
-      protocol: TCP
-      targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+      {{- $defaultPort := ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
+      port: {{ $override.port | default $defaultPort }}
+      protocol: {{ $override.protocol | default "TCP" }}
+      {{- $defaultTargetPort := ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+      targetPort: {{ $override.targetPort | default $defaultTargetPort }}
+      {{- $defaultNodePort := "" }}
       {{- if and .primary $service.nodePort }}
-      nodePort: {{ $service.nodePort }}
+      {{- $defaultNodePort = $service.nodePort }}
+      {{- end }}
+      {{- with ($override.nodePort | default $defaultNodePort) }}
+      nodePort: {{ . }}
+      {{- end }}
+      {{- with $override.appProtocol }}
+      appProtocol: {{ . }}
       {{- end }}
     {{- end }}
     {{- with include "vtagent.otlpGRPC.addr" . }}
+    {{- $override := dig "otlp-grpc" dict $overrides }}
     - name: otlp-grpc
-      port: {{ include "vm.port.from.flag" (dict "flag" .) }}
-      protocol: TCP
-      targetPort: otlp-grpc
+      port: {{ $override.port | default (include "vm.port.from.flag" (dict "flag" .)) }}
+      protocol: {{ $override.protocol | default "TCP" }}
+      targetPort: {{ $override.targetPort | default "otlp-grpc" }}
+      {{- with $override.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+      {{- with $override.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
     {{- end }}
     {{- range $service.extraPorts }}
+    {{- $override := dig .name dict $overrides }}
     - name: {{ .name }}
-      port: {{ .port }}
-      protocol: {{ .protocol | default "TCP" }}
-      targetPort: {{ .targetPort }}
+      port: {{ $override.port | default .port }}
+      protocol: {{ $override.protocol | default (.protocol | default "TCP") }}
+      targetPort: {{ $override.targetPort | default .targetPort }}
+      {{- with $override.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+      {{- with $override.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
     {{- end }}
   {{- $_ := set $ctx "extraLabels" (mergeOverwrite (deepCopy (.Values.selectorLabels | default dict)) (deepCopy $service.selectorLabels)) }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}

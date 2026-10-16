@@ -29,3 +29,46 @@ tests:
       - equal:
           path: spec.ports[0].nodePort
           value: 30093
+  - it: should override port, protocol, targetPort and appProtocol via portOverrides
+    set:
+      alertmanager:
+        enabled: true
+        image:
+          tag: v0.0.0
+        service:
+          portOverrides:
+            web:
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: web
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            appProtocol: kubernetes.io/h2c
+  - it: should override mesh ports via portOverrides
+    set:
+      alertmanager:
+        enabled: true
+        mode: statefulSet
+        replicaCount: 2
+        image:
+          tag: v0.0.0
+        service:
+          portOverrides:
+            tcp-mesh:
+              port: 9999
+            udp-mesh:
+              port: 9998
+    asserts:
+      - equal:
+          path: spec.ports[1].port
+          value: 9999
+      - equal:
+          path: spec.ports[2].port
+          value: 9998

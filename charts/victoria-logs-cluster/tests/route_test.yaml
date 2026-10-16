@@ -1,0 +1,31 @@
+suite: route templates test
+templates:
+  - route.yaml
+tests:
+  - it: uses portOverrides.http.port as the backend port when servicePort and route.port are unset
+    set:
+      vlselect:
+        route:
+          enabled: true
+        service:
+          portOverrides:
+            http:
+              port: 9999
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 9999
+  - it: route.port still takes precedence over portOverrides.http.port
+    set:
+      vlselect:
+        route:
+          enabled: true
+          port: 7777
+        service:
+          portOverrides:
+            http:
+              port: 9999
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 7777

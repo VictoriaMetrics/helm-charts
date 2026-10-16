@@ -1,0 +1,85 @@
+suite: service templates test
+templates:
+  - service.yaml
+tests:
+  - it: should not render appProtocol by default
+    asserts:
+      - notExists:
+          path: spec.ports[0].appProtocol
+  - it: should render appProtocol for the primary http port
+    set:
+      server:
+        service:
+          portOverrides:
+            http:
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+  - it: should render appProtocol for an extraPorts entry
+    set:
+      server:
+        service:
+          extraPorts:
+            - name: grpc
+              port: 9000
+              targetPort: 9000
+          portOverrides:
+            grpc:
+              appProtocol: grpc
+    asserts:
+      - equal:
+          path: spec.ports[1].appProtocol
+          value: grpc
+  - it: should override port, protocol, targetPort and nodePort for the primary http port
+    set:
+      server:
+        service:
+          type: NodePort
+          portOverrides:
+            http:
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+  - it: should override port and appProtocol for syslog-tcp and syslog-udp ports
+    set:
+      server:
+        extraArgs:
+          syslog.listenAddr.tcp: :514
+          syslog.listenAddr.udp: :514
+        service:
+          portOverrides:
+            syslog-tcp:
+              port: 9001
+              appProtocol: syslog
+            syslog-udp:
+              port: 9002
+              appProtocol: syslog
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: syslog-tcp
+            port: 9001
+            protocol: TCP
+            targetPort: syslog-tcp
+            appProtocol: syslog
+      - equal:
+          path: spec.ports[2]
+          value:
+            name: syslog-udp
+            port: 9002
+            protocol: UDP
+            targetPort: syslog-udp
+            appProtocol: syslog

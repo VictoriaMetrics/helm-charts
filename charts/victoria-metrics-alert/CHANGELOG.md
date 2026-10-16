@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `server.service.portOverrides` and `alertmanager.service.portOverrides`, maps keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 
 ## v0.51.0
 

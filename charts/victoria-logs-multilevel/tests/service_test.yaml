@@ -85,3 +85,95 @@ tests:
           path: spec.ports[0].nodePort
           value: 30427
         documentIndex: 1
+  - it: should not render appProtocol by default
+    asserts:
+      - notExists:
+          path: spec.ports[0].appProtocol
+        documentIndex: 0
+  - it: should render appProtocol for the primary http port
+    set:
+      vlselect:
+        service:
+          portOverrides:
+            http:
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+        documentIndex: 0
+  - it: should render appProtocol for an extraPorts entry
+    set:
+      vlselect:
+        service:
+          extraPorts:
+            - name: grpc
+              port: 9000
+              targetPort: 9000
+          portOverrides:
+            grpc:
+              appProtocol: grpc
+    asserts:
+      - equal:
+          path: spec.ports[1].appProtocol
+          value: grpc
+        documentIndex: 0
+  - it: should override port, protocol, targetPort and nodePort for the primary http port
+    set:
+      vlselect:
+        service:
+          type: NodePort
+          portOverrides:
+            http:
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+        documentIndex: 0
+  - it: should override appProtocol for vmauth's primary http port
+    set:
+      vmauth:
+        enabled: true
+        image:
+          tag: v1.116.0
+        service:
+          portOverrides:
+            http:
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+        documentIndex: 1
+  - it: should override port, targetPort and nodePort for an extraPorts entry
+    set:
+      vlselect:
+        service:
+          extraPorts:
+            - name: grpc
+              port: 9000
+              targetPort: 9000
+          portOverrides:
+            grpc:
+              port: 9001
+              targetPort: custom-target
+              nodePort: 31235
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: grpc
+            port: 9001
+            protocol: TCP
+            targetPort: custom-target
+            nodePort: 31235
+        documentIndex: 0
