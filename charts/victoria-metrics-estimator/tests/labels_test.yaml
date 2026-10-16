@@ -51,7 +51,7 @@ tests:
       - template: service.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
+          value: vmestimator-RELEASE-NAME
         equal:
           path: spec.selector
           value:
@@ -75,6 +75,13 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmestimator-single
+      - template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-RELEASE-NAME
+        equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: vmestimator-single
       - template: networkpolicy.yaml
         documentSelector:
           path: metadata.name
@@ -169,7 +176,7 @@ tests:
       - template: service.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-storage-RELEASE-NAME
+          value: vmestimator-insert-RELEASE-NAME
         equal:
           path: spec.selector
           value:
@@ -179,17 +186,7 @@ tests:
       - template: service.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-storage-RELEASE-NAME-insert
-        equal:
-          path: spec.selector
-          value:
-            app.kubernetes.io/component: monitoring
-            app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: vmestimator-storage
-      - template: service.yaml
-        documentSelector:
-          path: metadata.name
-          value: vmestimator-select-RELEASE-NAME
+          value: vmestimator-RELEASE-NAME
         equal:
           path: spec.selector
           value:
@@ -217,12 +214,25 @@ tests:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmestimator-select
       - template: monitor.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-RELEASE-NAME
         equal:
           path: spec.selector.matchLabels
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmestimator-select
+      - template: monitor.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmestimator-storage
       - template: networkpolicy.yaml
         documentSelector:
           path: metadata.name

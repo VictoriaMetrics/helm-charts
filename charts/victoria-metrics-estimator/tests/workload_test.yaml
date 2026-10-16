@@ -14,6 +14,27 @@ tests:
       - matchRegex:
           path: spec.template.metadata.annotations["checksum/config"]
           pattern: ^[a-f0-9]{64}$
+  - it: single mode defaults to /metrics, unlike storage's own cardinalityMetrics.exposeAt default
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/cardinality/metrics
+  - it: single mode inherits a non-default cardinalityMetrics.exposeAt set on storage
+    set:
+      storage.extraArgs:
+        cardinalityMetrics.exposeAt: /custom/estimates
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/custom/estimates
+  - it: single mode still honors an explicit deprecated single.extraArgs.cardinalityMetrics.exposeAt
+    set:
+      single.extraArgs:
+        cardinalityMetrics.exposeAt: /custom/path
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/custom/path
   - it: omits the checksum for an external ConfigMap
     set:
       config.existingConfigMap: external-config
@@ -33,6 +54,35 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].ports[0].containerPort
           value: 9000
+  - it: single mode falls back to storage.* when single.* doesn't set a field
+    set:
+      storage.extraArgs.httpListenAddr: ":9001"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --httpListenAddr=:9001
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 9001
+  - it: single.* takes precedence over storage.* for the same field
+    set:
+      storage.extraArgs.httpListenAddr: ":9001"
+      single.extraArgs.httpListenAddr: ":9002"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --httpListenAddr=:9002
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 9002
+  - it: always runs a single replica in single mode, regardless of storage.replicaCount or single.replicaCount
+    set:
+      storage.replicaCount: 5
+      single.replicaCount: 7
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
   - it: renders cluster mode
     set:
       mode: cluster
@@ -44,12 +94,16 @@ tests:
       - isKind:
           of: StatefulSet
         documentIndex: 0
+      - equal:
+          path: spec.serviceName
+          value: vmestimator-insert-RELEASE-NAME
+        documentIndex: 0
       - isKind:
           of: Deployment
         documentIndex: 1
       - contains:
           path: spec.template.spec.containers[0].args
-          content: --storageNode=http://vmestimator-storage-RELEASE-NAME-1.vmestimator-storage-RELEASE-NAME.NAMESPACE.svc.cluster.local:9001
+          content: --storageNode=http://vmestimator-storage-RELEASE-NAME-1.vmestimator-insert-RELEASE-NAME.NAMESPACE.svc.cluster.local:9001
         documentIndex: 1
   - it: preserves component fullname overrides
     set:
