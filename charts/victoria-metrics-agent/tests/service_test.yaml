@@ -1,0 +1,102 @@
+suite: service templates test
+set:
+  service.enabled: true
+templates:
+  - service.yaml
+tests:
+  - it: should not render appProtocol by default
+    asserts:
+      - notExists:
+          path: spec.ports[0].appProtocol
+  - it: should render appProtocol for the primary http port
+    set:
+      service:
+        portOverrides:
+          http:
+            appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+  - it: should override port, protocol, targetPort and nodePort for the primary http port
+    set:
+      service:
+        type: NodePort
+        portOverrides:
+          http:
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+  - it: should override port, protocol and targetPort for graphite ports
+    set:
+      extraArgs:
+        graphiteListenAddr: :2003
+      service:
+        portOverrides:
+          graphite-tcp:
+            port: 9001
+            appProtocol: kafka
+          graphite-udp:
+            protocol: TCP
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: graphite-tcp
+            protocol: TCP
+            port: 9001
+            targetPort: graphite-tcp
+            appProtocol: kafka
+      - equal:
+          path: spec.ports[2].protocol
+          value: TCP
+  - it: should override port and appProtocol for influx ports
+    set:
+      extraArgs:
+        influxListenAddr: :8089
+      service:
+        portOverrides:
+          influx-tcp:
+            appProtocol: influx
+          influx-udp:
+            port: 9002
+    asserts:
+      - equal:
+          path: spec.ports[1].appProtocol
+          value: influx
+      - equal:
+          path: spec.ports[2].port
+          value: 9002
+  - it: should override opentsdb ports
+    set:
+      extraArgs:
+        opentsdbHTTPListenAddr: :4242
+        opentsdbListenAddr: :4242
+      service:
+        portOverrides:
+          opentsdbhttp:
+            appProtocol: kubernetes.io/h2c
+          opentsdb-udp:
+            port: 9003
+          opentsdb-tcp:
+            port: 9004
+    asserts:
+      - equal:
+          path: spec.ports[1].appProtocol
+          value: kubernetes.io/h2c
+      - equal:
+          path: spec.ports[2].port
+          value: 9003
+      - equal:
+          path: spec.ports[3].port
+          value: 9004

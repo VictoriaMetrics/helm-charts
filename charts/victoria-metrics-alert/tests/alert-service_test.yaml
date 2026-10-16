@@ -21,3 +21,60 @@ tests:
       - equal:
           path: spec.ports[0].nodePort
           value: 30880
+  - it: should not render appProtocol by default
+    asserts:
+      - notExists:
+          path: spec.ports[0].appProtocol
+  - it: should render appProtocol for the primary http port
+    set:
+      server:
+        service:
+          portOverrides:
+            http:
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+  - it: should override port, protocol, targetPort and nodePort for the primary http port
+    set:
+      server:
+        service:
+          type: NodePort
+          portOverrides:
+            http:
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+  - it: portOverrides take precedence over top-level servicePort, targetPort and nodePort
+    set:
+      server:
+        service:
+          type: NodePort
+          servicePort: 8881
+          targetPort: top-level-target
+          nodePort: 30881
+          portOverrides:
+            http:
+              port: 9999
+              targetPort: override-target
+              nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: TCP
+            targetPort: override-target
+            nodePort: 31234

@@ -1,6 +1,7 @@
 ## Next release
 
 - bump `victoria-metrics-common` dependency to `0.4.*`. Resource names are unchanged.
+- add `server.service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and `otlpgrpc-tcp`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
 - fix `server.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - rename the container from `vtraces` to `vtsingle`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.

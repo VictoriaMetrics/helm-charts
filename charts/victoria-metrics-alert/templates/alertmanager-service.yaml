@@ -53,23 +53,43 @@ spec:
   ipFamilies: {{ toYaml . | nindent 4 }}
   {{- end }}
   ports:
-    - name: {{ include "alertmanager.service.portName" $ctx }}
-      port: {{ $service.servicePort }}
-      targetPort: web
-      protocol: TCP
-      {{- if $service.nodePort }}
-      nodePort: {{ $service.nodePort }}
+    {{- $overrides := $service.portOverrides | default dict }}
+    {{- $portName := include "alertmanager.service.portName" $ctx }}
+    {{- $override := dig $portName dict $overrides }}
+    - name: {{ $portName }}
+      port: {{ $override.port | default $service.servicePort }}
+      targetPort: {{ $override.targetPort | default "web" }}
+      protocol: {{ $override.protocol | default "TCP" }}
+      {{- with ($override.nodePort | default $service.nodePort) }}
+      nodePort: {{ . }}
+      {{- end }}
+      {{- with $override.appProtocol }}
+      appProtocol: {{ . }}
       {{- end }}
     {{- if gt (int $app.replicaCount) 1 }}
     {{- $meshPort := include "vm.port.from.flag" (dict "flag" $app.cluster.listenAddress "default" "9094") }}
+    {{- $tcpOverride := dig "tcp-mesh" dict $overrides }}
     - name: tcp-mesh
-      port: {{ $meshPort }}
-      targetPort: mesh-tcp
-      protocol: TCP
+      port: {{ $tcpOverride.port | default $meshPort }}
+      targetPort: {{ $tcpOverride.targetPort | default "mesh-tcp" }}
+      protocol: {{ $tcpOverride.protocol | default "TCP" }}
+      {{- with $tcpOverride.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+      {{- with $tcpOverride.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
+    {{- $udpOverride := dig "udp-mesh" dict $overrides }}
     - name: udp-mesh
-      port: {{ $meshPort }}
-      targetPort: mesh-udp
-      protocol: UDP
+      port: {{ $udpOverride.port | default $meshPort }}
+      targetPort: {{ $udpOverride.targetPort | default "mesh-udp" }}
+      protocol: {{ $udpOverride.protocol | default "UDP" }}
+      {{- with $udpOverride.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+      {{- with $udpOverride.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
     {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end }}
