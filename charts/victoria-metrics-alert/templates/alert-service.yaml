@@ -1,3 +1,4 @@
+{{- if not (include "vm.operator.enabled" .) }}
 {{- $app := .Values.server }}
 {{- $service := $app.service }}
 {{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmalert" }}
@@ -60,3 +61,4 @@ spec:
       {{- end }}
     {{- end }}
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
+{{- end }}

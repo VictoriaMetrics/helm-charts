@@ -1,0 +1,295 @@
+suite: operator mode
+templates:
+  - networkpolicy.yaml
+  - vtcluster.yaml
+  - vtstorage-server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - pdb.yaml
+  - ingress.yaml
+  - route.yaml
+  - vmauth-server.yaml
+  - vmauth-config.yaml
+set:
+  operator.enabled: true
+tests:
+  - it: doesn't render a VTCluster by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vtcluster.yaml
+
+  - it: renders a VTCluster instead of the component workloads
+    asserts:
+      - isKind:
+          of: VTCluster
+        template: vtcluster.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME
+        template: vtcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: vtstorage-server.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+
+  - it: converts components with the chart's claim template name
+    set:
+      vtstorage.retentionPeriod: 30d
+      vtselect.replicaCount: 3
+      vtinsert.resources.limits.memory: 1Gi
+    asserts:
+      - equal:
+          path: spec.storage.retentionPeriod
+          value: 30d
+        template: vtcluster.yaml
+      - equal:
+          path: spec.storage.storage.volumeClaimTemplate.metadata.name
+          value: vtstorage-db
+        template: vtcluster.yaml
+      - equal:
+          path: spec.select.replicaCount
+          value: 3
+        template: vtcluster.yaml
+      - equal:
+          path: spec.insert.resources.limits.memory
+          value: 1Gi
+        template: vtcluster.yaml
+      - notExists:
+          path: spec.storage.serviceAccountName
+        template: vtcluster.yaml
+
+  - it: converts component PodDisruptionBudgets and lets the operator create them
+    set:
+      vtselect.podDisruptionBudget.enabled: true
+      vtselect.podDisruptionBudget.maxUnavailable: 1
+    asserts:
+      - equal:
+          path: spec.select.podDisruptionBudget
+          value:
+            maxUnavailable: 1
+        template: vtcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: pdb.yaml
+
+  - it: converts the bundled vmauth to the requests load balancer
+    set:
+      vmauth.enabled: true
+      vmauth.podDisruptionBudget.enabled: true
+      vmauth.podDisruptionBudget.minAvailable: 1
+    asserts:
+      - equal:
+          path: spec.requestsLoadBalancer.enabled
+          value: true
+        template: vtcluster.yaml
+      - equal:
+          path: spec.requestsLoadBalancer.spec.port
+          value: "8427"
+        template: vtcluster.yaml
+      - equal:
+          path: spec.requestsLoadBalancer.spec.podDisruptionBudget.minAvailable
+          value: 1
+        template: vtcluster.yaml
+      - equal:
+          path: spec.requestsLoadBalancer.spec.disableSelfServiceScrape
+          value: true
+        template: vtcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: vmauth-server.yaml
+      - hasDocuments:
+          count: 0
+        template: vmauth-config.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+      - hasDocuments:
+          count: 0
+        template: pdb.yaml
+
+  - it: routes the vmauth ingress paths to the insert and select services
+    set:
+      vmauth.enabled: true
+      vmauth.ingress.enabled: true
+      vmauth.ingress.hosts:
+        - name: a.local
+          path: /
+        - name: b.local
+          path:
+            - /select/vmui
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths
+          value:
+            - path: /insert
+              pathType: Prefix
+              backend:
+                service:
+                  name: vtinsert-RELEASE-NAME
+                  port:
+                    number: 10481
+            - path: /select
+              pathType: Prefix
+              backend:
+                service:
+                  name: vtselect-RELEASE-NAME
+                  port:
+                    number: 10471
+        template: ingress.yaml
+      - equal:
+          path: spec.rules[1].http.paths[0].backend.service.name
+          value: vtselect-RELEASE-NAME
+        template: ingress.yaml
+
+  - it: fails on vmauth ingress paths outside insert and select
+    set:
+      vmauth.enabled: true
+      vmauth.ingress.enabled: true
+      vmauth.ingress.hosts:
+        - name: a.local
+          path: /insertfoo
+    asserts:
+      - failedTemplate:
+          errorPattern: "doesn't start with `/insert` or `/select`"
+        template: ingress.yaml
+
+  - it: routes the vmauth HTTPRoute to the insert and select services
+    set:
+      vmauth.enabled: true
+      vmauth.route.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules
+          value:
+            - backendRefs:
+                - name: vtinsert-RELEASE-NAME
+                  port: 10481
+                  group: ""
+                  kind: Service
+                  weight: 1
+              matches:
+                - path:
+                    type: PathPrefix
+                    value: /insert
+            - backendRefs:
+                - name: vtselect-RELEASE-NAME
+                  port: 10471
+                  group: ""
+                  kind: Service
+                  weight: 1
+              matches:
+                - path:
+                    type: PathPrefix
+                    value: /select
+        template: route.yaml
+
+  - it: fails on custom vmauth HTTPRoute matches
+    set:
+      vmauth.enabled: true
+      vmauth.route.enabled: true
+      vmauth.route.matches:
+        - path:
+            type: PathPrefix
+            value: /custom
+    asserts:
+      - failedTemplate:
+          errorPattern: "`vmauth.route.matches` other than the default"
+        template: route.yaml
+
+  - it: fails on a custom vmauth config
+    set:
+      vmauth.enabled: true
+      vmauth.config:
+        unauthorized_user:
+          url_prefix: http://example
+    asserts:
+      - failedTemplate:
+          errorPattern: "`vmauth.config` and `vmauth.configSecretName` are not converted"
+        template: vtcluster.yaml
+
+  - it: fails on a vmauth vertical pod autoscaler
+    set:
+      vmauth.enabled: true
+      vmauth.verticalPodAutoscaler.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "`vmauth.verticalPodAutoscaler` is not supported"
+        template: vtcluster.yaml
+
+  - it: deep-merges operator.spec over the generated spec
+    set:
+      operator.spec:
+        storage:
+          logLevel: WARN
+    asserts:
+      - equal:
+          path: spec.storage.logLevel
+          value: WARN
+        template: vtcluster.yaml
+
+  - it: excludes storage nodes from insert routing like the chart
+    set:
+      vtinsert.excludeStorageIDs: [0, 2]
+    asserts:
+      - equal:
+          path: spec.storage.maintenanceInsertNodeIDs
+          value: [0, 2]
+        template: vtcluster.yaml
+
+  - it: mounts an existing storage claim as the data volume
+    set:
+      vtstorage.persistentVolume.existingClaim: data
+    asserts:
+      - contains:
+          path: spec.storage.volumes
+          content:
+            name: vtstorage-db
+            persistentVolumeClaim:
+              claimName: data
+        template: vtcluster.yaml
+      - equal:
+          path: spec.storage.storageDataPath
+          value: /storage
+        template: vtcluster.yaml
+      - notExists:
+          path: spec.storage.storage
+        template: vtcluster.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      vtselect.networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.select.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        template: vtcluster.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      vtselect.networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`vtselect.networkPolicy.labels` is not converted"
+        template: vtcluster.yaml
+

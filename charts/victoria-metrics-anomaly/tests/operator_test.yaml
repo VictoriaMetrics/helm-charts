@@ -1,0 +1,208 @@
+suite: operator mode
+templates:
+  - networkpolicy.yaml
+  - vmanomaly.yaml
+  - server.yaml
+  - configmap.yaml
+  - pdb.yaml
+  - monitor.yaml
+  - service.yaml
+set:
+  operator.enabled: true
+  license.key: lic
+  config:
+    reader:
+      datasource_url: http://vmsingle:8428
+      queries:
+        q:
+          expr: up
+    writer:
+      datasource_url: http://vmsingle:8428
+tests:
+  - it: doesn't render a VMAnomaly by default
+    set:
+      operator.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: vmanomaly.yaml
+
+  - it: renders a VMAnomaly instead of the chart workload
+    asserts:
+      - isKind:
+          of: VMAnomaly
+        template: vmanomaly.yaml
+      - hasDocuments:
+          count: 0
+        template: server.yaml
+      - hasDocuments:
+          count: 0
+        template: configmap.yaml
+
+  - it: converts reader and writer into typed fields and keeps the rest of the config raw
+    set:
+      config.reader.sampling_period: 30s
+      config.reader.tenant_id: "1:0"
+      config.writer.metric_format:
+        __name__: $VAR
+    asserts:
+      - equal:
+          path: spec.reader
+          value:
+            datasourceURL: http://vmsingle:8428
+            samplingPeriod: 30s
+            tenantID: "1:0"
+        template: vmanomaly.yaml
+      - equal:
+          path: spec.writer
+          value:
+            datasourceURL: http://vmsingle:8428
+            metricFormat:
+              __name__: $VAR
+        template: vmanomaly.yaml
+      - matchRegex:
+          path: spec.configRawYaml
+          pattern: "reader:\\n  queries:\\n    q:\\n      expr: up"
+        template: vmanomaly.yaml
+      - notMatchRegex:
+          path: spec.configRawYaml
+          pattern: datasource_url
+        template: vmanomaly.yaml
+
+  - it: converts the monitoring pull port
+    set:
+      config.monitoring.pull:
+        enabled: true
+        port: 8490
+    asserts:
+      - equal:
+          path: spec.monitoring.pull.port
+          value: "8490"
+        template: vmanomaly.yaml
+
+  - it: converts storage, shards and the PodDisruptionBudget
+    set:
+      persistentVolume.enabled: true
+      shardsCount: 2
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.minAvailable: 1
+    asserts:
+      - equal:
+          path: spec.storage.volumeClaimTemplate.metadata.name
+          value: vmanomaly-storage
+        template: vmanomaly.yaml
+      - equal:
+          path: spec.shardCount
+          value: 2
+        template: vmanomaly.yaml
+      - equal:
+          path: spec.podDisruptionBudget.minAvailable
+          value: 1
+        template: vmanomaly.yaml
+      - hasDocuments:
+          count: 0
+        template: pdb.yaml
+
+  - it: rejects inline reader credentials
+    set:
+      config.reader.password: secret
+    asserts:
+      - failedTemplate:
+          errorPattern: "`config.reader.password` is not converted"
+        template: vmanomaly.yaml
+
+  - it: disables the operator self-scrape while the chart scrape toggle is off
+    asserts:
+      - equal:
+          path: spec.disableSelfServiceScrape
+          value: true
+        template: vmanomaly.yaml
+
+  - it: lets the operator scrape it instead of rendering the chart scrape object
+    set:
+      podMonitor.enabled: true
+    asserts:
+      - notExists:
+          path: spec.disableSelfServiceScrape
+        template: vmanomaly.yaml
+      - hasDocuments:
+          count: 0
+        template: monitor.yaml
+
+  - it: converts the NetworkPolicy and lets the operator create it
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - equal:
+          path: spec.networkPolicy
+          value:
+            ingress:
+              - from:
+                  - podSelector: {}
+        template: vmanomaly.yaml
+      - hasDocuments:
+          count: 0
+        template: networkpolicy.yaml
+
+  - it: rejects NetworkPolicy metadata the operator can't set
+    set:
+      networkPolicy:
+        enabled: true
+        labels:
+          team: obs
+    asserts:
+      - failedTemplate:
+          errorPattern: "`networkPolicy.labels` is not converted"
+        template: vmanomaly.yaml
+
+  - it: converts config.server and lets the operator create the Service
+    set:
+      service.enabled: true
+      service.servicePort: 8491
+      config.server:
+        port: 8491
+        path_prefix: /anomaly
+    asserts:
+      - equal:
+          path: spec.server
+          value:
+            port: "8491"
+            pathPrefix: /anomaly
+        template: vmanomaly.yaml
+      - notMatchRegex:
+          path: spec.configRawYaml
+          pattern: "server:"
+        template: vmanomaly.yaml
+      - hasDocuments:
+          count: 0
+        template: service.yaml
+
+  - it: fails when the service port differs from the server port
+    set:
+      service.enabled: true
+      service.servicePort: 9000
+    asserts:
+      - failedTemplate:
+          errorPattern: "`service.servicePort` must match the server port 8490"
+        template: vmanomaly.yaml
+
+  - it: fails on service settings the operator can't apply
+    set:
+      service.enabled: true
+      service.type: LoadBalancer
+    asserts:
+      - failedTemplate:
+          errorPattern: "`service.type` other than `ClusterIP` is not supported"
+        template: vmanomaly.yaml
+
+  - it: fails on unknown config.server keys
+    set:
+      config.server.foo: bar
+    asserts:
+      - failedTemplate:
+          errorPattern: "`config.server.foo` is not converted"
+        template: vmanomaly.yaml

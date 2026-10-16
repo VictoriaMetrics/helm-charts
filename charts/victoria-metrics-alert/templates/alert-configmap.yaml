@@ -1,5 +1,5 @@
 {{- $app := .Values.server }}
-{{- if empty $app.configMap }}
+{{- if and (empty $app.configMap) (not (include "vm.operator.enabled" .)) }}
 {{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmalert" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

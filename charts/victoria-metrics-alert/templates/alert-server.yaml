@@ -1,3 +1,4 @@
+{{- if not (include "vm.operator.enabled" .) }}
 {{- $app := .Values.server }}
 {{- if not $app.extraArgs.rule }}
   {{- if and (empty $app.configMap) (empty $app.config.alerts.groups) -}}
@@ -154,3 +155,4 @@ spec:
           {{- toYaml (omit . "name") | nindent 10 }}
         {{- end }}
         {{- include "vm.license.volume" . | nindent 8 }}
+{{- end }}

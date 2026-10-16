@@ -1,6 +1,13 @@
 # Default values for victoria-logs.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+# -- Use legacy naming convention (release-name based). When false, resource names
+# -- use the same convention as the operator (type-prefixed, e.g. vlsingle-<release>).
+# -- The default (`true`) exists for historical reasons and backwards compatibility with existing deployments.
+# -- For new deployments, setting this to `false` is recommended to match VictoriaMetrics operator naming
+# -- and simplify future migration to operator-managed resources.
+useLegacyNaming: true
 global:
   # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
@@ -524,6 +531,21 @@ vector:
             VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
             AccountID: "0"
             ProjectID: "0"
+
+# Deploy VictoriaLogs single through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-logs-single/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VLSingle](https://docs.victoriametrics.com/operator/resources/vlsingle/) resource built from `server` values
+  # instead of the chart's own Deployment/StatefulSet, Service and ServiceAccount.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VLSingle labels
+  labels: {}
+  # -- VLSingle annotations
+  annotations: {}
+  # -- VLSingle spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VLSingleSpec](https://docs.victoriametrics.com/operator/api/#vlsinglespec)
+  spec: {}
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []

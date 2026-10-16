@@ -4,8 +4,12 @@
 {{- if .Values.vtinsert.enabled }}
 {{- if .Values.vmauth.enabled }}
   {{- $_ := set $ctx "appKey" "vmauth" }}
+  {{- if include "vm.operator.enabled" $ }}
+    {{- $_ := set $ctx "kindOverride" "vtclusterlb" }}
+  {{- end }}
 {{- else }}
   {{- $_ := set $ctx "appKey" "vtinsert" }}
+  {{- $_ := unset $ctx "kindOverride" }}
 {{- end }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 Write API:
@@ -19,8 +23,12 @@ Check how to ingest data in https://docs.victoriametrics.com/victoriatraces/data
 {{- if .Values.vtselect.enabled }}
 {{- if .Values.vmauth.enabled }}
   {{- $_ := set $ctx "appKey" "vmauth" }}
+  {{- if include "vm.operator.enabled" $ }}
+    {{- $_ := set $ctx "kindOverride" "vtclusterlb" }}
+  {{- end }}
 {{- else }}
   {{- $_ := set $ctx "appKey" "vtselect" }}
+  {{- $_ := unset $ctx "kindOverride" }}
 {{- end }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 Read API:

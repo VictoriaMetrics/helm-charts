@@ -370,6 +370,34 @@ remoteWrite:
 
 {{ include "chart.uninstallSection" . }}
 
+### VictoriaMetrics operator
+
+With `operator.enabled: true` the chart renders a [VLAgent](https://docs.victoriametrics.com/operator/resources/vlagent/) resource
+instead of its own DaemonSet, ServiceAccount, RBAC and VMPodScrape,
+and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) manages the workload.
+The operator must already be installed in the cluster. Operator mode always uses operator-style names, regardless of `useLegacyNaming`.
+
+The VLAgent is named `collector-<release>`, so the operator creates `vlagent-collector-<release>` objects, the names the chart uses. 
+
+Settings without an operator equivalent fail rendering, with a message pointing to the replacement:
+
+- `fileCollector`, since the VLAgent only collects Kubernetes container logs;
+- `updateStrategy`; set it in `operator.spec` instead;
+- `remoteWrite` inline credentials and options the VLAgent doesn't support; set `operator.spec.remoteWrite` instead;
+- `podMonitor` `relabelings`, `metricRelabelings`, `port`, `targetPort`, `path`, `interval`, `scrapeTimeout`, `scheme`, `basicAuth` and `tlsConfig`; set `operator.spec.serviceScrapeSpec` instead;
+- `networkPolicy` labels, annotations and `extraLabels`, since the operator-managed NetworkPolicy has no custom metadata.
+
+Fields that have no chart value, or need a different value, go to `operator.spec`, which is deep-merged over the generated spec:
+
+```yaml
+operator:
+  enabled: true
+  spec:
+    logLevel: WARN
+```
+
+Probes keep the operator defaults. Switching a release to `operator.enabled: true` recreates its pods.
+
 ## Parameters
 
 The following tables lists the configurable parameters of the chart and their default values.
