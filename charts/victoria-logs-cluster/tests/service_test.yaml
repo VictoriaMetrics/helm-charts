@@ -82,3 +82,93 @@ tests:
           path: spec.ports[0].nodePort
           value: 30481
         documentIndex: 0
+  - it: should not render appProtocol by default
+    asserts:
+      - notExists:
+          path: spec.ports[0].appProtocol
+        documentIndex: 0
+      - notExists:
+          path: spec.ports[0].appProtocol
+        documentIndex: 1
+  - it: should render appProtocol for the primary http port
+    set:
+      vlselect:
+        service:
+          portOverrides:
+            http:
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+        documentIndex: 1
+  - it: should render appProtocol for an extraPorts entry
+    set:
+      vlinsert:
+        service:
+          extraPorts:
+            - name: grpc
+              port: 9000
+              targetPort: 9000
+          portOverrides:
+            grpc:
+              appProtocol: grpc
+    asserts:
+      - equal:
+          path: spec.ports[1].appProtocol
+          value: grpc
+        documentIndex: 0
+  - it: should override port and appProtocol for syslog-tcp and syslog-udp ports
+    set:
+      vlinsert:
+        extraArgs:
+          syslog.listenAddr.tcp: :514
+          syslog.listenAddr.udp: :514
+        service:
+          portOverrides:
+            syslog-tcp:
+              port: 9001
+              appProtocol: syslog
+            syslog-udp:
+              port: 9002
+              appProtocol: syslog
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: syslog-tcp
+            port: 9001
+            protocol: TCP
+            targetPort: syslog-tcp
+            appProtocol: syslog
+        documentIndex: 0
+      - equal:
+          path: spec.ports[2]
+          value:
+            name: syslog-udp
+            port: 9002
+            protocol: UDP
+            targetPort: syslog-udp
+            appProtocol: syslog
+        documentIndex: 0
+  - it: should override port, protocol, targetPort and nodePort for the primary http port
+    set:
+      vlselect:
+        service:
+          type: NodePort
+          portOverrides:
+            http:
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+        documentIndex: 1

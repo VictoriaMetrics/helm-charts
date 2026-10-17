@@ -118,109 +118,195 @@
 
 {{- define "vlselect.ports" -}}
 {{- $service := .service -}}
+{{- $overrides := $service.portOverrides | default dict }}
 {{- $extraArgs := .extraArgs | default dict -}}
 {{- $httpAddr := $extraArgs.httpListenAddr -}}
 {{- $ports := ternary .http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
 {{- range $ports }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9471") }}
-  port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
-  protocol: TCP
-  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- $defaultPort := ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
+  port: {{ $override.port | default $defaultPort }}
+  protocol: {{ $override.protocol | default "TCP" }}
+  {{- $defaultTargetPort := ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  targetPort: {{ $override.targetPort | default $defaultTargetPort }}
+  {{- $defaultNodePort := "" }}
   {{- if and (.primary | default false) $service.nodePort }}
-  nodePort: {{ $service.nodePort }}
+  {{- $defaultNodePort = $service.nodePort }}
+  {{- end }}
+  {{- with ($override.nodePort | default $defaultNodePort) }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
   {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
-  port: {{ .port }}
-  protocol: TCP
-  targetPort: {{ .targetPort }}
+  port: {{ $override.port | default .port }}
+  protocol: {{ $override.protocol | default (.protocol | default "TCP") }}
+  targetPort: {{ $override.targetPort | default .targetPort }}
+  {{- with $override.nodePort }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
+  {{- end }}
 {{- end }}
 {{- end -}}
 
 {{- define "vlinsert.ports" -}}
 {{- $service := .service -}}
+{{- $overrides := $service.portOverrides | default dict }}
 {{- $extraArgs := .extraArgs | default dict -}}
 {{- $httpAddr := $extraArgs.httpListenAddr -}}
 {{- $ports := ternary .http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
 {{- range $ports }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9481") }}
-  port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
-  protocol: TCP
-  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- $defaultPort := ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
+  port: {{ $override.port | default $defaultPort }}
+  protocol: {{ $override.protocol | default "TCP" }}
+  {{- $defaultTargetPort := ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  targetPort: {{ $override.targetPort | default $defaultTargetPort }}
+  {{- $defaultNodePort := "" }}
   {{- if and (.primary | default false) $service.nodePort }}
-  nodePort: {{ $service.nodePort }}
+  {{- $defaultNodePort = $service.nodePort }}
+  {{- end }}
+  {{- with ($override.nodePort | default $defaultNodePort) }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
   {{- end }}
 {{- end }}
 {{- $syslogTCPAddr := index $extraArgs "syslog.listenAddr.tcp" -}}
 {{- $tcpPorts := ternary .syslog.tcp (list (dict "name" "syslog-tcp" "value" $syslogTCPAddr)) (empty $syslogTCPAddr) }}
 {{- range $tcpPorts }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
-  port: {{ include "vm.port.from.flag" (dict "flag" .value) }}
-  protocol: TCP
-  targetPort: {{ .name }}
+  port: {{ $override.port | default (include "vm.port.from.flag" (dict "flag" .value)) }}
+  protocol: {{ $override.protocol | default "TCP" }}
+  targetPort: {{ $override.targetPort | default .name }}
+  {{- with $override.nodePort }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
+  {{- end }}
 {{- end }}
 {{- $syslogUDPAddr := index $extraArgs "syslog.listenAddr.udp" -}}
 {{- $udpPorts := ternary .syslog.udp (list (dict "name" "syslog-udp" "value" $syslogUDPAddr)) (empty $syslogUDPAddr) }}
 {{- range $udpPorts }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
-  port: {{ include "vm.port.from.flag" (dict "flag" .value) }}
-  protocol: UDP
-  targetPort: {{ .name }}
+  port: {{ $override.port | default (include "vm.port.from.flag" (dict "flag" .value)) }}
+  protocol: {{ $override.protocol | default "UDP" }}
+  targetPort: {{ $override.targetPort | default .name }}
+  {{- with $override.nodePort }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
+  {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
-  port: {{ .port }}
-  protocol: {{ .protocol | default "TCP" }}
-  targetPort: {{ .targetPort }}
+  port: {{ $override.port | default .port }}
+  protocol: {{ $override.protocol | default (.protocol | default "TCP") }}
+  targetPort: {{ $override.targetPort | default .targetPort }}
+  {{- with $override.nodePort }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
+  {{- end }}
 {{- end }}
 {{- end -}}
 
 {{- define "vlstorage.ports" -}}
 {{- $service := .service -}}
+{{- $overrides := $service.portOverrides | default dict }}
 {{- $extraArgs := .extraArgs | default dict -}}
 {{- $httpAddr := $extraArgs.httpListenAddr -}}
 {{- $ports := ternary .http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
 {{- range $ports }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "9491") }}
-  port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
-  protocol: TCP
-  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- $defaultPort := ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
+  port: {{ $override.port | default $defaultPort }}
+  protocol: {{ $override.protocol | default "TCP" }}
+  {{- $defaultTargetPort := ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  targetPort: {{ $override.targetPort | default $defaultTargetPort }}
+  {{- $defaultNodePort := "" }}
   {{- if and (.primary | default false) $service.nodePort }}
-  nodePort: {{ $service.nodePort }}
+  {{- $defaultNodePort = $service.nodePort }}
+  {{- end }}
+  {{- with ($override.nodePort | default $defaultNodePort) }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
   {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
-  port: {{ .port }}
-  protocol: TCP
-  targetPort: {{ .targetPort }}
+  port: {{ $override.port | default .port }}
+  protocol: {{ $override.protocol | default (.protocol | default "TCP") }}
+  targetPort: {{ $override.targetPort | default .targetPort }}
+  {{- with $override.nodePort }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
+  {{- end }}
 {{- end }}
 {{- end -}}
 
 {{- define "vmauth.ports" -}}
 {{- $service := .service -}}
+{{- $overrides := $service.portOverrides | default dict }}
 {{- $extraArgs := .extraArgs | default dict -}}
 {{- $httpAddr := $extraArgs.httpListenAddr -}}
 {{- $ports := ternary .http (list (dict "name" "http" "value" $httpAddr "primary" true)) (empty $httpAddr) }}
 {{- range $ports }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
   {{- $port := include "vm.port.from.flag" (dict "flag" .value "default" "8427") }}
-  port: {{ ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
-  protocol: TCP
-  targetPort: {{ ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  {{- $defaultPort := ternary ($service.servicePort | default $port) $port (and (.primary | default false) (not (empty $service.servicePort))) }}
+  port: {{ $override.port | default $defaultPort }}
+  protocol: {{ $override.protocol | default "TCP" }}
+  {{- $defaultTargetPort := ternary $service.targetPort .name (and (.primary | default false) (not (empty $service.targetPort))) }}
+  targetPort: {{ $override.targetPort | default $defaultTargetPort }}
+  {{- $defaultNodePort := "" }}
   {{- if and (.primary | default false) $service.nodePort }}
-  nodePort: {{ $service.nodePort }}
+  {{- $defaultNodePort = $service.nodePort }}
+  {{- end }}
+  {{- with ($override.nodePort | default $defaultNodePort) }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
   {{- end }}
 {{- end }}
 {{- range $service.extraPorts }}
+{{- $override := dig .name dict $overrides }}
 - name: {{ .name }}
-  port: {{ .port }}
-  protocol: TCP
-  targetPort: {{ .targetPort }}
+  port: {{ $override.port | default .port }}
+  protocol: {{ $override.protocol | default (.protocol | default "TCP") }}
+  targetPort: {{ $override.targetPort | default .targetPort }}
+  {{- with $override.nodePort }}
+  nodePort: {{ . }}
+  {{- end }}
+  {{- with $override.appProtocol }}
+  appProtocol: {{ . }}
+  {{- end }}
 {{- end }}
 {{- end -}}
 

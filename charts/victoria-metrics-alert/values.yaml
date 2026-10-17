@@ -248,6 +248,8 @@ server:
     ipFamilyPolicy: ""
     # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilies: []
+    # -- Per-port Service overrides, keyed by port name. Each entry may override port, protocol, targetPort, nodePort and/or appProtocol
+    portOverrides: {}
 
   route:
     # -- Enable deployment of HTTPRoute for VMAlert
@@ -575,6 +577,8 @@ alertmanager:
     ipFamilyPolicy: ""
     # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
     ipFamilies: []
+    # -- Per-port Service overrides, keyed by port name. Each entry may override port, protocol, targetPort, nodePort and/or appProtocol. Valid keys: `http` (`web` with legacy naming), `tcp-mesh`, `udp-mesh` (mesh ports only render when `replicaCount` > 1)
+    portOverrides: {}
 
   route:
     # -- Enable deployment of HTTPRoute for VMAlertmanager
