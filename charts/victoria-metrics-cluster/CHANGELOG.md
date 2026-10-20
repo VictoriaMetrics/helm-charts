@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump version of VM components to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1), which fixes delayed requests in vmauth when a request with an `Authorization` header is matched to `unauthorized_user`. See [VictoriaMetrics#11774](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11774).
 
 ## v0.53.0
 

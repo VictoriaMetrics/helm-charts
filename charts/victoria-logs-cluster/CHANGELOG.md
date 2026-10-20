@@ -1,6 +1,6 @@
 ## Next release
 
-- bump vmauth version to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0).
+- bump vmauth version to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1).
 
 ## v0.2.9
 
