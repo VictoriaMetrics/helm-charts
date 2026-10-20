@@ -2,7 +2,7 @@
 
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
 - fix `vtstorage.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
-- bump vmauth version to [v1.154.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.0).
+- bump vmauth version to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1).
 
 ## v0.2.10
 
