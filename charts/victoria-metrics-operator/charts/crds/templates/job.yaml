@@ -12,16 +12,10 @@ kind: Job
 metadata:
   name: {{ template "crds.upgrade.name" $ctx }}
   namespace: {{ template "vm.namespace" $ctx }}
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade,pre-rollback
-    "helm.sh/hook-weight": "5"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-    {{- with $app.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with ((.Values.global).extraAnnotations) }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+  {{- $hookAnnotations := include "crds.upgrade.hookAnnotations" (dict "hookWeight" "5") | fromYaml }}
+  {{- $_ := set $ctx "extraAnnotations" (mergeOverwrite $hookAnnotations ($app.annotations | default dict)) }}
+  annotations: {{ include "vm.annotations" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
   {{- $extraLabels := $app.labels | default dict }}
   {{- $_ := set $ctx "extraLabels" $app.labels }}
   {{- $_ := set $extraLabels "app.kubernetes.io/component" "upgrade-crds" }}
@@ -32,9 +26,9 @@ spec:
   backoffLimit: 3
   template:
     metadata:
-      {{- with $app.podLabels }}
-      labels: {{ toYaml . | nindent 8 }}
-      {{- end }}
+      {{- $_ := set $ctx "extraLabels" $app.podLabels }}
+      labels: {{ include "vm.podLabels" $ctx | nindent 8 }}
+      {{- $_ := unset $ctx "extraLabels" }}
       {{- $_ := set $ctx "extraAnnotations" $app.podAnnotations }}
       {{- with (include "vm.annotations" $ctx) }}
       annotations: {{ . | nindent 8 }}

@@ -10,18 +10,20 @@ metadata:
   name: {{ $fullname }}-sync-job
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
-  annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation
+  {{- $_ := set $ctx "extraAnnotations" (dict "helm.sh/hook" "post-install,post-upgrade" "helm.sh/hook-delete-policy" "before-hook-creation") }}
+  annotations: {{ include "vm.annotations" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
 spec:
   ttlSecondsAfterFinished: {{ $job.ttlSecondsAfterFinished }}
   backoffLimit: {{ $job.backoffLimit }}
   template:
     metadata:
       labels: {{ include "vm.labels" $ctx | nindent 8 }}
-      {{- with $job.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      {{- $_ := set $ctx "extraAnnotations" $job.podAnnotations }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
       {{- end }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
       serviceAccountName: {{ $fullname }}-sync-job
       restartPolicy: OnFailure

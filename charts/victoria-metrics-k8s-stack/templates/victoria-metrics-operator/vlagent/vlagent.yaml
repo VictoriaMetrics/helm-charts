@@ -7,9 +7,11 @@
 apiVersion: operator.victoriametrics.com/v1
 kind: VLAgent
 metadata:
-  {{- with $app.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
-  {{- end  }}
+  {{- $_ := set $ctx "extraAnnotations" $app.annotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
   name: {{ $fullname }}
   namespace: {{ $ns }}
   {{- $_ := set $ctx "style" "managed" }}

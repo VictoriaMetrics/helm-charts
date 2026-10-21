@@ -8,8 +8,11 @@
 {{- if and (not .Values.crds.plain) .Values.crds.enabled }}
   {{- $files := .Files }}
   {{- $crds := $files.Get "crd.yaml" | splitList "---" }}
-  {{- $annotations := mergeOverwrite ((include "vm-operator.crds.annotations" .) | fromYaml) .Values.crds.annotations -}}
-  {{- $extra := dict "metadata" (dict "annotations" $annotations) -}}
+  {{- $_ := set $ctx "extraAnnotations" (mergeOverwrite ((include "vm-operator.crds.annotations" .) | fromYaml) .Values.crds.annotations) -}}
+  {{- $annotations := include "vm.annotations" $ctx | fromYaml -}}
+  {{- $_ := unset $ctx "extraAnnotations" -}}
+  {{- $labels := include "vm.labels" $ctx | fromYaml -}}
+  {{- $extra := dict "metadata" (dict "annotations" $annotations "labels" $labels) -}}
   {{- range $crds }}
     {{- $crd := merge (fromYaml .) $extra }}
     {{- range $attrKey, $attrValue := $crd }}
