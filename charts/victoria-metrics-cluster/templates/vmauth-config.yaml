@@ -20,12 +20,12 @@ data:
     {{- $urlMap := ($config.unauthorized_user).url_map | default list }}
     {{- if empty $urlMap }}
       {{- if $.Values.vmselect.service.enabled }}
-        {{- $readPaths := list (printf "%s/*" $readURL.path) }}
+        {{- $readPaths := list (printf "%s/.*" $readURL.path) (printf "%s/admin/tenants" (trimSuffix "/select" $readURL.path)) }}
         {{- $readPrefix := urlJoin (omit .vm.read "path") }}
         {{- $urlMap = append $urlMap (dict "src_paths" $readPaths "url_prefix" $readPrefix "discover_backend_ips" true) }}
       {{- end }}
       {{- if $.Values.vminsert.service.enabled }}
-        {{- $writePaths := list (printf "%s/*" $writeURL.path) }}
+        {{- $writePaths := list (printf "%s/.*" $writeURL.path) }}
         {{- $writePrefix := urlJoin (omit .vm.write "path") }}
         {{- $urlMap = append $urlMap (dict "src_paths" $writePaths "url_prefix" $writePrefix "discover_backend_ips" true) }}
       {{- end }}

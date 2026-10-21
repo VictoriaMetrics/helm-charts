@@ -1,0 +1,83 @@
+suite: vmauth config test
+templates:
+  - vmauth-config.yaml
+tests:
+  - it: should route all select and insert paths and /admin/tenants by default
+    set:
+      vmauth:
+        enabled: true
+    asserts:
+      - matchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /select/\.\*$'
+          decodeBase64: true
+      - matchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /admin/tenants$'
+          decodeBase64: true
+      - matchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /insert/\.\*$'
+          decodeBase64: true
+      - notMatchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /(select|insert)/\*$'
+          decodeBase64: true
+  - it: should keep the http path prefix for every default route
+    set:
+      vmauth:
+        enabled: true
+      vmselect:
+        extraArgs:
+          http.pathPrefix: /vm
+      vminsert:
+        extraArgs:
+          http.pathPrefix: /vm
+    asserts:
+      - matchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /vm/select/\.\*$'
+          decodeBase64: true
+      - matchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /vm/admin/tenants$'
+          decodeBase64: true
+      - matchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /vm/insert/\.\*$'
+          decodeBase64: true
+  - it: should not route select paths when the vmselect service is disabled
+    set:
+      vmauth:
+        enabled: true
+      vmselect:
+        service:
+          enabled: false
+    asserts:
+      - notMatchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)/(select/|admin/tenants)'
+          decodeBase64: true
+      - matchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /insert/\.\*$'
+          decodeBase64: true
+  - it: should leave a user-provided url_map untouched
+    set:
+      vmauth:
+        enabled: true
+        config:
+          unauthorized_user:
+            url_map:
+              - src_paths:
+                  - /custom/.*
+                url_prefix: http://custom:8481
+    asserts:
+      - matchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)^\s+- /custom/\.\*$'
+          decodeBase64: true
+      - notMatchRegex:
+          path: data["auth.yml"]
+          pattern: '(?m)/(select|insert|admin)/'
+          decodeBase64: true
