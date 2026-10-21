@@ -12,12 +12,14 @@ set:
   vlsingle.enabled: true
   vlagent.enabled: true
   vtsingle.enabled: true
+  vtagent.enabled: true
   alertmanager.enabled: true
   vmalert.enabled: false
 templates:
   - victoria-metrics-operator/vlsingle/vlsingle.yml
   - victoria-metrics-operator/vlagent/vlagent.yaml
   - victoria-metrics-operator/vtsingle/vtsingle.yaml
+  - victoria-metrics-operator/vtagent/vtagent.yaml
   - victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
 tests:
   - it: "chart default global.versions populate spec.image.tag and the version label"
@@ -46,6 +48,14 @@ tests:
           path: metadata.labels["app.kubernetes.io/version"]
           value: v0.0.3
         template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: spec.image.tag
+          value: v0.0.3
+        template: victoria-metrics-operator/vtagent/vtagent.yaml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v0.0.3
+        template: victoria-metrics-operator/vtagent/vtagent.yaml
       - equal:
           path: spec.image.tag
           value: v0.0.5
@@ -78,6 +88,14 @@ tests:
         template: victoria-metrics-operator/vtsingle/vtsingle.yaml
       - equal:
           path: spec.image.tag
+          value: v9.9.9-traces
+        template: victoria-metrics-operator/vtagent/vtagent.yaml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v9.9.9-traces
+        template: victoria-metrics-operator/vtagent/vtagent.yaml
+      - equal:
+          path: spec.image.tag
           value: v9.9.9-am
         documentSelector:
           path: kind
@@ -89,6 +107,7 @@ tests:
       vlsingle.spec.image.tag: v1.1.1-explicit
       vlagent.spec.image.tag: v1.1.1-explicit
       vtsingle.spec.image.tag: v1.1.1-explicit
+      vtagent.spec.image.tag: v1.1.1-explicit
       alertmanager.spec.image.tag: v1.1.1-explicit
       global.versions.logs: v9.9.9-logs
       global.versions.traces: v9.9.9-traces
@@ -110,6 +129,10 @@ tests:
           path: spec.image.tag
           value: v1.1.1-explicit
         template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: spec.image.tag
+          value: v1.1.1-explicit
+        template: victoria-metrics-operator/vtagent/vtagent.yaml
       - equal:
           path: spec.image.tag
           value: v1.1.1-explicit
@@ -148,6 +171,14 @@ tests:
           path: metadata.labels["app.kubernetes.io/version"]
           value: v0.0.0
         template: victoria-metrics-operator/vtsingle/vtsingle.yaml
+      - equal:
+          path: spec.image.tag
+          value: ""
+        template: victoria-metrics-operator/vtagent/vtagent.yaml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v0.0.0
+        template: victoria-metrics-operator/vtagent/vtagent.yaml
       - equal:
           path: spec.image.tag
           value: ""

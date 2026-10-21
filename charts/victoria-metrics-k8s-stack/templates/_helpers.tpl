@@ -717,6 +717,50 @@ global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
   {{- $mergedSpec | toYaml -}}
 {{- end }}
 
+{{- /* vt.native.write appends the native insert path to vt.write.endpoint for managed VTSingle/VTCluster deployments */ -}}
+{{- define "vt.native.write" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $endpoint := fromYaml (include "vt.write.endpoint" .) -}}
+  {{- if $endpoint.url -}}
+    {{- if or $Values.vtsingle.enabled (and $Values.vtcluster.enabled $Values.vtcluster.spec.vtinsert.enabled) -}}
+      {{- $_ := set $endpoint "url" (printf "%s/insert/native" $endpoint.url) -}}
+    {{- end -}}
+    {{- toYaml $endpoint -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* VTAgent spec */ -}}
+{{- define "vt.agent.spec" -}}
+  {{- $Values := (.helm).Values | default .Values }}
+  {{- $agentValues := $Values.vtagent -}}
+  {{- $remoteWrites := $agentValues.additionalRemoteWrites | default list }}
+  {{- $rws := $agentValues.spec.remoteWrite | default list }}
+  {{- $writeEndpoint := include "vt.native.write" . -}}
+  {{- with $writeEndpoint -}}
+    {{- if $rws -}}
+      {{- $rws = prepend (slice $rws 1) (mergeOverwrite (fromYaml .) (deepCopy (first $rws))) -}}
+    {{- else -}}
+      {{- $rws = append $rws (fromYaml .) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $remoteWrites = concat $remoteWrites $rws }}
+  {{- if empty $remoteWrites -}}
+    {{- fail "vtagent.spec.remoteWrite cannot be empty: enable vtsingle/vtcluster, set external.vt.write.url, or provide vtagent.spec.remoteWrite/vtagent.additionalRemoteWrites" -}}
+  {{- end -}}
+  {{- $spec := dict "remoteWrite" $remoteWrites -}}
+  {{- with (include "vm.license.global" .) -}}
+    {{- $_ := set $spec "license" (fromYaml .) -}}
+  {{- end -}}
+  {{- $mergedSpec := mergeOverwrite (deepCopy $agentValues.spec) (deepCopy $spec) -}}
+  {{- if not (($mergedSpec.image).tag) -}}
+    {{- $version := include "vm.versions.resolve" (dict "helm" .helm "key" "traces") -}}
+    {{- with $version -}}
+      {{- $_ := set $mergedSpec "image" (mergeOverwrite ($mergedSpec.image | default dict) (dict "tag" .)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $mergedSpec | toYaml -}}
+{{- end }}
+
 {{- /* VTCluster spec */ -}}
 {{- define "vt.cluster.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}

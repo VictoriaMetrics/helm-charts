@@ -1232,6 +1232,83 @@ vtcluster:
         - path:
             type: PathPrefix
             value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vtcluster.spec.vtinsert }}'
+vtagent:
+  # -- Create VTAgent CR
+  enabled: false
+  # -- VTAgent labels
+  labels: {}
+  # -- VTAgent annotations
+  annotations: {}
+  # -- Override the namespace for this component. When set, deploys the CR to a different namespace than the release namespace.
+  namespaceOverride: ""
+  rbac:
+    # -- Role/RoleBinding annotations
+    annotations: {}
+    # -- Defines if ClusterRole or Role with respective bindings should be created
+    namespaced: true
+    # -- Role/RoleBinding labels
+    extraLabels: {}
+    # -- additional rules for a role
+    rules: []
+  # -- Remote write configuration of VTAgent, allowed parameters defined in a [spec](https://docs.victoriametrics.com/operator/api/#vtagentremotewritespec)
+  additionalRemoteWrites: []
+  #- url: http://some-remote-write/insert/native
+  # -- (object) Full spec for VTAgent CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vtagentspec)
+  spec:
+    port: "10429"
+    image:
+      # -- VictoriaTraces image tag. Defaults to `global.versions.traces` when empty.
+      tag: ""
+  # -- (object) VTAgent ingress configuration
+  ingress:
+    enabled: false
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+    # Values can be templated
+    annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    labels: {}
+    path: ""
+    pathType: Prefix
+    hosts:
+      - vtagent.domain.com
+    extraPaths: []
+    # - path: /*
+    #   pathType: Prefix
+    #   backend:
+    #     service:
+    #       name: ssl-redirect
+    #       port:
+    #         name: service
+    tls: []
+    #  - secretName: vtagent-ingress-tls
+    #    hosts:
+    #      - vtagent.domain.com
+  # -- (object) VTAgent route configuration
+  route:
+    # -- Enable deployment of HTTPRoute for vtagent component
+    enabled: false
+    # -- HTTPRoute annotations
+    annotations: {}
+    # -- HTTPRoute extra labels
+    labels: {}
+    # -- HTTPGateway objects refs
+    parentRefs: []
+    # -- Array of hostnames
+    hostnames: []
+    # -- Extra rules to prepend to route. This is useful when working with annotation based services.
+    extraRules: []
+    # -- Route port
+    port: '{{ .Values.vtagent.spec.port }}'
+    # -- Filters for a default rule in HTTPRoute
+    filters: []
+    # -- Matches for a default rule in HTTPRoute
+    matches:
+      - path:
+          type: PathPrefix
+          value: '{{ dig "spec" "extraArgs" "http.pathPrefix" "/" .Values.vtagent }}'
 # Configures vmsingle params
 vmsingle:
   # -- VMSingle labels

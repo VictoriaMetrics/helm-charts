@@ -1,0 +1,115 @@
+suite: vtagent spec tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vtagent/vtagent.yaml
+tests:
+  - it: remoteWrite points to vtsingle write endpoint when vtsingle enabled
+    set:
+      vtagent:
+        enabled: true
+      vtsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vtsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:10428/insert/native
+
+  - it: user-configured spec.remoteWrite entries after the first are all preserved
+    set:
+      vtagent:
+        enabled: true
+        spec:
+          remoteWrite:
+            - url: http://custom1.example.com
+            - url: http://custom2.example.com
+            - url: http://custom3.example.com
+      vtsingle:
+        enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.remoteWrite
+          count: 3
+      - equal:
+          path: spec.remoteWrite[1].url
+          value: http://custom2.example.com
+      - equal:
+          path: spec.remoteWrite[2].url
+          value: http://custom3.example.com
+
+  - it: remoteWrite points to vtinsert when vtcluster enabled
+    set:
+      vtagent:
+        enabled: true
+      vtcluster:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vtinsert-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:10481/insert/native
+
+  - it: external vt write URL is used when no vt CR configured
+    set:
+      vtagent:
+        enabled: true
+      external:
+        vt:
+          write:
+            url: http://vt.external.example.com/insert/native
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://vt.external.example.com/insert/native
+
+  - it: additionalRemoteWrites are prepended to remoteWrite list
+    set:
+      vtagent:
+        enabled: true
+        additionalRemoteWrites:
+          - url: http://additional.example.com
+      vtsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.remoteWrite[0].url
+          value: http://additional.example.com
+      - equal:
+          path: spec.remoteWrite[1].url
+          value: http://vtsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:10428/insert/native
+
+  - it: image tag from values is preserved and not overridden by chart appVersion
+    set:
+      vtagent:
+        enabled: true
+        spec:
+          image:
+            tag: v9.9.9
+      vtsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.image.tag
+          value: v9.9.9
+
+  - it: app.kubernetes.io/version label reflects spec.image.tag
+    set:
+      vtagent:
+        enabled: true
+        spec:
+          image:
+            tag: v0.10.0
+      vtsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: v0.10.0
+
+  - it: fails when no remoteWrite target is configured
+    set:
+      vtagent:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "vtagent.spec.remoteWrite cannot be empty: enable vtsingle/vtcluster, set external.vt.write.url, or provide vtagent.spec.remoteWrite/vtagent.additionalRemoteWrites"

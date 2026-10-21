@@ -1,0 +1,25 @@
+{{- $app := .Values.vtagent }}
+{{- if $app.enabled }}
+{{- $ctx := dict "helm" . "appKey" (list "vtagent" "spec") }}
+{{- $fullname := include "vm.cr.fullname" $ctx }}
+{{- $ns := include "vm.namespace" $ctx }}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VTAgent
+metadata:
+  {{- with $app.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end  }}
+  name: {{ $fullname }}
+  namespace: {{ $ns }}
+  {{- $_ := set $ctx "style" "managed" }}
+  {{- $_ := set $ctx "extraLabels" ($app.labels | default dict) }}
+  {{- $labels := include "vm.labels" $ctx | fromYaml }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- $version := include "vm.versions.resolve" (dict "helm" . "tag" ($app.spec.image).tag "key" "traces") }}
+  {{- with $version }}
+    {{- $_ := set $labels "app.kubernetes.io/version" . }}
+  {{- end }}
+  labels: {{ toYaml $labels | nindent 4 }}
+spec: {{ include "vt.agent.spec" $ctx | nindent 2 }}
+{{- end }}

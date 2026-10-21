@@ -2,15 +2,20 @@ suite: useLegacyNaming tests
 set:
   vmagent.enabled: true
   vlagent.enabled: true
+  vtagent.enabled: true
   vmagent.rbac.rules[0].apiGroups[0]: ""
   vmagent.rbac.rules[0].resources[0]: pods
   vmagent.rbac.rules[0].verbs[0]: get
   vlagent.rbac.rules[0].apiGroups[0]: ""
   vlagent.rbac.rules[0].resources[0]: pods
   vlagent.rbac.rules[0].verbs[0]: get
+  vtagent.rbac.rules[0].apiGroups[0]: ""
+  vtagent.rbac.rules[0].resources[0]: pods
+  vtagent.rbac.rules[0].verbs[0]: get
 templates:
   - victoria-metrics-operator/vmagent/rbac.yaml
   - victoria-metrics-operator/vlagent/rbac.yaml
+  - victoria-metrics-operator/vtagent/rbac.yaml
   - victoria-metrics-operator/vmsingle/vmsingle.yml
   - victoria-metrics-operator/vmagent/vmagent.yaml
 tests:
@@ -44,6 +49,20 @@ tests:
           path: kind
           value: RoleBinding
         template: victoria-metrics-operator/vlagent/rbac.yaml
+      - equal:
+          path: metadata.name
+          value: vtagent-RELEASE-NAME-victoria-metrics-k8s-stack
+        documentSelector:
+          path: kind
+          value: Role
+        template: victoria-metrics-operator/vtagent/rbac.yaml
+      - equal:
+          path: metadata.name
+          value: vtagent-RELEASE-NAME-victoria-metrics-k8s-stack
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: victoria-metrics-operator/vtagent/rbac.yaml
   - it: "useLegacyNaming: true is rejected -- vm.cr.fullname requires CR names to stay stable"
     set:
       useLegacyNaming: true

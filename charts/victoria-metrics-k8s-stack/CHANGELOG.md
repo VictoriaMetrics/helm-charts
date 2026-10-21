@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VM components to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1), which fixes delayed requests in vmauth when a request with an `Authorization` header is matched to `unauthorized_user`. See [VictoriaMetrics#11774](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11774).
+- add `vtagent` support, allowing a `VTAgent` CR to be deployed and configured the same way as `vmagent`/`vlagent`. Its default `remoteWrite` points at the configured `vtsingle`/`vtcluster` (or `external.vt.write.url`); enabling `vtagent` without any of these, or a custom `remoteWrite`, now fails the template render instead of producing a `VTAgent` with an empty `remoteWrite` that the operator would reject. See [#3279](https://github.com/VictoriaMetrics/helm-charts/issues/3279).
 
 ## v0.96.0
 
