@@ -9,6 +9,9 @@ metadata:
   name: {{ $fullname }}-extra-tpl
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 data:
 {{- range $file, $template := $app.templateFiles }}
   {{ $file }}: |-

@@ -18,6 +18,9 @@ metadata:
   {{- $labels := include "vm.labels" $ctx | fromYaml }}
   {{- $_ := set $labels "app.kubernetes.io/component" "vmauth" }}
   labels: {{ toYaml $labels | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 spec: {{ include "vm.auth.internal.spec" $ctx | nindent 2 }}
 {{- end }}
 {{- end }}

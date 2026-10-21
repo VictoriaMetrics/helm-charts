@@ -1,0 +1,428 @@
+suite: global.extraLabels and global.extraAnnotations propagation tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+set:
+  global:
+    extraLabels:
+      example.com/global-label: expected
+    extraAnnotations:
+      example.com/global-annotation: expected
+templates:
+  - victoria-metrics-operator/vmsingle/vmsingle.yml
+  - victoria-metrics-operator/vmagent/vmagent.yaml
+  - victoria-metrics-operator/vmagent/rbac.yaml
+  - victoria-metrics-operator/vlagent/vlagent.yaml
+  - victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+  - victoria-metrics-operator/vmalertmanager/custom-templates.yaml
+  - victoria-metrics-operator/vmalertmanager/monzo-template.yaml
+  - victoria-metrics-operator/vmalert/custom-templates.yaml
+  - victoria-metrics-operator/vmalert/notifiers.yaml
+  - victoria-metrics-operator/vmauth/vmauth.yaml
+  - victoria-metrics-operator/vmauth/internal.yaml
+  - ingress.yaml
+  - route.yaml
+  - sync-job/job.yaml
+  - sync-job/config.yaml
+  - sync-job/rbac.yaml
+  - servicemonitors.yaml
+  - grafana/datasource.yaml
+tests:
+  - it: VMSingle CR gets global.extraLabels and global.extraAnnotations, local annotations preserved
+    set:
+      vmsingle:
+        enabled: true
+        annotations:
+          local: vmsingle
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vmsingle/vmsingle.yml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vmsingle/vmsingle.yml
+      - equal:
+          path: metadata.annotations.local
+          value: vmsingle
+        template: victoria-metrics-operator/vmsingle/vmsingle.yml
+
+  - it: VMAgent CR gets global.extraLabels and global.extraAnnotations
+    set:
+      vmagent:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vmagent/vmagent.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vmagent/vmagent.yaml
+
+  - it: VLAgent CR gets global.extraLabels and global.extraAnnotations
+    set:
+      vlagent:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vlagent/vlagent.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vlagent/vlagent.yaml
+
+  - it: VMAgent RBAC Role/RoleBinding get global.extraLabels and global.extraAnnotations
+    set:
+      vmagent:
+        enabled: true
+        rbac:
+          rules:
+            - apiGroups: [""]
+              resources: ["pods"]
+              verbs: ["get"]
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Role
+        template: victoria-metrics-operator/vmagent/rbac.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Role
+        template: victoria-metrics-operator/vmagent/rbac.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: victoria-metrics-operator/vmagent/rbac.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: victoria-metrics-operator/vmagent/rbac.yaml
+
+  - it: VMAlertmanager CR gets global.extraLabels and global.extraAnnotations
+    set:
+      alertmanager:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: VMAlertmanager
+        template: victoria-metrics-operator/vmalertmanager/vmalertmanager.yaml
+
+  - it: VMAlertmanager custom-templates and monzo-template ConfigMaps get global.extraLabels and global.extraAnnotations
+    set:
+      alertmanager:
+        enabled: true
+        templateFiles:
+          foo.tmpl: "bar"
+        monzoTemplate:
+          enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vmalertmanager/custom-templates.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vmalertmanager/custom-templates.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vmalertmanager/monzo-template.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vmalertmanager/monzo-template.yaml
+
+  - it: vmalert custom-templates ConfigMap and notifiers Secret get global.extraLabels and global.extraAnnotations
+    set:
+      vmalert:
+        templateFiles:
+          foo.tmpl: "bar"
+        additionalNotifierConfigs:
+          static_configs: []
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vmalert/custom-templates.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vmalert/custom-templates.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vmalert/notifiers.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vmalert/notifiers.yaml
+
+  - it: VMAuth CR gets global.extraLabels and global.extraAnnotations
+    set:
+      vmauth:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vmauth/vmauth.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vmauth/vmauth.yaml
+
+  - it: internal VMAuth CR gets global.extraLabels and global.extraAnnotations
+    set:
+      vmsingle:
+        enabled: true
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: victoria-metrics-operator/vmauth/internal.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: victoria-metrics-operator/vmauth/internal.yaml
+
+  - it: Ingress gets global.extraLabels and global.extraAnnotations
+    set:
+      vmsingle:
+        enabled: true
+        ingress:
+          enabled: true
+          hosts:
+            - vmsingle.example.com
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: ingress.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: ingress.yaml
+
+  - it: HTTPRoute gets global.extraLabels and global.extraAnnotations
+    set:
+      vmsingle:
+        enabled: true
+        route:
+          enabled: true
+          hostnames:
+            - vmsingle.example.com
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: route.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: route.yaml
+
+  - it: sync-job Job, config ConfigMap and RBAC get global.extraLabels and global.extraAnnotations alongside hook annotations
+    set:
+      syncJob:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: sync-job/job.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: sync-job/job.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/hook"]
+          value: post-install,post-upgrade
+        template: sync-job/job.yaml
+      - equal:
+          path: spec.template.metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: sync-job/job.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: sync-job/config.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: sync-job/config.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: ServiceAccount
+        template: sync-job/rbac.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: ServiceAccount
+        template: sync-job/rbac.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Role
+        template: sync-job/rbac.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Role
+        template: sync-job/rbac.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: sync-job/rbac.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: RoleBinding
+        template: sync-job/rbac.yaml
+
+  - it: generated VMServiceScrape, Service and Endpoints get global.extraLabels and global.extraAnnotations
+    set:
+      kubelet.enabled: false
+      kubeApiServer.enabled: false
+      kubeControllerManager.enabled: false
+      coreDns.enabled: false
+      kubeEtcd.enabled: false
+      kubeScheduler.enabled: false
+      grafana.enabled: false
+      kube-state-metrics.enabled: false
+      prometheus-node-exporter.enabled: false
+      customScrapeTarget:
+        enabled: true
+        endpoints:
+          - 10.0.0.1
+        vmScrape:
+          spec:
+            endpoints:
+              - port: http
+            selector:
+              matchLabels:
+                app: custom
+        service:
+          enabled: true
+          port: 8080
+          labels: {}
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: VMServiceScrape
+        template: servicemonitors.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: VMServiceScrape
+        template: servicemonitors.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Service
+        template: servicemonitors.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Service
+        template: servicemonitors.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Endpoints
+        template: servicemonitors.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Endpoints
+        template: servicemonitors.yaml
+
+  - it: Grafana datasource ConfigMap gets global.extraLabels and global.extraAnnotations
+    set:
+      vmsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: grafana/datasource.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: grafana/datasource.yaml
+
+  - it: Grafana GrafanaDatasource CR gets global.extraLabels and global.extraAnnotations
+    set:
+      vmsingle:
+        enabled: true
+      defaultDatasources:
+        grafanaOperator:
+          enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: grafana/datasource.yaml
+        documentIndex: 0
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: grafana/datasource.yaml
+        documentIndex: 0

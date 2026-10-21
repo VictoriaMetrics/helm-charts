@@ -1,0 +1,354 @@
+suite: global.extraLabels and global.extraAnnotations propagation tests
+set:
+  global:
+    extraLabels:
+      example.com/global-label: expected
+    extraAnnotations:
+      example.com/global-annotation: expected
+  crds.cleanup.enabled: true
+  admissionWebhooks.enabled: true
+  podDisruptionBudget.enabled: true
+  serviceMonitor.enabled: true
+  rbac.create: true
+  rbac.aggregatedClusterRoles.enabled: true
+  serviceAccount.create: true
+capabilities:
+  apiVersions:
+    - operator.victoriametrics.com/v1beta1
+    - monitoring.coreos.com/v1
+    - gateway.networking.k8s.io/v1
+    - autoscaling.k8s.io/v1
+templates:
+  - cleanup.yaml
+  - crb.yaml
+  - rb.yaml
+  - role.yaml
+  - server.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - monitor.yaml
+  - pdb.yaml
+  - webhook.yaml
+  - crd.yaml
+tests:
+  - it: cleanup Job and its Pod template get global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: cleanup.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: cleanup.yaml
+      - equal:
+          path: metadata.annotations["helm.sh/hook"]
+          value: pre-delete
+        template: cleanup.yaml
+      - equal:
+          path: spec.template.metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: cleanup.yaml
+
+  - it: ClusterRoleBinding and its cleanup-hook counterpart get global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator
+        template: crb.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator
+        template: crb.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-cleanup-hook
+        template: crb.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-cleanup-hook
+        template: crb.yaml
+
+  - it: RoleBinding gets global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: rb.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: rb.yaml
+
+  - it: Role, ClusterRole, cleanup-hook ClusterRole and aggregated ClusterRoles get global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Role
+        template: role.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Role
+        template: role.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentIndex: 0
+        template: role.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentIndex: 0
+        template: role.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-cleanup-hook
+        template: role.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-cleanup-hook
+        template: role.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-victoriametrics-admin
+        template: role.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-victoriametrics-admin
+        template: role.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-victoriametrics-view
+        template: role.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-victoriametrics-view
+        template: role.yaml
+
+  - it: Deployment and its Pod template get global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: server.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: server.yaml
+      - equal:
+          path: spec.template.metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: server.yaml
+
+  - it: Service gets global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: service.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: service.yaml
+
+  - it: ServiceAccount and its cleanup-hook counterpart get global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-cleanup-hook
+        template: serviceaccount.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-cleanup-hook
+        template: serviceaccount.yaml
+
+  - it: VMServiceScrape gets global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: monitor.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: monitor.yaml
+
+  - it: PodDisruptionBudget gets global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        template: pdb.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        template: pdb.yaml
+
+  - it: ValidatingWebhookConfiguration gets global.extraLabels and global.extraAnnotations
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: ValidatingWebhookConfiguration
+        template: webhook.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: ValidatingWebhookConfiguration
+        template: webhook.yaml
+
+  - it: cert-manager Issuer and Certificate resources get global.extraLabels and global.extraAnnotations
+    set:
+      admissionWebhooks.certManager.enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-root
+        template: webhook.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-root
+        template: webhook.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-root-ca
+        template: webhook.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-root-ca
+        template: webhook.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-issuer
+        template: webhook.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-issuer
+        template: webhook.yaml
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-validation
+        template: webhook.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-operator-validation
+        template: webhook.yaml
+
+  - it: self-signed fallback Secret gets global.extraLabels and global.extraAnnotations
+    set:
+      admissionWebhooks.certManager.enabled: false
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Secret
+        template: webhook.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentSelector:
+          path: kind
+          value: Secret
+        template: webhook.yaml
+
+  - it: CRDs get global.extraLabels and global.extraAnnotations
+    set:
+      crds.enabled: true
+      crds.plain: false
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/global-label"]
+          value: expected
+        documentIndex: 0
+        template: crd.yaml
+      - equal:
+          path: metadata.annotations["example.com/global-annotation"]
+          value: expected
+        documentIndex: 0
+        template: crd.yaml

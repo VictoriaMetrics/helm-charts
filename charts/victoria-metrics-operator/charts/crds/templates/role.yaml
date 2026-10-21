@@ -8,10 +8,9 @@ kind: ClusterRole
 metadata:
   name: {{ template "crds.upgrade.name" . }}
   namespace: {{ template "vm.namespace" . }}
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade,pre-rollback
-    "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  {{- $_ := set $ctx "extraAnnotations" (include "crds.upgrade.hookAnnotations" (dict "hookWeight" "-5") | fromYaml) }}
+  annotations: {{ include "vm.annotations" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
   labels: {{ $labels | nindent 4 }}
   {{- $crds := .Files.Get "crds/crd.yaml" | splitList "---" }}
 rules:
@@ -36,10 +35,9 @@ kind: ClusterRoleBinding
 metadata:
   name: {{ template "crds.upgrade.name" . }}
   namespace: {{ template "vm.namespace" . }}
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade,pre-rollback
-    "helm.sh/hook-weight": "-3"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  {{- $_ := set $ctx "extraAnnotations" (include "crds.upgrade.hookAnnotations" (dict "hookWeight" "-3") | fromYaml) }}
+  annotations: {{ include "vm.annotations" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
   labels: {{ $labels | nindent 4 }}
 subjects:
   - kind: ServiceAccount

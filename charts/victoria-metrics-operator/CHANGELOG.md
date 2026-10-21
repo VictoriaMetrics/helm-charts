@@ -1,6 +1,7 @@
 ## Next release
 
 - fix pod label selector in the chart notes: repeated `-l` flags were replaced with a single comma-separated selector, since `kubectl` only honours the last `-l`.
+- BUGFIX: apply `global.extraLabels` and `global.extraAnnotations` to every resource this chart renders directly. See [#3202](https://github.com/VictoriaMetrics/helm-charts/issues/3202).
 
 ## v0.68.1
 

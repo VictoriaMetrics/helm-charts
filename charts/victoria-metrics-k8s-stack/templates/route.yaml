@@ -27,9 +27,11 @@ metadata:
   namespace: {{ include "vm.namespace" $ctx }}
   {{- $_ := set $ctx "extraLabels" $route.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
-  {{- with $route.annotations }}
-  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- $_ := set $ctx "extraAnnotations" $route.annotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ tpl . $ | nindent 4 }}
   {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
 spec:
   {{- with $route.parentRefs }}
   parentRefs: {{ toYaml . | nindent 4 }}

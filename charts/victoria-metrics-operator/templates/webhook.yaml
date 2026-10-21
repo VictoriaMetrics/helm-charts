@@ -14,19 +14,17 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name:  {{ $fullname }}-admission
-  {{- if or $certManager.enabled $webhooks.annotations }}
-  annotations:
-    {{- if $certManager.enabled }}
-    certmanager.k8s.io/inject-ca-from: {{ printf "%s/%s-validation" $ns $fullname | quote }}
-    cert-manager.io/inject-ca-from: {{ printf "%s/%s-validation" $ns $fullname | quote }}
-    {{- end }}
-    {{- with $certManager.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with $webhooks.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+  {{- $whAnnotations := dict }}
+  {{- if $certManager.enabled }}
+    {{- $_ := set $whAnnotations "certmanager.k8s.io/inject-ca-from" (printf "%s/%s-validation" $ns $fullname) }}
+    {{- $_ := set $whAnnotations "cert-manager.io/inject-ca-from" (printf "%s/%s-validation" $ns $fullname) }}
   {{- end }}
+  {{- $whAnnotations = mergeOverwrite $whAnnotations ($certManager.annotations | default dict) ($webhooks.annotations | default dict) }}
+  {{- $_ := set $ctx "extraAnnotations" $whAnnotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
 webhooks:
 {{- range $crds }}
@@ -74,6 +72,10 @@ kind: Issuer
 metadata:
   name: {{ $fullname }}-root
   namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 spec:
   selfSigned: {}
 ---
@@ -82,6 +84,10 @@ kind: Certificate
 metadata:
   name: {{ $fullname }}-root-ca
   namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 spec:
   secretName: {{ $fullname }}-root-ca
   duration: {{ $certManager.ca.duration }}
@@ -101,6 +107,10 @@ kind: Issuer
 metadata:
   name: {{ $fullname }}-issuer
   namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 spec:
   ca:
     secretName: {{ $fullname }}-root-ca
@@ -112,6 +122,10 @@ kind: Certificate
 metadata:
   name: {{ $fullname }}-validation
   namespace: {{ $ns }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 spec:
   secretName: {{ $fullname }}-validation
   duration: {{ $certManager.cert.duration }}
@@ -144,6 +158,9 @@ metadata:
   name: {{ $fullname }}-validation
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 type: kubernetes.io/tls
 data:
   ca.crt: {{ $tls.caCert }}
