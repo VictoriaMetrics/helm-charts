@@ -58,29 +58,85 @@ tests:
           path: metadata.labels["app.kubernetes.io/component"]
           value: vmauth
 
-  - it: url_map routes logsql paths to vlsingle
+  - it: targetRefs route logsql paths to vlsingle via crd
     set:
       vlsingle:
         enabled: true
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].paths[0]
+          value: '/select/logsql/.*'
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].crd
+          value:
+            kind: VLSingle
+            name: RELEASE-NAME-victoria-metrics-k8s-stack
+            namespace: NAMESPACE
+
+  - it: targetRefs route all other paths to vmsingle via crd
+    set:
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[1].paths[0]
+          value: '/.*'
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[1].crd
+          value:
+            kind: VMSingle
+            name: RELEASE-NAME-victoria-metrics-k8s-stack
+            namespace: NAMESPACE
+
+  - it: targetRefs route vmcluster vmselect with tenant path suffix
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+      vlsingle:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[1].crd.kind
+          value: VMCluster/vmselect
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[1].target_path_suffix
+          value: /select/0/prometheus
+
+  - it: targetRefs route vldistributed via static ref
+    set:
+      vlsingle:
+        enabled: false
+      vldistributed:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].paths[0]
+          value: '/select/logsql/.*'
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].static.url
+          value: 'http://vmauth-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8427/'
+
+  - it: does not generate targetRefs when user sets a custom url_map
+    set:
+      vlsingle:
+        enabled: true
+      internal:
+        vmauth:
+          spec:
+            unauthorizedUserAccessSpec:
+              url_map:
+                - src_paths:
+                    - /foo/.*
+                  url_prefix:
+                    - http://foo/
     asserts:
       - equal:
           path: spec.unauthorizedUserAccessSpec.url_map[0].src_paths[0]
-          value: '/select/logsql/.*'
-      - equal:
-          path: spec.unauthorizedUserAccessSpec.url_map[0].url_prefix[0]
-          value: 'http://vlsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9428/'
-
-  - it: url_map routes all other paths to vmsingle
-    set:
-      vlsingle:
-        enabled: true
-    asserts:
-      - equal:
-          path: spec.unauthorizedUserAccessSpec.url_map[1].src_paths[0]
-          value: '/.*'
-      - equal:
-          path: spec.unauthorizedUserAccessSpec.url_map[1].url_prefix[0]
-          value: 'http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8428/'
+          value: /foo/.*
+      - notExists:
+          path: spec.unauthorizedUserAccessSpec.targetRefs
 
   - it: port is 8427
     set:

@@ -1868,7 +1868,11 @@ vmauth:
   # -- Override the namespace for this component. When set, deploys the CR to a different namespace than the release namespace.
   namespaceOverride: ""
   # -- (object) Full spec for VMAuth CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vmauthspec)
-  # It's possible to use given below predefined variables in spec:
+  # If `unauthorizedUserAccessSpec.url_map`, `.url_prefix` and `.targetRefs` are all left unset, the chart
+  # automatically routes to vmsingle/vmcluster (or `external.vm.read`/`external.vm.write`) using `targetRefs`
+  # with `crd` references, so the operator derives all backend routes (e.g. `/admin/tenants`) automatically.
+  # Set `url_map`, `url_prefix` or `targetRefs` explicitly to take full control of routing instead.
+  # It's possible to use given below predefined variables in a custom spec:
   # * `{{ .vm.read }}` - parsed vmselect, vmsingle or external.vm.read URL
   # * `{{ .vm.write }}` - parsed vminsert, vmsingle or external.vm.write URL
   # * `{{ .vl.read }}` - parsed vlselect, vlsingle or external.vl.read URL
@@ -1881,15 +1885,6 @@ vmauth:
       # -- Flag, that allows to disable default VMAuth unauthorized user access config
       disabled: false
       discover_backend_ips: true
-      url_map:
-        - src_paths:
-            - '{{ .vm.read.path }}/.*'
-          url_prefix:
-            - '{{ urlJoin (omit .vm.read "path") }}/'
-        - src_paths:
-            - '{{ .vm.write.path }}/.*'
-          url_prefix:
-            - '{{ urlJoin (omit .vm.write "path") }}/'
 vmagent:
   # -- Create VMAgent CR
   enabled: true
@@ -2434,21 +2429,15 @@ internal:
     # -- name is a template for the internal VMAuth CR used for vmalert datasource routing
     name: '{{ .fullname }}-internal'
     # -- (object) Spec for internal VMAuth CRD used as a vmalert datasource proxy.
-    # It's possible to use given below predefined variables in spec:
+    # If `unauthorizedUserAccessSpec.url_map`, `.url_prefix` and `.targetRefs` are all left unset, the chart
+    # automatically routes `/select/logsql/.*` to vlsingle/vlcluster (or `external.vl.read`) and everything
+    # else to vmsingle/vmcluster (or `external.vm.read`) using `targetRefs` with `crd` references.
+    # Set `url_map`, `url_prefix` or `targetRefs` explicitly to take full control of routing instead.
+    # It's possible to use given below predefined variables in a custom spec:
     # * `{{ .vm.read }}` - parsed vmselect, vmsingle or external.vm.read URL
     # * `{{ .vl.read }}` - parsed vlselect, vlsingle or external.vl.read URL
     # * `{{ .vt.read }}` - parsed vtselect, vtsingle or external.vt.read URL
     spec:
       port: "8427"
-      unauthorizedUserAccessSpec:
-        url_map:
-          - src_paths:
-              - '/select/logsql/.*'
-            url_prefix:
-              - '{{ urlJoin (omit .vl.read "path") }}/'
-          - src_paths:
-              - '/.*'
-            url_prefix:
-              - '{{ (include "vm.prometheus.read" . | fromYaml).url }}/'
 # -- Add extra objects dynamically to this chart
 extraObjects: []

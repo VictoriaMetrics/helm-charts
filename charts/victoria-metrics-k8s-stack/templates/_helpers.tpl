@@ -281,6 +281,34 @@ global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
   {{- $_ := set . "vt" $vt -}}
 {{- end -}}
 
+{{- /* Default targetRefs for unauthorizedUserAccessSpec */ -}}
+{{- define "vm.auth.targetRefs" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $refs := list -}}
+  {{- if $Values.vmsingle.enabled -}}
+    {{- $ctx := dict "helm" .helm "appKey" (list "vmsingle" "spec") -}}
+    {{- $refs = append $refs (dict "crd" (dict "kind" "VMSingle" "name" (include "vm.cr.fullname" $ctx) "namespace" (include "vm.namespace" $ctx))) -}}
+  {{- else -}}
+    {{- if and $Values.vmcluster.enabled $Values.vmcluster.spec.vmselect.enabled -}}
+      {{- $ctx := dict "helm" .helm "appKey" (list "vmcluster" "spec") -}}
+      {{- $refs = append $refs (dict "crd" (dict "kind" "VMCluster/vmselect" "name" (include "vm.cr.fullname" $ctx) "namespace" (include "vm.namespace" $ctx))) -}}
+    {{- else -}}
+      {{- with .vm.read -}}
+        {{- $refs = append $refs (dict "static" (dict "url" (printf "%s/" (urlJoin (omit . "path")))) "paths" (list (printf "%s/.*" .path))) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if and $Values.vmcluster.enabled $Values.vmcluster.spec.vminsert.enabled -}}
+      {{- $ctx := dict "helm" .helm "appKey" (list "vmcluster" "spec") -}}
+      {{- $refs = append $refs (dict "crd" (dict "kind" "VMCluster/vminsert" "name" (include "vm.cr.fullname" $ctx) "namespace" (include "vm.namespace" $ctx))) -}}
+    {{- else -}}
+      {{- with .vm.write -}}
+        {{- $refs = append $refs (dict "static" (dict "url" (printf "%s/" (urlJoin (omit . "path")))) "paths" (list (printf "%s/.*" .path))) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toYaml $refs -}}
+{{- end -}}
+
 {{- /* VMAuth spec */ -}}
 {{- define "vm.auth.spec" -}}
   {{- $Values := (.helm).Values | default .Values }}
@@ -292,6 +320,12 @@ global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
       {{- $_ := unset $spec "unauthorizedUserAccessSpec" }}
     {{- else -}}
       {{- $_ := unset $spec.unauthorizedUserAccessSpec "disabled" }}
+      {{- if not (or $spec.unauthorizedUserAccessSpec.url_map $spec.unauthorizedUserAccessSpec.url_prefix $spec.unauthorizedUserAccessSpec.targetRefs) -}}
+        {{- $targetRefs := fromYamlArray (include "vm.auth.targetRefs" .) -}}
+        {{- if $targetRefs -}}
+          {{- $_ := set $spec.unauthorizedUserAccessSpec "targetRefs" $targetRefs -}}
+        {{- end -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
   {{- $_ := set $spec "image" (mergeOverwrite (deepCopy $image) (deepCopy ($spec.image | default dict))) -}}
@@ -742,9 +776,49 @@ global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
   {{- tpl (toYaml $clusterSpec) . -}}
 {{- end -}}
 
+{{- /* targetRefs for internal VMAuth: /select/logsql/.* routes to VL, everything else to VM */ -}}
+{{- define "vm.auth.internal.targetRefs" -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $refs := list -}}
+  {{- if $Values.vlsingle.enabled -}}
+    {{- $ctx := dict "helm" .helm "appKey" (list "vlsingle" "spec") -}}
+    {{- $refs = append $refs (dict "crd" (dict "kind" "VLSingle" "name" (include "vm.cr.fullname" $ctx) "namespace" (include "vm.namespace" $ctx)) "paths" (list "/select/logsql/.*")) -}}
+  {{- else if and $Values.vlcluster.enabled $Values.vlcluster.spec.vlselect.enabled -}}
+    {{- $ctx := dict "helm" .helm "appKey" (list "vlcluster" "spec") -}}
+    {{- $refs = append $refs (dict "crd" (dict "kind" "VLCluster/vlselect" "name" (include "vm.cr.fullname" $ctx) "namespace" (include "vm.namespace" $ctx)) "paths" (list "/select/logsql/.*")) -}}
+  {{- else -}}
+    {{- with .vl.read -}}
+      {{- $refs = append $refs (dict "static" (dict "url" (printf "%s/" (urlJoin (omit . "path")))) "paths" (list "/select/logsql/.*")) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $Values.vmsingle.enabled -}}
+    {{- $ctx := dict "helm" .helm "appKey" (list "vmsingle" "spec") -}}
+    {{- $refs = append $refs (dict "crd" (dict "kind" "VMSingle" "name" (include "vm.cr.fullname" $ctx) "namespace" (include "vm.namespace" $ctx)) "paths" (list "/.*")) -}}
+  {{- else if and $Values.vmcluster.enabled $Values.vmcluster.spec.vmselect.enabled -}}
+    {{- $ctx := dict "helm" .helm "appKey" (list "vmcluster" "spec") -}}
+    {{- $tenant := $Values.tenant | default 0 -}}
+    {{- $refs = append $refs (dict "crd" (dict "kind" "VMCluster/vmselect" "name" (include "vm.cr.fullname" $ctx) "namespace" (include "vm.namespace" $ctx)) "target_path_suffix" (printf "/select/%d/prometheus" (int $tenant)) "paths" (list "/.*")) -}}
+  {{- else -}}
+    {{- $vmRead := fromYaml (include "vm.prometheus.read" .) -}}
+    {{- with $vmRead.url -}}
+      {{- $refs = append $refs (dict "static" (dict "url" (printf "%s/" .)) "paths" (list "/.*")) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toYaml $refs -}}
+{{- end -}}
+
 {{- /* VMAuth spec for routing vmalert: /select/logsql/.* → VL, everything else → VM */ -}}
 {{- define "vm.auth.internal.spec" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- include "vm.auth.context" . -}}
-  {{- tpl (deepCopy $Values.internal.vmauth.spec | toYaml) . -}}
+  {{- $spec := deepCopy $Values.internal.vmauth.spec -}}
+  {{- $uaSpec := $spec.unauthorizedUserAccessSpec | default dict -}}
+  {{- if not (or $uaSpec.url_map $uaSpec.url_prefix $uaSpec.targetRefs) -}}
+    {{- $targetRefs := fromYamlArray (include "vm.auth.internal.targetRefs" .) -}}
+    {{- if $targetRefs -}}
+      {{- $_ := set $uaSpec "targetRefs" $targetRefs -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $_ := set $spec "unauthorizedUserAccessSpec" $uaSpec -}}
+  {{- tpl (toYaml $spec) . -}}
 {{- end -}}
