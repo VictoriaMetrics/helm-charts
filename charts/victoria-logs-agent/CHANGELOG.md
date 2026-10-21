@@ -1,6 +1,7 @@
 ## Next release
 
 - add `serviceAccount` options. A dedicated ServiceAccount is created by default and the API token isn't mounted (`serviceAccount.automountToken: false`), as vlagent doesn't access the Kubernetes API. Pods are restarted once on upgrade.
+- add `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and `syslog-tcp`/`syslog-udp`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 
 ## v0.2.10
 

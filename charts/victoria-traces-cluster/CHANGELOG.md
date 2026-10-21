@@ -1,6 +1,7 @@
 ## Next release
 
 - add `dnsConfig` option to set a custom DNS config for the pod. See [#3174](https://github.com/VictoriaMetrics/helm-charts/issues/3174)
+- add `vtselect`/`vtinsert`/`vtstorage`/`vmauth`'s `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and protocol-specific ports (e.g. `otlpgrpc-tcp`). See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 - fix `vtstorage.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - bump vmauth version to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1).
 

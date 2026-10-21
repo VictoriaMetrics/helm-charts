@@ -1,0 +1,73 @@
+suite: service templates test
+templates:
+  - service.yaml
+tests:
+  - it: should not render appProtocol by default
+    asserts:
+      - notExists:
+          path: spec.ports[0].appProtocol
+  - it: should render appProtocol for the primary http port
+    set:
+      server:
+        service:
+          portOverrides:
+            http:
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+  - it: should render appProtocol for an extraPorts entry
+    set:
+      server:
+        service:
+          extraPorts:
+            - name: grpc
+              port: 9000
+              targetPort: 9000
+          portOverrides:
+            grpc:
+              appProtocol: grpc
+    asserts:
+      - equal:
+          path: spec.ports[1].appProtocol
+          value: grpc
+  - it: should override port, protocol, targetPort and nodePort for the primary http port
+    set:
+      server:
+        service:
+          type: NodePort
+          portOverrides:
+            http:
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+  - it: should override the otlpgrpc-tcp port
+    set:
+      server:
+        extraArgs:
+          otlpGRPCListenAddr: :4317
+        service:
+          portOverrides:
+            otlpgrpc-tcp:
+              port: 9999
+              appProtocol: grpc
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: otlpgrpc-tcp
+            port: 9999
+            protocol: TCP
+            targetPort: otlpgrpc-tcp
+            appProtocol: grpc

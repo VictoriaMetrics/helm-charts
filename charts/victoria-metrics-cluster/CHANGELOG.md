@@ -1,6 +1,7 @@
 ## Next release
 
 - bump version of VM components to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1), which fixes delayed requests in vmauth when a request with an `Authorization` header is matched to `unauthorized_user`. See [VictoriaMetrics#11774](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11774).
+- add `vmselect`/`vminsert`/`vmstorage`/`vmauth`'s `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and protocol-specific ports (e.g. `clusternative`, `graphite-tcp`, `influx-tcp`). See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 
 ## v0.53.0
 

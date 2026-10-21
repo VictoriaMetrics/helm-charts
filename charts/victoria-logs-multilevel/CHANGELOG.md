@@ -2,6 +2,7 @@
 
 - fix rendering of a templated `serviceAccount.name` (e.g. `{{ .Release.Name }}-sa`), which failed with a nil pointer error.
 - bump vmauth version to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1).
+- add `vlselect`/`vmauth`'s `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]` and `extraPorts[]`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 
 ## v0.2.9
 

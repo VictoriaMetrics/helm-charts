@@ -29,3 +29,39 @@ tests:
               protocol: TCP
               targetPort: http
               nodePort: 30000
+
+  - it: renders appProtocol when set
+    set:
+      service:
+        portOverrides:
+          http:
+            appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 8427
+              protocol: TCP
+              targetPort: http
+              appProtocol: kubernetes.io/h2c
+
+  - it: overrides port, protocol, targetPort and nodePort for the primary http port
+    set:
+      service:
+        type: NodePort
+        portOverrides:
+          http:
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234

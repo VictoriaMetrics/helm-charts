@@ -93,3 +93,107 @@ tests:
           path: spec.ports[0].nodePort
           value: 30482
         documentIndex: 2
+  - it: should not render appProtocol by default
+    asserts:
+      - notExists:
+          path: spec.ports[0].appProtocol
+        documentIndex: 0
+      - notExists:
+          path: spec.ports[0].appProtocol
+        documentIndex: 1
+      - notExists:
+          path: spec.ports[0].appProtocol
+        documentIndex: 2
+  - it: should render appProtocol for the primary http port
+    set:
+      vmselect:
+        service:
+          portOverrides:
+            http:
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+        documentIndex: 1
+  - it: should render appProtocol for an extraPorts entry
+    set:
+      vminsert:
+        service:
+          extraPorts:
+            - name: grpc
+              port: 9000
+              targetPort: 9000
+          portOverrides:
+            grpc:
+              appProtocol: grpc
+    asserts:
+      - equal:
+          path: spec.ports[1].appProtocol
+          value: grpc
+        documentIndex: 0
+  - it: should override the clusternative port on vmselect
+    set:
+      vmselect:
+        extraArgs:
+          clusternativeListenAddr: :8400
+        service:
+          portOverrides:
+            clusternative:
+              port: 9999
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: clusternative
+            protocol: TCP
+            port: 9999
+            targetPort: clusternative
+            appProtocol: kubernetes.io/h2c
+        documentIndex: 1
+  - it: should override the fixed vmselect and vminsert ports on vmstorage
+    set:
+      vmstorage:
+        service:
+          portOverrides:
+            vmselect:
+              port: 9998
+              appProtocol: kubernetes.io/h2c
+            vminsert:
+              port: 9997
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: vmselect
+            port: 9998
+            targetPort: vmselect
+            protocol: TCP
+            appProtocol: kubernetes.io/h2c
+        documentIndex: 2
+      - equal:
+          path: spec.ports[2].port
+          value: 9997
+        documentIndex: 2
+  - it: should override port, protocol, targetPort and nodePort for the primary http port
+    set:
+      vmselect:
+        service:
+          type: NodePort
+          portOverrides:
+            http:
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+        documentIndex: 1

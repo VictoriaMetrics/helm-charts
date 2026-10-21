@@ -88,3 +88,80 @@ tests:
           value: LoadBalancer
       - notExists:
           path: spec.clusterIP
+
+  - it: renders appProtocol when set
+    set:
+      service:
+        portOverrides:
+          http:
+            appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 10429
+              protocol: TCP
+              targetPort: http
+              appProtocol: kubernetes.io/h2c
+
+  - it: overrides port, protocol, targetPort and nodePort for the primary http port
+    set:
+      service:
+        type: NodePort
+        portOverrides:
+          http:
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234
+
+  - it: overrides the otlp-grpc port
+    set:
+      otlpGRPC:
+        listenAddr: :4317
+      service:
+        portOverrides:
+          otlp-grpc:
+            port: 9999
+            appProtocol: grpc
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: otlp-grpc
+            port: 9999
+            protocol: TCP
+            targetPort: otlp-grpc
+            appProtocol: grpc
+
+  - it: overrides an extraPorts entry
+    set:
+      service:
+        extraPorts:
+          - name: grpc
+            port: 9000
+            targetPort: 9000
+        portOverrides:
+          grpc:
+            port: 9001
+            protocol: UDP
+            appProtocol: grpc
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: grpc
+            port: 9001
+            protocol: UDP
+            targetPort: 9000
+            appProtocol: grpc

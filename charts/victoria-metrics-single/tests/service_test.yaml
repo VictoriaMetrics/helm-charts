@@ -1,0 +1,39 @@
+suite: service templates test
+templates:
+  - service.yaml
+tests:
+  - it: should not render appProtocol by default
+    asserts:
+      - notExists:
+          path: spec.ports[0].appProtocol
+  - it: should render appProtocol for the primary http port
+    set:
+      server:
+        service:
+          portOverrides:
+            http:
+              appProtocol: kubernetes.io/h2c
+    asserts:
+      - equal:
+          path: spec.ports[0].appProtocol
+          value: kubernetes.io/h2c
+  - it: should override port, protocol, targetPort and nodePort for the primary http port
+    set:
+      server:
+        service:
+          type: NodePort
+          portOverrides:
+            http:
+              port: 9999
+              protocol: UDP
+              targetPort: custom-target
+              nodePort: 31234
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 9999
+            protocol: UDP
+            targetPort: custom-target
+            nodePort: 31234
