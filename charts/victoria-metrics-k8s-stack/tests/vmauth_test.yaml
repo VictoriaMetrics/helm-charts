@@ -1,0 +1,139 @@
+suite: vmauth tests
+chart:
+  version: 0.1.1
+  appVersion: 0.1.0
+templates:
+  - victoria-metrics-operator/vmauth/vmauth.yaml
+tests:
+  - it: does not render when disabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: routes to VMSingle via targetRefs by default
+    set:
+      vmauth:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].crd.kind
+          value: VMSingle
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].crd.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: routes to VMCluster vmselect and vminsert via targetRefs by default
+    set:
+      vmsingle:
+        enabled: false
+      vmcluster:
+        enabled: true
+      vmauth:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].crd.kind
+          value: VMCluster/vmselect
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[1].crd.kind
+          value: VMCluster/vminsert
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].crd.name
+          value: RELEASE-NAME-victoria-metrics-k8s-stack
+
+  - it: routes to external VM read/write via static targetRefs by default
+    set:
+      vmsingle:
+        enabled: false
+      vmauth:
+        enabled: true
+      external:
+        vm:
+          read:
+            url: http://external-vm-read:8481/select/0/prometheus
+          write:
+            url: http://external-vm-write:8480/insert/0/prometheus
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].static.url
+          value: http://external-vm-read:8481/
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].paths[0]
+          value: /select/0/prometheus/.*
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[1].static.url
+          value: http://external-vm-write:8480/
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[1].paths[0]
+          value: /insert/0/prometheus/.*
+
+  - it: does not generate targetRefs when user sets a custom url_map
+    set:
+      vmauth:
+        enabled: true
+        spec:
+          unauthorizedUserAccessSpec:
+            url_map:
+              - src_paths:
+                  - /foo/.*
+                url_prefix:
+                  - http://foo/
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.url_map[0].src_paths[0]
+          value: /foo/.*
+      - notExists:
+          path: spec.unauthorizedUserAccessSpec.targetRefs
+
+  - it: falls back to external VM read when vmselect is disabled in cluster mode
+    set:
+      vmsingle:
+        enabled: false
+      vmauth:
+        enabled: true
+      vmcluster:
+        enabled: true
+        spec:
+          vmselect:
+            enabled: false
+      external:
+        vm:
+          read:
+            url: http://external-vm-read:8481/select/0/prometheus
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].static.url
+          value: http://external-vm-read:8481/
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].paths[0]
+          value: /select/0/prometheus/.*
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[1].crd.kind
+          value: VMCluster/vminsert
+
+  - it: does not generate targetRefs when user sets custom targetRefs
+    set:
+      vmauth:
+        enabled: true
+        spec:
+          unauthorizedUserAccessSpec:
+            targetRefs:
+              - static:
+                  url: http://custom-backend:8080/
+                paths:
+                  - /.*
+    asserts:
+      - equal:
+          path: spec.unauthorizedUserAccessSpec.targetRefs[0].static.url
+          value: http://custom-backend:8080/
+
+  - it: does not render unauthorizedUserAccessSpec when disabled
+    set:
+      vmauth:
+        enabled: true
+        spec:
+          unauthorizedUserAccessSpec:
+            disabled: true
+    asserts:
+      - notExists:
+          path: spec.unauthorizedUserAccessSpec
