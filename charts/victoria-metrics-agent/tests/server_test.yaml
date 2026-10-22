@@ -153,6 +153,21 @@ tests:
             value: 4136770268434MiB
         template: server.yaml
 
+  - it: should scale large mantissas before the int64 range check
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: "10000000000000000000m"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 8106231689MiB
+        template: server.yaml
+
   - it: should preserve an explicit GOMEMLIMIT
     set:
       remoteWrite:

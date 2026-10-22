@@ -63,12 +63,6 @@
   {{- $fraction := regexFind "[.][0-9]*$" $numberText -}}
   {{- $whole := trimSuffix $fraction $numberText -}}
   {{- $fractionDigits := trimPrefix "." $fraction -}}
-  {{- $digits := regexReplaceAll "^0+" (printf "%s%s" $whole $fractionDigits) "" -}}
-  {{- if empty $digits -}}{{- $digits = "0" -}}{{- end -}}
-  {{- if or (gt (len $digits) 19) (and (eq (len $digits) 19) (gt $digits "9223372036854775807")) -}}
-    {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
-  {{- end -}}
-  {{- $mantissa := int64 $digits -}}
   {{- $exponent := int64 0 -}}
   {{- if $exponentText -}}
     {{- $exponentSign := regexFind "^[+-]" $exponentText -}}
@@ -81,43 +75,54 @@
     {{- if eq $exponentSign "-" -}}{{- $exponent = mul $exponent -1 -}}{{- end -}}
   {{- end -}}
   {{- $scalePower := sub (len $fractionDigits) $exponent -}}
-  {{- if or (gt $scalePower 18) (lt $scalePower -18) -}}
-    {{- fail (printf "memory quantity precision in %q is outside the supported range" $quantity) -}}
-  {{- end -}}
   {{- $maxInt64 := int64 9223372036854775807 -}}
-  {{- $scale := int64 1 -}}
-  {{- if gt $scalePower 0 -}}
-    {{- range until (int $scalePower) -}}
-      {{- if gt $scale (div $maxInt64 10) -}}
-        {{- fail (printf "memory quantity precision in %q is outside the supported range" $quantity) -}}
-      {{- end -}}
-      {{- $scale = mul $scale 10 -}}
-    {{- end -}}
-  {{- else if lt $scalePower 0 -}}
-    {{- range until (int (sub 0 $scalePower)) -}}
-      {{- if gt $mantissa (div $maxInt64 10) -}}
-        {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
-      {{- end -}}
-      {{- $mantissa = mul $mantissa 10 -}}
-    {{- end -}}
-  {{- end -}}
   {{- $unitNumerators := dict "k" 1000 "M" 1000000 "G" 1000000000 "T" 1000000000000 "P" 1000000000000000 "E" 1000000000000000000 "Ki" 1024 "Mi" 1048576 "Gi" 1073741824 "Ti" 1099511627776 "Pi" 1125899906842624 "Ei" 1152921504606846976 -}}
   {{- $unitNumerator := int64 1 -}}
-  {{- $unitDenominator := int64 1 -}}
   {{- if hasKey $unitNumerators $suffix -}}
     {{- $unitNumerator = int64 (index $unitNumerators $suffix) -}}
-  {{- else if eq $suffix "n" -}}
-    {{- $unitDenominator = int64 1000000000 -}}
-  {{- else if eq $suffix "u" -}}
-    {{- $unitDenominator = int64 1000000 -}}
-  {{- else if eq $suffix "m" -}}
-    {{- $unitDenominator = int64 1000 -}}
   {{- end -}}
-  {{- if gt $scale (div $maxInt64 $unitDenominator) -}}
-    {{- fail (printf "85%% of memory quantity %q is less than 1MiB" $quantity) -}}
+  {{- $unitDenominatorPower := int64 0 -}}
+  {{- if eq $suffix "n" -}}{{- $unitDenominatorPower = int64 9 -}}{{- else if eq $suffix "u" -}}{{- $unitDenominatorPower = int64 6 -}}{{- else if eq $suffix "m" -}}{{- $unitDenominatorPower = int64 3 -}}{{- end -}}
+  {{- $denominatorPower := add $scalePower $unitDenominatorPower -}}
+  {{- if or (gt $denominatorPower 18) (lt $denominatorPower -18) -}}
+    {{- fail (printf "memory quantity precision in %q is outside the supported range" $quantity) -}}
   {{- end -}}
-  {{- $denominator := mul $scale $unitDenominator -}}
-  {{- include "vmstorage.mulDivFloor" (dict "a" $mantissa "b" $unitNumerator "d" $denominator) -}}
+  {{- $digits := regexReplaceAll "^0+" (printf "%s%s" $whole $fractionDigits) "" -}}
+  {{- if empty $digits -}}{{- $digits = "0" -}}{{- end -}}
+  {{- $wholeDigits := $digits -}}
+  {{- $remainderDigits := "0" -}}
+  {{- $denominator := int64 1 -}}
+  {{- if gt $denominatorPower 0 -}}
+    {{- if gt (len $digits) $denominatorPower -}}
+      {{- $wholeLength := int (sub (len $digits) $denominatorPower) -}}
+      {{- $wholeDigits = substr 0 $wholeLength $digits -}}
+      {{- $remainderDigits = substr $wholeLength -1 $digits -}}
+    {{- else -}}
+      {{- $wholeDigits = "0" -}}
+      {{- $remainderDigits = $digits -}}
+    {{- end -}}
+    {{- range until (int $denominatorPower) -}}
+      {{- if gt $denominator (div $maxInt64 10) -}}
+        {{- fail (printf "memory quantity precision in %q is outside the supported range" $quantity) -}}
+      {{- end -}}
+      {{- $denominator = mul $denominator 10 -}}
+    {{- end -}}
+  {{- else if lt $denominatorPower 0 -}}
+    {{- $wholeDigits = printf "%s%s" $digits (repeat (int (sub 0 $denominatorPower)) "0") -}}
+  {{- end -}}
+  {{- $wholeDigits = regexReplaceAll "^0+" $wholeDigits "" -}}
+  {{- if empty $wholeDigits -}}{{- $wholeDigits = "0" -}}{{- end -}}
+  {{- $remainderDigits = regexReplaceAll "^0+" $remainderDigits "" -}}
+  {{- if empty $remainderDigits -}}{{- $remainderDigits = "0" -}}{{- end -}}
+  {{- if or (gt (len $wholeDigits) 19) (and (eq (len $wholeDigits) 19) (gt $wholeDigits "9223372036854775807")) -}}
+    {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
+  {{- end -}}
+  {{- $wholeBytes := include "vmstorage.mulDivFloor" (dict "a" (int64 $wholeDigits) "b" $unitNumerator "d" 1) | int64 -}}
+  {{- $fractionalBytes := include "vmstorage.mulDivFloor" (dict "a" (int64 $remainderDigits) "b" $unitNumerator "d" $denominator) | int64 -}}
+  {{- if gt $wholeBytes (sub $maxInt64 $fractionalBytes) -}}
+    {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
+  {{- end -}}
+  {{- add $wholeBytes $fractionalBytes -}}
 {{- end -}}
 
 {{- define "vmstorage.gomemlimit" -}}
