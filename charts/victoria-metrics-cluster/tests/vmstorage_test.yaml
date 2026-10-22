@@ -33,6 +33,7 @@ tests:
   - it: should set GOMEMLIMIT to 85 percent of the memory limit
     set:
       vmstorage:
+        useGOMEMLIMIT: true
         resources:
           limits:
             memory: 80Gi
@@ -49,6 +50,8 @@ tests:
         resources:
           limits:
             memory: 10Gi
+      vmstorage:
+        useGOMEMLIMIT: true
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -59,6 +62,7 @@ tests:
   - it: should calculate a decimal quantity exactly at a MiB boundary
     set:
       vmstorage:
+        useGOMEMLIMIT: true
         resources:
           limits:
             memory: 5103197671.757G
@@ -72,6 +76,7 @@ tests:
   - it: should scale large mantissas before the int64 range check
     set:
       vmstorage:
+        useGOMEMLIMIT: true
         resources:
           limits:
             memory: "10000000000000000000m"
@@ -85,6 +90,7 @@ tests:
   - it: should preserve an explicit GOMEMLIMIT
     set:
       vmstorage:
+        useGOMEMLIMIT: true
         resources:
           limits:
             memory: 80Gi
@@ -103,7 +109,20 @@ tests:
             name: GOMEMLIMIT
             value: 69632MiB
 
-  - it: should not set GOMEMLIMIT when no memory limit is configured
+  - it: should not set GOMEMLIMIT by default
+    set:
+      vmstorage:
+        resources:
+          limits:
+            memory: 80Gi
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env
+
+  - it: should not set GOMEMLIMIT when enabled without a memory limit
+    set:
+      vmstorage:
+        useGOMEMLIMIT: true
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].env
@@ -122,6 +141,7 @@ tests:
   - it: should not override values that may be supplied through envFrom
     set:
       vmstorage:
+        useGOMEMLIMIT: true
         resources:
           limits:
             memory: 80Gi
@@ -135,6 +155,7 @@ tests:
   - it: should fail when the memory quantity is invalid
     set:
       vmstorage:
+        useGOMEMLIMIT: true
         resources:
           limits:
             memory: 1foo
@@ -146,10 +167,80 @@ tests:
   - it: should fail when GOMEMLIMIT would be less than 1MiB
     set:
       vmstorage:
+        useGOMEMLIMIT: true
         resources:
           limits:
             memory: 1Mi
     asserts:
       - failedTemplate:
           errorMessage: '85% of memory quantity "1Mi" is less than 1MiB; automatic GOMEMLIMIT must be at least 1MiB'
+        template: vmstorage-server.yaml
+
+  - it: should use the configured percentage
+    set:
+      vmstorage:
+        useGOMEMLIMIT: true
+        goMemLimitPercent: 70
+        resources:
+          limits:
+            memory: 80Gi
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 57344MiB
+
+  - it: should accept a GOMEMLIMIT percentage of 100
+    set:
+      vmstorage:
+        useGOMEMLIMIT: true
+        goMemLimitPercent: 100
+        resources:
+          limits:
+            memory: 80Gi
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 81920MiB
+
+  - it: should reject a GOMEMLIMIT percentage above 100
+    set:
+      vmstorage:
+        useGOMEMLIMIT: true
+        goMemLimitPercent: 101
+        resources:
+          limits:
+            memory: 80Gi
+    asserts:
+      - failedTemplate:
+          errorMessage: 'goMemLimitPercent must be an integer between 1 and 100, got "101"'
+        template: vmstorage-server.yaml
+
+  - it: should reject a zero GOMEMLIMIT percentage
+    set:
+      vmstorage:
+        useGOMEMLIMIT: true
+        goMemLimitPercent: 0
+        resources:
+          limits:
+            memory: 80Gi
+    asserts:
+      - failedTemplate:
+          errorMessage: 'goMemLimitPercent must be an integer between 1 and 100, got "0"'
+        template: vmstorage-server.yaml
+
+  - it: should reject fractional GOMEMLIMIT percentages
+    set:
+      vmstorage:
+        useGOMEMLIMIT: true
+        goMemLimitPercent: 85.5
+        resources:
+          limits:
+            memory: 80Gi
+    asserts:
+      - failedTemplate:
+          errorMessage: 'goMemLimitPercent must be an integer between 1 and 100, got "85.5"'
         template: vmstorage-server.yaml

@@ -372,3 +372,148 @@ the ones the VictoriaMetrics operator sets for the same component. Ownership lab
   {{- end -}}
   {{- toYaml $labels -}}
 {{- end -}}
+
+{{- define "vm.mulDivFloor" -}}
+  {{- $a := int64 .a -}}
+  {{- $b := int64 .b -}}
+  {{- $d := int64 .d -}}
+  {{- $maxInt64 := int64 9223372036854775807 -}}
+  {{- if or (lt $a 0) (lt $b 0) (le $d 0) -}}
+    {{- fail "vm.mulDivFloor requires non-negative values and a positive divisor" -}}
+  {{- end -}}
+  {{- $bits := list -}}
+  {{- $remaining := $b -}}
+  {{- range until 63 -}}
+    {{- $bits = append $bits (mod $remaining 2) -}}
+    {{- $remaining = div $remaining 2 -}}
+  {{- end -}}
+  {{- $quotient := int64 0 -}}
+  {{- $remainder := int64 0 -}}
+  {{- $aQuotient := div $a $d -}}
+  {{- $aRemainder := mod $a $d -}}
+  {{- range reverse $bits -}}
+    {{- if gt $quotient (div $maxInt64 2) -}}
+      {{- fail "memory quantity is outside the supported int64 range" -}}
+    {{- end -}}
+    {{- $quotient = mul $quotient 2 -}}
+    {{- if ge $remainder (sub $d $remainder) -}}
+      {{- $remainder = sub $remainder (sub $d $remainder) -}}
+      {{- if eq $quotient $maxInt64 -}}
+        {{- fail "memory quantity is outside the supported int64 range" -}}
+      {{- end -}}
+      {{- $quotient = add $quotient 1 -}}
+    {{- else -}}
+      {{- $remainder = add $remainder $remainder -}}
+    {{- end -}}
+    {{- if . -}}
+      {{- if gt $quotient (sub $maxInt64 $aQuotient) -}}
+        {{- fail "memory quantity is outside the supported int64 range" -}}
+      {{- end -}}
+      {{- $quotient = add $quotient $aQuotient -}}
+      {{- if ge $remainder (sub $d $aRemainder) -}}
+        {{- $remainder = sub $remainder (sub $d $aRemainder) -}}
+        {{- if eq $quotient $maxInt64 -}}
+          {{- fail "memory quantity is outside the supported int64 range" -}}
+        {{- end -}}
+        {{- $quotient = add $quotient 1 -}}
+      {{- else -}}
+        {{- $remainder = add $remainder $aRemainder -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $quotient -}}
+{{- end -}}
+
+{{- define "vm.memoryBytes" -}}
+  {{- $quantity := toString . -}}
+  {{- $quantityPattern := "^[+]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+|(Ki|Mi|Gi|Ti|Pi|Ei|n|u|m|k|M|G|T|P|E))?$" -}}
+  {{- if not (regexMatch $quantityPattern $quantity) -}}
+    {{- fail (printf "invalid memory quantity %q for automatic GOMEMLIMIT" $quantity) -}}
+  {{- end -}}
+  {{- $suffix := regexFind "(Ki|Mi|Gi|Ti|Pi|Ei|n|u|m|k|M|G|T|P|E)$" $quantity -}}
+  {{- $numberText := trimSuffix $suffix $quantity -}}
+  {{- $exponentText := regexFind "[eE][+-]?[0-9]+$" $numberText -}}
+  {{- $numberText = trimSuffix $exponentText $numberText -}}
+  {{- $numberText = trimPrefix "+" $numberText -}}
+  {{- $fraction := regexFind "[.][0-9]*$" $numberText -}}
+  {{- $whole := trimSuffix $fraction $numberText -}}
+  {{- $fractionDigits := trimPrefix "." $fraction -}}
+  {{- $exponent := int64 0 -}}
+  {{- if $exponentText -}}
+    {{- $exponentSign := regexFind "^[+-]" $exponentText -}}
+    {{- $exponentDigits := regexReplaceAll "^0+" (regexReplaceAll "^[eE][+-]?" $exponentText "") "" -}}
+    {{- if empty $exponentDigits -}}{{- $exponentDigits = "0" -}}{{- end -}}
+    {{- if gt (len $exponentDigits) 2 -}}
+      {{- fail (printf "memory quantity exponent in %q is outside the supported range" $quantity) -}}
+    {{- end -}}
+    {{- $exponent = int64 $exponentDigits -}}
+    {{- if eq $exponentSign "-" -}}{{- $exponent = mul $exponent -1 -}}{{- end -}}
+  {{- end -}}
+  {{- $scalePower := sub (len $fractionDigits) $exponent -}}
+  {{- $maxInt64 := int64 9223372036854775807 -}}
+  {{- $unitNumerators := dict "k" 1000 "M" 1000000 "G" 1000000000 "T" 1000000000000 "P" 1000000000000000 "E" 1000000000000000000 "Ki" 1024 "Mi" 1048576 "Gi" 1073741824 "Ti" 1099511627776 "Pi" 1125899906842624 "Ei" 1152921504606846976 -}}
+  {{- $unitNumerator := int64 1 -}}
+  {{- if hasKey $unitNumerators $suffix -}}
+    {{- $unitNumerator = int64 (index $unitNumerators $suffix) -}}
+  {{- end -}}
+  {{- $unitDenominatorPower := int64 0 -}}
+  {{- if eq $suffix "n" -}}{{- $unitDenominatorPower = int64 9 -}}{{- else if eq $suffix "u" -}}{{- $unitDenominatorPower = int64 6 -}}{{- else if eq $suffix "m" -}}{{- $unitDenominatorPower = int64 3 -}}{{- end -}}
+  {{- $denominatorPower := add $scalePower $unitDenominatorPower -}}
+  {{- if or (gt $denominatorPower 18) (lt $denominatorPower -18) -}}
+    {{- fail (printf "memory quantity precision in %q is outside the supported range" $quantity) -}}
+  {{- end -}}
+  {{- $digits := regexReplaceAll "^0+" (printf "%s%s" $whole $fractionDigits) "" -}}
+  {{- if empty $digits -}}{{- $digits = "0" -}}{{- end -}}
+  {{- $wholeDigits := $digits -}}
+  {{- $remainderDigits := "0" -}}
+  {{- $denominator := int64 1 -}}
+  {{- if gt $denominatorPower 0 -}}
+    {{- if gt (len $digits) $denominatorPower -}}
+      {{- $wholeLength := int (sub (len $digits) $denominatorPower) -}}
+      {{- $wholeDigits = substr 0 $wholeLength $digits -}}
+      {{- $remainderDigits = substr $wholeLength -1 $digits -}}
+    {{- else -}}
+      {{- $wholeDigits = "0" -}}
+      {{- $remainderDigits = $digits -}}
+    {{- end -}}
+    {{- range until (int $denominatorPower) -}}
+      {{- if gt $denominator (div $maxInt64 10) -}}
+        {{- fail (printf "memory quantity precision in %q is outside the supported range" $quantity) -}}
+      {{- end -}}
+      {{- $denominator = mul $denominator 10 -}}
+    {{- end -}}
+  {{- else if lt $denominatorPower 0 -}}
+    {{- $wholeDigits = printf "%s%s" $digits (repeat (int (sub 0 $denominatorPower)) "0") -}}
+  {{- end -}}
+  {{- $wholeDigits = regexReplaceAll "^0+" $wholeDigits "" -}}
+  {{- if empty $wholeDigits -}}{{- $wholeDigits = "0" -}}{{- end -}}
+  {{- $remainderDigits = regexReplaceAll "^0+" $remainderDigits "" -}}
+  {{- if empty $remainderDigits -}}{{- $remainderDigits = "0" -}}{{- end -}}
+  {{- if or (gt (len $wholeDigits) 19) (and (eq (len $wholeDigits) 19) (gt $wholeDigits "9223372036854775807")) -}}
+    {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
+  {{- end -}}
+  {{- $wholeBytes := include "vm.mulDivFloor" (dict "a" (int64 $wholeDigits) "b" $unitNumerator "d" 1) | int64 -}}
+  {{- $fractionalBytes := include "vm.mulDivFloor" (dict "a" (int64 $remainderDigits) "b" $unitNumerator "d" $denominator) | int64 -}}
+  {{- if gt $wholeBytes (sub $maxInt64 $fractionalBytes) -}}
+    {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
+  {{- end -}}
+  {{- add $wholeBytes $fractionalBytes -}}
+{{- end -}}
+
+{{- define "vm.gomemlimit" -}}
+  {{- $memory := toString .memory -}}
+  {{- $percentText := toString .percent -}}
+  {{- if not (regexMatch "^[0-9]{1,3}$" $percentText) -}}
+    {{- fail (printf "goMemLimitPercent must be an integer between 1 and 100, got %q" $percentText) -}}
+  {{- end -}}
+  {{- $percent := int64 $percentText -}}
+  {{- if or (lt $percent 1) (gt $percent 100) -}}
+    {{- fail (printf "goMemLimitPercent must be an integer between 1 and 100, got %q" $percentText) -}}
+  {{- end -}}
+  {{- $memoryBytes := include "vm.memoryBytes" $memory | int64 -}}
+  {{- $memoryMiB := include "vm.mulDivFloor" (dict "a" $memoryBytes "b" $percent "d" 104857600) | int64 -}}
+  {{- if lt $memoryMiB 1 -}}
+    {{- fail (printf "%d%% of memory quantity %q is less than 1MiB; automatic GOMEMLIMIT must be at least 1MiB" $percent $memory) -}}
+  {{- end -}}
+  {{- printf "%dMiB" $memoryMiB -}}
+{{- end -}}

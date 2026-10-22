@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- add shared exact memory quantity parsing and GOMEMLIMIT calculation helpers for consuming charts.
 
 ## v0.4.3
 

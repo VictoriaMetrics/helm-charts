@@ -336,8 +336,11 @@ ingress:
   # -- Ingress path type
   pathType: Prefix
 
-# -- Automatically set GOMEMLIMIT to 85% of `resources.limits.memory` when a memory limit is configured. An explicit GOMEMLIMIT in `env` takes precedence; automatic injection is skipped when `envFrom` is non-empty.
-useGOMEMLIMIT: true
+# -- Automatically set GOMEMLIMIT to `goMemLimitPercent` of `resources.limits.memory` when enabled. An explicit GOMEMLIMIT in `env` takes precedence; automatic injection is skipped when `envFrom` is non-empty.
+useGOMEMLIMIT: false
+
+# -- Percentage of `resources.limits.memory` used for GOMEMLIMIT when `useGOMEMLIMIT` is enabled. Must be an integer between 1 and 100.
+goMemLimitPercent: 85
 
 # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
 resources:

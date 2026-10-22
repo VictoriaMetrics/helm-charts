@@ -106,7 +106,7 @@ spec:
                   fieldPath: metadata.name
             {{- if and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT) (empty $app.envFrom) }}
             - name: GOMEMLIMIT
-              value: {{ include "vmagent.gomemlimit" $memoryLimit | quote }}
+              value: {{ include "vm.gomemlimit" (dict "memory" $memoryLimit "percent" $app.goMemLimitPercent) | quote }}
             {{- end }}
             {{- with $app.env }}
             {{ toYaml .| nindent 12 }}
