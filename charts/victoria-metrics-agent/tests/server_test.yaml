@@ -93,6 +93,131 @@ tests:
         template: server.yaml
         documentIndex: 0
 
+  - it: should set GOMEMLIMIT to 85 percent of the memory limit
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: 5Gi
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 4352MiB
+        template: server.yaml
+
+  - it: should convert decimal and exponent memory quantities
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: 1.5G
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 1215MiB
+        template: server.yaml
+
+  - it: should convert exponent memory quantities
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: 129e6
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 104MiB
+        template: server.yaml
+
+  - it: should preserve an explicit GOMEMLIMIT
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: 5Gi
+      env:
+        - name: GOMEMLIMIT
+          value: 123MiB
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 123MiB
+        template: server.yaml
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 4352MiB
+        template: server.yaml
+
+  - it: should not set GOMEMLIMIT when no memory limit is configured
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env
+          value:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+        template: server.yaml
+
+  - it: should not set GOMEMLIMIT when disabled
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      useGOMEMLIMIT: false
+      resources:
+        limits:
+          memory: 5Gi
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env
+          value:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+        template: server.yaml
+
+  - it: should fail when the memory quantity is invalid
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: 1foo
+    asserts:
+      - failedTemplate:
+          errorMessage: 'invalid memory quantity "1foo" for automatic GOMEMLIMIT'
+        template: server.yaml
+
+  - it: should fail when GOMEMLIMIT would be less than 1MiB
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: 1Mi
+    asserts:
+      - failedTemplate:
+          errorMessage: '85% of memory quantity "1Mi" is less than 1MiB; automatic GOMEMLIMIT must be at least 1MiB'
+        template: server.yaml
+
   - it: should apply global.extraAnnotations to resource metadata and pod template
     set:
       remoteWrite:

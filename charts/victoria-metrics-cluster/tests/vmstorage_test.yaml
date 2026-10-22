@@ -29,3 +29,88 @@ tests:
           path: spec.template.spec.containers[0].command
           value:
             - /custom/bin/vmstorage
+
+  - it: should set GOMEMLIMIT to 85 percent of the memory limit
+    set:
+      vmstorage:
+        resources:
+          limits:
+            memory: 80Gi
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 69632MiB
+
+  - it: should use the common memory limit when vmstorage has no component limit
+    set:
+      common:
+        resources:
+          limits:
+            memory: 10Gi
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 8704MiB
+
+  - it: should preserve an explicit GOMEMLIMIT
+    set:
+      vmstorage:
+        resources:
+          limits:
+            memory: 80Gi
+        env:
+          - name: GOMEMLIMIT
+            value: 123MiB
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 123MiB
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 69632MiB
+
+  - it: should not set GOMEMLIMIT when no memory limit is configured
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env
+
+  - it: should not set GOMEMLIMIT when disabled
+    set:
+      vmstorage:
+        useGOMEMLIMIT: false
+        resources:
+          limits:
+            memory: 80Gi
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env
+
+  - it: should fail when the memory quantity is invalid
+    set:
+      vmstorage:
+        resources:
+          limits:
+            memory: 1foo
+    asserts:
+      - failedTemplate:
+          errorMessage: 'invalid memory quantity "1foo" for automatic GOMEMLIMIT'
+        template: vmstorage-server.yaml
+
+  - it: should fail when GOMEMLIMIT would be less than 1MiB
+    set:
+      vmstorage:
+        resources:
+          limits:
+            memory: 1Mi
+    asserts:
+      - failedTemplate:
+          errorMessage: '85% of memory quantity "1Mi" is less than 1MiB; automatic GOMEMLIMIT must be at least 1MiB'
+        template: vmstorage-server.yaml

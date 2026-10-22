@@ -1,3 +1,24 @@
+{{- define "vmstorage.gomemlimit" -}}
+  {{- $quantity := toString . -}}
+  {{- $quantityPattern := "^[+]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+|(Ki|Mi|Gi|Ti|Pi|Ei|n|u|m|k|M|G|T|P|E))?$" -}}
+  {{- if not (regexMatch $quantityPattern $quantity) -}}
+    {{- fail (printf "invalid memory quantity %q for automatic GOMEMLIMIT" $quantity) -}}
+  {{- end -}}
+  {{- $suffix := regexFind "(Ki|Mi|Gi|Ti|Pi|Ei|n|u|m|k|M|G|T|P|E)$" $quantity -}}
+  {{- $numberText := trimSuffix $suffix $quantity -}}
+  {{- $number := float64 $numberText -}}
+  {{- $multipliers := dict "n" 0.000000001 "u" 0.000001 "m" 0.001 "k" 1000.0 "M" 1000000.0 "G" 1000000000.0 "T" 1000000000000.0 "P" 1000000000000000.0 "E" 1000000000000000000.0 "Ki" 1024.0 "Mi" 1048576.0 "Gi" 1073741824.0 "Ti" 1099511627776.0 "Pi" 1125899906842624.0 "Ei" 1152921504606846976.0 -}}
+  {{- $multiplier := 1.0 -}}
+  {{- if hasKey $multipliers $suffix -}}
+    {{- $multiplier = index $multipliers $suffix -}}
+  {{- end -}}
+  {{- $memoryMiB := mulf (divf (mulf $number $multiplier) 1048576.0) 0.85 | floor -}}
+  {{- if lt $memoryMiB 1.0 -}}
+    {{- fail (printf "85%% of memory quantity %q is less than 1MiB; automatic GOMEMLIMIT must be at least 1MiB" $quantity) -}}
+  {{- end -}}
+  {{- printf "%.0fMiB" $memoryMiB -}}
+{{- end -}}
+
 {{- define "vminsert.relabel.config.name" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $app := $Values.vminsert }}

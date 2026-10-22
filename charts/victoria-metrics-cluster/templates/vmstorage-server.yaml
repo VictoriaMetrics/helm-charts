@@ -1,6 +1,15 @@
 {{- $app := merge (deepCopy .Values.vmstorage) (deepCopy .Values.common) -}}
 {{- $pvc := $app.persistentVolume }}
 {{- $_ := set .Values "vmstorage" $app }}
+{{- $resources := $app.resources | default dict }}
+{{- $limits := $resources.limits | default dict }}
+{{- $memoryLimit := $limits.memory | default "" }}
+{{- $hasGOMEMLIMIT := false }}
+{{- range $app.env }}
+  {{- if eq .name "GOMEMLIMIT" }}
+    {{- $hasGOMEMLIMIT = true }}
+  {{- end }}
+{{- end }}
 {{- if $app.enabled -}}
 {{- $ctx := dict "helm" . "appKey" "vmstorage" }}
 {{- $storageName := tpl ($pvc.name | default (include "vmstorage.volume.name" $ctx)) $ctx }}
@@ -123,8 +132,15 @@ spec:
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $app.env }}
-          env: {{ toYaml . | nindent 12 }}
+          {{- if or $app.env (and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT)) }}
+          env:
+            {{- if and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT) }}
+            - name: GOMEMLIMIT
+              value: {{ include "vmstorage.gomemlimit" $memoryLimit | quote }}
+            {{- end }}
+            {{- with $app.env }}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}

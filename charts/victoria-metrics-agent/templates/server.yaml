@@ -1,4 +1,13 @@
 {{- $app := .Values }}
+{{- $resources := $app.resources | default dict }}
+{{- $limits := $resources.limits | default dict }}
+{{- $memoryLimit := $limits.memory | default "" }}
+{{- $hasGOMEMLIMIT := false }}
+{{- range $app.env }}
+  {{- if eq .name "GOMEMLIMIT" }}
+    {{- $hasGOMEMLIMIT = true }}
+  {{- end }}
+{{- end }}
 {{- $pvc := $app.persistentVolume }}
 {{- $mode := $app.mode }}
 {{- if and $mode (hasKey $app $mode) }}
@@ -95,6 +104,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{- if and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT) }}
+            - name: GOMEMLIMIT
+              value: {{ include "vmagent.gomemlimit" $memoryLimit | quote }}
+            {{- end }}
             {{- with $app.env }}
             {{ toYaml .| nindent 12 }}
             {{- end }}
