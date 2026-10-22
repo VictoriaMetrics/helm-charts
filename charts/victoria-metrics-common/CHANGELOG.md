@@ -2,7 +2,7 @@
 
 ## Next release
 
-- add shared exact memory quantity parsing and GOMEMLIMIT calculation helpers for consuming charts.
+- add shared memory quantity parsing and overflow-safe GOMEMLIMIT calculation helpers for consuming charts; positive fractional-byte quantities round up, and unsupported exponent, precision, or signed-int64 ranges are rejected.
 
 ## v0.4.3
 

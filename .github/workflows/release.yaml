@@ -172,6 +172,41 @@ jobs:
               fi
           done
 
+      - name: Package charts
+        if: ${{ hashFiles('charts/*/RELEASE_NOTES') != '' }}
+        run: |
+          rm -rf .cr-release-packages
+          mkdir -p .cr-release-packages
+          for chart in charts/*; do
+            if [ ! -f "$chart/RELEASE_NOTES" ]; then
+              continue
+            fi
+
+            echo "Packaging $chart"
+            helm dependency update "$chart"
+
+            # The agent and cluster charts use the sibling common library in source so the
+            # release can bundle a library version that is published in the same run. Keep
+            # their published Chart.yaml portable by writing the OCI repository into the
+            # package metadata and omitting the source-local Chart.lock.
+            if [[ "$chart" == "charts/victoria-metrics-agent" || "$chart" == "charts/victoria-metrics-cluster" ]]; then
+              yq -M -i '(.dependencies[] | select(.name == "victoria-metrics-common").repository) = "oci://ghcr.io/victoriametrics/helm-charts"' "$chart/Chart.yaml"
+              lock_backup="$RUNNER_TEMP/$(basename "$chart").Chart.lock"
+              mv "$chart/Chart.lock" "$lock_backup"
+              helm package "$chart" --destination .cr-release-packages
+              package=".cr-release-packages/$(basename "$chart")-$(yq -M '.version' "$chart/Chart.yaml").tgz"
+              published_repository=$(helm show chart "$package" | yq -M '.dependencies[] | select(.name == "victoria-metrics-common").repository')
+              if [[ "$published_repository" != "oci://ghcr.io/victoriametrics/helm-charts" ]]; then
+                echo "ERROR: $package has a non-portable victoria-metrics-common repository: $published_repository"
+                exit 1
+              fi
+              mv "$lock_backup" "$chart/Chart.lock"
+              yq -M -i '(.dependencies[] | select(.name == "victoria-metrics-common").repository) = "file://../victoria-metrics-common"' "$chart/Chart.yaml"
+            else
+              helm package "$chart" --destination .cr-release-packages
+            fi
+          done
+
       - name: Release
         if: ${{ hashFiles('charts/*/RELEASE_NOTES') != '' }}
         uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f  # v1.7.0
@@ -179,6 +214,7 @@ jobs:
           CR_TOKEN: "${{ secrets.VM_BOT_GH_TOKEN }}"
         with:
           config: .github/ci/cr.yaml
+          skip_packaging: true
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f  # v4.6.0

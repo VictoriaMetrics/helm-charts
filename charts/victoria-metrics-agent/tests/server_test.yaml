@@ -329,6 +329,23 @@ tests:
             value: 5120MiB
         template: server.yaml
 
+  - it: should round fractional bytes up like Kubernetes
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      useGOMEMLIMIT: true
+      goMemLimitPercent: 100
+      resources:
+        limits:
+          memory: "1048575.9999"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 1MiB
+        template: server.yaml
+
   - it: should reject a GOMEMLIMIT percentage above 100
     set:
       remoteWrite:

@@ -373,13 +373,14 @@ the ones the VictoriaMetrics operator sets for the same component. Ownership lab
   {{- toYaml $labels -}}
 {{- end -}}
 
-{{- define "vm.mulDivFloor" -}}
+{{- define "vm.mulDiv" -}}
   {{- $a := int64 .a -}}
   {{- $b := int64 .b -}}
   {{- $d := int64 .d -}}
+  {{- $roundUp := .roundUp | default false -}}
   {{- $maxInt64 := int64 9223372036854775807 -}}
   {{- if or (lt $a 0) (lt $b 0) (le $d 0) -}}
-    {{- fail "vm.mulDivFloor requires non-negative values and a positive divisor" -}}
+    {{- fail "vm.mulDiv requires non-negative values and a positive divisor" -}}
   {{- end -}}
   {{- $bits := list -}}
   {{- $remaining := $b -}}
@@ -420,6 +421,12 @@ the ones the VictoriaMetrics operator sets for the same component. Ownership lab
         {{- $remainder = add $remainder $aRemainder -}}
       {{- end -}}
     {{- end -}}
+  {{- end -}}
+  {{- if and $roundUp (gt $remainder 0) -}}
+    {{- if eq $quotient $maxInt64 -}}
+      {{- fail "memory quantity is outside the supported int64 range" -}}
+    {{- end -}}
+    {{- $quotient = add $quotient 1 -}}
   {{- end -}}
   {{- $quotient -}}
 {{- end -}}
@@ -492,8 +499,8 @@ the ones the VictoriaMetrics operator sets for the same component. Ownership lab
   {{- if or (gt (len $wholeDigits) 19) (and (eq (len $wholeDigits) 19) (gt $wholeDigits "9223372036854775807")) -}}
     {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
   {{- end -}}
-  {{- $wholeBytes := include "vm.mulDivFloor" (dict "a" (int64 $wholeDigits) "b" $unitNumerator "d" 1) | int64 -}}
-  {{- $fractionalBytes := include "vm.mulDivFloor" (dict "a" (int64 $remainderDigits) "b" $unitNumerator "d" $denominator) | int64 -}}
+  {{- $wholeBytes := include "vm.mulDiv" (dict "a" (int64 $wholeDigits) "b" $unitNumerator "d" 1) | int64 -}}
+  {{- $fractionalBytes := include "vm.mulDiv" (dict "a" (int64 $remainderDigits) "b" $unitNumerator "d" $denominator "roundUp" true) | int64 -}}
   {{- if gt $wholeBytes (sub $maxInt64 $fractionalBytes) -}}
     {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
   {{- end -}}
@@ -511,7 +518,7 @@ the ones the VictoriaMetrics operator sets for the same component. Ownership lab
     {{- fail (printf "goMemLimitPercent must be an integer between 1 and 100, got %q" $percentText) -}}
   {{- end -}}
   {{- $memoryBytes := include "vm.memoryBytes" $memory | int64 -}}
-  {{- $memoryMiB := include "vm.mulDivFloor" (dict "a" $memoryBytes "b" $percent "d" 104857600) | int64 -}}
+  {{- $memoryMiB := include "vm.mulDiv" (dict "a" $memoryBytes "b" $percent "d" 104857600) | int64 -}}
   {{- if lt $memoryMiB 1 -}}
     {{- fail (printf "%d%% of memory quantity %q is less than 1MiB; automatic GOMEMLIMIT must be at least 1MiB" $percent $memory) -}}
   {{- end -}}
