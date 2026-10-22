@@ -104,7 +104,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            {{- if and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT) }}
+            {{- if and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT) (empty $app.envFrom) }}
             - name: GOMEMLIMIT
               value: {{ include "vmagent.gomemlimit" $memoryLimit | quote }}
             {{- end }}

@@ -1,4 +1,55 @@
-{{- define "vmstorage.gomemlimit" -}}
+{{- define "vmstorage.mulDivFloor" -}}
+  {{- $a := int64 .a -}}
+  {{- $b := int64 .b -}}
+  {{- $d := int64 .d -}}
+  {{- $maxInt64 := int64 9223372036854775807 -}}
+  {{- if or (lt $a 0) (lt $b 0) (le $d 0) -}}
+    {{- fail "vmstorage.mulDivFloor requires non-negative values and a positive divisor" -}}
+  {{- end -}}
+  {{- $bits := list -}}
+  {{- $remaining := $b -}}
+  {{- range until 63 -}}
+    {{- $bits = append $bits (mod $remaining 2) -}}
+    {{- $remaining = div $remaining 2 -}}
+  {{- end -}}
+  {{- $quotient := int64 0 -}}
+  {{- $remainder := int64 0 -}}
+  {{- $aQuotient := div $a $d -}}
+  {{- $aRemainder := mod $a $d -}}
+  {{- range reverse $bits -}}
+    {{- if gt $quotient (div $maxInt64 2) -}}
+      {{- fail "memory quantity is outside the supported int64 range" -}}
+    {{- end -}}
+    {{- $quotient = mul $quotient 2 -}}
+    {{- if ge $remainder (sub $d $remainder) -}}
+      {{- $remainder = sub $remainder (sub $d $remainder) -}}
+      {{- if eq $quotient $maxInt64 -}}
+        {{- fail "memory quantity is outside the supported int64 range" -}}
+      {{- end -}}
+      {{- $quotient = add $quotient 1 -}}
+    {{- else -}}
+      {{- $remainder = add $remainder $remainder -}}
+    {{- end -}}
+    {{- if . -}}
+      {{- if gt $quotient (sub $maxInt64 $aQuotient) -}}
+        {{- fail "memory quantity is outside the supported int64 range" -}}
+      {{- end -}}
+      {{- $quotient = add $quotient $aQuotient -}}
+      {{- if ge $remainder (sub $d $aRemainder) -}}
+        {{- $remainder = sub $remainder (sub $d $aRemainder) -}}
+        {{- if eq $quotient $maxInt64 -}}
+          {{- fail "memory quantity is outside the supported int64 range" -}}
+        {{- end -}}
+        {{- $quotient = add $quotient 1 -}}
+      {{- else -}}
+        {{- $remainder = add $remainder $aRemainder -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $quotient -}}
+{{- end -}}
+
+{{- define "vmstorage.memoryBytes" -}}
   {{- $quantity := toString . -}}
   {{- $quantityPattern := "^[+]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+|(Ki|Mi|Gi|Ti|Pi|Ei|n|u|m|k|M|G|T|P|E))?$" -}}
   {{- if not (regexMatch $quantityPattern $quantity) -}}
@@ -6,17 +57,76 @@
   {{- end -}}
   {{- $suffix := regexFind "(Ki|Mi|Gi|Ti|Pi|Ei|n|u|m|k|M|G|T|P|E)$" $quantity -}}
   {{- $numberText := trimSuffix $suffix $quantity -}}
-  {{- $number := float64 $numberText -}}
-  {{- $multipliers := dict "n" 0.000000001 "u" 0.000001 "m" 0.001 "k" 1000.0 "M" 1000000.0 "G" 1000000000.0 "T" 1000000000000.0 "P" 1000000000000000.0 "E" 1000000000000000000.0 "Ki" 1024.0 "Mi" 1048576.0 "Gi" 1073741824.0 "Ti" 1099511627776.0 "Pi" 1125899906842624.0 "Ei" 1152921504606846976.0 -}}
-  {{- $multiplier := 1.0 -}}
-  {{- if hasKey $multipliers $suffix -}}
-    {{- $multiplier = index $multipliers $suffix -}}
+  {{- $exponentText := regexFind "[eE][+-]?[0-9]+$" $numberText -}}
+  {{- $numberText = trimSuffix $exponentText $numberText -}}
+  {{- $numberText = trimPrefix "+" $numberText -}}
+  {{- $fraction := regexFind "[.][0-9]*$" $numberText -}}
+  {{- $whole := trimSuffix $fraction $numberText -}}
+  {{- $fractionDigits := trimPrefix "." $fraction -}}
+  {{- $digits := regexReplaceAll "^0+" (printf "%s%s" $whole $fractionDigits) "" -}}
+  {{- if empty $digits -}}{{- $digits = "0" -}}{{- end -}}
+  {{- if or (gt (len $digits) 19) (and (eq (len $digits) 19) (gt $digits "9223372036854775807")) -}}
+    {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
   {{- end -}}
-  {{- $memoryMiB := mulf (divf (mulf $number $multiplier) 1048576.0) 0.85 | floor -}}
-  {{- if lt $memoryMiB 1.0 -}}
-    {{- fail (printf "85%% of memory quantity %q is less than 1MiB; automatic GOMEMLIMIT must be at least 1MiB" $quantity) -}}
+  {{- $mantissa := int64 $digits -}}
+  {{- $exponent := int64 0 -}}
+  {{- if $exponentText -}}
+    {{- $exponentSign := regexFind "^[+-]" $exponentText -}}
+    {{- $exponentDigits := regexReplaceAll "^0+" (regexReplaceAll "^[eE][+-]?" $exponentText "") "" -}}
+    {{- if empty $exponentDigits -}}{{- $exponentDigits = "0" -}}{{- end -}}
+    {{- if gt (len $exponentDigits) 2 -}}
+      {{- fail (printf "memory quantity exponent in %q is outside the supported range" $quantity) -}}
+    {{- end -}}
+    {{- $exponent = int64 $exponentDigits -}}
+    {{- if eq $exponentSign "-" -}}{{- $exponent = mul $exponent -1 -}}{{- end -}}
   {{- end -}}
-  {{- printf "%.0fMiB" $memoryMiB -}}
+  {{- $scalePower := sub (len $fractionDigits) $exponent -}}
+  {{- if or (gt $scalePower 18) (lt $scalePower -18) -}}
+    {{- fail (printf "memory quantity precision in %q is outside the supported range" $quantity) -}}
+  {{- end -}}
+  {{- $maxInt64 := int64 9223372036854775807 -}}
+  {{- $scale := int64 1 -}}
+  {{- if gt $scalePower 0 -}}
+    {{- range until (int $scalePower) -}}
+      {{- if gt $scale (div $maxInt64 10) -}}
+        {{- fail (printf "memory quantity precision in %q is outside the supported range" $quantity) -}}
+      {{- end -}}
+      {{- $scale = mul $scale 10 -}}
+    {{- end -}}
+  {{- else if lt $scalePower 0 -}}
+    {{- range until (int (sub 0 $scalePower)) -}}
+      {{- if gt $mantissa (div $maxInt64 10) -}}
+        {{- fail (printf "memory quantity %q is outside the supported int64 range" $quantity) -}}
+      {{- end -}}
+      {{- $mantissa = mul $mantissa 10 -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $unitNumerators := dict "k" 1000 "M" 1000000 "G" 1000000000 "T" 1000000000000 "P" 1000000000000000 "E" 1000000000000000000 "Ki" 1024 "Mi" 1048576 "Gi" 1073741824 "Ti" 1099511627776 "Pi" 1125899906842624 "Ei" 1152921504606846976 -}}
+  {{- $unitNumerator := int64 1 -}}
+  {{- $unitDenominator := int64 1 -}}
+  {{- if hasKey $unitNumerators $suffix -}}
+    {{- $unitNumerator = int64 (index $unitNumerators $suffix) -}}
+  {{- else if eq $suffix "n" -}}
+    {{- $unitDenominator = int64 1000000000 -}}
+  {{- else if eq $suffix "u" -}}
+    {{- $unitDenominator = int64 1000000 -}}
+  {{- else if eq $suffix "m" -}}
+    {{- $unitDenominator = int64 1000 -}}
+  {{- end -}}
+  {{- if gt $scale (div $maxInt64 $unitDenominator) -}}
+    {{- fail (printf "85%% of memory quantity %q is less than 1MiB" $quantity) -}}
+  {{- end -}}
+  {{- $denominator := mul $scale $unitDenominator -}}
+  {{- include "vmstorage.mulDivFloor" (dict "a" $mantissa "b" $unitNumerator "d" $denominator) -}}
+{{- end -}}
+
+{{- define "vmstorage.gomemlimit" -}}
+  {{- $memoryBytes := include "vmstorage.memoryBytes" . | int64 -}}
+  {{- $memoryMiB := include "vmstorage.mulDivFloor" (dict "a" $memoryBytes "b" 17 "d" 20971520) | int64 -}}
+  {{- if lt $memoryMiB 1 -}}
+    {{- fail (printf "85%% of memory quantity %q is less than 1MiB; automatic GOMEMLIMIT must be at least 1MiB" .) -}}
+  {{- end -}}
+  {{- printf "%dMiB" $memoryMiB -}}
 {{- end -}}
 
 {{- define "vminsert.relabel.config.name" -}}

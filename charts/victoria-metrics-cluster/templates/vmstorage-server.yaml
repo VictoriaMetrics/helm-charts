@@ -132,9 +132,9 @@ spec:
           {{- with $app.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or $app.env (and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT)) }}
+          {{- if or $app.env (and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT) (empty $app.envFrom)) }}
           env:
-            {{- if and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT) }}
+            {{- if and $app.useGOMEMLIMIT $memoryLimit (not $hasGOMEMLIMIT) (empty $app.envFrom) }}
             - name: GOMEMLIMIT
               value: {{ include "vmstorage.gomemlimit" $memoryLimit | quote }}
             {{- end }}

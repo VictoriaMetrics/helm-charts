@@ -56,6 +56,19 @@ tests:
             name: GOMEMLIMIT
             value: 8704MiB
 
+  - it: should calculate a decimal quantity exactly at a MiB boundary
+    set:
+      vmstorage:
+        resources:
+          limits:
+            memory: 5103197671.757G
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 4136770268434MiB
+
   - it: should preserve an explicit GOMEMLIMIT
     set:
       vmstorage:
@@ -89,6 +102,19 @@ tests:
         resources:
           limits:
             memory: 80Gi
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env
+
+  - it: should not override values that may be supplied through envFrom
+    set:
+      vmstorage:
+        resources:
+          limits:
+            memory: 80Gi
+        envFrom:
+          - configMapRef:
+              name: app-env
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].env

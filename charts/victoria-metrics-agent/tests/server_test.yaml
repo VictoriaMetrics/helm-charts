@@ -138,6 +138,21 @@ tests:
             value: 104MiB
         template: server.yaml
 
+  - it: should calculate a decimal quantity exactly at a MiB boundary
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: 5103197671.757G
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GOMEMLIMIT
+            value: 4136770268434MiB
+        template: server.yaml
+
   - it: should preserve an explicit GOMEMLIMIT
     set:
       remoteWrite:
@@ -184,6 +199,26 @@ tests:
       resources:
         limits:
           memory: 5Gi
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env
+          value:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+        template: server.yaml
+
+  - it: should not override values that may be supplied through envFrom
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      resources:
+        limits:
+          memory: 5Gi
+      envFrom:
+        - configMapRef:
+            name: app-env
     asserts:
       - equal:
           path: spec.template.spec.containers[0].env
