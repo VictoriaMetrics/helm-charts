@@ -1,4 +1,4 @@
-{{- if and (empty .Values.vmauth.configSecretName) .Values.vmauth.enabled }}
+{{- if and (empty .Values.vmauth.configSecretName) .Values.vmauth.enabled (not (include "vm.operator.enabled" .)) }}
 {{- $ctx := dict "helm" . "appKey" "vmauth" "style" "plain" }}
 apiVersion: v1
 kind: Secret

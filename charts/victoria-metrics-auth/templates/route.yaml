@@ -1,6 +1,6 @@
 {{- $app := .Values }}
 {{- $route := $app.route }}
-{{- if $route.enabled  }}
+{{- if and $route.enabled (not (include "vm.operator.enabled" .)) }}
 {{- $ctx := dict "helm" . "kindOverride" "vmauth" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

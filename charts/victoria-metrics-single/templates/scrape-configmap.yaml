@@ -1,5 +1,5 @@
 {{- $app := .Values.server }}
-{{- if and $app.scrape.enabled (empty $app.scrape.configMap) }}
+{{- if and $app.scrape.enabled (empty $app.scrape.configMap) (not (include "vm.operator.enabled" .)) }}
 {{- $ctx := dict "helm" . "appKey" "server" "kindOverride" "vmsingle" }}
 {{- $fullname := include "vm.plain.fullname" $ctx }}
 {{- $ns := include "vm.namespace" $ctx }}

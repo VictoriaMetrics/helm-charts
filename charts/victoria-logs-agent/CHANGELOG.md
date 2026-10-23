@@ -2,6 +2,7 @@
 
 - add `serviceAccount` options. A dedicated ServiceAccount is created by default and the API token isn't mounted (`serviceAccount.automountToken: false`), as vlagent doesn't access the Kubernetes API. Pods are restarted once on upgrade.
 - add `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and `syslog-tcp`/`syslog-udp`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
+- add `operator.enabled` to deploy vlagent through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/): the chart renders a `VLAgent` resource built from chart values instead of its own StatefulSet, Service, ServiceAccount and VPA. Operator-only settings and overrides go to `operator.spec`. See [these docs](https://docs.victoriametrics.com/helm/victoria-logs-agent/#victoriametrics-operator).
 
 ## v0.2.10
 

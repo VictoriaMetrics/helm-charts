@@ -2,7 +2,8 @@
 
 ## Next release
 
-- TODO
+- add `vm.operator.*` helpers to render VictoriaMetrics operator custom resources from chart values: `vm.operator.enabled`, `vm.operator.cr.name`, `vm.operator.cr.labels`, `vm.operator.cr.spec`, `vm.operator.app.spec`, `vm.operator.service.spec`, `vm.operator.storage`, `vm.operator.license`, `vm.operator.relabel.configs`, `vm.operator.scrape`, `vm.operator.scrape.spec` and `vm.operator.scrape.configs` (Prometheus-compatible scrape jobs to `VMScrapeConfig` resources), `vm.operator.remote.write`, `vm.operator.http.endpoint`, `vm.operator.syslog.spec`, `vm.operator.data.volume`, `vm.operator.self.scrape`, `vm.operator.cluster.component`, `vm.operator.backup` and `vm.operator.network.policy`. `.Values.operator.spec` is deep-merged over the generated spec.
+- with `operator.enabled: true` operator naming is always used, regardless of `useLegacyNaming`, as the operator names the objects it creates.
 
 ## v0.4.3
 
