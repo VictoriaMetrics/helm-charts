@@ -13,9 +13,11 @@ metadata:
   {{- $_ := set $ctx "extraLabels" $labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
-  {{- with $annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{- $_ := set $ctx "extraAnnotations" $annotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
   {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
 spec:
   selector:
     matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}

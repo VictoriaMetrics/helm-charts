@@ -16,12 +16,17 @@ metadata:
   name: {{ $fullname }}-cleanup-hook
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
-  annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-3") | nindent 4 }}
+  {{- $_ := set $ctx "extraAnnotations" (include "vm-operator.cleanup.annotations" (dict "hookWeight" "-3") | fromYaml) }}
+  annotations: {{ include "vm.annotations" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
 spec:
   template:
     metadata:
       name: {{ $fullname }}
       labels: {{ include "vm.labels" $ctx | nindent 8 }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
+      {{- end }}
     spec:
       serviceAccountName: {{ $fullname }}-cleanup-hook
       {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}

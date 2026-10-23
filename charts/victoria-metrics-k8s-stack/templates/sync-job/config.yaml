@@ -101,6 +101,9 @@ metadata:
   name: {{ $fullname }}-sync-job-config
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 data:
   config.yaml: |
     common:

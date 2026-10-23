@@ -2,6 +2,12 @@
 {{- print (include "vm.plain.fullname" .) "-upgrade-crds" }}
 {{- end -}}
 
+{{- define "crds.upgrade.hookAnnotations" -}}
+"helm.sh/hook": pre-install,pre-upgrade,pre-rollback
+"helm.sh/hook-weight": "{{ .hookWeight }}"
+"helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+{{- end -}}
+
 {{- define "crds.upgrade.serviceAccountName" -}}
 {{- $Values := (.helm).Values | default .Values }}
 {{- $upgrade := $Values.upgrade }}

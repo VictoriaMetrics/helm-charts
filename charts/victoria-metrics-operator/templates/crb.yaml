@@ -9,9 +9,11 @@ metadata:
   {{- $_ := set $ctx "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
-  {{- with .Values.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{- $_ := set $ctx "extraAnnotations" .Values.annotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
   {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
 subjects:
 - kind: ServiceAccount
   name: {{ (.Values.serviceAccount).name | default $fullname }}
@@ -29,7 +31,9 @@ metadata:
   name: {{ $fullname }}-cleanup-hook
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
-  annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-4") | nindent 4 }}
+  {{- $_ := set $ctx "extraAnnotations" (include "vm-operator.cleanup.annotations" (dict "hookWeight" "-4") | fromYaml) }}
+  annotations: {{ include "vm.annotations" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

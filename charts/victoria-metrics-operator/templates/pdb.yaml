@@ -11,6 +11,9 @@ metadata:
   {{- $_ := set $ctx "extraLabels" $pdb.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 spec:
   {{- with $pdb.minAvailable }}
   minAvailable: {{ . }}

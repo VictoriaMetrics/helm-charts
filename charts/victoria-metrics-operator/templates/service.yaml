@@ -6,9 +6,11 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: {{ $ns }}
-  {{- with $service.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{- $_ := set $ctx "extraAnnotations" $service.annotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
   {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
   {{- $_ := set $ctx "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}

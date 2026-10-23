@@ -9,6 +9,9 @@ metadata:
   name: {{ $fullname }}-additional-notifier
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 stringData:
   {{- $configs := $app.additionalNotifierConfigs.static_configs | default list -}}
   {{- if (.Values.alertmanager).enabled }}

@@ -25,6 +25,10 @@ metadata:
   {{- $extraLabels := dict "app.kubernetes.io/component" $svc "k8s-app" $svc }}
   {{- $_ := set $ctx "extraLabels" $extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 subsets:
   - addresses:
       {{- range . }}
@@ -60,6 +64,9 @@ metadata:
   {{- $_ := set $ctx "extraLabels" $extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 spec:
   clusterIP: None
   {{- if $ports }}
@@ -105,6 +112,11 @@ metadata:
   {{- $_ := set $ctx "extraLabels" $sc.labels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
+  {{- $_ := set $ctx "extraAnnotations" $sc.annotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
 {{- $emptyParamsToDrop := list "endpoints" }}
 {{- $scrapeSpec := mergeOverwrite (deepCopy $spec) (deepCopy $sc.spec) }}
 {{- $namespaceSelector := $scrapeSpec.namespaceSelector | default dict }}
