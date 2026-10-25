@@ -40,6 +40,20 @@ tests:
           path: spec.template.spec.containers[0].command
           value:
             - /custom/bin/victoriametrics
+  - it: should render container lifecycle
+    set:
+      server:
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sleep", "5"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle
+          value:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
   - it: should render runtimeClassName
     set:
       server:

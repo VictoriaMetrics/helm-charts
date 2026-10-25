@@ -118,6 +118,9 @@ spec:
           {{- $_ := set $ctx "appKey" "server" }}
           image: {{ include "vm.image" $ctx }}
           imagePullPolicy: {{ $app.image.pullPolicy }}
+          {{- with $app.lifecycle }}
+          lifecycle: {{ . | toYaml | nindent 12 }}
+          {{- end }}
           {{- if $app.containerWorkingDir }}
           workingDir: {{ $app.containerWorkingDir }}
           {{- end }}
