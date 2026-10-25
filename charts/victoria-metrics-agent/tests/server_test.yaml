@@ -53,6 +53,23 @@ tests:
             - /custom/bin/vmagent
         template: server.yaml
         documentIndex: 0
+  - it: should render container lifecycle
+    set:
+      remoteWrite:
+        - url: http://vm-insert:8480/insert/0/prometheus
+      lifecycle:
+        preStop:
+          exec:
+            command: ["sleep", "5"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle
+          value:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
+        template: server.yaml
+        documentIndex: 0
   - it: should apply global.extraLabels to resource metadata and pod template
     set:
       remoteWrite:

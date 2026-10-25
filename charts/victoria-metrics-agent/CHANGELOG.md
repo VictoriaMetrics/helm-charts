@@ -1,6 +1,7 @@
 ## Next release
 
 - add `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]` and protocol-specific ports (e.g. `graphite-tcp`, `influx-tcp`, `opentsdbhttp`). See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
+- fix `lifecycle` being ignored: the value was never rendered into the vmagent container spec.
 
 ## v0.50.0
 
