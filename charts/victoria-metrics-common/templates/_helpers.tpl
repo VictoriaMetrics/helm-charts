@@ -156,6 +156,12 @@ Returns "true", "false", or "" (not set at any level).
       {{- end -}}
     {{- end -}}
   {{- end -}}
+  {{- if include "vm.operator.enabled" . -}}
+    {{- if eq $result "true" -}}
+      {{- fail "useLegacyNaming: true is not supported with operator.enabled: true; the operator names the objects it creates" -}}
+    {{- end -}}
+    {{- $result = "false" -}}
+  {{- end -}}
   {{- $result -}}
 {{- end -}}
 
