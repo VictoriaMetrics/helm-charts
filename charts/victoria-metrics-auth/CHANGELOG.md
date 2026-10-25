@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.44.1
+
+**Release date:** 25 Oct 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.154.1](https://img.shields.io/badge/v1.154.1-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11541)
+
 - bump version of VM components to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1), which fixes delayed requests in vmauth when a request with an `Authorization` header is matched to `unauthorized_user`. See [VictoriaMetrics#11774](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11774).
 - add `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 

@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.2.1
+
+**Release date:** 25 Oct 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v0.1.17](https://img.shields.io/badge/v0.1.17-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fvmestimator%2Fchangelog%2F%23v0117)
+
 - bump version of VMEstimator to [v0.1.17](https://github.com/VictoriaMetrics/vmestimator/releases/tag/v0.1.17)
 
 ## v0.2.0
