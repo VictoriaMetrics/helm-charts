@@ -1,0 +1,26 @@
+suite: Ingress
+templates:
+  - ingress.yaml
+set:
+  ingress.enabled: true
+tests:
+  - it: routes to storage without select
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: vmestimator-storage-RELEASE-NAME
+  - it: routes to select if it has replicas
+    set:
+      select.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: vmestimator-select-RELEASE-NAME
+  - it: routes to storage if select has no replicas
+    set:
+      select.enabled: true
+      select.replicaCount: 0
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: vmestimator-storage-RELEASE-NAME

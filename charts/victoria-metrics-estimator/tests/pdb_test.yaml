@@ -4,7 +4,7 @@ templates:
 tests:
   - it: omits availability fields by default
     set:
-      single.podDisruptionBudget.enabled: true
+      storage.podDisruptionBudget.enabled: true
     asserts:
       - notExists:
           path: spec.minAvailable
@@ -14,9 +14,9 @@ tests:
           path: spec.unhealthyPodEvictionPolicy
   - it: supports maxUnavailable and unhealthyPodEvictionPolicy
     set:
-      single.podDisruptionBudget.enabled: true
-      single.podDisruptionBudget.maxUnavailable: 1
-      single.podDisruptionBudget.unhealthyPodEvictionPolicy: AlwaysAllow
+      storage.podDisruptionBudget.enabled: true
+      storage.podDisruptionBudget.maxUnavailable: 1
+      storage.podDisruptionBudget.unhealthyPodEvictionPolicy: AlwaysAllow
     asserts:
       - notExists:
           path: spec.minAvailable
@@ -28,9 +28,9 @@ tests:
           value: AlwaysAllow
   - it: rejects both availability fields
     set:
-      single.podDisruptionBudget.enabled: true
-      single.podDisruptionBudget.minAvailable: 1
-      single.podDisruptionBudget.maxUnavailable: 1
+      storage.podDisruptionBudget.enabled: true
+      storage.podDisruptionBudget.minAvailable: 1
+      storage.podDisruptionBudget.maxUnavailable: 1
     asserts:
       - failedTemplate:
-          errorMessage: ".Values.single.podDisruptionBudget.minAvailable and maxUnavailable are mutually exclusive"
+          errorMessage: ".Values.storage.podDisruptionBudget.minAvailable and maxUnavailable are mutually exclusive"

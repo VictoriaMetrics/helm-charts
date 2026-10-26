@@ -430,6 +430,31 @@ spec: {}
 			require.NoError(t, err)
 		},
 	},
+	{
+		chart: "victoria-metrics-estimator",
+		values: map[string]any{
+			"serviceAccount.create": true,
+			"storage.replicaCount":  2,
+			"select.enabled":        true,
+			"config.data":           map[string]any{"streams": []any{map[string]any{"interval": "5m"}}},
+		},
+		manifest: `
+apiVersion: operator.victoriametrics.com/v1
+kind: VMEstimator
+spec:
+  streams: [{interval: 5m}]
+  storage:
+    replicaCount: 2
+  select:
+    replicaCount: 2
+`,
+		kinds:         []string{"vmestimator", "vmestimator-storage", "vmestimator-select"},
+		workloadKinds: []string{"vmestimator-storage", "vmestimator-select"},
+		ignore: []string{
+			"StatefulSet/vmestimator-storage-compat container=config-reloader",
+			"StatefulSet/vmestimator-storage-compat container[config-reloader]",
+		},
+	},
 }
 
 var manifestKindRe = regexp.MustCompile(`(?m)^kind: (\w+)$`)
