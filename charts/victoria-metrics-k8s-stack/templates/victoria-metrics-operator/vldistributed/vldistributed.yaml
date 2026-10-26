@@ -20,8 +20,9 @@ metadata:
   {{- $labels := include "vm.labels" $ctx | fromYaml }}
   {{- $_ := unset $ctx "extraLabels" }}
   {{- $clusterVersion := dig "spec" "zoneCommon" "vlcluster" "spec" "clusterVersion" "" $app }}
-  {{- if $clusterVersion }}
-    {{- $_ := set $labels "app.kubernetes.io/version" (include "vm.version.label" $clusterVersion) }}
+  {{- $version := include "vm.versions.resolve" (dict "helm" . "tag" $clusterVersion "key" "logs") }}
+  {{- with $version }}
+    {{- $_ := set $labels "app.kubernetes.io/version" (include "vm.version.label" .) }}
   {{- end }}
   labels: {{ toYaml $labels | nindent 4 }}
 spec: {{ include "vl.distributed.spec" $ctx | nindent 2 }}

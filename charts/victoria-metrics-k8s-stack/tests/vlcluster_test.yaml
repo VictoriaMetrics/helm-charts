@@ -51,19 +51,16 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-victoria-metrics-k8s-stack
 
-  - it: clusterVersion defaults to the pinned VictoriaLogs version in values
+  - it: clusterVersion is unset by default, the operator falls back to its own default
     set:
       vlcluster:
         enabled: true
-        spec:
-          clusterVersion: v0.0.7
     asserts:
-      - equal:
+      - notExists:
           path: spec.clusterVersion
-          value: v0.0.7
       - equal:
           path: metadata.labels["app.kubernetes.io/version"]
-          value: v0.0.7
+          value: v1.53.0
 
   - it: custom clusterVersion in values overrides the pinned default
     set:

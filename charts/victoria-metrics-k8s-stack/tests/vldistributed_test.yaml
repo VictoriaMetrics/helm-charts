@@ -67,7 +67,7 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-victoria-metrics-k8s-stack
 
-  - it: zoneCommon vlcluster clusterVersion defaults to the pinned VictoriaLogs version
+  - it: zoneCommon vlcluster clusterVersion is unset by default, the operator falls back to its own default
     set:
       vldistributed:
         enabled: true
@@ -80,8 +80,10 @@ tests:
           extraArgs:
             notifier.blackhole: "true"
     asserts:
-      - equal:
+      - notExists:
           path: spec.zoneCommon.vlcluster.spec.clusterVersion
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
           value: v1.53.0
 
   - it: zoneCommon vlcluster clusterVersion can be overridden

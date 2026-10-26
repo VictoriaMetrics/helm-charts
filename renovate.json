@@ -47,6 +47,14 @@
         "# renovate: image=(?<depName>[^\\s]+)\\n(?:HELM_IMAGE|CT_IMAGE) = [^:]+:(?<currentValue>\\S+)"
       ],
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/charts\\/victoria-metrics-k8s-stack\\/values\\.yaml/"],
+      "matchStrings": [
+        "# renovate: image=(?<depName>[^\\s]+)\\n\\s+\\S+: (?<currentValue>v[^\\s]+)"
+      ],
+      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
@@ -92,7 +100,8 @@
       "matchManagers": ["custom.regex"],
       "matchFileNames": [
         "charts/**/Chart.yaml",
-        ".github/workflows/run-testing.yaml"
+        ".github/workflows/run-testing.yaml",
+        "charts/victoria-metrics-k8s-stack/values.yaml"
       ],
       "allowedVersions": "/^v[0-9]+\\.[0-9]+\\.[0-9]+$/"
     },
@@ -125,6 +134,12 @@
       "matchManagers": ["custom.regex"],
       "matchPackageNames": ["victoriametrics/operator"],
       "groupName": "VictoriaMetrics Operator"
+    },
+    {
+      "description": "Group VictoriaMetrics Anomaly Detection appVersion updates",
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["victoriametrics/vmanomaly"],
+      "groupName": "VictoriaMetrics Anomaly Detection"
     },
     {
       "description": "Group GitHub Actions updates",
