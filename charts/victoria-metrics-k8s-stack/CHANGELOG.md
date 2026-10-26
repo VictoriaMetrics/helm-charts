@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- BUGFIX: strip the `@sha256:...` digest from `vlsingle.spec.image.tag`, `vlagent.spec.image.tag` and `vtsingle.spec.image.tag` before using it as the `app.kubernetes.io/version` label, since the API server rejects label values containing `@` or longer than 63 characters. See [#3303](https://github.com/VictoriaMetrics/helm-charts/issues/3303).
 
 ## v0.96.1
 

@@ -7,6 +7,14 @@ global.versions[.key] (e.g. "logs", "traces", "alertmanager"), otherwise empty.
   {{- .tag | default (index (($Values.global).versions | default dict) .key) | default "" -}}
 {{- end -}}
 
+{{- /*
+vm.version.label strips an `@sha256:...` digest from an image tag, so it's safe to use as the
+`app.kubernetes.io/version` label; a label value can't contain `@` or exceed 63 characters.
+*/ -}}
+{{- define "vm.version.label" -}}
+  {{- regexReplaceAll "(.*)(@sha.*)" . "${1}" -}}
+{{- end -}}
+
 {{- define "vm.read.endpoint" -}}
   {{- $Values := (.helm).Values | default .Values -}}
   {{- $endpoint := dict -}}
