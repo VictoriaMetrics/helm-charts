@@ -1,5 +1,13 @@
 ## Next release
 
+- TODO
+
+## v0.97.0
+
+**Release date:** 26 Oct 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.155.0](https://img.shields.io/badge/v1.155.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictoriametrics%2Fchangelog%2F%23v11550) ![VM Operator: 0.68.1](https://img.shields.io/badge/VM_Operator-0.68.1-success?logo=kubernetes&logoColor=7B3FE4&labelColor=white&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fhelm%2Fvictoria-metrics-operator%2Fchangelog%2F%230681)
+
 - bump version of VM components to [v1.155.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.155.0)
 - strip the `@sha256:...` digest from `vlsingle.spec.image.tag`, `vlagent.spec.image.tag` and `vtsingle.spec.image.tag` before using it as the `app.kubernetes.io/version` label, since the API server rejects label values containing `@` or longer than 63 characters. See [#3303](https://github.com/VictoriaMetrics/helm-charts/issues/3303).
 - `kubelet.vmScrapes.resources.enabled` now defaults to `false`. `/metrics/resource` exposes the same metric names and labels as `/metrics/cadvisor` (e.g. `container_cpu_usage_seconds_total`, `container_memory_working_set_bytes`), so scraping both by default created duplicate series; the bundled rules and dashboards only depend on `/metrics/cadvisor`. Set `kubelet.vmScrapes.resources.enabled: true` to restore the previous behavior. See [#2315](https://github.com/VictoriaMetrics/helm-charts/issues/2315).
