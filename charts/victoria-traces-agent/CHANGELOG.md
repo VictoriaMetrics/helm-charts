@@ -1,6 +1,7 @@
 ## Next release
 
 - add `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and `otlp-grpc`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
+- bump version of VictoriaTraces components to [v0.12.1](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.12.1)
 
 ## v0.2.0
 
