@@ -2,6 +2,14 @@
 
 ## Next release
 
+- TODO
+
+## v0.4.5
+
+**Release date:** 26 Oct 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0)
+
 - with `useLegacyNaming: false` and a known component kind, `vm.selectorLabels` (and therefore `vm.commonLabels` and `vm.podLabels`) now also set `managed-by: vm-operator`, matching the label the VictoriaMetrics operator unconditionally adds to its own selectors. Selector, `serviceName` and `volumeClaimTemplates` are immutable on Deployments/StatefulSets, so without this a chart release could never adopt operator-created workloads in place - only delete and recreate them.
 
 ## v0.4.4
