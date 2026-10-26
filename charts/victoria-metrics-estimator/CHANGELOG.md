@@ -1,6 +1,9 @@
 ## Next release
 
-- TODO
+**Update note**: the query-facing `Service`/`Ingress`/`VMServiceScrape` are now named `vmestimator-<release>` and the remote-write `Service` is now named `vmestimator-insert-<release>` in both `single` and `cluster` mode (previously `vmestimator-single-<release>` in `single` mode and `vmestimator-select-<release>`/`vmestimator-storage-<release>-insert` in `cluster` mode). In `cluster` mode, `vmestimator-insert-<release>` also replaces `vmestimator-storage-<release>` as the `storage` StatefulSet's governing headless Service. `StatefulSet.spec.serviceName` is immutable, so upgrading an existing `cluster` mode install needs `kubectl delete statefulset vmestimator-storage-<release> -n <namespace> --cascade=orphan` (use the actual name if `fullnameOverride` is set) before `helm upgrade`. `single` mode isn't affected, since Services aren't immutable.
+
+- `mode: single` now reads its configuration from `storage.*` by default instead of a separate `single.*` section; existing `single.*` overrides still take precedence. Exceptions: `single.replicaCount` is now ignored (single mode always runs 1 replica), and `cardinalityMetrics.exposeAt` defaults to `/metrics` for `single` even though `storage` itself still defaults to `/cardinality/metrics`.
+- `cluster` mode now also gets a `VMServiceScrape` for `storage` (`/metrics` only); previously only `select` was scraped, so `storage` went unmonitored entirely.
 
 ## v0.2.1
 

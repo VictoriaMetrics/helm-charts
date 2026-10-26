@@ -12,7 +12,12 @@ func TestVictoriaMetricsEstimatorInstallDefault(t *testing.T) {
 	ctx := context.Background()
 	defer chartCleanup(t, ctx, cp)
 
-	name := fmt.Sprintf("vmestimator-single-%s", cp.releaseName)
-	waitUntilDeploymentAvailable(t, ctx, cp.client, cp.namespace, name)
-	waitUntilServiceAvailable(t, ctx, cp.client, cp.namespace, name)
+	deploymentName := fmt.Sprintf("vmestimator-single-%s", cp.releaseName)
+	waitUntilDeploymentAvailable(t, ctx, cp.client, cp.namespace, deploymentName)
+
+	serviceName := fmt.Sprintf("vmestimator-%s", cp.releaseName)
+	waitUntilServiceAvailable(t, ctx, cp.client, cp.namespace, serviceName)
+
+	insertServiceName := fmt.Sprintf("vmestimator-insert-%s", cp.releaseName)
+	waitUntilServiceAvailable(t, ctx, cp.client, cp.namespace, insertServiceName)
 }
