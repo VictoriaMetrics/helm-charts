@@ -6,6 +6,7 @@
 - fix `server.persistentVolume.volumeAttributesClassName` being ignored because of a typo in the template.
 - rename the container from `vtraces` to `vtsingle`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.
 - fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
+- bump version of VictoriaTraces components to [v0.12.1](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.12.1).
 
 ## v0.1.11
 
