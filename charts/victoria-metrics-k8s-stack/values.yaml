@@ -2158,9 +2158,10 @@ kubelet:
       enabled: true
       spec:
         path: /metrics/probes
-    # -- Enabled scraping /metrics/resource from kubelet's service
+    # -- Enable scraping /metrics/resource from kubelet's service. Disabled by default to avoid duplicating
+    # /metrics/cadvisor series, which the bundled rules and dashboards rely on.
     resources:
-      enabled: true
+      enabled: false
       spec:
         path: /metrics/resource
     kubelet:
