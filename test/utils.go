@@ -184,6 +184,18 @@ func waitUntilDeploymentAvailable(t *testing.T, ctx context.Context, client *kub
 	require.NoError(t, err, "deployment %s not available", name)
 }
 
+func waitUntilStatefulSetAvailable(t *testing.T, ctx context.Context, client *kubernetes.Clientset, namespace, name string) {
+	t.Helper()
+	err := wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (bool, error) {
+		s, err := client.AppsV1().StatefulSets(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return false, nil
+		}
+		return s.Status.ReadyReplicas == s.Status.Replicas && s.Status.Replicas > 0, nil
+	})
+	require.NoError(t, err, "statefulset %s not available", name)
+}
+
 func waitUntilServiceAvailable(t *testing.T, ctx context.Context, client *kubernetes.Clientset, namespace, name string) {
 	t.Helper()
 	err := wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (bool, error) {
