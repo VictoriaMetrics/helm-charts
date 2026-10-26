@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- with `useLegacyNaming: false` and a known component kind, `vm.selectorLabels` (and therefore `vm.commonLabels` and `vm.podLabels`) now also set `managed-by: vm-operator`, matching the label the VictoriaMetrics operator unconditionally adds to its own selectors. Selector, `serviceName` and `volumeClaimTemplates` are immutable on Deployments/StatefulSets, so without this a chart release could never adopt operator-created workloads in place - only delete and recreate them.
 
 ## v0.4.4
 

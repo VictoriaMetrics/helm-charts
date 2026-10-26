@@ -348,9 +348,11 @@ vm.labels.operator returns "true" when labels follow the VictoriaMetrics operato
 
 {{- /*
 Selector labels.
-With `useLegacyNaming: false` and a known kind the name, instance and component labels match
-the ones the VictoriaMetrics operator sets for the same component. Ownership labels
-(`managed-by`) are intentionally left as is.
+With `useLegacyNaming: false` and a known kind the name, instance, component and managed-by
+labels match the ones the VictoriaMetrics operator sets for the same component, so that
+Deployments/StatefulSets created by the operator can be adopted by the chart in place
+(selector/serviceName/volumeClaimTemplates are immutable, so any mismatch forces a delete
+and recreate instead of an adoption).
 */ -}}
 {{- define "vm.selectorLabels" -}}
   {{- $labels := .extraLabels | default dict -}}
@@ -360,6 +362,7 @@ the ones the VictoriaMetrics operator sets for the same component. Ownership lab
     {{- if not (hasKey $labels "app.kubernetes.io/component") -}}
       {{- $_ := set $labels "app.kubernetes.io/component" "monitoring" -}}
     {{- end -}}
+    {{- $_ := set $labels "managed-by" "vm-operator" -}}
   {{- else -}}
     {{- $_ := set $labels "app.kubernetes.io/name" (include "vm.name" .) -}}
     {{- $_ := set $labels "app.kubernetes.io/instance" (include "vm.release" .) -}}
