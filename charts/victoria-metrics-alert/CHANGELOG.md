@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.154.1](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.154.1)
 - add `server.service.portOverrides` and `alertmanager.service.portOverrides`, maps keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 
 ## v0.51.0
