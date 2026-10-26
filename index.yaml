@@ -40801,6 +40801,43 @@ entries:
   - annotations:
       artifacthub.io/category: monitoring-logging
       artifacthub.io/changes: |
+        - 'with `useLegacyNaming: false` and a known component kind, `vm.selectorLabels` (and therefore `vm.commonLabels` and `vm.podLabels`) now also set `managed-by: vm-operator`, matching the label the VictoriaMetrics operator unconditionally adds to its own selectors. Selector, `serviceName` and `volumeClaimTemplates` are immutable on Deployments/StatefulSets, so without this a chart release could never adopt operator-created workloads in place - only delete and recreate them.'
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Sources
+          url: https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-common
+        - name: Charts repo
+          url: https://victoriametrics.github.io/helm-charts/
+      artifacthub.io/readme: |
+        # VictoriaMetrics Common Helm chart
+
+        Chart documentation is available [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/).
+        Changelog is [here](https://docs.victoriametrics.com/helm/victoria-metrics-common/changelog/).
+    apiVersion: v2
+    created: "2026-10-26T20:02:42.865998146Z"
+    description: VictoriaMetrics Common - contains shared templates for all Victoria
+      Metrics helm charts
+    digest: c0766ec15f0bd8066da6d48eee1d9f00969378c0d394a548f1e48f9bd911caa7
+    keywords:
+    - victoriametrics
+    - monitoring
+    - kubernetes
+    - observability
+    - tsdb
+    - metrics
+    - metricsql
+    - timeseries
+    kubeVersion: '>=1.23.0-0'
+    name: victoria-metrics-common
+    sources:
+    - https://github.com/VictoriaMetrics/helm-charts
+    type: library
+    urls:
+    - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-metrics-common-0.4.5/victoria-metrics-common-0.4.5.tgz
+    version: 0.4.5
+  - annotations:
+      artifacthub.io/category: monitoring-logging
+      artifacthub.io/changes: |
         - 'add `vm.operator.*` helpers to render VictoriaMetrics operator custom resources from chart values: `vm.operator.enabled`, `vm.operator.cr.name`, `vm.operator.cr.labels`, `vm.operator.cr.spec`, `vm.operator.app.spec`, `vm.operator.service.spec`, `vm.operator.resource.spec`, `vm.operator.storage`, `vm.operator.license`, `vm.operator.relabel.configs`, `vm.operator.tls.config`, `vm.operator.scrape`, `vm.operator.scrape.spec` and `vm.operator.scrape.configs` (Prometheus-compatible scrape jobs to `VMScrapeConfig` resources), `vm.operator.remote.write`, `vm.operator.http.endpoint`, `vm.operator.syslog.spec`, `vm.operator.data.volume`, `vm.operator.self.scrape`, `vm.operator.cluster.component`, `vm.operator.backup` and `vm.operator.network.policy`. `.Values.operator.spec` is deep-merged over the generated spec.'
         - 'with `operator.enabled: true`, `useLegacyNaming: true` now fails since the operator names the objects it creates; leaving `useLegacyNaming` unset or `false` resolves to operator naming.'
       artifacthub.io/license: Apache-2.0
@@ -88919,4 +88956,4 @@ entries:
     urls:
     - https://github.com/VictoriaMetrics/helm-charts/releases/download/victoria-traces-single-0.0.1/victoria-traces-single-0.0.1.tgz
     version: 0.0.1
-generated: "2026-10-26T14:19:28.558840301Z"
+generated: "2026-10-26T20:02:43.844235179Z"
