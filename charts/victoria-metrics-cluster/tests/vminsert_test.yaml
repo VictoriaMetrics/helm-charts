@@ -4,10 +4,12 @@ chart:
   appVersion: 0.1.0
 templates:
   - vminsert-server.yaml
+  - relabel-configmap.yaml
 tests:
   - it: deployment should match snapshot
     asserts:
       - matchSnapshot: {}
+        template: vminsert-server.yaml
   - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
     set:
       vminsert:
@@ -19,13 +21,15 @@ tests:
           podLabelName: podLabelValue
     asserts:
       - matchSnapshot: {}
+        template: vminsert-server.yaml
   - it: should render custom command
     set:
       vminsert:
         command:
           - /custom/bin/vminsert
     asserts:
-      - equal:
+      - template: vminsert-server.yaml
+        equal:
           path: spec.template.spec.containers[0].command
           value:
             - /custom/bin/vminsert
@@ -35,10 +39,12 @@ tests:
         extraLabels:
           team: platform
     asserts:
-      - equal:
+      - template: vminsert-server.yaml
+        equal:
           path: metadata.labels.team
           value: platform
-      - equal:
+      - template: vminsert-server.yaml
+        equal:
           path: spec.template.metadata.labels.team
           value: platform
   - it: should apply global.extraAnnotations to resource metadata and pod template
@@ -47,9 +53,36 @@ tests:
         extraAnnotations:
           owner: platform-team
     asserts:
-      - equal:
+      - template: vminsert-server.yaml
+        equal:
           path: metadata.annotations.owner
           value: platform-team
-      - equal:
+      - template: vminsert-server.yaml
+        equal:
           path: spec.template.metadata.annotations.owner
           value: platform-team
+  - it: should render checksum for chart-managed relabel config overriding podAnnotations
+    set:
+      vminsert:
+        podAnnotations:
+          checksum/config: custom
+        relabel:
+          enabled: true
+    asserts:
+      - template: vminsert-server.yaml
+        exists:
+          path: spec.template.metadata.annotations["checksum/config"]
+      - template: vminsert-server.yaml
+        notEqual:
+          path: spec.template.metadata.annotations["checksum/config"]
+          value: custom
+  - it: should not render checksum with external relabel configmap
+    set:
+      vminsert:
+        relabel:
+          enabled: true
+          configMap: external
+    asserts:
+      - template: vminsert-server.yaml
+        notExists:
+          path: spec.template.metadata.annotations["checksum/config"]

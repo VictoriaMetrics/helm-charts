@@ -1,6 +1,6 @@
 ## Next release
 
-- add `checksum/config` annotation on `vmauth` and `vminsert` pods to automatically trigger a deployment rollout when content of secret or configmap changes.
+- add `checksum/config` annotation on `vmauth` and `vminsert` pods to trigger a rollout when the chart-managed vmauth Secret or vminsert relabel ConfigMap changes. Externally managed `vmauth.configSecretName` and `vminsert.relabel.configMap` are not tracked. A `checksum/config` key set in `podAnnotations` is overridden by the generated value.
 
 ## v0.54.0
 
