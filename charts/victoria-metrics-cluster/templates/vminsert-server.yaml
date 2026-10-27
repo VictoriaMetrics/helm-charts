@@ -31,7 +31,7 @@ spec:
   template:
     metadata:
       {{- $_ := set $ctx "extraAnnotations" $app.podAnnotations }}
-      {{- if (include "vm.annotations" $ctx) or $app.relabel.enabled }}
+      {{- if or (include "vm.annotations" $ctx) $app.relabel.enabled }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/relabel-configmap.yaml") . | sha256sum }}
         {{- with (include "vm.annotations" $ctx) }}
