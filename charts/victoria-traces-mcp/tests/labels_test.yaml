@@ -36,6 +36,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vtmcp
+            managed-by: vm-operator
         template: networkpolicy.yaml
       - equal:
           path: spec.selector.matchLabels
@@ -43,6 +44,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vtmcp
+            managed-by: vm-operator
         template: pdb.yaml
       - equal:
           path: spec.selector
@@ -50,6 +52,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vtmcp
+            managed-by: vm-operator
         template: service.yaml
       - equal:
           path: spec.selector.matchLabels
@@ -57,6 +60,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vtmcp
+            managed-by: vm-operator
         template: deployment.yaml
       - isSubset:
           path: spec.template.metadata.labels
@@ -71,4 +75,5 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vtmcp
+            managed-by: vm-operator
         template: scrape.yaml

@@ -6,12 +6,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"sort"
 	"strings"
@@ -21,18 +20,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/wait"
-	utilyaml "k8s.io/apimachinery/pkg/util/yaml"
 )
 
 const compatName = "compat"
 
-// compatKinds are the object kinds whose naming has to match between a chart and the operator.
-var compatKinds = []string{"Deployment", "StatefulSet", "DaemonSet", "Service", "ServiceAccount", "PersistentVolumeClaim"}
-
-type compatCase struct {
+type migrationCase struct {
 	// chart is a chart directory name under charts/
 	chart string
-	// values are passed to helm template with --set-json
+	// values are passed to helm install with --set-json
 	values map[string]any
 	// manifest is the operator custom resource equivalent to values, named compatName
 	manifest string
@@ -42,12 +37,15 @@ type compatCase struct {
 	workloadKinds []string
 	// ignore lists contract entries that intentionally differ, as "<kind>/<name> <field>"
 	ignore []string
+	// recreate lists objects that can't be adopted by the chart in place and are deleted
+	// before migrating back from the operator, as "<kind>/<name>"
+	recreate []string
 }
 
-var compatCases = []compatCase{
+var migrationCases = []migrationCase{
 	{
-		chart:  "victoria-metrics-single",
-		values: map[string]any{"server.mode": "deployment"},
+		chart:      "victoria-metrics-single",
+		values:     map[string]any{"server.mode": "deployment"},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMSingle
@@ -60,10 +58,11 @@ spec:
 			"Deployment/vmsingle-compat container[vmsingle].port=",
 			"Service/vmsingle-compat port=",
 		},
+		recreate: []string{"Service/vmsingle-compat"},
 	},
 	{
-		chart:  "victoria-logs-single",
-		values: map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
+		chart:      "victoria-logs-single",
+		values:     map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1
 kind: VLSingle
@@ -73,8 +72,8 @@ spec:
 		kinds: []string{"vlsingle"},
 	},
 	{
-		chart:  "victoria-traces-single",
-		values: map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
+		chart:      "victoria-traces-single",
+		values:     map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1
 kind: VTSingle
@@ -234,12 +233,31 @@ spec:
 	},
 }
 
-// TestOperatorCompat checks that charts rendered with `useLegacyNaming: false` name their
-// workloads, services, service accounts, volumes, containers and ports the same way the
-// VictoriaMetrics operator does for an equivalent custom resource.
+var manifestKindRe = regexp.MustCompile(`(?m)^kind: (\w+)$`)
+
+// TestOperatorMigration checks that a release installed with `useLegacyNaming: false` can be replaced
+// by an equivalent operator custom resource and back. Workloads may be recreated and pods restarted,
+// but Services, ServiceAccounts and PersistentVolumeClaims have to be kept, and workloads, services,
+// service accounts, volumes, containers and ports have to be named the same way by the chart and the operator.
+//
+// Chart -> operator:
+//  1. Helm release secrets are deleted, so that Helm forgets the release without deleting its objects;
+//  2. the custom resource is applied, the operator adopts objects with the same names, updating them
+//     in place or, e.g. for StatefulSets with changed claim templates, recreating them without their pods.
+//
+// Operator -> chart:
+//  1. the custom resource is paused, so that an in-flight reconcile doesn't put back owner references
+//     the orphaning delete removes, which would make the garbage collector delete the objects;
+//  2. `kubectl delete <cr> --cascade=orphan` removes the custom resource without deleting its children;
+//  3. `kubectl delete deployments,statefulsets,daemonsets --cascade=orphan` removes the workloads but keeps
+//     their pods and claims: they can't be adopted in place, since StatefulSet spec is mostly immutable and
+//     server-side apply keeps operator-owned fields, e.g. an httpGet probe next to the chart's tcpSocket one;
+//  4. objects that still can't be adopted, e.g. a Service with differently named ports, are deleted;
+//  5. `helm install --take-ownership --force-conflicts` adopts the remaining objects and recreates
+//     the deleted ones, workloads adopt the orphaned pods.
 //
 // The operator has to be running in the cluster before the test starts.
-func TestOperatorCompat(t *testing.T) {
+func TestOperatorMigration(t *testing.T) {
 	workdir, err := os.Getwd()
 	require.NoError(t, err)
 	chartsDir := filepath.Join(filepath.Dir(workdir), "charts")
@@ -247,56 +265,86 @@ func TestOperatorCompat(t *testing.T) {
 	client, err := newKubeClient(kc)
 	require.NoError(t, err)
 
-	for _, tc := range compatCases {
+	for _, tc := range migrationCases {
 		t.Run(tc.chart, func(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()
-			namespace := fmt.Sprintf("compat-%s", uniqueID())
+			namespace := fmt.Sprintf("migrate-%s", uniqueID())
 			_, err := kubectl(kc, "", "create", "namespace", namespace)
 			require.NoError(t, err)
-			defer client.CoreV1().Namespaces().Delete(ctx, namespace, metav1.DeleteOptions{}) //nolint:errcheck
+			defer client.CoreV1().Namespaces().Delete(ctx, namespace, metav1.DeleteOptions{})                    //nolint:errcheck
+			defer helmRun(kc, "uninstall", compatName, "--namespace", namespace, "--wait", "--ignore-not-found") //nolint:errcheck
 
+			var crKinds []string
+			for _, m := range manifestKindRe.FindAllStringSubmatch(tc.manifest, -1) {
+				crKinds = append(crKinds, m[1])
+			}
+			workloadKinds := tc.workloadKinds
+			if workloadKinds == nil {
+				workloadKinds = tc.kinds
+			}
+			byChart := func(o *unstructured.Unstructured) bool {
+				return len(o.GetOwnerReferences()) == 0 && o.GetAnnotations()["meta.helm.sh/release-name"] == compatName
+			}
+			byOperator := func(o *unstructured.Unstructured) bool {
+				return slices.ContainsFunc(o.GetOwnerReferences(), func(r metav1.OwnerReference) bool {
+					return slices.Contains(crKinds, r.Kind) && r.Name == compatName
+				})
+			}
+			waitForStatus := func(status string) {
+				t.Helper()
+				for _, k := range crKinds {
+					err := wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (bool, error) {
+						out, err := kubectl(kc, "", "get", strings.ToLower(k), compatName, "-n", namespace, "-o", "jsonpath={.status.updateStatus}")
+						return err == nil && string(out) == status, nil
+					})
+					require.NoError(t, err, "%s did not become %s", k, status)
+				}
+			}
+			chartDir := filepath.Join(chartsDir, tc.chart)
+			chartArgs := migrationHelmArgs("install", chartDir, namespace, tc.values)
+
+			out, err := helmRun(kc, chartArgs...)
+			require.NoError(t, err, "helm install failed: %s", out)
+			chartObjs := waitForRollout(t, ctx, kc, namespace, tc.kinds, workloadKinds, byChart)
+			chartPVCs, err := releaseObjects(kc, namespace, "persistentvolumeclaims")
+			require.NoError(t, err)
+
+			_, err = kubectl(kc, "", "delete", "secrets", "-n", namespace, "-l", fmt.Sprintf("owner=helm,name=%s", compatName))
+			require.NoError(t, err)
 			_, err = kubectl(kc, compatManifest(tc.manifest), "apply", "-n", namespace, "-f", "-")
 			require.NoError(t, err)
+			waitForStatus("operational")
+			operatorObjs := waitForRollout(t, ctx, kc, namespace, tc.kinds, workloadKinds, byOperator)
+			requireSameContract(t, operatorObjs, chartObjs, tc.ignore, "chart %s differs from the operator", tc.chart)
+			requireKept(t, chartPVCs, mustReleaseObjects(t, kc, namespace, "persistentvolumeclaims"))
+			requireKept(t, chartObjs, operatorObjs)
 
-			var operatorObjs []*unstructured.Unstructured
-			err = wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (bool, error) {
-				operatorObjs, err = operatorObjects(kc, namespace, tc.kinds)
-				if err != nil {
-					return false, nil
-				}
-				workloadKinds := tc.workloadKinds
-				if workloadKinds == nil {
-					workloadKinds = tc.kinds
-				}
-				for _, k := range workloadKinds {
-					if !slices.ContainsFunc(operatorObjs, func(o *unstructured.Unstructured) bool {
-						return isWorkload(o) && o.GetLabels()["app.kubernetes.io/name"] == k
-					}) {
-						return false, nil
-					}
-				}
-				return true, nil
-			})
-			require.NoError(t, err, "operator didn't create workloads for %v", tc.kinds)
-
-			chartObjs, err := chartObjects(filepath.Join(chartsDir, tc.chart), namespace, tc.values)
+			for _, k := range crKinds {
+				_, err = kubectl(kc, "", "patch", strings.ToLower(k), compatName, "-n", namespace, "--type=merge", "-p", `{"spec":{"paused":true}}`)
+				require.NoError(t, err)
+			}
+			waitForStatus("paused")
+			for _, k := range crKinds {
+				_, err = kubectl(kc, "", "delete", strings.ToLower(k), compatName, "-n", namespace, "--cascade=orphan")
+				require.NoError(t, err)
+			}
+			_, err = kubectl(kc, "", "delete", "deployments,statefulsets,daemonsets", "-n", namespace, "--cascade=orphan",
+				"-l", fmt.Sprintf("app.kubernetes.io/instance=%s", compatName))
 			require.NoError(t, err)
+			for _, o := range tc.recreate {
+				_, err = kubectl(kc, "", "delete", o, "-n", namespace)
+				require.NoError(t, err)
+			}
 
-			expected := filterIgnored(contract(operatorObjs), tc.ignore)
-			actual := filterIgnored(contract(chartObjs), tc.ignore)
-			var problems []string
-			for _, line := range expected {
-				if !slices.Contains(actual, line) {
-					problems = append(problems, "operator only: "+line)
-				}
-			}
-			for _, line := range actual {
-				if !slices.Contains(expected, line) && contractObjectIn(line, expected) {
-					problems = append(problems, "chart only:    "+line)
-				}
-			}
-			require.Empty(t, problems, "chart %s differs from the operator:\n%s", tc.chart, strings.Join(problems, "\n"))
+			out, err = helmRun(kc, append(chartArgs, "--take-ownership", "--force-conflicts")...)
+			require.NoError(t, err, "helm install --take-ownership --force-conflicts failed: %s", out)
+			migratedObjs := waitForRollout(t, ctx, kc, namespace, tc.kinds, workloadKinds, byChart)
+			requireSameContract(t, chartObjs, migratedObjs, nil, "chart %s changed after migrating back from the operator", tc.chart)
+			requireKept(t, chartPVCs, mustReleaseObjects(t, kc, namespace, "persistentvolumeclaims"))
+			requireKept(t, slices.DeleteFunc(operatorObjs, func(o *unstructured.Unstructured) bool {
+				return slices.Contains(tc.recreate, o.GetKind()+"/"+o.GetName())
+			}), migratedObjs)
 		})
 	}
 }
@@ -324,8 +372,8 @@ func kubectl(kubeconfig, stdin string, args ...string) ([]byte, error) {
 	return out, nil
 }
 
-// operatorObjects returns objects the operator created for the compatName custom resources of the given kinds.
-func operatorObjects(kubeconfig, namespace string, kinds []string) ([]*unstructured.Unstructured, error) {
+// compatObjects returns compatName objects of the given kinds, whether created by the chart or by the operator.
+func compatObjects(kubeconfig, namespace string, kinds []string) ([]*unstructured.Unstructured, error) {
 	out, err := kubectl(kubeconfig, "", "get", "deployments,statefulsets,daemonsets,services,serviceaccounts,persistentvolumeclaims",
 		"-n", namespace, "-o", "json",
 		"-l", fmt.Sprintf("app.kubernetes.io/instance=%s,app.kubernetes.io/name in (%s)", compatName, strings.Join(kinds, ",")))
@@ -355,44 +403,6 @@ func operatorObjects(kubeconfig, namespace string, kinds []string) ([]*unstructu
 			continue
 		}
 		objs = append(objs, o)
-	}
-	return objs, nil
-}
-
-// chartObjects renders a chart with operator naming and returns the rendered objects.
-func chartObjects(chartDir, namespace string, values map[string]any) ([]*unstructured.Unstructured, error) {
-	args := []string{"template", compatName, chartDir, "--namespace", namespace, "--set", "useLegacyNaming=false"}
-	for k, v := range values {
-		b, err := json.Marshal(v)
-		if err != nil {
-			return nil, err
-		}
-		args = append(args, "--set-json", k+"="+string(b))
-	}
-	cmd := exec.Command("helm", args...)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	out, err := cmd.Output()
-	if err != nil {
-		return nil, fmt.Errorf("helm %s: %w: %s", strings.Join(args, " "), err, stderr.String())
-	}
-	var objs []*unstructured.Unstructured
-	dec := utilyaml.NewYAMLOrJSONDecoder(bytes.NewReader(out), 4096)
-	for {
-		var obj map[string]any
-		if err := dec.Decode(&obj); err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return nil, err
-		}
-		if obj == nil {
-			continue
-		}
-		u := &unstructured.Unstructured{Object: obj}
-		if slices.Contains(compatKinds, u.GetKind()) {
-			objs = append(objs, u)
-		}
 	}
 	return objs, nil
 }
@@ -499,4 +509,141 @@ func withoutOwnership(labels map[string]string) map[string]string {
 		}
 	}
 	return out
+}
+
+// waitForRollout waits until every workload kind has a workload matching owned and all compatName
+// workloads finished rolling out, then returns compatName objects of the given kinds.
+func waitForRollout(t *testing.T, ctx context.Context, kubeconfig, namespace string, kinds, workloadKinds []string, owned func(*unstructured.Unstructured) bool) []*unstructured.Unstructured {
+	t.Helper()
+	var objs []*unstructured.Unstructured
+	err := wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (bool, error) {
+		var err error
+		objs, err = compatObjects(kubeconfig, namespace, kinds)
+		if err != nil {
+			return false, nil
+		}
+		for _, k := range workloadKinds {
+			if !slices.ContainsFunc(objs, func(o *unstructured.Unstructured) bool {
+				return isWorkload(o) && o.GetLabels()["app.kubernetes.io/name"] == k && owned(o)
+			}) {
+				return false, nil
+			}
+		}
+		return !slices.ContainsFunc(objs, func(o *unstructured.Unstructured) bool { return isWorkload(o) && !rolledOut(o) }), nil
+	})
+	require.NoError(t, err, "workloads for %v did not roll out", workloadKinds)
+	return objs
+}
+
+// rolledOut reports whether all replicas of a workload are updated and ready.
+func rolledOut(o *unstructured.Unstructured) bool {
+	generation, _, _ := unstructured.NestedInt64(o.Object, "status", "observedGeneration")
+	if generation < o.GetGeneration() {
+		return false
+	}
+	if o.GetKind() == "DaemonSet" {
+		desired, _, _ := unstructured.NestedInt64(o.Object, "status", "desiredNumberScheduled")
+		updated, _, _ := unstructured.NestedInt64(o.Object, "status", "updatedNumberScheduled")
+		ready, _, _ := unstructured.NestedInt64(o.Object, "status", "numberReady")
+		return desired == updated && desired == ready
+	}
+	desired, found, _ := unstructured.NestedInt64(o.Object, "spec", "replicas")
+	if !found {
+		desired = 1
+	}
+	replicas, _, _ := unstructured.NestedInt64(o.Object, "status", "replicas")
+	updated, _, _ := unstructured.NestedInt64(o.Object, "status", "updatedReplicas")
+	ready, _, _ := unstructured.NestedInt64(o.Object, "status", "readyReplicas")
+	if o.GetKind() == "StatefulSet" {
+		current, _, _ := unstructured.NestedString(o.Object, "status", "currentRevision")
+		update, _, _ := unstructured.NestedString(o.Object, "status", "updateRevision")
+		if current != update {
+			return false
+		}
+	}
+	return replicas == desired && updated == desired && ready == desired
+}
+
+// requireSameContract checks that actual objects are named the same way as expected ones,
+// ignoring objects present only in actual.
+func requireSameContract(t *testing.T, expectedObjs, actualObjs []*unstructured.Unstructured, ignore []string, msg string, args ...any) {
+	t.Helper()
+	expected := filterIgnored(contract(expectedObjs), ignore)
+	actual := filterIgnored(contract(actualObjs), ignore)
+	var problems []string
+	for _, line := range expected {
+		if !slices.Contains(actual, line) {
+			problems = append(problems, "missing:    "+line)
+		}
+	}
+	for _, line := range actual {
+		if !slices.Contains(expected, line) && contractObjectIn(line, expected) {
+			problems = append(problems, "unexpected: "+line)
+		}
+	}
+	require.Empty(t, problems, "%s:\n%s", fmt.Sprintf(msg, args...), strings.Join(problems, "\n"))
+}
+
+// requireKept checks that every expected object except workloads, which may be recreated,
+// is still present in actual with the same UID.
+func requireKept(t *testing.T, expected, actual []*unstructured.Unstructured) {
+	t.Helper()
+	uids := make(map[string]string, len(actual))
+	for _, o := range actual {
+		uids[o.GetKind()+"/"+o.GetName()] = string(o.GetUID())
+	}
+	for _, o := range expected {
+		if isWorkload(o) {
+			continue
+		}
+		key := o.GetKind() + "/" + o.GetName()
+		require.Equal(t, string(o.GetUID()), uids[key], "%s was recreated or removed", key)
+	}
+}
+
+// migrationHelmArgs builds a helm install or upgrade run of the compatName release with operator naming.
+func migrationHelmArgs(verb, chartDir, namespace string, values map[string]any) []string {
+	args := []string{verb, compatName, chartDir, "--namespace", namespace, "--set", "useLegacyNaming=false"}
+	return append(args, migrationValues(values)...)
+}
+
+func migrationValues(values map[string]any) []string {
+	var args []string
+	for k, v := range values {
+		b, _ := json.Marshal(v)
+		args = append(args, "--set-json", k+"="+string(b))
+	}
+	return args
+}
+
+// helmRun runs an arbitrary helm command against the test cluster, returning combined output.
+func helmRun(kubeconfig string, args ...string) ([]byte, error) {
+	cmd := exec.Command("helm", append([]string{"--kubeconfig", kubeconfig}, args...)...)
+	return cmd.CombinedOutput()
+}
+
+func mustReleaseObjects(t *testing.T, kubeconfig, namespace, resources string) []*unstructured.Unstructured {
+	t.Helper()
+	objs, err := releaseObjects(kubeconfig, namespace, resources)
+	require.NoError(t, err)
+	return objs
+}
+
+// releaseObjects returns compatName objects of the given resources, regardless of which controller created them.
+func releaseObjects(kubeconfig, namespace, resources string) ([]*unstructured.Unstructured, error) {
+	out, err := kubectl(kubeconfig, "", "get", resources,
+		"-n", namespace, "-o", "json",
+		"-l", fmt.Sprintf("app.kubernetes.io/instance=%s", compatName))
+	if err != nil {
+		return nil, err
+	}
+	var list unstructured.UnstructuredList
+	if err := json.Unmarshal(out, &list); err != nil {
+		return nil, err
+	}
+	objs := make([]*unstructured.Unstructured, len(list.Items))
+	for i := range list.Items {
+		objs[i] = &list.Items[i]
+	}
+	return objs, nil
 }

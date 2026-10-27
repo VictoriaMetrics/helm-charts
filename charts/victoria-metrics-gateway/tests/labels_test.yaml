@@ -39,6 +39,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmgateway
+            managed-by: vm-operator
         template: networkpolicy.yaml
       - equal:
           path: spec.selector.matchLabels
@@ -46,6 +47,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmgateway
+            managed-by: vm-operator
         template: pdb.yaml
       - equal:
           path: spec.selector
@@ -53,6 +55,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmgateway
+            managed-by: vm-operator
         template: service.yaml
       - equal:
           path: spec.selector.matchLabels
@@ -60,6 +63,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmgateway
+            managed-by: vm-operator
         template: server.yaml
       - isSubset:
           path: spec.template.metadata.labels
@@ -74,6 +78,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmgateway
+            managed-by: vm-operator
         template: monitor.yaml
   - it: "selectors match pod labels with legacy naming"
     set:

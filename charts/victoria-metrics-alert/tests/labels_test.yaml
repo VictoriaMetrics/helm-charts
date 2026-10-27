@@ -49,6 +49,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmalert
+            managed-by: vm-operator
         template: alert-networkpolicy.yaml
       - equal:
           path: spec.podSelector.matchLabels
@@ -56,6 +57,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmalertmanager
+            managed-by: vm-operator
         template: alertmanager-networkpolicy.yaml
       - equal:
           path: spec.selector.matchLabels
@@ -63,6 +65,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmalert
+            managed-by: vm-operator
         template: alert-pdb.yaml
       - equal:
           path: spec.selector
@@ -70,6 +73,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmalert
+            managed-by: vm-operator
         template: alert-service.yaml
       - equal:
           path: spec.selector
@@ -77,6 +81,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmalertmanager
+            managed-by: vm-operator
         template: alertmanager-service.yaml
       - equal:
           path: spec.selector.matchLabels
@@ -84,6 +89,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmalert
+            managed-by: vm-operator
         template: alert-server.yaml
       - isSubset:
           path: spec.template.metadata.labels
@@ -98,6 +104,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmalertmanager
+            managed-by: vm-operator
         template: alertmanager-server.yaml
       - isSubset:
           path: spec.template.metadata.labels
@@ -112,6 +119,7 @@ tests:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmalert
+            managed-by: vm-operator
         template: monitor.yaml
   - it: "selectors match pod labels with legacy naming"
     set:
