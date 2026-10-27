@@ -33,7 +33,9 @@ spec:
       {{- $_ := set $ctx "extraAnnotations" $app.podAnnotations }}
       {{- if or (include "vm.annotations" $ctx) $app.relabel.enabled }}
       annotations:
+        {{- if $app.relabel.enabled }}
         checksum/config: {{ include (print $.Template.BasePath "/relabel-configmap.yaml") . | sha256sum }}
+        {{- end }}
         {{- with (include "vm.annotations" $ctx) }}
         {{ . | nindent 8 }}
         {{- end }}
