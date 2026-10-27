@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `checksum/config` annotation on `vmauth` pods to automatically trigger a deployment rollout when content of secret changes.
 
 ## v0.2.11
 

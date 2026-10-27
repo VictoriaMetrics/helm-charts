@@ -4,6 +4,7 @@ chart:
   appVersion: 0.1.0
 templates:
   - vmauth-server.yaml
+  - vmauth-config.yaml
 tests:
   - it: deployment should match empty snapshot
     asserts:
@@ -14,6 +15,7 @@ tests:
         enabled: true
     asserts:
       - matchSnapshot: {}
+        template: vmauth-server.yaml
   - it: deployment should match snapshot with fullnameOverride, extraLabels and podLabels
     set:
       vmauth:
@@ -26,6 +28,7 @@ tests:
           podLabelName: podLabelValue
     asserts:
       - matchSnapshot: {}
+        template: vmauth-server.yaml
   - it: should render custom command
     set:
       vmauth:
@@ -33,7 +36,8 @@ tests:
         command:
           - /custom/bin/vmauth
     asserts:
-      - equal:
+      - template: vmauth-server.yaml
+        equal:
           path: spec.template.spec.containers[0].command
           value:
             - /custom/bin/vmauth
