@@ -9,9 +9,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   {{- $_ := set $ctx "extraAnnotations" $app.annotations }}
-  {{- with (include "vm.annotations" $ctx) }}
-  annotations: {{ . | nindent 4 }}
-  {{- end }}
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/vmauth-config.yaml") . | sha256sum }}
+    {{- with (include "vm.annotations" $ctx) }}
+    {{ . | nindent 4 }}
+    {{- end }}
   {{- $_ := unset $ctx "extraAnnotations" }}
   {{- $_ := set $ctx "extraLabels" $app.extraLabels }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
