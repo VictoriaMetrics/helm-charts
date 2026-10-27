@@ -30,15 +30,13 @@ spec:
   {{- end }}
   template:
     metadata:
-      {{- $_ := set $ctx "extraAnnotations" $app.podAnnotations }}
-      {{- if or (include "vm.annotations" $ctx) $app.relabel.enabled }}
-      annotations:
-        {{- if $app.relabel.enabled }}
-        checksum/config: {{ include (print $.Template.BasePath "/relabel-configmap.yaml") . | sha256sum }}
-        {{- end }}
-        {{- with (include "vm.annotations" $ctx) }}
-        {{- . | nindent 8 }}
-        {{- end }}
+      {{- $podAnnotations := deepCopy (default dict $app.podAnnotations) }}
+      {{- if and $app.relabel.enabled (empty $app.relabel.configMap) }}
+        {{- $_ := set $podAnnotations "checksum/config" (include (print $.Template.BasePath "/relabel-configmap.yaml") . | sha256sum) }}
+      {{- end }}
+      {{- $_ := set $ctx "extraAnnotations" $podAnnotations }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
       {{- end }}
       {{- $_ := unset $ctx "extraAnnotations" }}
       {{- $_ := set $ctx "extraLabels" $app.podLabels }}

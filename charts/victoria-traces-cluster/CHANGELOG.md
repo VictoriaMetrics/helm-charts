@@ -1,6 +1,6 @@
 ## Next release
 
-- add `checksum/config` annotation on `vmauth` pods to automatically trigger a deployment rollout when content of secret changes.
+- add `checksum/config` annotation on `vmauth` pods to trigger a rollout when the chart-managed vmauth Secret changes. Externally managed `vmauth.configSecretName` is not tracked.
 
 ## v0.2.11
 

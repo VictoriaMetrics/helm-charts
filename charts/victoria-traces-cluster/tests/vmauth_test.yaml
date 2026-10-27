@@ -45,3 +45,23 @@ tests:
           path: spec.template.spec.containers[0].command
           value:
             - /custom/bin/vmauth
+  - it: generated checksum overrides podAnnotations
+    set:
+      vmauth:
+        enabled: true
+        podAnnotations:
+          checksum/config: custom
+    asserts:
+      - template: vmauth-server.yaml
+        notEqual:
+          path: spec.template.metadata.annotations["checksum/config"]
+          value: custom
+  - it: should not render checksum with external config secret
+    set:
+      vmauth:
+        enabled: true
+        configSecretName: external
+    asserts:
+      - template: vmauth-server.yaml
+        notExists:
+          path: spec.template.metadata.annotations["checksum/config"]
