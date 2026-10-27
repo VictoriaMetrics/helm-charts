@@ -18,6 +18,7 @@ spec:
   selector:
     matchLabels: {{ include "vm.selectorLabels" $ctx | nindent 6 }}
   serviceName: {{ include "vm.plain.fullname" $ctx }}
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
   {{- $hpa := .Values.horizontalPodAutoscaling | default .Values.horizontalPodAutoscaler }}
   {{- if not $hpa.enabled }}
   replicas: {{ .Values.replicaCount }}

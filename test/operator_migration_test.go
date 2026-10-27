@@ -37,15 +37,12 @@ type migrationCase struct {
 	workloadKinds []string
 	// ignore lists contract entries that intentionally differ, as "<kind>/<name> <field>"
 	ignore []string
-	// recreate lists objects that can't be adopted by the chart in place and are deleted
-	// before migrating back from the operator, as "<kind>/<name>"
-	recreate []string
 }
 
 var migrationCases = []migrationCase{
 	{
-		chart:      "victoria-metrics-single",
-		values:     map[string]any{"server.mode": "deployment"},
+		chart:  "victoria-metrics-single",
+		values: map[string]any{"server.mode": "deployment"},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMSingle
@@ -58,11 +55,10 @@ spec:
 			"Deployment/vmsingle-compat container[vmsingle].port=",
 			"Service/vmsingle-compat port=",
 		},
-		recreate: []string{"Service/vmsingle-compat"},
 	},
 	{
-		chart:      "victoria-logs-single",
-		values:     map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
+		chart:  "victoria-logs-single",
+		values: map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1
 kind: VLSingle
@@ -72,8 +68,8 @@ spec:
 		kinds: []string{"vlsingle"},
 	},
 	{
-		chart:      "victoria-traces-single",
-		values:     map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
+		chart:  "victoria-traces-single",
+		values: map[string]any{"server.mode": "deployment", "serviceAccount.create": true},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1
 kind: VTSingle
@@ -101,22 +97,24 @@ spec:
 	},
 	{
 		chart:  "victoria-logs-agent",
-		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:9428"}}, "service.enabled": true},
+		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:9428"}}, "service.enabled": true, "podManagementPolicy": "Parallel"},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1
 kind: VLAgent
 spec:
+  rollingUpdateStrategy: RollingUpdate
   remoteWrite: [{url: "http://x:9428/internal/insert"}]
 `,
 		kinds: []string{"vlagent"},
 	},
 	{
 		chart:  "victoria-traces-agent",
-		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:10428"}}},
+		values: map[string]any{"remoteWrite": []any{map[string]any{"url": "http://x:10428"}}, "podManagementPolicy": "Parallel"},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1
 kind: VTAgent
 spec:
+  rollingUpdateStrategy: RollingUpdate
   remoteWrite: [{url: "http://x:10428/insert/native"}]
 `,
 		kinds: []string{"vtagent"},
@@ -140,6 +138,7 @@ spec:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlertmanager
 spec:
+  rollingUpdateStrategy: RollingUpdate
   replicaCount: 2
 `,
 		kinds: []string{"vmalert", "vmalertmanager"},
@@ -177,10 +176,12 @@ spec:
   retentionPeriod: "1"
   vmstorage:
     replicaCount: 2
+    rollingUpdateStrategy: RollingUpdate
     resources: {requests: {cpu: 10m, memory: 32Mi}}
     storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 8Gi}}}}}
   vmselect:
     replicaCount: 2
+    rollingUpdateStrategy: RollingUpdate
     resources: {requests: {cpu: 10m, memory: 32Mi}}
   vminsert:
     replicaCount: 2
@@ -198,6 +199,7 @@ kind: VLCluster
 spec:
   vlstorage:
     replicaCount: 2
+    rollingUpdateStrategy: RollingUpdate
     resources: {requests: {cpu: 10m, memory: 32Mi}}
     storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
   vlselect:
@@ -219,6 +221,7 @@ kind: VTCluster
 spec:
   storage:
     replicaCount: 2
+    rollingUpdateStrategy: RollingUpdate
     resources: {requests: {cpu: 10m, memory: 32Mi}}
     storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
   select:
@@ -236,9 +239,10 @@ spec:
 var manifestKindRe = regexp.MustCompile(`(?m)^kind: (\w+)$`)
 
 // TestOperatorMigration checks that a release installed with `useLegacyNaming: false` can be replaced
-// by an equivalent operator custom resource and back. Workloads may be recreated and pods restarted,
-// but Services, ServiceAccounts and PersistentVolumeClaims have to be kept, and workloads, services,
-// service accounts, volumes, containers and ports have to be named the same way by the chart and the operator.
+// by an equivalent operator custom resource and back. Pods may be restarted, and the operator may recreate
+// StatefulSets with changed claim templates, but Services, ServiceAccounts and PersistentVolumeClaims have
+// to be kept, and workloads, services, service accounts, volumes, containers and ports have to be named
+// the same way by the chart and the operator.
 //
 // Chart -> operator:
 //  1. Helm release secrets are deleted, so that Helm forgets the release without deleting its objects;
@@ -249,12 +253,9 @@ var manifestKindRe = regexp.MustCompile(`(?m)^kind: (\w+)$`)
 //  1. the custom resource is paused, so that an in-flight reconcile doesn't put back owner references
 //     the orphaning delete removes, which would make the garbage collector delete the objects;
 //  2. `kubectl delete <cr> --cascade=orphan` removes the custom resource without deleting its children;
-//  3. `kubectl delete deployments,statefulsets,daemonsets --cascade=orphan` removes the workloads but keeps
-//     their pods and claims: they can't be adopted in place, since StatefulSet spec is mostly immutable and
-//     server-side apply keeps operator-owned fields, e.g. an httpGet probe next to the chart's tcpSocket one;
-//  4. objects that still can't be adopted, e.g. a Service with differently named ports, are deleted;
-//  5. `helm install --take-ownership --force-conflicts` adopts the remaining objects and recreates
-//     the deleted ones, workloads adopt the orphaned pods.
+//  3. fields managed by the operator are handed over to Helm's field manager, otherwise server-side apply
+//     would keep fields the chart doesn't render, e.g. an httpGet probe next to the chart's tcpSocket one;
+//  4. `helm install --take-ownership --force-conflicts` adopts the objects in place, removing such fields.
 //
 // The operator has to be running in the cluster before the test starts.
 func TestOperatorMigration(t *testing.T) {
@@ -329,23 +330,59 @@ func TestOperatorMigration(t *testing.T) {
 				_, err = kubectl(kc, "", "delete", strings.ToLower(k), compatName, "-n", namespace, "--cascade=orphan")
 				require.NoError(t, err)
 			}
-			_, err = kubectl(kc, "", "delete", "deployments,statefulsets,daemonsets", "-n", namespace, "--cascade=orphan",
-				"-l", fmt.Sprintf("app.kubernetes.io/instance=%s", compatName))
-			require.NoError(t, err)
-			for _, o := range tc.recreate {
-				_, err = kubectl(kc, "", "delete", o, "-n", namespace)
-				require.NoError(t, err)
-			}
+			handOverToHelm(t, kc, namespace)
 
 			out, err = helmRun(kc, append(chartArgs, "--take-ownership", "--force-conflicts")...)
 			require.NoError(t, err, "helm install --take-ownership --force-conflicts failed: %s", out)
 			migratedObjs := waitForRollout(t, ctx, kc, namespace, tc.kinds, workloadKinds, byChart)
 			requireSameContract(t, chartObjs, migratedObjs, nil, "chart %s changed after migrating back from the operator", tc.chart)
 			requireKept(t, chartPVCs, mustReleaseObjects(t, kc, namespace, "persistentvolumeclaims"))
-			requireKept(t, slices.DeleteFunc(operatorObjs, func(o *unstructured.Unstructured) bool {
-				return slices.Contains(tc.recreate, o.GetKind()+"/"+o.GetName())
-			}), migratedObjs)
+			requireKept(t, operatorObjs, migratedObjs)
 		})
+	}
+}
+
+// handOverToHelm makes Helm's field manager the only owner of all non-subresource fields of compatName objects,
+// so that `helm install --take-ownership` removes fields the chart doesn't render.
+func handOverToHelm(t *testing.T, kubeconfig, namespace string) {
+	t.Helper()
+	out, err := kubectl(kubeconfig, "", "get", "deployments,statefulsets,daemonsets,services,serviceaccounts,secrets,configmaps,poddisruptionbudgets",
+		"-n", namespace, "-o", "json", "--show-managed-fields", "-l", fmt.Sprintf("app.kubernetes.io/instance=%s", compatName))
+	require.NoError(t, err)
+	var list unstructured.UnstructuredList
+	require.NoError(t, json.Unmarshal(out, &list))
+	for _, o := range list.Items {
+		fields := map[string]any{}
+		managed := []metav1.ManagedFieldsEntry{{Manager: "helm", Operation: metav1.ManagedFieldsOperationApply, APIVersion: o.GetAPIVersion(), FieldsType: "FieldsV1"}}
+		for _, e := range o.GetManagedFields() {
+			if e.Subresource != "" {
+				managed = append(managed, e)
+				continue
+			}
+			var f map[string]any
+			require.NoError(t, json.Unmarshal(e.FieldsV1.Raw, &f))
+			mergeFields(fields, f)
+		}
+		raw, err := json.Marshal(fields)
+		require.NoError(t, err)
+		managed[0].FieldsV1 = &metav1.FieldsV1{Raw: raw}
+		patch, err := json.Marshal([]map[string]any{{"op": "replace", "path": "/metadata/managedFields", "value": managed}})
+		require.NoError(t, err)
+		_, err = kubectl(kubeconfig, "", "patch", strings.ToLower(o.GetKind()), o.GetName(), "-n", namespace, "--type=json", "-p", string(patch))
+		require.NoError(t, err)
+	}
+}
+
+// mergeFields adds the field set src to dst.
+func mergeFields(dst, src map[string]any) {
+	for k, v := range src {
+		sv, ok := v.(map[string]any)
+		dv, dok := dst[k].(map[string]any)
+		if ok && dok {
+			mergeFields(dv, sv)
+		} else {
+			dst[k] = v
+		}
 	}
 }
 

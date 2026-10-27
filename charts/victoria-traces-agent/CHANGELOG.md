@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- add `podManagementPolicy` option for the StatefulSet. Set it to `Parallel` to match the StatefulSet created by the VictoriaMetrics operator, so that it can be adopted in place when migrating from a VTAgent custom resource.
 
 ## v0.2.1
 
