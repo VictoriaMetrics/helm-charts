@@ -37,7 +37,7 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/relabel-configmap.yaml") . | sha256sum }}
         {{- end }}
         {{- with (include "vm.annotations" $ctx) }}
-        {{ . | nindent 8 }}
+        {{- . | nindent 8 }}
         {{- end }}
       {{- end }}
       {{- $_ := unset $ctx "extraAnnotations" }}
