@@ -22,6 +22,12 @@ items:
       {{- $_ := set $ctx "extraLabels" $extraLabels }}
       labels: {{ include "vm.labels" $ctx | nindent 8 }}
       {{- $_ := unset $ctx "extraLabels" }}
+      {{- $extraAnnotations := mergeOverwrite (deepCopy ($spec.annotations | default dict)) (deepCopy ($spec.additionalAnnotations | default dict)) -}}
+      {{- $_ := set $ctx "extraAnnotations" $extraAnnotations }}
+      {{- with (include "vm.annotations" $ctx) }}
+      annotations: {{ . | nindent 8 }}
+      {{- end }}
+      {{- $_ := unset $ctx "extraAnnotations" }}
     spec:
       groups: {{ toYaml $spec.groups | nindent 8 }}
   {{- end }}

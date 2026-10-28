@@ -15,6 +15,9 @@ metadata:
   name: {{ $fullname }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 spec: {{ toYaml .Values.alertmanager.config | nindent 2 }}
   {{- else }}
 ---
@@ -24,6 +27,9 @@ metadata:
   name: {{ include "vm.managed.fullname" $ctx }}
   namespace: {{ $ns }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
 stringData:
   {{- $config := (.Values.alertmanager).config | default dict }}
   {{- $templates := concat (list "/etc/vm/templates/**/*.tmpl") ($config.templates | default list) | uniq }}
@@ -35,9 +41,11 @@ stringData:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlertmanager
 metadata:
-  {{- with .Values.alertmanager.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
-  {{- end  }}
+  {{- $_ := set $ctx "extraAnnotations" $app.annotations }}
+  {{- with (include "vm.annotations" $ctx) }}
+  annotations: {{ . | nindent 4 }}
+  {{- end }}
+  {{- $_ := unset $ctx "extraAnnotations" }}
   name: {{ $fullname }}
   namespace: {{ $ns }}
   {{- $_ := set $ctx "extraLabels" ($app.labels | default dict) }}
