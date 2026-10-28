@@ -56,8 +56,8 @@ They are not kept in sync with upstream, and the chart has no values to tune ind
 - keep the default jobs and append your own via `extraScrapeConfigs`;
 - set `config.scrape_configs` to your own list, using the defaults as a template. Since it is a list, it replaces all default jobs.
 
-For example, to scrape services that expose metrics only over HTTPS while keeping the default jobs, annotate them with a dedicated annotation
-instead of `prometheus.io/scrape`, so default jobs skip them, and add a job with `tls_config`:
+For example, to scrape services that expose metrics only over HTTPS while keeping the default jobs, annotate them with `prometheus.io/scrape-https: "true"`
+instead of `prometheus.io/scrape`, so default jobs skip them, and add a job with `tls_config`. `prometheus.io/path` and `prometheus.io/port` annotations work as in default jobs:
 
 ```yaml
 # values.yaml
@@ -70,9 +70,14 @@ extraScrapeConfigs:
     kubernetes_sd_configs:
       - role: endpointslice
     relabel_configs:
-      - source_labels: [__meta_kubernetes_service_annotation_example_com_scrape_https]
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape_https]
         action: keep
         regex: "true"
+      - action: keep_if_equal
+        source_labels: [__meta_kubernetes_service_annotation_prometheus_io_port, __meta_kubernetes_pod_container_port_number]
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        target_label: __metrics_path__
+        regex: (.+)
       - source_labels: [__meta_kubernetes_namespace]
         target_label: namespace
       - source_labels: [__meta_kubernetes_service_name]
@@ -80,7 +85,8 @@ extraScrapeConfigs:
 ```
 
 For per-service scrape settings consider the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/)
-and [VMServiceScrape](https://docs.victoriametrics.com/operator/resources/vmservicescrape/) resources.
+or the [victoria-metrics-k8s-stack](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/) chart, which installs it,
+with [VMServiceScrape](https://docs.victoriametrics.com/operator/resources/vmservicescrape/) resources. They select targets by labels instead of `prometheus.io/*` annotations.
 
 ### Daemonset mode
 
