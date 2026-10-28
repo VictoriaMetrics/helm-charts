@@ -48,6 +48,40 @@ remoteWrite:
 
 ## Examples
 
+### Scrape configuration
+
+Default `config.scrape_configs` are a starting point adapted from the archived Prometheus chart.
+They are not kept in sync with upstream, and the chart has no values to tune individual default jobs. To change scraping, either:
+
+- keep the default jobs and append your own via `extraScrapeConfigs`;
+- set `config.scrape_configs` to your own list, using the defaults as a template. Since it is a list, it replaces all default jobs.
+
+For example, to scrape services that expose metrics only over HTTPS while keeping the default jobs, annotate them with a dedicated annotation
+instead of `prometheus.io/scrape`, so default jobs skip them, and add a job with `tls_config`:
+
+```yaml
+# values.yaml
+
+extraScrapeConfigs:
+  - job_name: kubernetes-service-endpoints-https
+    scheme: https
+    tls_config:
+      server_name: my-service.example.com
+    kubernetes_sd_configs:
+      - role: endpointslice
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_example_com_scrape_https]
+        action: keep
+        regex: "true"
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_service_name]
+        target_label: service
+```
+
+For per-service scrape settings consider the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/)
+and [VMServiceScrape](https://docs.victoriametrics.com/operator/resources/vmservicescrape/) resources.
+
 ### Daemonset mode
 
 The `vmagent` can be deployed as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/), launching one pod per Kubernetes node.
