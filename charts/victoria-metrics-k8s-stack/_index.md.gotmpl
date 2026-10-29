@@ -36,6 +36,17 @@ This chart is an All-in-one solution to start monitoring and logging in a Kubern
 It installs multiple dependency charts like [grafana](https://github.com/grafana/helm-charts/tree/main/charts/grafana), [node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter), [kube-state-metrics](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics) and [victoria-metrics-operator](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-operator).
 Also it installs Custom Resources like [VMSingle](https://docs.victoriametrics.com/operator/resources/vmsingle/), [VMCluster](https://docs.victoriametrics.com/operator/resources/vmcluster/), [VMAgent](https://docs.victoriametrics.com/operator/resources/vmagent/), [VMAlert](https://docs.victoriametrics.com/operator/resources/vmalert/) for metrics, optionally [VLSingle](https://docs.victoriametrics.com/operator/resources/vlsingle/), [VLCluster](https://docs.victoriametrics.com/operator/resources/vlcluster/), [VLAgent](https://docs.victoriametrics.com/operator/resources/vlagent/) for logs, and [VTSingle](https://docs.victoriametrics.com/operator/resources/vtsingle/), [VTCluster](https://docs.victoriametrics.com/operator/resources/vtcluster/) for traces.
 
+> [!NOTE]
+> This chart doesn't render Deployments, StatefulSets, DaemonSets or Services for VictoriaMetrics, VictoriaLogs and VictoriaTraces components.
+> It renders custom resources, and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) creates and manages workloads from them.
+> Component values like `vmsingle.spec`, `vmagent.spec` or `vmcluster.spec` are passed to the custom resource spec as is,
+> so only fields described in the [operator API reference](https://docs.victoriametrics.com/operator/api/) can be configured.
+> If you need full control over Kubernetes resources, use standalone charts instead: [victoria-metrics-single](https://docs.victoriametrics.com/helm/victoria-metrics-single/),
+> [victoria-metrics-cluster](https://docs.victoriametrics.com/helm/victoria-metrics-cluster/), [victoria-metrics-agent](https://docs.victoriametrics.com/helm/victoria-metrics-agent/),
+> [victoria-metrics-alert](https://docs.victoriametrics.com/helm/victoria-metrics-alert/), [victoria-metrics-auth](https://docs.victoriametrics.com/helm/victoria-metrics-auth/),
+> [victoria-logs-single](https://docs.victoriametrics.com/helm/victoria-logs-single/), [victoria-logs-cluster](https://docs.victoriametrics.com/helm/victoria-logs-cluster/),
+> [victoria-traces-single](https://docs.victoriametrics.com/helm/victoria-traces-single/) and [victoria-traces-cluster](https://docs.victoriametrics.com/helm/victoria-traces-cluster/).
+
 By default, the operator [converts all existing prometheus-operator API objects](https://docs.victoriametrics.com/operator/integrations/prometheus/#objects-conversion) into corresponding VictoriaMetrics Operator objects.
 
 To enable metrics collection for kubernetes this chart installs multiple scrape configurations for kubernetes components like kubelet and kube-proxy, etc. Metrics collection is done by [VMAgent](https://docs.victoriametrics.com/operator/resources/vmagent/). So if want to ship metrics to external VictoriaMetrics database you can disable VMSingle installation by setting `vmsingle.enabled` to `false` and setting `vmagent.vmagentSpec.remoteWrite.url` to your external VictoriaMetrics database.
