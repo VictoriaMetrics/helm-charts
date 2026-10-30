@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- docs: point the cAdvisor scrape config comment to the moved prometheus-operator issue link
 
 ## v0.51.0
 

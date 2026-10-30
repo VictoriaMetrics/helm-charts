@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix the App Changelog link in `Chart.yaml`, which pointed to a non-existent page
 
 ## v0.2.1
 
