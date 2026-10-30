@@ -1,5 +1,5 @@
 {{- $service := .Values.service }}
-{{- if $service.enabled }}
+{{- if and $service.enabled (not (include "vm.operator.enabled" .)) }}
 {{- $shardingEnabled := gt (int .Values.shardsCount) 1 }}
 {{- if $shardingEnabled }}
   {{- fail ".Values.service.enabled is not allowed when sharding is enabled" }}

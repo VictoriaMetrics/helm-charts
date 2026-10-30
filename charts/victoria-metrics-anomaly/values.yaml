@@ -1,6 +1,13 @@
 # Default values for victoria-metrics-anomaly.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+# -- Use legacy naming convention (release-name based). When false, resource names
+# -- use the same convention as the operator (type-prefixed, e.g. vmanomaly-<release>).
+# -- The default (`true`) exists for historical reasons and backwards compatibility with existing deployments.
+# -- For new deployments, setting this to `false` is recommended to match VictoriaMetrics operator naming
+# -- and simplify future migration to operator-managed resources.
+useLegacyNaming: true
 global:
   # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
@@ -381,6 +388,21 @@ route:
     - path:
         type: PathPrefix
         value: '/'
+
+# Deploy vmanomaly through the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/).
+# See https://docs.victoriametrics.com/helm/victoria-metrics-anomaly/#victoriametrics-operator for details.
+operator:
+  # -- Render a [VMAnomaly](https://docs.victoriametrics.com/operator/resources/vmanomaly/) resource built from chart values
+  # instead of the chart's own Deployment/StatefulSet, config ConfigMap, PodDisruptionBudget and VMPodScrape.
+  # Requires the VictoriaMetrics operator and its CRDs in the cluster
+  enabled: false
+  # -- VMAnomaly labels
+  labels: {}
+  # -- VMAnomaly annotations
+  annotations: {}
+  # -- VMAnomaly spec fields deep-merged over the spec generated from chart values.
+  # Use it for operator-only settings or to override generated ones. See [VMAnomalySpec](https://docs.victoriametrics.com/operator/api/#vmanomalyspec)
+  spec: {}
 
 # -- Add extra specs dynamically to this chart
 extraObjects: []

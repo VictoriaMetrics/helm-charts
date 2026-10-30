@@ -1,0 +1,125 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $app := .Values }}
+{{- $ctx := dict
+    "helm" .
+    "kindOverride" "vmauth"
+}}
+{{- if ne $app.mode "deployment" }}
+  {{- fail (printf "`mode: %s` is not supported by the VMAuth resource with `operator.enabled: true`; use `mode: deployment`" $app.mode) }}
+{{- end }}
+{{- $appSpec := include "vm.operator.app.spec" (dict
+    "helm" .
+    "app" $app
+    "kindOverride" "vmauth"
+    "scrape" .Values.serviceMonitor
+    "scrapePath" "serviceMonitor"
+) }}
+{{- $spec := fromYaml $appSpec }}
+{{- $externalConfigSecretRef := dict
+    "name" ($app.secretName | default (include "vmauth.config.name" $ctx))
+    "key" "auth.yml"
+}}
+{{- $_ := set $spec "externalConfig" (dict "secretRef" $externalConfigSecretRef) }}
+{{- with $app.deployment.spec.strategy }}
+  {{- with .type }}
+    {{- $_ := set $spec "updateStrategy" . }}
+  {{- end }}
+  {{- with .rollingUpdate }}
+    {{- $_ := set $spec "rollingUpdate" . }}
+  {{- end }}
+{{- end }}
+{{- $ingress := $app.ingress }}
+{{- if $ingress.enabled }}
+  {{- if and $ingress.pathType (ne $ingress.pathType "Prefix") }}
+    {{- fail "`ingress.pathType` other than `Prefix` is not converted with `operator.enabled: true`; set `operator.spec.ingress.extraRules` instead" }}
+  {{- end }}
+  {{- $spec_ingress := dict }}
+  {{- with $ingress.annotations }}
+    {{- $_ := set $spec_ingress "annotations" . }}
+  {{- end }}
+  {{- with $ingress.extraLabels }}
+    {{- $_ := set $spec_ingress "labels" . }}
+  {{- end }}
+  {{- with $ingress.ingressClassName }}
+    {{- $_ := set $spec_ingress "class_name" . }}
+  {{- end }}
+  {{- $rules := list }}
+  {{- range $i, $host := $ingress.hosts }}
+    {{- $paths := ternary (list $host.path) $host.path (kindIs "string" $host.path) }}
+    {{- if eq $i 0 }}
+      {{- $_ := set $spec_ingress "host" (tpl $host.name $) }}
+      {{- $_ := set $spec_ingress "paths" $paths }}
+    {{- else }}
+      {{- $rulePaths := list }}
+      {{- range $paths }}
+        {{- $backendService := dict
+            "name" (include "vm.plain.fullname" $ctx)
+            "port" (fromYaml (include "vm.ingress.port" $host))
+        }}
+        {{- $rulePath := dict
+            "path" .
+            "pathType" "Prefix"
+            "backend" (dict "service" $backendService)
+        }}
+        {{- $rulePaths = append $rulePaths $rulePath }}
+      {{- end }}
+      {{- $rule := dict
+          "host" (tpl $host.name $)
+          "http" (dict "paths" $rulePaths)
+      }}
+      {{- $rules = append $rules $rule }}
+    {{- end }}
+  {{- end }}
+  {{- with $rules }}
+    {{- $_ := set $spec_ingress "extraRules" . }}
+  {{- end }}
+  {{- range $i, $tls := (fromYamlArray (tpl (toYaml ($ingress.tls | default list)) $)) }}
+    {{- if eq $i 0 }}
+      {{- $_ := set $spec_ingress "tlsSecretName" $tls.secretName }}
+      {{- $_ := set $spec_ingress "tlsHosts" $tls.hosts }}
+    {{- else }}
+      {{- $_ := set $spec_ingress "extraTls" (append ($spec_ingress.extraTls | default list) $tls) }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $spec "ingress" $spec_ingress }}
+{{- end }}
+{{- $route := $app.route }}
+{{- if $route.enabled }}
+  {{- if $route.filters }}
+    {{- fail "`route.filters` is not converted with `operator.enabled: true`; set `operator.spec.httpRoute.extraRules` instead" }}
+  {{- end }}
+  {{- $defaultRoutePath := dict
+      "type" "PathPrefix"
+      "value" "/"
+  }}
+  {{- $defaultRouteMatch := dict "path" $defaultRoutePath }}
+  {{- if and $route.matches (ne (toJson $route.matches) (toJson (list $defaultRouteMatch))) }}
+    {{- fail "`route.matches` other than the default `/` prefix is not converted with `operator.enabled: true`; set `operator.spec.httpRoute.extraRules` instead" }}
+  {{- end }}
+  {{- $httpRoute := dict }}
+  {{- range $key := list "annotations" "parentRefs" "hostnames" "extraRules" }}
+    {{- with index $route $key }}
+      {{- $_ := set $httpRoute $key (fromYaml (tpl (toYaml (dict "v" .)) $)).v }}
+    {{- end }}
+  {{- end }}
+  {{- with $route.extraLabels }}
+    {{- $_ := set $httpRoute "labels" . }}
+  {{- end }}
+  {{- $_ := set $spec "httpRoute" $httpRoute }}
+{{- end }}
+{{- $crSpec := dict
+    "helm" .
+    "spec" $spec
+}}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" $crSpec | nindent 2 }}
+{{- end }}

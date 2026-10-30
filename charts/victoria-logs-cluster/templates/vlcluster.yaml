@@ -1,0 +1,125 @@
+{{- if include "vm.operator.enabled" . }}
+{{- $Values := .Values }}
+{{- $ctx := dict
+    "helm" .
+    "kindOverride" "vlcluster"
+}}
+{{- $spec := fromYaml (include "vm.operator.resource.spec" (dict "helm" .)) }}
+{{- $storage := $Values.vlstorage }}
+{{- if $storage.enabled }}
+  {{- $componentSpec := include "vm.operator.cluster.component" (dict
+      "helm" .
+      "appKey" "vlstorage"
+      "kindOverride" "vlstorage"
+      "app" $storage
+      "scrape" $storage.vmServiceScrape
+      "scrapePath" "vlstorage.vmServiceScrape"
+  ) }}
+  {{- $component := fromYaml $componentSpec }}
+  {{- $extraArgs := $component.extraArgs | default dict }}
+  {{- with $storage.retentionPeriod }}
+    {{- $_ := set $component "retentionPeriod" (toString .) }}
+  {{- end }}
+  {{- with $storage.retentionDiskSpaceUsage }}
+    {{- $_ := set $component "retentionMaxDiskSpaceUsageBytes" (ternary (printf "%dGiB" (int .)) (toString .) (gt (int .) 0)) }}
+  {{- end }}
+  {{- with $storage.retentionMaxDiskUsagePercent }}
+    {{- $_ := set $extraArgs "retention.maxDiskUsagePercent" (toString .) }}
+    {{- $_ := set $component "extraArgs" $extraArgs }}
+  {{- end }}
+  {{- $pvc := $storage.persistentVolume }}
+  {{- if and $pvc.enabled $pvc.existingClaim }}
+    {{- $_ := set $component "storageDataPath" $pvc.mountPath }}
+    {{- $volume := dict
+        "name" "vlstorage-db"
+        "persistentVolumeClaim" (dict "claimName" (tpl $pvc.existingClaim .))
+    }}
+    {{- $_ := set $component "volumes" (append ($component.volumes | default list) $volume) }}
+  {{- else if $pvc.enabled }}
+    {{- $volumeNameCtx := dict
+        "helm" .
+        "appKey" "vlstorage"
+    }}
+    {{- $claimName := $pvc.name | default (include "vlstorage.volume.name" $volumeNameCtx) }}
+    {{- $template := dict
+        "metadata" (dict "name" $claimName)
+        "spec" (fromYaml (include "vm.operator.storage" (dict "persistentVolume" $pvc)))
+    }}
+    {{- $_ := set $component "storage" (dict "volumeClaimTemplate" $template) }}
+  {{- end }}
+  {{- $_ := set $spec "vlstorage" $component }}
+{{- end }}
+{{- $components := dict
+    "vlselect" "vlselect"
+    "vlinsert" "vlinsert"
+}}
+{{- range $name, $key := $components }}
+  {{- $app := index $Values $name }}
+  {{- if $app.enabled }}
+    {{- with $app.excludeStorageIDs }}
+      {{- if (index $spec "vlstorage") }}
+        {{- $ids := list }}
+        {{- range . }}
+          {{- $ids = append $ids (int .) }}
+        {{- end }}
+        {{- $_ := set (index $spec "vlstorage") (ternary "maintenanceInsertNodeIDs" "maintenanceSelectNodeIDs" (hasSuffix "insert" $name)) $ids }}
+      {{- end }}
+    {{- end }}
+    {{- $componentSpec := include "vm.operator.cluster.component" (dict
+        "helm" $
+        "appKey" $name
+        "kindOverride" $name
+        "app" $app
+        "scrape" $app.vmServiceScrape
+        "scrapePath" (printf "%s.vmServiceScrape" $name)
+    ) }}
+    {{- $component := fromYaml $componentSpec }}
+    {{- if eq $name "vlinsert" }}
+      {{- $extraArgs := $component.extraArgs | default dict }}
+      {{- if and (empty (index $extraArgs "syslog.listenAddr.tcp")) (empty (index $extraArgs "syslog.listenAddr.udp")) }}
+        {{- with (include "vm.operator.syslog.spec" (dict "syslog" $app.syslog)) }}
+          {{- $_ := set $component "syslogSpec" (fromYaml .) }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- $_ := set $spec $key $component }}
+  {{- end }}
+{{- end }}
+{{- $auth := $Values.vmauth }}
+{{- if $auth.enabled }}
+  {{- if or $auth.config $auth.configSecretName }}
+    {{- fail "`vmauth.config` and `vmauth.configSecretName` are not converted with `operator.enabled: true`; the operator load balancer generates its own routing config, customize it in `operator.spec.requestsLoadBalancer`" }}
+  {{- end }}
+  {{- if ($auth.verticalPodAutoscaler).enabled }}
+    {{- fail "`vmauth.verticalPodAutoscaler` is not supported by the operator load balancer with `operator.enabled: true`" }}
+  {{- end }}
+  {{- $lbSpec := include "vm.operator.cluster.component" (dict
+      "helm" .
+      "appKey" "vmauth"
+      "kindOverride" "vmauth"
+      "app" $auth
+      "scrape" $auth.vmServiceScrape
+      "scrapePath" "vmauth.vmServiceScrape"
+  ) }}
+  {{- $lb := fromYaml $lbSpec }}
+  {{- $_ := set $spec "requestsLoadBalancer" (dict
+    "enabled" true
+    "spec" $lb
+  ) }}
+{{- end }}
+{{- $crSpec := dict
+    "helm" .
+    "spec" $spec
+}}
+---
+apiVersion: operator.victoriametrics.com/v1
+kind: VLCluster
+metadata:
+  name: {{ include "vm.operator.cr.name" $ctx }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  labels: {{ include "vm.operator.cr.labels" $ctx | nindent 4 }}
+  {{- with .Values.operator.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec: {{ include "vm.operator.cr.spec" $crSpec | nindent 2 }}
+{{- end }}
