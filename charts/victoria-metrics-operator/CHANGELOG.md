@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- render `extraHostPathMounts` in the operator pod. It was documented in `values.yaml` but never used by the templates.
 
 ## v0.68.2
 

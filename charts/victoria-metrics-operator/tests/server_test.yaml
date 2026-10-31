@@ -114,3 +114,25 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
+  - it: should mount extraHostPathMounts into the operator container
+    set:
+      extraHostPathMounts:
+        - name: certs-dir
+          mountPath: /etc/kubernetes/certs
+          subPath: ca
+          hostPath: /etc/kubernetes/certs
+          readOnly: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: certs-dir
+            mountPath: /etc/kubernetes/certs
+            subPath: ca
+            readOnly: true
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: certs-dir
+            hostPath:
+              path: /etc/kubernetes/certs

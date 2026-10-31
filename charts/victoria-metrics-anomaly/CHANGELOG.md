@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- render `extraContainers` and `extraHostPathMounts` in the vmanomaly pod. Both were documented in `values.yaml` but never used by the templates.
 
 ## v1.12.20
 
