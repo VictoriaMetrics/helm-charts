@@ -2,6 +2,7 @@
 
 - bump vmauth version to [v1.155.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.155.0).
 - add `vlselect`/`vlinsert`/`vlstorage`/`vmauth`'s `service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and protocol-specific ports (e.g. `syslog-tcp`, `syslog-udp`). See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
+- updated vector dependency 0.60.0 -> 0.61.0
 
 ## v0.2.9
 

@@ -4,6 +4,7 @@
 - add `server.service.portOverrides`, a map keyed by Service port name to override `port`, `protocol`, `targetPort`, `nodePort` and/or `appProtocol`. It applies to every rendered Service port, including `http[]`, `extraPorts[]` and `syslog-tcp`/`syslog-udp`. See [#3223](https://github.com/VictoriaMetrics/helm-charts/issues/3223).
 - rename the container from `vlogs` to `vlsingle`, matching the VictoriaMetrics operator. Pods are restarted once on upgrade.
 - fix `server.persistentVolume.name` in StatefulSet mode: the container mounted the default volume name instead of the overridden claim template name, which produced an invalid pod spec.
+- updated vector dependency 0.60.0 -> 0.61.0
 
 ## v0.13.10
 
