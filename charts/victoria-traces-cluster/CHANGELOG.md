@@ -1,5 +1,6 @@
 ## Next release
 
+- bump vmauth version to [v1.155.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.155.0).
 - add `checksum/config` annotation on `vmauth` pods to trigger a rollout when the chart-managed vmauth Secret changes. Externally managed `vmauth.configSecretName` is not tracked.
 
 ## v0.2.11
