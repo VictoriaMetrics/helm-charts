@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump version of VMEstimator to [v0.1.18](https://github.com/VictoriaMetrics/vmestimator/releases/tag/v0.1.18)
 
 ## v0.2.1
 
