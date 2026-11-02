@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump version of alertmanager to [v0.34.2](https://github.com/prometheus/alertmanager/releases/tag/v0.34.2)
 
 ## v0.52.0
 
