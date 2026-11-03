@@ -2,7 +2,7 @@
 
 ## Next release
 
-- TODO
+- removed the `vm.operator.*` helpers that rendered VictoriaMetrics operator custom resources from chart values, and the `operator.enabled` handling in `vm.useLegacyNaming`. Use [helm-converter](https://docs.victoriametrics.com/operator/helm-converter/) to generate custom resources from chart values.
 
 ## v0.4.5
 
