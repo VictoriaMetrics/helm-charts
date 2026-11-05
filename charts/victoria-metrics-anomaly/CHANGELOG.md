@@ -1,6 +1,7 @@
 ## Next release
 
 - render `extraContainers` and `extraHostPathMounts` in the vmanomaly pod. Both were documented in `values.yaml` but never used by the templates.
+- upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.32.0](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1320)
 
 ## v1.12.20
 
