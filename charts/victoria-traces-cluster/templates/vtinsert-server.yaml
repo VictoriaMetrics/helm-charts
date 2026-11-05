@@ -92,7 +92,7 @@ spec:
           {{- with (fromYaml (include "vm.probe" (dict "app" $app "type" "startup"))) }}
           startupProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or $app.extraVolumeMounts }}
+          {{- if $app.extraVolumeMounts }}
           volumeMounts:
             {{- with $app.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
