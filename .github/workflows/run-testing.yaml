@@ -123,6 +123,21 @@ jobs:
             --set admissionWebhooks.enabled=false \
             --wait --timeout 5m
 
+      - name: Checkout operator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          repository: VictoriaMetrics/operator
+          # renovate: datasource=github-releases depName=VictoriaMetrics/operator
+          ref: 45778f26aa90b7c67621bf93807bfa3c65d784b6  # v0.75.2
+          path: operator
+          persist-credentials: false
+
+      - name: Install helm-converter
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          (cd operator && go build -o "$RUNNER_TEMP/bin/helm-converter" ./cmd/helm-converter)
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
       - name: Compare charts with operator
         run: |
           cd test && go test -tags operatorcompat -run TestOperatorMigration -count=1 -timeout 30m -v ./...

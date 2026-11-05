@@ -21,7 +21,9 @@ tags:
 
 {{ template "chart.description" . }}
 
-{{ template "chart.prerequisites" . }}
+{{ include "chart.operatorNote" (dict "specs" (list "zoneTpl.vmcluster.spec" "zoneTpl.vmagent.spec" "zoneTpl.vmsingle.spec")) }}
+
+{{ include "chart.prerequisites" (dict "operator" "victoria-metrics-k8s-stack.victoria-metrics-operator.enabled") }}
 
 ## Chart Details
 
