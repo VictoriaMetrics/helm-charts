@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump version of VT components to [v0.13.0](https://github.com/VictoriaMetrics/VictoriaTraces/releases/tag/v0.13.0)
 
 ## v0.2.12
 
