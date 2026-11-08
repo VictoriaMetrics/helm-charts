@@ -68,7 +68,12 @@ dashboards:
   dashboards:        # per-dashboard overrides keyed by dashboard name (derived from JSON title)
     my-dashboard:
       enabled: false
-      clusterMetric: vm_app_version  # metric used to build the cluster template variable
+      variables:                     # dashboard variable overrides keyed by variable name
+        cluster:
+          query: label_values(vm_app_version, cluster)  # replaces the query, adds the variable if missing
+          # regex: ""                  # replaces the variable regex, empty string removes it
+      # a variable whose label_values() query lists the cluster label is the cluster picker
+      # clusterMetric: vm_app_version  # deprecated, same as variables.<clusterLabel>.query: label_values(vm_app_version, <clusterLabel>)
   sources:
     - url: https://example.com/dashboard.json
       enabled: true   # omit or set true to include; false to skip
@@ -133,10 +138,8 @@ Group keys under `rules.groups` are matched against upstream group names in this
 
 ## Building
 
-Requires Go 1.24+ with `GOEXPERIMENT=jsonv2`.
-
 ```sh
-GOEXPERIMENT=jsonv2 go build -o sync-job .
+go build -o sync-job .
 ```
 
 ## Docker
@@ -150,5 +153,5 @@ Two-stage build: the final image is `scratch` with the statically linked binary 
 ## Testing
 
 ```sh
-GOEXPERIMENT=jsonv2 go test ./...
+go test ./...
 ```

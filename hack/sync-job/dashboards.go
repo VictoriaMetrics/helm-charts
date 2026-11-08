@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"log"
+	"maps"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/VictoriaMetrics/metricsql"
@@ -15,7 +17,7 @@ import (
 
 var dashboardNameRe = regexp.MustCompile(`[ /_-]+`)
 
-// --- JSON types (unknown fields preserved via GOEXPERIMENT=jsonv2) ---
+// --- JSON types (unknown fields preserved via json:",embed") ---
 
 type dashboard struct {
 	Title       string          `json:"title"`
@@ -26,7 +28,7 @@ type dashboard struct {
 	Annotations dashAnnotations `json:"annotations,omitempty"`
 	Templating  dashTemplating  `json:"templating"`
 	Panels      []dashPanel     `json:"panels"`
-	XXX         map[string]any  `json:",unknown"`
+	XXX         map[string]any  `json:",embed"`
 }
 
 type dashPanel struct {
@@ -34,13 +36,13 @@ type dashPanel struct {
 	Targets    []dashTarget   `json:"targets,omitempty"`
 	Panels     []dashPanel    `json:"panels,omitempty"`
 	Datasource *strOrMap      `json:"datasource,omitempty"`
-	XXX        map[string]any `json:",unknown"`
+	XXX        map[string]any `json:",embed"`
 }
 
 type dashTarget struct {
 	Datasource *strOrMap      `json:"datasource,omitempty"`
 	Expr       string         `json:"expr,omitempty"`
-	XXX        map[string]any `json:",unknown"`
+	XXX        map[string]any `json:",embed"`
 }
 
 type dashAnnotations struct {
@@ -51,7 +53,7 @@ type dashAnnotation struct {
 	Name       string         `json:"name,omitempty"`
 	Expr       string         `json:"expr,omitempty"`
 	Datasource *strOrMap      `json:"datasource,omitempty"`
-	XXX        map[string]any `json:",unknown"`
+	XXX        map[string]any `json:",embed"`
 }
 
 type dashTemplating struct {
@@ -69,7 +71,11 @@ type dashVariable struct {
 	IncludeAll *boolOrStr     `json:"includeAll,omitempty"`
 	Hide       intOrStr       `json:"hide,omitempty"`
 	AllValue   string         `json:"allValue,omitempty"`
-	XXX        map[string]any `json:",unknown"`
+	XXX        map[string]any `json:",embed"`
+}
+
+func marshalJSON(v any) ([]byte, error) {
+	return json.Marshal(v, json.Deterministic(true))
 }
 
 type strOrMap struct {
@@ -79,10 +85,10 @@ type strOrMap struct {
 
 func (r strOrMap) MarshalJSON() ([]byte, error) {
 	if len(r.StrVal) > 0 {
-		return json.Marshal(r.StrVal)
+		return marshalJSON(r.StrVal)
 	}
 	if len(r.MapVal) > 0 {
-		return json.Marshal(r.MapVal)
+		return marshalJSON(r.MapVal)
 	}
 	return []byte("null"), nil
 }
@@ -109,9 +115,9 @@ type boolOrStr struct {
 
 func (v boolOrStr) MarshalJSON() ([]byte, error) {
 	if v.IsBool {
-		return json.Marshal(v.BoolVal)
+		return marshalJSON(v.BoolVal)
 	}
-	return json.Marshal(v.StrVal)
+	return marshalJSON(v.StrVal)
 }
 
 func (r *boolOrStr) UnmarshalJSON(raw []byte) error {
@@ -137,9 +143,9 @@ type intOrStr struct {
 
 func (v intOrStr) MarshalJSON() ([]byte, error) {
 	if v.IsInt {
-		return json.Marshal(v.IntVal)
+		return marshalJSON(v.IntVal)
 	}
-	return json.Marshal(v.StrVal)
+	return marshalJSON(v.StrVal)
 }
 
 func (r *intOrStr) UnmarshalJSON(raw []byte) error {
@@ -200,8 +206,8 @@ func reconcileDashboards(ctx context.Context, kube *syncClient, cfg *dashboardsC
 			if dc.Enabled != nil && !*dc.Enabled {
 				continue
 			}
-			patchDashboard(d, name, dc.ClusterMetric, common, grafana)
-			data, err := json.Marshal(d)
+			patchDashboard(d, name, dc, common, grafana)
+			data, err := marshalJSON(d)
 			if err != nil {
 				log.Printf("marshal dashboard %q: %v", name, err)
 				continue
@@ -286,52 +292,47 @@ func parseDashboards(raw []byte, srcURL string) (map[string]*dashboard, error) {
 	return result, nil
 }
 
-func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfig, grafana grafanaConfig) {
+func patchDashboard(d *dashboard, name string, dc dashboardOverride, common commonConfig, grafana grafanaConfig) {
 	d.Editable = false
 	d.Tags = appendUnique(d.Tags, "vm-k8s-stack")
 
 	cl := common.ClusterLabel
+	patchVariables(d, dc.variables(cl))
 
-	// Pre-scan to determine whether a cluster variable will be present after patching.
-	// Panel expressions must not reference $cluster unless the variable actually exists.
-	hasCluster := false
-	for _, t := range d.Templating.List {
-		if t.Name == cl || t.Name == "cluster" {
-			hasCluster = true
-			break
-		}
+	// Panel expressions must not reference the cluster variable unless it actually exists.
+	cv := clusterVariable(d, cl)
+	injectCluster := cv == "" && !common.Multicluster && !slices.ContainsFunc(d.Templating.List, func(t dashVariable) bool { return t.Name == cl })
+	if injectCluster {
+		cv = cl
 	}
-	willHaveCluster := hasCluster || clusterMetric != "" || !common.Multicluster
 
 	for i := range d.Annotations.List {
 		a := &d.Annotations.List[i]
 		patchDatasource(a.Datasource, grafana)
-		a.Expr = patchDashExpr(a.Expr, a.Name, cl, willHaveCluster)
+		a.Expr = patchDashExpr(a.Expr, a.Name, cl, cv)
 	}
 	for i := range d.Targets {
 		t := &d.Targets[i]
 		patchDatasource(t.Datasource, grafana)
-		t.Expr = patchDashExpr(t.Expr, name, cl, willHaveCluster)
+		t.Expr = patchDashExpr(t.Expr, name, cl, cv)
 	}
 	for i := range d.Panels {
-		patchPanel(&d.Panels[i], name, cl, grafana, willHaveCluster)
+		patchPanel(&d.Panels[i], name, cl, cv, grafana)
 	}
 
-	hasCluster = false
 	for i := range d.Templating.List {
 		t := &d.Templating.List[i]
 		patchDatasource(t.Datasource, grafana)
 		if t.Type == "datasource" {
 			patchVariableDatasource(t, grafana.Datasource)
 		}
-		if t.Name == cl || t.Name == "cluster" {
-			hasCluster = true
+		if t.Name == cv {
 			t.Multi = &boolOrStr{IsBool: true, BoolVal: common.Multicluster}
 			t.IncludeAll = &boolOrStr{IsBool: true, BoolVal: common.Multicluster}
 			if common.Multicluster {
 				t.Type = "query"
 				t.Hide = intOrStr{IsInt: true, IntVal: 0}
-				patchVariableExpr(t, cl, cl)
+				patchVariableExpr(t, cv, cl, cv)
 			} else {
 				t.Type = "constant"
 				t.Hide = intOrStr{IsInt: true, IntVal: 2}
@@ -339,46 +340,112 @@ func patchDashboard(d *dashboard, name, clusterMetric string, common commonConfi
 				t.Definition = ".*"
 			}
 		} else if t.Type == "query" && t.Query != nil {
-			patchVariableExpr(t, t.Name, cl)
+			patchVariableExpr(t, t.Name, cl, cv)
 		}
 	}
 
-	if !hasCluster && (clusterMetric != "" || !common.Multicluster) {
-		d.Templating.List = append(d.Templating.List, buildClusterVariable(clusterMetric, common))
+	if injectCluster {
+		d.Templating.List = append(d.Templating.List, dashVariable{
+			Name:       cv,
+			Label:      cv,
+			Type:       "constant",
+			AllValue:   ".*",
+			Query:      &strOrMap{StrVal: ".*"},
+			Multi:      &boolOrStr{IsBool: true},
+			IncludeAll: &boolOrStr{IsBool: true},
+			Hide:       intOrStr{IsInt: true, IntVal: 2},
+		})
 	}
 }
 
-func buildClusterVariable(metric string, common commonConfig) dashVariable {
-	v := dashVariable{
-		Name:       "cluster",
-		Label:      "cluster",
-		AllValue:   ".*",
-		Multi:      &boolOrStr{IsBool: true, BoolVal: common.Multicluster},
-		IncludeAll: &boolOrStr{IsBool: true, BoolVal: common.Multicluster},
+func patchVariables(d *dashboard, overrides map[string]variableOverride) {
+	pos := 0
+	for i, t := range d.Templating.List {
+		if t.Type == "datasource" {
+			pos = i + 1
+		}
 	}
-	if common.Multicluster {
-		v.Type = "query"
-		v.Hide = intOrStr{IsInt: true, IntVal: 0}
-		v.Query = &strOrMap{StrVal: fmt.Sprintf("label_values(%s, %s)", metric, common.ClusterLabel)}
-		v.Definition = v.Query.StrVal
-	} else {
-		v.Type = "constant"
-		v.Hide = intOrStr{IsInt: true, IntVal: 2}
-		v.Query = &strOrMap{StrVal: ".*"}
+	for _, name := range slices.Sorted(maps.Keys(overrides)) {
+		o := overrides[name]
+		i := slices.IndexFunc(d.Templating.List, func(t dashVariable) bool { return t.Name == name })
+		if i < 0 {
+			if o.Query == "" {
+				log.Printf("dashboard %q: variable %q not found", d.Title, name)
+				continue
+			}
+			d.Templating.List = slices.Insert(d.Templating.List, pos, dashVariable{Name: name, Label: name, Type: "query", AllValue: ".*"})
+			i = pos
+			pos++
+		}
+		v := &d.Templating.List[i]
+		if o.Query != "" {
+			v.Type = "query"
+			v.Query = &strOrMap{StrVal: o.Query}
+			v.Definition = o.Query
+		}
+		switch {
+		case o.Regex == nil:
+		case *o.Regex == "":
+			delete(v.XXX, "regex")
+		default:
+			if v.XXX == nil {
+				v.XXX = map[string]any{}
+			}
+			v.XXX["regex"] = *o.Regex
+		}
 	}
-	return v
 }
 
-func patchVariableExpr(t *dashVariable, varName, cl string) {
+func clusterVariable(d *dashboard, cl string) string {
+	for _, t := range d.Templating.List {
+		if t.Type != "query" {
+			continue
+		}
+		if l := labelValuesLabel(variableQuery(t)); l == cl || l == "cluster" {
+			return t.Name
+		}
+	}
+	return ""
+}
+
+func variableQuery(t dashVariable) string {
 	if t.Query != nil {
 		if t.Query.StrVal != "" {
-			t.Query.StrVal = patchDashExpr(t.Query.StrVal, varName, cl, true)
+			return t.Query.StrVal
+		}
+		if q, ok := t.Query.MapVal["query"].(string); ok {
+			return q
+		}
+	}
+	return t.Definition
+}
+
+func labelValuesLabel(query string) string {
+	e, err := metricsql.ParseWithVars(query, true)
+	if err != nil {
+		return ""
+	}
+	fe, ok := e.(*metricsql.FuncExpr)
+	if !ok || fe.Name != "label_values" || len(fe.Args) == 0 {
+		return ""
+	}
+	me, ok := fe.Args[len(fe.Args)-1].(*metricsql.MetricExpr)
+	if !ok || len(me.LabelFilterss) != 1 || len(me.LabelFilterss[0]) != 1 || me.LabelFilterss[0][0].Label != "__name__" {
+		return ""
+	}
+	return me.LabelFilterss[0][0].Value
+}
+
+func patchVariableExpr(t *dashVariable, varName, cl, cv string) {
+	if t.Query != nil {
+		if t.Query.StrVal != "" {
+			t.Query.StrVal = patchDashExpr(t.Query.StrVal, varName, cl, cv)
 		} else if q, ok := t.Query.MapVal["query"].(string); ok {
-			t.Query.MapVal["query"] = patchDashExpr(q, varName, cl, true)
+			t.Query.MapVal["query"] = patchDashExpr(q, varName, cl, cv)
 		}
 	}
 	if t.Definition != "" {
-		t.Definition = patchDashExpr(t.Definition, varName, cl, true)
+		t.Definition = patchDashExpr(t.Definition, varName, cl, cv)
 	}
 }
 
@@ -416,19 +483,19 @@ func patchVariableDatasource(t *dashVariable, datasource string) {
 	}
 }
 
-func patchPanel(p *dashPanel, name, clusterLabel string, grafana grafanaConfig, withCluster bool) {
+func patchPanel(p *dashPanel, name, clusterLabel, clusterVar string, grafana grafanaConfig) {
 	patchDatasource(p.Datasource, grafana)
 	for i := range p.Targets {
 		t := &p.Targets[i]
 		patchDatasource(t.Datasource, grafana)
-		t.Expr = patchDashExpr(t.Expr, p.Title, clusterLabel, withCluster)
+		t.Expr = patchDashExpr(t.Expr, p.Title, clusterLabel, clusterVar)
 	}
 	for i := range p.Panels {
-		patchPanel(&p.Panels[i], name, clusterLabel, grafana, withCluster)
+		patchPanel(&p.Panels[i], name, clusterLabel, clusterVar, grafana)
 	}
 }
 
-func patchDashExpr(expr, varName, clusterLabel string, withCluster bool) string {
+func patchDashExpr(expr, varName, clusterLabel, clusterVar string) string {
 	if expr == "" {
 		return expr
 	}
@@ -437,6 +504,10 @@ func patchDashExpr(expr, varName, clusterLabel string, withCluster bool) string 
 		return expr
 	}
 	cl := clusterLabel
+	ref := "$" + clusterVar
+	withCluster := clusterVar != ""
+	isClusterVar := withCluster && varName == clusterVar
+	isClusterRef := func(v string) bool { return withCluster && v == ref }
 
 	modifierFn := func(m *metricsql.ModifierExpr) {
 		if m.Op != "by" && m.Op != "on" {
@@ -463,7 +534,7 @@ func patchDashExpr(expr, varName, clusterLabel string, withCluster bool) string 
 			modifierFn(&t.JoinModifier)
 			modifierFn(&t.GroupModifier)
 		case *metricsql.AggrFuncExpr:
-			if varName == cl || varName == "cluster" {
+			if isClusterVar {
 				return
 			}
 			modifierFn(&t.Modifier)
@@ -476,10 +547,10 @@ func patchDashExpr(expr, varName, clusterLabel string, withCluster bool) string 
 				var out []metricsql.LabelFilter
 				found := false
 				for _, f := range t.LabelFilterss[i] {
-					if f.Label == "cluster" || f.Value == "$cluster" {
+					if f.Label == "cluster" || isClusterRef(f.Value) {
 						f.Label = cl
-						if withCluster && varName != cl && varName != "cluster" {
-							f.Value = "$cluster"
+						if withCluster && !isClusterVar {
+							f.Value = ref
 							f.IsRegexp = true
 						}
 						found = true
@@ -489,8 +560,8 @@ func patchDashExpr(expr, varName, clusterLabel string, withCluster bool) string 
 					}
 					out = append(out, f)
 				}
-				if !found && withCluster && len(out) > 1 && varName != cl && varName != "cluster" {
-					out = append(out, metricsql.LabelFilter{Label: cl, Value: "$cluster", IsRegexp: true})
+				if !found && withCluster && len(out) > 1 && !isClusterVar {
+					out = append(out, metricsql.LabelFilter{Label: cl, Value: ref, IsRegexp: true})
 				}
 				t.LabelFilterss[i] = out
 			}

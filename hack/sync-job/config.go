@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"go.yaml.in/yaml/v3"
@@ -19,8 +20,21 @@ type config struct {
 }
 
 type dashboardOverride struct {
-	Enabled       *bool  `yaml:"enabled,omitempty"`
-	ClusterMetric string `yaml:"clusterMetric,omitempty"`
+	Enabled       *bool                       `yaml:"enabled,omitempty"`
+	ClusterMetric string                      `yaml:"clusterMetric,omitempty"` // Deprecated: use Variables with a label_values(<metric>, cluster) query instead.
+	Variables     map[string]variableOverride `yaml:"variables,omitempty"`
+}
+
+func (o dashboardOverride) variables(clusterLabel string) map[string]variableOverride {
+	if o.ClusterMetric == "" || o.Variables != nil {
+		return o.Variables
+	}
+	return map[string]variableOverride{clusterLabel: {Query: fmt.Sprintf("label_values(%s, %s)", o.ClusterMetric, clusterLabel)}}
+}
+
+type variableOverride struct {
+	Query string  `yaml:"query,omitempty"`
+	Regex *string `yaml:"regex,omitempty"`
 }
 
 type grafanaConfig struct {
@@ -109,6 +123,11 @@ func loadConfig(path string) (*config, error) {
 	}
 	if cfg.Common.ClusterLabel == "" {
 		cfg.Common.ClusterLabel = "cluster"
+	}
+	for name, dc := range cfg.Dashboards.Dashboards {
+		if dc.ClusterMetric != "" {
+			log.Printf("dashboards.dashboards.%s.clusterMetric is deprecated, use variables.%s.query instead", name, cfg.Common.ClusterLabel)
+		}
 	}
 	if cfg.Dashboards.Common.Grafana.Datasource == "" {
 		cfg.Dashboards.Common.Grafana.Datasource = "prometheus"
