@@ -1,6 +1,6 @@
 module github.com/VictoriaMetrics/sync-job
 
-go 1.26.0
+go 1.27.3
 
 require (
 	github.com/VictoriaMetrics/metricsql v0.87.3-0.20260702102836-01c77e4995de

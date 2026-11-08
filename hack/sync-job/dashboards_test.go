@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json/v2"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -10,6 +12,7 @@ func TestPatchDashExpr(t *testing.T) {
 		expr         string
 		varName      string
 		clusterLabel string
+		clusterVar   string
 		want         string
 	}
 	f := func(o opts) {
@@ -18,7 +21,11 @@ func TestPatchDashExpr(t *testing.T) {
 		if cl == "" {
 			cl = "cluster"
 		}
-		got := patchDashExpr(o.expr, o.varName, cl, true)
+		cv := o.clusterVar
+		if cv == "" {
+			cv = "cluster"
+		}
+		got := patchDashExpr(o.expr, o.varName, cl, cv)
 		if got != o.want {
 			t.Fatalf("patchDashExpr(%q, varName=%q, cl=%q)\ngot:  %s\nwant: %s", o.expr, o.varName, cl, got, o.want)
 		}
@@ -57,6 +64,7 @@ func TestPatchDashExpr(t *testing.T) {
 		expr:         `label_values(kube_node_info{cluster!=""}, cluster)`,
 		varName:      "k8s_cluster",
 		clusterLabel: "k8s_cluster",
+		clusterVar:   "k8s_cluster",
 		want:         `label_values(kube_node_info{k8s_cluster!=""}, k8s_cluster)`,
 	})
 
@@ -91,6 +99,7 @@ func TestPatchDashExpr(t *testing.T) {
 		expr:         `sum(up)`,
 		varName:      "env",
 		clusterLabel: "env",
+		clusterVar:   "env",
 		want:         `sum(up)`,
 	})
 
@@ -355,7 +364,7 @@ func TestPatchDashboardClusterVariable(t *testing.T) {
 		}
 		common := commonConfig{ClusterLabel: cl, Multicluster: o.multicluster}
 		d := &dashboard{Templating: dashTemplating{List: []dashVariable{v}}}
-		patchDashboard(d, "test", "", common, grafanaConfig{
+		patchDashboard(d, "test", dashboardOverride{}, common, grafanaConfig{
 			Datasource:    "prometheus",
 			DatasourceUID: "prometheus",
 		})
@@ -443,7 +452,7 @@ func TestPatchVariableExpr(t *testing.T) {
 			Query:      q,
 			Definition: o.definition,
 		}
-		patchVariableExpr(&v, o.name, "cluster")
+		patchVariableExpr(&v, o.name, "cluster", "cluster")
 		if o.wantStr != "" && v.Query.StrVal != o.wantStr {
 			t.Fatalf("Query.StrVal: got %q, want %q", v.Query.StrVal, o.wantStr)
 		}
@@ -505,7 +514,7 @@ func TestPatchDashboardInjectClusterVariable(t *testing.T) {
 		t.Helper()
 		common := commonConfig{ClusterLabel: "cluster", Multicluster: o.multicluster}
 		d := &dashboard{Templating: dashTemplating{List: []dashVariable{}}}
-		patchDashboard(d, "test", o.clusterMetric, common, grafanaConfig{
+		patchDashboard(d, "test", dashboardOverride{ClusterMetric: o.clusterMetric}, common, grafanaConfig{
 			Datasource:    "prometheus",
 			DatasourceUID: "prometheus",
 		})
@@ -570,11 +579,189 @@ func TestPatchDashboardNoClusterVarNoInjection(t *testing.T) {
 		Templating: dashTemplating{List: []dashVariable{{Name: "namespace", Type: "query"}}},
 	}
 	common := commonConfig{ClusterLabel: "cluster", Multicluster: true}
-	patchDashboard(d, "test", "", common, grafanaConfig{Datasource: "prometheus", DatasourceUID: "prometheus"})
+	patchDashboard(d, "test", dashboardOverride{}, common, grafanaConfig{Datasource: "prometheus", DatasourceUID: "prometheus"})
 
 	got := d.Panels[0].Targets[0].Expr
 	if strings.Contains(got, "$cluster") {
 		t.Fatalf("panel expr must not reference $cluster when no cluster variable exists, got: %s", got)
+	}
+}
+
+func TestPatchDashboardVariables(t *testing.T) {
+	type opts struct {
+		multicluster bool
+		override     dashboardOverride
+		dashboard    string
+		variable     string
+		wantVars     []string
+		wantExprs    []string
+		wantVarQuery string
+		wantRegex    string
+	}
+	f := func(o opts) {
+		t.Helper()
+		var d dashboard
+		if err := json.Unmarshal([]byte(o.dashboard), &d); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		common := commonConfig{ClusterLabel: "cluster", Multicluster: o.multicluster}
+		patchDashboard(&d, "test", o.override, common, grafanaConfig{Datasource: "prometheus", DatasourceUID: "prometheus"})
+
+		var gotVars []string
+		for _, v := range d.Templating.List {
+			gotVars = append(gotVars, v.Name+":"+v.Type)
+		}
+		if strings.Join(gotVars, ",") != strings.Join(o.wantVars, ",") {
+			t.Fatalf("variables: got %v, want %v", gotVars, o.wantVars)
+		}
+		var gotExprs []string
+		for _, tg := range d.Panels[0].Targets {
+			gotExprs = append(gotExprs, tg.Expr)
+		}
+		if strings.Join(gotExprs, "\n") != strings.Join(o.wantExprs, "\n") {
+			t.Fatalf("exprs:\ngot:  %q\nwant: %q", gotExprs, o.wantExprs)
+		}
+		name := o.variable
+		if name == "" {
+			name = "cluster"
+		}
+		v := d.Templating.List[slices.IndexFunc(d.Templating.List, func(t dashVariable) bool { return t.Name == name })]
+		if got := variableQuery(v); got != o.wantVarQuery {
+			t.Fatalf("variable query: got %q, want %q", got, o.wantVarQuery)
+		}
+		if got, _ := v.XXX["regex"].(string); got != o.wantRegex {
+			t.Fatalf("regex: got %q, want %q", got, o.wantRegex)
+		}
+	}
+
+	const etcd = `{
+  "panels": [{"targets": [
+    {"expr": "sum(rate(grpc_server_started_total{job=\"$cluster\",grpc_type=\"unary\"}[$__rate_interval]))"},
+    {"expr": "etcd_server_has_leader{job=\"$cluster\"}"}
+  ]}],
+  "templating": {"list": [
+    {"name": "datasource", "type": "datasource", "query": "prometheus"},
+    {"name": "cluster", "type": "query", "query": "label_values(etcd_server_has_leader{job=~\".*etcd.*\"}, job)"}
+  ]}
+}`
+	etcdOverride := dashboardOverride{Variables: map[string]variableOverride{
+		"k8s_cluster": {Query: "label_values(etcd_server_has_leader, cluster)"},
+	}}
+
+	// multicluster: dashboard's own cluster variable kept, picker created from the override
+	f(opts{
+		multicluster: true,
+		override:     etcdOverride,
+		dashboard:    etcd,
+		wantVars:     []string{"datasource:datasource", "k8s_cluster:query", "cluster:query"},
+		wantExprs: []string{
+			`sum(rate(grpc_server_started_total{job="$cluster",grpc_type="unary",cluster=~"$k8s_cluster"}[$__rate_interval])) by(cluster)`,
+			`etcd_server_has_leader{job="$cluster",cluster=~"$k8s_cluster"}`,
+		},
+		wantVarQuery: `label_values(etcd_server_has_leader{job=~".*etcd.*",cluster=~"$k8s_cluster"}, job)`,
+	})
+	// single cluster: created picker becomes a hidden constant
+	f(opts{
+		override:  etcdOverride,
+		dashboard: etcd,
+		wantVars:  []string{"datasource:datasource", "k8s_cluster:constant", "cluster:query"},
+		wantExprs: []string{
+			`sum(rate(grpc_server_started_total{job="$cluster",grpc_type="unary",cluster=~"$k8s_cluster"}[$__rate_interval])) by(cluster)`,
+			`etcd_server_has_leader{job="$cluster",cluster=~"$k8s_cluster"}`,
+		},
+		wantVarQuery: `label_values(etcd_server_has_leader{job=~".*etcd.*",cluster=~"$k8s_cluster"}, job)`,
+	})
+	// no override: variable listing another label is not a picker, nothing is filtered by cluster
+	f(opts{
+		multicluster: true,
+		dashboard:    etcd,
+		wantVars:     []string{"datasource:datasource", "cluster:query"},
+		wantExprs: []string{
+			`sum(rate(grpc_server_started_total{job="$cluster",grpc_type="unary"}[$__rate_interval]))`,
+			`etcd_server_has_leader{job="$cluster"}`,
+		},
+		wantVarQuery: `label_values(etcd_server_has_leader{job=~".*etcd.*"}, job)`,
+	})
+	// no override, single cluster: injected constant would clash with the dashboard's variable, so it is skipped
+	f(opts{
+		dashboard: etcd,
+		wantVars:  []string{"datasource:datasource", "cluster:query"},
+		wantExprs: []string{
+			`sum(rate(grpc_server_started_total{job="$cluster",grpc_type="unary"}[$__rate_interval]))`,
+			`etcd_server_has_leader{job="$cluster"}`,
+		},
+		wantVarQuery: `label_values(etcd_server_has_leader{job=~".*etcd.*"}, job)`,
+	})
+	// query override keeps the regex unless it's overridden too, empty regex removes it
+	f(opts{
+		multicluster: true,
+		override: dashboardOverride{Variables: map[string]variableOverride{
+			"cluster":     {Query: `label_values(cnpg_collector_up{namespace=~"$namespace"}, pg_cluster)`, Regex: new("")},
+			"k8s_cluster": {Query: "label_values(cnpg_collector_up, cluster)"},
+		}},
+		dashboard: `{
+  "panels": [{"targets": [{"expr": "cnpg_collector_up{namespace=\"x\",pod=~\"$cluster-([1-9][0-9]*)$\"}"}]}],
+  "templating": {"list": [
+    {"name": "cluster", "type": "query", "query": "cnpg_collector_up", "regex": "/\\bcluster\\b=\"(?<text>[^\"]+)/g"}
+  ]}
+}`,
+		wantVars:     []string{"k8s_cluster:query", "cluster:query"},
+		wantExprs:    []string{`cnpg_collector_up{namespace="x",pod=~"$cluster-([1-9][0-9]*)$",cluster=~"$k8s_cluster"}`},
+		wantVarQuery: `label_values(cnpg_collector_up{namespace=~"$namespace",cluster=~"$k8s_cluster"}, pg_cluster)`,
+	})
+	const regexVar = `{
+  "panels": [{"targets": [{"expr": "up{job=\"x\"}"}]}],
+  "templating": {"list": [
+    {"name": "version", "type": "query", "query": "label_values(vm_app_version, version)", "regex": "/v(.*)/"}
+  ]}
+}`
+	// query override without regex keeps the original regex
+	f(opts{
+		override:     dashboardOverride{Variables: map[string]variableOverride{"version": {Query: `label_values(vm_app_version{env="prod"}, version)`}}},
+		dashboard:    regexVar,
+		variable:     "version",
+		wantVars:     []string{"version:query", "cluster:constant"},
+		wantExprs:    []string{`up{job="x",cluster=~"$cluster"}`},
+		wantVarQuery: `label_values(vm_app_version{env="prod",cluster=~"$cluster"}, version)`,
+		wantRegex:    "/v(.*)/",
+	})
+	// regex-only override replaces the regex and keeps the query
+	f(opts{
+		override:     dashboardOverride{Variables: map[string]variableOverride{"version": {Regex: new("/(.*)/")}}},
+		dashboard:    regexVar,
+		variable:     "version",
+		wantVars:     []string{"version:query", "cluster:constant"},
+		wantExprs:    []string{`up{job="x",cluster=~"$cluster"}`},
+		wantVarQuery: `label_values(vm_app_version, version)`,
+		wantRegex:    "/(.*)/",
+	})
+	// deprecated clusterMetric: picker named after the cluster label is created
+	f(opts{
+		multicluster: true,
+		override:     dashboardOverride{ClusterMetric: "vm_app_version"},
+		dashboard:    `{"panels": [{"targets": [{"expr": "up{job=\"vm\"}"}]}], "templating": {"list": []}}`,
+		wantVars:     []string{"cluster:query"},
+		wantExprs:    []string{`up{job="vm",cluster=~"$cluster"}`},
+		wantVarQuery: `label_values(vm_app_version, cluster)`,
+	})
+	// query override turns a non-query variable into a query one, so it becomes the picker
+	f(opts{
+		multicluster: true,
+		override:     dashboardOverride{Variables: map[string]variableOverride{"cluster": {Query: "label_values(vm_app_version, cluster)"}}},
+		dashboard:    `{"panels": [{"targets": [{"expr": "up{job=\"vm\"}"}]}], "templating": {"list": [{"name": "cluster", "type": "custom", "query": "a,b"}]}}`,
+		wantVars:     []string{"cluster:query"},
+		wantExprs:    []string{`up{job="vm",cluster=~"$cluster"}`},
+		wantVarQuery: `label_values(vm_app_version, cluster)`,
+	})
+}
+
+func TestDashboardOverrideVariables(t *testing.T) {
+	if got := (dashboardOverride{ClusterMetric: "m", Variables: map[string]variableOverride{}}).variables("cluster"); len(got) != 0 {
+		t.Fatalf("explicit empty variables must suppress clusterMetric, got %v", got)
+	}
+	got := (dashboardOverride{ClusterMetric: "m"}).variables("env")
+	if got["env"].Query != "label_values(m, env)" {
+		t.Fatalf("unexpected clusterMetric conversion: %v", got)
 	}
 }
 

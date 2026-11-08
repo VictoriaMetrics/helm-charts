@@ -199,3 +199,26 @@ func mapKeys(m map[string]any) []string {
 	}
 	return keys
 }
+
+func TestLoadConfigDashboardVariables(t *testing.T) {
+	path := writeConfigFile(t, `
+dashboards:
+  dashboards:
+    cloudnative-pg:
+      variables:
+        cluster:
+          query: label_values(cnpg_collector_up, pg_cluster)
+          regex: ""
+`)
+	cfg, err := loadConfig(path)
+	if err != nil {
+		t.Fatalf("loadConfig: %v", err)
+	}
+	got := cfg.Dashboards.Dashboards["cloudnative-pg"].Variables["cluster"]
+	if got.Query != "label_values(cnpg_collector_up, pg_cluster)" {
+		t.Fatalf("query: got %q", got.Query)
+	}
+	if got.Regex == nil || *got.Regex != "" {
+		t.Fatalf("regex: got %v, want empty string", got.Regex)
+	}
+}
