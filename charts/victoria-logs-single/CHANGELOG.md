@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix `vector-k8s-monitoring` dashboard being rendered with `vector.enabled: false`. See [#3332](https://github.com/VictoriaMetrics/helm-charts/issues/3332).
 
 ## v0.13.11
 
