@@ -28,6 +28,9 @@
     {{- with index $val "clusterMetric" -}}
       {{- $dc = merge $dc (dict "clusterMetric" .) -}}
     {{- end -}}
+    {{- with index $val "variables" -}}
+      {{- $dc = merge $dc (dict "variables" .) -}}
+    {{- end -}}
     {{- if $dc -}}
       {{- $dashboards = set $dashboards $key $dc -}}
     {{- end -}}

@@ -77,33 +77,60 @@ defaultDashboards:
           dashboards: grafana
       allowCrossNamespaceImport: false
   # -- Per-dashboard configuration. Keys match dashboard names from JSON content.
-  # Set enabled: false to skip a dashboard. Set clusterMetric to patch the cluster variable query.
+  # `enabled: false` skips a dashboard. `variables.<name>` sets a variable `query` (adds the variable if missing) and `regex` ("" removes it).
+  # The cluster picker is the variable with a label_values(..., cluster) query.
   dashboards:
     victoriametrics-single-node:
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     victoriametrics-vmagent:
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     victoriametrics-cluster:
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     victoriametrics-vmalert:
       enabled: true
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     victoriametrics-operator:
       enabled: true
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     victorialogs-cluster:
-      clusterMetric: vm_app_version
+      variables:
+        k8s_cluster:
+          query: label_values(vm_app_version, cluster)
     victorialogs-single-node:
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     victorialogs-vlagent:
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     victoriatraces-single-node:
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     victoriatraces-cluster:
-      clusterMetric: vm_app_version
+      variables:
+        cluster:
+          query: label_values(vm_app_version, cluster)
     node-exporter-full:
       enabled: true
-      clusterMetric: node_uname_info
+      variables:
+        cluster:
+          query: label_values(node_uname_info, cluster)
+    etcd:
+      variables:
+        k8s_cluster:
+          query: label_values(etcd_server_has_leader, cluster)
     alertmanager-overview:
       enabled: '{{ .Values.alertmanager.enabled }}'
     grafana-overview:
@@ -180,7 +207,7 @@ syncJob:
   enabled: true
   image:
     repository: ghcr.io/victoriametrics/sync-job
-    tag: v0.0.17
+    tag: v0.0.18
     pullPolicy: IfNotPresent
   # -- Image pull secrets for the sync-job Pod. Needed when `image.repository` points at a
   # private registry. Falls back to `global.imagePullSecrets` when not set.
