@@ -1,0 +1,37 @@
+suite: dashboards
+templates:
+  - dashboard.yaml
+release:
+  name: vls
+tests:
+  - it: skips vector dashboard when vector is disabled
+    set:
+      dashboards.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: vls-victoria-logs-single-victorialogs-single-node
+      - notMatchRegex:
+          path: data["victorialogs-single-node.json"]
+          pattern: '"condition"'
+
+  - it: renders vector dashboard when vector is enabled
+    set:
+      dashboards.enabled: true
+      dashboards.grafanaOperator.enabled: true
+      vector.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: GrafanaDashboard
+      - equal:
+          path: metadata.name
+          value: vls-victoria-logs-single-vector-k8s-monitoring
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: vls-victoria-logs-single-victorialogs-single-node
+        documentIndex: 1

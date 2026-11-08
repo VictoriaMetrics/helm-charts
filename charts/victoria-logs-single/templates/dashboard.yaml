@@ -21,9 +21,7 @@ Get dashboard data from file
 */}}
 {{- $dashboardData := fromYaml (tpl ($.Files.Get $dashboardFile) $ctx) -}}
 
-{{- /*
-Delete condition from dashboard
-*/}}
+{{- if or (not (hasKey $dashboardData "condition")) $dashboardData.condition }}
 {{- $_ := unset $dashboardData "condition" -}}
 
 {{- $dashboardResult := toRawJson $dashboardData -}}
@@ -55,6 +53,7 @@ metadata:
   {{- end }}
 data:
   {{ $dashboardName }}.json: | {{ $dashboardResult | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
