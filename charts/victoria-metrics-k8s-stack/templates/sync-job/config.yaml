@@ -123,10 +123,10 @@ data:
           operator:
             spec: {{ toYaml $Values.defaultDashboards.grafanaOperator.spec | nindent 14 }}
           {{- end }}
-        {{- with $Values.defaultDashboards.labels }}
+        {{- with mergeOverwrite (deepCopy ($Values.global.extraLabels | default dict)) ($Values.defaultDashboards.labels | default dict) }}
         labels: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- with $Values.defaultDashboards.annotations }}
+        {{- with mergeOverwrite (deepCopy ($Values.global.extraAnnotations | default dict)) ($Values.defaultDashboards.annotations | default dict) }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
       {{- if $dashboards }}
@@ -152,10 +152,10 @@ data:
         {{- with $Values.defaultRules.recording }}
         recording: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- with $Values.defaultRules.labels }}
+        {{- with mergeOverwrite (deepCopy ($Values.global.extraLabels | default dict)) ($Values.defaultRules.labels | default dict) }}
         labels: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- with $Values.defaultRules.annotations }}
+        {{- with mergeOverwrite (deepCopy ($Values.global.extraAnnotations | default dict)) ($Values.defaultRules.annotations | default dict) }}
         annotations: {{ toYaml . | nindent 10 }}
         {{- end }}
         {{- with $Values.defaultRules.jobNamespaces }}

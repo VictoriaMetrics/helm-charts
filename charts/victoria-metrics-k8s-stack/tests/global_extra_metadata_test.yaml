@@ -327,6 +327,37 @@ tests:
           value: RoleBinding
         template: sync-job/rbac.yaml
 
+  - it: sync-job dashboards and rules get global.extraLabels and global.extraAnnotations, overridden by defaultDashboards/defaultRules
+    set:
+      syncJob:
+        enabled: true
+      defaultDashboards:
+        labels:
+          example.com/global-label: dashboards
+      defaultRules:
+        annotations:
+          example.com/global-annotation: rules
+    template: sync-job/config.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: |-
+            dashboards:
+              common:
+            (?s:.*?)    labels:\s*
+                  example.com/global-label: dashboards
+                annotations:\s*
+                  example.com/global-annotation: expected
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: |-
+            rules:
+              common:
+            (?s:.*?)    labels:\s*
+                  example.com/global-label: expected
+                annotations:\s*
+                  example.com/global-annotation: rules
+
   - it: generated VMServiceScrape, Service and Endpoints get global.extraLabels and global.extraAnnotations
     set:
       kubelet.enabled: false

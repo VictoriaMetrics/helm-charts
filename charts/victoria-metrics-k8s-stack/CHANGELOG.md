@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- sync-job: apply `global.extraLabels` and `global.extraAnnotations` to the dashboard ConfigMaps/GrafanaDashboards and VMRules it creates.
 
 ## v0.98.0
 
