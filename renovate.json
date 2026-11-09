@@ -77,6 +77,12 @@
       "rangeStrategy": "replace"
     },
     {
+      "description": "OCI chart dependencies are looked up via the docker datasource, use helm versioning so X.Y.* ranges work",
+      "matchManagers": ["helmv3"],
+      "matchDatasources": ["docker"],
+      "versioning": "helm"
+    },
+    {
       "description": "Disable updates for victoriametrics images tracked via appVersion, except components embedded as a secondary dependency in another chart",
       "matchManagers": ["helm-values"],
       "matchPackagePatterns": ["^victoriametrics/vm"],
