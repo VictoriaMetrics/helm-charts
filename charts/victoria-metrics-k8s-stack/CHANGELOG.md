@@ -1,8 +1,10 @@
 ## Next release
 
-- bump kube-state-metrics dependency chart to version 9.0.0. Its pod now has `nodeSelector: kubernetes.io/os: linux` by default; set `kube-state-metrics.nodeSelector: null` to remove it.
-- bump prometheus-node-exporter dependency chart to version 4.60.1
-- bump grafana dependency chart to version 14.4.0 (Grafana 13.3.0). The chart now validates `grafana` values against a schema, so wrongly typed values (e.g. a numeric `image.tag` or label value, a quoted `service.port`) fail the install or upgrade. Grafana pods no longer have the `helm.sh/chart` label.
+**Update note 1**: if `prometheus-node-exporter.containerSecurityContext` sets `privileged: true` or adds `SYS_ADMIN` capability (e.g. for the `perf` collector), also set `allowPrivilegeEscalation: true` there, otherwise the API server rejects the node exporter DaemonSet. Set the new security context keys to `null` to restore the previous behaviour.
+
+- bump kube-state-metrics dependency chart to version 9.0.1. Its pod now has `nodeSelector: kubernetes.io/os: linux` by default; set `kube-state-metrics.nodeSelector: null` to remove it.
+- bump prometheus-node-exporter dependency chart to version 5.1.0. Node exporter and kube-rbac-proxy containers now run with `allowPrivilegeEscalation: false`, all capabilities dropped and `seccompProfile.type: RuntimeDefault`; liveness and readiness probe timeouts are raised from 1s to 5s.
+- bump grafana dependency chart to version 14.4.1 (Grafana 13.3.0). The chart now validates `grafana` values against a schema, so wrongly typed values (e.g. a numeric `image.tag` or label value, a quoted `service.port`) fail the install or upgrade. Grafana pods no longer have the `helm.sh/chart` label.
 - bump version of alertmanager to [v0.35.0](https://github.com/prometheus/alertmanager/releases/tag/v0.35.0)
 
 ## v0.98.1
