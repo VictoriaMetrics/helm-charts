@@ -172,3 +172,12 @@ tests:
             targetPort: custom-target
             nodePort: 31234
         documentIndex: 1
+  - it: service should not be rendered for the vector subchart
+    set:
+      vector:
+        enabled: true
+        service:
+          enabled: true
+    asserts:
+      - hasDocuments:
+          count: 3

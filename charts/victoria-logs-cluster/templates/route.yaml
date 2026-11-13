@@ -1,6 +1,6 @@
 {{- $ctx := dict "helm" . }}
 {{- range $name, $app := .Values }}
-{{- if and (kindIs "map" $app) $app.enabled ($app.route).enabled }}
+{{- if and (kindIs "map" $app) (not (hasKey $.Subcharts $name)) $app.enabled ($app.route).enabled }}
 {{- $route := $app.route }}
 {{- $_ := set $ctx "extraLabels" $route.extraLabels }}
 {{- $_ := set $ctx "appKey" $name }}

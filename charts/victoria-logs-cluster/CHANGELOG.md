@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- fix the `vector` subchart values being treated as a chart component: `vector.service.enabled: true` failed the render, and `vector.ingress.enabled` or `vector.podDisruptionBudget.enabled` created a second, unused resource next to the one from the subchart.
 
 ## v0.2.11
 
