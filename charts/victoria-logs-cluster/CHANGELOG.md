@@ -1,5 +1,6 @@
 ## Next release
 
+- bump VictoriaLogs version to [v1.54.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.54.0).
 - fix the `vector` subchart values being treated as a chart component: `vector.service.enabled: true` failed the render, and `vector.ingress.enabled` or `vector.podDisruptionBudget.enabled` created a second, unused resource next to the one from the subchart.
 - bump vmauth version to [v1.156.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.156.0).
 
