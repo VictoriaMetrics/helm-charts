@@ -1,6 +1,16 @@
 ## Next release
 
+- TODO
+
+## v0.2.12
+
+**Release date:** 13 Nov 2026
+
+![Helm: v3](https://img.shields.io/badge/Helm-v3.14%2B-informational?color=informational&logo=helm&link=https%3A%2F%2Fgithub.com%2Fhelm%2Fhelm%2Freleases%2Ftag%2Fv3.14.0) ![AppVersion: v1.54.0](https://img.shields.io/badge/v1.54.0-success?logo=VictoriaMetrics&labelColor=gray&link=https%3A%2F%2Fdocs.victoriametrics.com%2Fvictorialogs%2Fchangelog%2F%23v1540)
+
+- bump VictoriaLogs version to [v1.54.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.54.0).
 - fix the `vector` subchart values being treated as a chart component: `vector.service.enabled: true` failed the render, and `vector.ingress.enabled` or `vector.podDisruptionBudget.enabled` created a second, unused resource next to the one from the subchart.
+- bump vmauth version to [v1.156.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.156.0).
 
 ## v0.2.11
 
