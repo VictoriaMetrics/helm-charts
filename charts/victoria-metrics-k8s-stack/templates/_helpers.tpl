@@ -123,6 +123,9 @@ vm.version.label strips an `@sha256:...` digest from an image tag, so it's safe 
     {{- end -}}
   {{- end -}}
   {{- if $Values.vmalert.additionalNotifierConfigs }}
+    {{- if $Values.vmalert.notifierConfig -}}
+      {{- fail "`vmalert.notifierConfig` is not supported with `vmalert.additionalNotifierConfigs`, set notifier settings like `tls_config` in `vmalert.additionalNotifierConfigs` instead" -}}
+    {{- end -}}
     {{- $configName := printf "%s-additional-notifier" $fullname -}}
     {{- $notifierConfigRef := dict "name" $configName "key" "notifier-configs.yaml" -}}
     {{- $_ := set $remotes "notifierConfigRef" $notifierConfigRef -}}
@@ -136,7 +139,8 @@ vm.version.label strips an `@sha256:...` digest from an image tag, so it's safe 
     {{- $alertManagerReplicas := $Values.alertmanager.spec.replicaCount | default 1 | int -}}
     {{- range until $alertManagerReplicas -}}
       {{- $_ := set $ctx "appIdx" . -}}
-      {{- $notifiers = append $notifiers (dict "url" (include "vm.url" $ctx)) -}}
+      {{- $notifier := mergeOverwrite (deepCopy ($Values.vmalert.notifierConfig | default dict)) (dict "url" (include "vm.url" $ctx)) -}}
+      {{- $notifiers = append $notifiers $notifier -}}
       {{- $_ := unset $ctx "appIdx" }}
     {{- end }}
     {{- $_ := set $remotes "notifiers" $notifiers -}}

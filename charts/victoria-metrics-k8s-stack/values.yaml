@@ -1806,6 +1806,14 @@ vmalert:
   enabled: true
   # -- Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite
   remoteWriteVMAgent: false
+  # -- (object) Settings added to every notifier generated for the chart's alertmanager, e.g. `tlsConfig` or `basicAuth`.
+  # Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vmalertnotifierspec). Not supported with `additionalNotifierConfigs`
+  notifierConfig: {}
+  # tlsConfig:
+  #   ca:
+  #     secret:
+  #       name: alertmanager-ca
+  #       key: ca.crt
   # -- (object) Full spec for VMAlert CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vmalertspec)
   spec:
     port: "8080"

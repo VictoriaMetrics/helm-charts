@@ -106,3 +106,49 @@ tests:
       - equal:
           path: spec.remoteRead.url
           value: http://vmsingle-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:8428
+
+  - it: adds notifierConfig settings to every generated notifier
+    set:
+      grafana:
+        enabled: false
+      alertmanager:
+        spec:
+          replicaCount: 2
+          webConfig:
+            tls_server_config:
+              cert_secret_ref: {name: am-tls, key: tls.crt}
+              key_secret_ref: {name: am-tls, key: tls.key}
+      vmalert:
+        notifierConfig:
+          url: http://ignored:9093
+          tlsConfig:
+            ca:
+              secret: {name: am-ca, key: ca.crt}
+    asserts:
+      - equal:
+          path: spec.notifiers
+          value:
+            - url: https://vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack-0.vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9093
+              tlsConfig:
+                ca:
+                  secret: {name: am-ca, key: ca.crt}
+            - url: https://vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack-1.vmalertmanager-RELEASE-NAME-victoria-metrics-k8s-stack.NAMESPACE.svc.cluster.local.:9093
+              tlsConfig:
+                ca:
+                  secret: {name: am-ca, key: ca.crt}
+
+  - it: rejects notifierConfig together with additionalNotifierConfigs
+    set:
+      grafana:
+        enabled: false
+      vmalert:
+        notifierConfig:
+          tlsConfig:
+            ca:
+              secret: {name: am-ca, key: ca.crt}
+        additionalNotifierConfigs:
+          static_configs:
+            - targets: [http://am:9093]
+    asserts:
+      - failedTemplate:
+          errorMessage: "`vmalert.notifierConfig` is not supported with `vmalert.additionalNotifierConfigs`, set notifier settings like `tls_config` in `vmalert.additionalNotifierConfigs` instead"
