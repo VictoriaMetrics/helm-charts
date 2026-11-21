@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump `victoria-metrics-k8s-stack` dependency from `0.95.*` to `0.98.*`
 
 ## v0.50.0
 
