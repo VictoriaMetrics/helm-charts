@@ -1,9 +1,3 @@
-{{- if eq .Values.mode "single" }}
-{{ include "vmestimator.service" (dict "root" . "component" "single") }}
-{{- else }}
-{{ include "vmestimator.service" (dict "root" . "component" "storage" "headless" true) }}
+{{ include "vmestimator.service" (dict "root" . "role" "select") }}
 ---
-{{ include "vmestimator.service" (dict "root" . "component" "storage" "nameSuffix" "-insert") }}
----
-{{ include "vmestimator.service" (dict "root" . "component" "select") }}
-{{- end }}
+{{ include "vmestimator.service" (dict "root" . "role" "storage") }}

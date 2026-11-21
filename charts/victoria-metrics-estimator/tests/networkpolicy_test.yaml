@@ -7,7 +7,7 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: selects the pods of the single component
+  - it: selects the storage pods in single mode
     set:
       networkPolicy.enabled: true
     asserts:
@@ -15,13 +15,13 @@ tests:
           count: 1
       - equal:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
+          value: vmestimator-storage-RELEASE-NAME
       - equal:
           path: spec.podSelector.matchLabels
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: vmestimator-single
+            app.kubernetes.io/name: vmestimator-storage
             managed-by: vm-operator
 
   - it: renders a policy per component in cluster mode

@@ -2,18 +2,89 @@ suite: vmestimator workloads
 templates:
   - workload.yaml
 tests:
-  - it: renders single mode
+  - it: renders only a single-replica storage StatefulSet in single mode
     asserts:
       - hasDocuments:
           count: 1
       - isKind:
-          of: Deployment
+          of: StatefulSet
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.serviceName
+          value: vmestimator-storage-RELEASE-NAME
       - contains:
           path: spec.template.spec.containers[0].args
           content: --config=/etc/vmestimator/streams.yaml
       - matchRegex:
           path: spec.template.metadata.annotations["checksum/config"]
           pattern: ^[a-f0-9]{64}$
+  - it: ignores storage.replicaCount in single mode
+    set:
+      storage.replicaCount: 5
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+  - it: single mode overrides storage values with values set in single
+    set:
+      storage.extraArgs.httpListenAddr: ":9001"
+      storage.resources.limits.memory: 1Gi
+      single.extraArgs.httpListenAddr: ":9002"
+      single.fullnameOverride: custom-single
+    asserts:
+      - equal:
+          path: metadata.name
+          value: custom-single
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --httpListenAddr=:9002
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --loggerFormat=json
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 9002
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 1Gi
+  - it: rejects more than one replica set in single
+    set:
+      single.replicaCount: 2
+    asserts:
+      - failedTemplate:
+          errorMessage: .Values.single.replicaCount must be 1 in single mode
+  - it: ignores single values in cluster mode
+    set:
+      mode: cluster
+      single.fullnameOverride: custom-single
+      single.extraArgs.httpListenAddr: ":9002"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --httpListenAddr=:8490
+        documentIndex: 0
+  - it: single mode exposes cardinality estimates at /metrics by default
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/cardinality/metrics
+  - it: single mode honors an explicit storage.extraArgs.cardinalityMetrics.exposeAt
+    set:
+      storage.extraArgs:
+        cardinalityMetrics.exposeAt: /custom/estimates
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/custom/estimates
   - it: omits the checksum for an external ConfigMap
     set:
       config.existingConfigMap: external-config
@@ -25,7 +96,7 @@ tests:
           value: external-config
   - it: derives the container port from the listener
     set:
-      single.extraArgs.httpListenAddr: ":9000"
+      storage.extraArgs.httpListenAddr: ":9000"
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
@@ -44,6 +115,18 @@ tests:
       - isKind:
           of: StatefulSet
         documentIndex: 0
+      - equal:
+          path: spec.replicas
+          value: 2
+        documentIndex: 0
+      - equal:
+          path: spec.serviceName
+          value: vmestimator-storage-RELEASE-NAME
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/cardinality/metrics
+        documentIndex: 0
       - isKind:
           of: Deployment
         documentIndex: 1
@@ -53,17 +136,17 @@ tests:
         documentIndex: 1
   - it: preserves component fullname overrides
     set:
-      single.fullnameOverride: custom-single
+      storage.fullnameOverride: custom-storage
     asserts:
       - equal:
           path: metadata.name
-          value: custom-single
+          value: custom-storage
 
   - it: component fullname override wins over the chart-level fullnameOverride
     set:
       fullnameOverride: shared
-      single.fullnameOverride: custom-single
+      storage.fullnameOverride: custom-storage
     asserts:
       - equal:
           path: metadata.name
-          value: custom-single
+          value: custom-storage

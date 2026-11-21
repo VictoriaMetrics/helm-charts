@@ -65,67 +65,19 @@ config:
         group_by:
           - __name__
 
+# -- (object) Overrides of `storage` values in single mode, e.g. `single.resources`
 single:
-  # -- Number of single-node replicas
+  # -- Number of replicas in single mode, must be 1
   replicaCount: 1
-  # -- Additional command-line arguments
-  extraArgs:
-    envflag.enable: true
-    envflag.prefix: VM_
-    loggerFormat: json
-  # -- Override the container command
-  command: []
-  # -- Overrides the full name of the single-node component
+  # -- Overrides the full name of the storage component in single mode
   fullnameOverride: ""
-  # -- Additional environment variables
-  env: []
-  # -- Additional environment sources
-  envFrom: []
-  # -- Pod annotations
-  podAnnotations: {}
-  # -- Pod labels
-  podLabels: {}
-  # -- Container resources
-  resources: {}
-  # -- Custom DNS config for pod
-  dnsConfig: {}
-  # -- Pod node selector
-  nodeSelector: {}
-  # -- Pod tolerations
-  tolerations: []
-  # -- Pod affinity
-  affinity: {}
-  # -- Pod topology spread constraints
-  topologySpreadConstraints: []
-  # -- Additional volumes
-  extraVolumes: []
-  # -- Additional volume mounts
-  extraVolumeMounts: []
-  service:
-    # -- Service type
-    type: ClusterIP
-    # -- Service port
-    port: 8490
-    # -- Service annotations
-    annotations: {}
-    # -- Service labels
-    labels: {}
-  podDisruptionBudget:
-    # -- Enable a PodDisruptionBudget
-    enabled: false
-    # -- Minimum available pods
-    minAvailable: 0
-    # -- Maximum unavailable pods
-    maxUnavailable: 0
-    # -- Policy for evicting unhealthy pods
-    unhealthyPodEvictionPolicy:
 
+# -- (object) Settings of the storage component, which runs in both modes
 storage:
   # -- Number of storage nodes in cluster mode
   replicaCount: 3
   # -- Additional command-line arguments
   extraArgs:
-    cardinalityMetrics.exposeAt: /cardinality/metrics
     envflag.enable: true
     envflag.prefix: VM_
     loggerFormat: json
@@ -157,8 +109,9 @@ storage:
     maxUnavailable: 0
     unhealthyPodEvictionPolicy:
 
+# -- (object) Settings of the select component, which runs only in cluster mode
 select:
-  # -- Number of selector nodes in cluster mode
+  # -- Number of selector nodes
   replicaCount: 2
   # -- Additional command-line arguments
   extraArgs:
@@ -217,7 +170,7 @@ probe:
     periodSeconds: 30
 
 serviceMonitor:
-  # -- Create a VMServiceScrape for the public single/select service
+  # -- Create VMServiceScrapes for storage and, in cluster mode, select
   enabled: false
   # -- Scrape interval
   interval: ""
@@ -229,7 +182,7 @@ serviceMonitor:
   metricRelabelings: []
 
 ingress:
-  # -- Enable ingress for the public single/select service
+  # -- Enable ingress for the select service
   enabled: false
   # -- Ingress class name
   className: ""

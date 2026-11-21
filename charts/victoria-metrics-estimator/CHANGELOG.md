@@ -1,6 +1,8 @@
 ## Next release
 
-- TODO
+**Update note**: in `single` mode vmestimator runs as the `vmestimator-storage-<release>` StatefulSet instead of the `vmestimator-single-<release>` Deployment, configured with `storage.*` values overridden by `single.*` values, and the `vmestimator-single-<release>` Service is replaced by `vmestimator-storage-<release>` for remote write and `vmestimator-select-<release>` for queries. In `cluster` mode the `vmestimator-storage-<release>-insert` Service is removed, send remote write data to `vmestimator-storage-<release>` instead.
+
+- add `VMServiceScrape` for `storage` in `cluster` mode. In `single` mode `VMServiceScrape` is renamed to `vmestimator-storage-<release>`.
 
 ## v0.2.2
 
