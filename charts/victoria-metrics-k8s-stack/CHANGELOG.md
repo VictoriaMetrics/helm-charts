@@ -2,6 +2,7 @@
 
 **Update note 1**: if `prometheus-node-exporter.containerSecurityContext` sets `privileged: true` or adds `SYS_ADMIN` capability (e.g. for the `perf` collector), also set `allowPrivilegeEscalation: true` there, otherwise the API server rejects the node exporter DaemonSet. Set the new security context keys to `null` to restore the previous behaviour.
 
+- bump version of VM components to [v1.157.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.157.0)
 - bump version of VL components to [v1.54.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.54.0)
 - bump kube-state-metrics dependency chart to version 9.0.1. Its pod now has `nodeSelector: kubernetes.io/os: linux` by default; set `kube-state-metrics.nodeSelector: null` to remove it.
 - bump prometheus-node-exporter dependency chart to version 5.1.0. Node exporter and kube-rbac-proxy containers now run with `allowPrivilegeEscalation: false`, all capabilities dropped and `seccompProfile.type: RuntimeDefault`; liveness and readiness probe timeouts are raised from 1s to 5s.
