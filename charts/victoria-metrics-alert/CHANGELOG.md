@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.157.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.157.0)
 - bump version of alertmanager to [v0.35.0](https://github.com/prometheus/alertmanager/releases/tag/v0.35.0)
 
 ## v0.53.0

@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.157.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.157.0)
 - bump `victoria-metrics-k8s-stack` dependency from `0.95.*` to `0.98.*`
 
 ## v0.50.0

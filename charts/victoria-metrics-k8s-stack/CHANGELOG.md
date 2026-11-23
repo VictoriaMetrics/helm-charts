@@ -1,5 +1,6 @@
 ## Next release
 
+- bump version of VM components to [v1.157.0](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.157.0)
 **Update note 1**: if `prometheus-node-exporter.containerSecurityContext` sets `privileged: true` or adds `SYS_ADMIN` capability (e.g. for the `perf` collector), also set `allowPrivilegeEscalation: true` there, otherwise the API server rejects the node exporter DaemonSet. Set the new security context keys to `null` to restore the previous behaviour.
 
 - bump version of VL components to [v1.54.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.54.0)
