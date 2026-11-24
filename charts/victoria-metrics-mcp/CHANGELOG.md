@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump version of VictoriaMetrics MCP to [v1.22.0](https://github.com/victoriametrics/mcp-victoriametrics/releases/tag/v1.22.0)
 
 ## v0.4.1
 
