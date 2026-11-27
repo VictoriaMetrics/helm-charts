@@ -1,6 +1,6 @@
 ## Next release
 
-- TODO
+- bump version of VL components to [v1.55.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.55.0)
 
 ## v0.99.0
 
