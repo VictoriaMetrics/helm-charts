@@ -1,6 +1,7 @@
 ## Next release
 
 - render `extraHostPathMounts` in the operator pod. It was documented in `values.yaml` but never used by the templates.
+- set `seccompProfile.type` to `RuntimeDefault` for victoria-metrics-operator
 
 ## v0.68.2
 
