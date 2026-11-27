@@ -122,3 +122,20 @@ tests:
       - exists:
           path: spec.template.spec.volumes[?(@.configMap.name == "vmanomaly-RELEASE-NAME")]
         template: server.yaml
+  - it: StatefulSet has no serviceName with legacy naming
+    asserts:
+      - notExists:
+          path: spec.serviceName
+        template: server.yaml
+  - it: StatefulSet serviceName points to the Service with operator naming
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: spec.serviceName
+          value: vmanomaly-RELEASE-NAME
+        template: server.yaml
+      - equal:
+          path: metadata.name
+          value: vmanomaly-RELEASE-NAME
+        template: service.yaml
