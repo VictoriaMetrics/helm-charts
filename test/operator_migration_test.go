@@ -5,21 +5,28 @@ package test
 import (
 	"bytes"
 	"context"
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"slices"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/yaml"
 )
 
 const compatName = "compat"
@@ -31,6 +38,102 @@ type migrationCase struct {
 	kinds         []string
 	workloadKinds []string
 	ignore        []string
+	data          *dataCheck
+	healthPath    string
+	prepare       func(t *testing.T, kubeconfig, namespace string)
+}
+
+func (tc *migrationCase) expandManifest(chartDir string) (string, error) {
+	var chart struct {
+		AppVersion string `json:"appVersion"`
+	}
+	var values map[string]any
+	for name, v := range map[string]any{"Chart.yaml": &chart, "values.yaml": &values} {
+		data, err := os.ReadFile(filepath.Join(chartDir, name))
+		if err != nil {
+			return "", err
+		}
+		if err := yaml.Unmarshal(data, v); err != nil {
+			return "", err
+		}
+	}
+	return os.Expand(tc.manifest, func(key string) string {
+		if v, ok := tc.values[key]; ok {
+			return fmt.Sprint(v)
+		}
+		var v any = values
+		for _, k := range strings.Split(key, ".") {
+			m, _ := v.(map[string]any)
+			v = m[k]
+		}
+		if s, ok := v.(string); ok && s != "" {
+			return s
+		}
+		return chart.AppVersion
+	}), nil
+}
+
+func (tc *migrationCase) health() string {
+	if tc.healthPath == "" {
+		return "/-/healthy"
+	}
+	return tc.healthPath
+}
+
+type dataCheck struct {
+	write func(id string, ts time.Time) (target, body string)
+	read  func(id string) string
+}
+
+type dataPoint struct {
+	id     string
+	result string
+}
+
+func metricsData(insert, sel string) *dataCheck {
+	return &dataCheck{
+		write: func(id string, ts time.Time) (string, string) {
+			return insert + "/api/v1/import/prometheus", fmt.Sprintf("migration_test{id=%q} 1 %d\n", id, ts.UnixMilli())
+		},
+		read: func(id string) string {
+			return sel + "/api/v1/export?match%5B%5D=" + url.QueryEscape(fmt.Sprintf("migration_test{id=%q}", id))
+		},
+	}
+}
+
+func tracesData(insert, sel string) *dataCheck {
+	traceID := func(id string) string { return fmt.Sprintf("%x", md5.Sum([]byte(id))) }
+	return &dataCheck{
+		write: func(id string, ts time.Time) (string, string) {
+			span := map[string]any{
+				"traceId":           traceID(id),
+				"spanId":            traceID(id)[:16],
+				"name":              id,
+				"kind":              1,
+				"startTimeUnixNano": strconv.FormatInt(ts.UnixNano(), 10),
+				"endTimeUnixNano":   strconv.FormatInt(ts.Add(time.Millisecond).UnixNano(), 10),
+			}
+			body, _ := json.Marshal(map[string]any{"resourceSpans": []any{map[string]any{
+				"resource":   map[string]any{"attributes": []any{map[string]any{"key": "service.name", "value": map[string]any{"stringValue": "migration"}}}},
+				"scopeSpans": []any{map[string]any{"spans": []any{span}}},
+			}}})
+			return insert + "/insert/opentelemetry/v1/traces", string(body)
+		},
+		read: func(id string) string {
+			return sel + "/select/logsql/query?disable_latency_offset=true&query=" + url.QueryEscape(fmt.Sprintf("trace_id:=%q | fields _time, trace_id, span_id, name", traceID(id)))
+		},
+	}
+}
+
+func logsData(insert, sel string) *dataCheck {
+	return &dataCheck{
+		write: func(id string, ts time.Time) (string, string) {
+			return insert + "/insert/jsonline?_stream_fields=id", fmt.Sprintf(`{"_time":%q,"_msg":"migration","id":%q}`+"\n", ts.UTC().Format(time.RFC3339Nano), id)
+		},
+		read: func(id string) string {
+			return sel + "/select/logsql/query?query=" + url.QueryEscape(fmt.Sprintf("id:=%q | fields _time, _msg, id", id))
+		},
+	}
 }
 
 var migrationCases = []migrationCase{
@@ -41,9 +144,11 @@ var migrationCases = []migrationCase{
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMSingle
 spec:
+  image: {tag: "${server.image.tag}"}
   storage: {resources: {requests: {storage: 16Gi}}}
 `,
 		kinds: []string{"vmsingle"},
+		data:  metricsData("vmsingle-compat", "vmsingle-compat"),
 		ignore: []string{
 			"Deployment/vmsingle-compat container[vmsingle].port=",
 			"Service/vmsingle-compat port=",
@@ -56,9 +161,11 @@ spec:
 apiVersion: operator.victoriametrics.com/v1
 kind: VLSingle
 spec:
+  image: {tag: "${server.image.tag}"}
   storage: {resources: {requests: {storage: 10Gi}}}
 `,
 		kinds: []string{"vlsingle"},
+		data:  logsData("vlsingle-compat", "vlsingle-compat"),
 	},
 	{
 		chart:  "victoria-traces-single",
@@ -67,9 +174,11 @@ spec:
 apiVersion: operator.victoriametrics.com/v1
 kind: VTSingle
 spec:
+  image: {tag: "${server.image.tag}"}
   storage: {resources: {requests: {storage: 10Gi}}}
 `,
 		kinds: []string{"vtsingle"},
+		data:  tracesData("vtsingle-compat", "vtsingle-compat"),
 	},
 	{
 		chart:  "victoria-metrics-agent",
@@ -78,6 +187,7 @@ spec:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
 spec:
+  image: {tag: "${image.tag}"}
   remoteWrite: [{url: "http://x:8428/api/v1/write"}]
 `,
 		kinds: []string{"vmagent"},
@@ -95,6 +205,7 @@ spec:
 apiVersion: operator.victoriametrics.com/v1
 kind: VLAgent
 spec:
+  image: {tag: "${image.tag}"}
   rollingUpdateStrategy: RollingUpdate
   remoteWrite: [{url: "http://x:9428/internal/insert"}]
 `,
@@ -107,6 +218,7 @@ spec:
 apiVersion: operator.victoriametrics.com/v1
 kind: VTAgent
 spec:
+  image: {tag: "${image.tag}"}
   rollingUpdateStrategy: RollingUpdate
   remoteWrite: [{url: "http://x:10428/insert/native"}]
 `,
@@ -117,7 +229,7 @@ spec:
 		values: map[string]any{
 			"server.datasource.url":            "http://x:8428",
 			"alertmanager.enabled":             true,
-			"alertmanager.replicaCount":        2,
+			"alertmanager.replicaCount":        1,
 			"alertmanager.mode":                "statefulSet",
 			"server.notifier.alertmanager.url": "",
 		},
@@ -125,14 +237,16 @@ spec:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlert
 spec:
+  image: {tag: "${server.image.tag}"}
   datasource: {url: "http://x:8428"}
   notifier: {url: "http://x:9093"}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlertmanager
 spec:
+  image: {tag: "${alertmanager.image.tag}"}
   rollingUpdateStrategy: RollingUpdate
-  replicaCount: 2
+  replicaCount: 1
 `,
 		kinds: []string{"vmalert", "vmalertmanager"},
 		ignore: []string{
@@ -141,6 +255,9 @@ spec:
 			"StatefulSet/vmalertmanager-compat container=config-reloader",
 			"StatefulSet/vmalertmanager-compat container[config-reloader]",
 			"StatefulSet/vmalertmanager-compat volume=tls-assets",
+			"StatefulSet/vmalertmanager-compat container[alertmanager].port=mesh-",
+			"Service/vmalertmanager-compat port=tcp-mesh",
+			"Service/vmalertmanager-compat port=udp-mesh",
 		},
 	},
 	{
@@ -150,6 +267,7 @@ spec:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAuth
 spec:
+  image: {tag: "${image.tag}"}
   unauthorizedUserAccessSpec:
     url_prefix: ["http://x:8428"]
 `,
@@ -159,72 +277,158 @@ spec:
 			"Deployment/vmauth-compat container[config-reloader]",
 		},
 	}, {
-		chart:  "victoria-metrics-cluster",
-		values: map[string]any{"serviceAccount.create": true, "vmselect.mode": "statefulSet"},
+		chart: "victoria-metrics-cluster",
+		values: map[string]any{
+			"serviceAccount.create":  true,
+			"vmselect.mode":          "statefulSet",
+			"vmstorage.replicaCount": 1,
+			"vmselect.replicaCount":  1,
+			"vminsert.replicaCount":  1,
+		},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMCluster
 spec:
+  clusterVersion: "${vmstorage.image.tag}-cluster"
   retentionPeriod: "1"
   vmstorage:
-    replicaCount: 2
+    replicaCount: 1
     rollingUpdateStrategy: RollingUpdate
     resources: {requests: {cpu: 10m, memory: 32Mi}}
     storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 8Gi}}}}}
   vmselect:
-    replicaCount: 2
+    replicaCount: 1
     rollingUpdateStrategy: RollingUpdate
     resources: {requests: {cpu: 10m, memory: 32Mi}}
   vminsert:
-    replicaCount: 2
+    replicaCount: 1
     resources: {requests: {cpu: 10m, memory: 32Mi}}
 `,
 		kinds:         []string{"vmcluster", "vmstorage", "vmselect", "vminsert"},
 		workloadKinds: []string{"vmstorage", "vmselect", "vminsert"},
+		data:          metricsData("vminsert-compat/insert/0/prometheus", "vmselect-compat/select/0/prometheus"),
 	},
 	{
-		chart:  "victoria-logs-cluster",
-		values: map[string]any{"serviceAccount.create": true},
+		chart: "victoria-logs-cluster",
+		values: map[string]any{
+			"serviceAccount.create":  true,
+			"vlstorage.replicaCount": 1,
+			"vlselect.replicaCount":  1,
+			"vlinsert.replicaCount":  1,
+		},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1
 kind: VLCluster
 spec:
+  clusterVersion: "${vlstorage.image.tag}"
   vlstorage:
-    replicaCount: 2
+    replicaCount: 1
     rollingUpdateStrategy: RollingUpdate
     resources: {requests: {cpu: 10m, memory: 32Mi}}
     storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
   vlselect:
-    replicaCount: 2
+    replicaCount: 1
     resources: {requests: {cpu: 10m, memory: 32Mi}}
   vlinsert:
-    replicaCount: 2
+    replicaCount: 1
     resources: {requests: {cpu: 10m, memory: 32Mi}}
 `,
 		kinds:         []string{"vlcluster", "vlstorage", "vlselect", "vlinsert"},
 		workloadKinds: []string{"vlstorage", "vlselect", "vlinsert"},
+		data:          logsData("vlinsert-compat", "vlselect-compat"),
 	},
 	{
-		chart:  "victoria-traces-cluster",
-		values: map[string]any{"serviceAccount.create": true},
+		chart: "victoria-traces-cluster",
+		values: map[string]any{
+			"serviceAccount.create":  true,
+			"vtstorage.replicaCount": 1,
+			"vtselect.replicaCount":  1,
+			"vtinsert.replicaCount":  1,
+		},
 		manifest: `
 apiVersion: operator.victoriametrics.com/v1
 kind: VTCluster
 spec:
+  clusterVersion: "${vtstorage.image.tag}"
   storage:
-    replicaCount: 2
+    replicaCount: 1
     rollingUpdateStrategy: RollingUpdate
     resources: {requests: {cpu: 10m, memory: 32Mi}}
     storage: {volumeClaimTemplate: {spec: {resources: {requests: {storage: 10Gi}}}}}
   select:
-    replicaCount: 2
+    replicaCount: 1
     resources: {requests: {cpu: 10m, memory: 32Mi}}
   insert:
-    replicaCount: 2
+    replicaCount: 1
     resources: {requests: {cpu: 10m, memory: 32Mi}}
 `,
 		kinds:         []string{"vtcluster", "vtstorage", "vtselect", "vtinsert"},
 		workloadKinds: []string{"vtstorage", "vtselect", "vtinsert"},
+		data:          tracesData("vtinsert-compat", "vtselect-compat"),
+	},
+	{
+		chart: "victoria-metrics-anomaly",
+		values: map[string]any{
+			"license.secret.name":                  "license",
+			"license.secret.key":                   "key",
+			"persistentVolume.enabled":             true,
+			"statefulSet.spec.podManagementPolicy": "Parallel",
+			"service.enabled":                      true,
+			"config.reader.datasource_url":         "http://vmsingle-datasource:8428",
+			"config.reader.sampling_period":        "1m",
+			"config.reader.queries.test.expr":      "sum(up)",
+			"config.writer.datasource_url":         "http://vmsingle-datasource:8428",
+			"config.models.test.class":             "zscore",
+			"config.schedulers.test.class":         "scheduler.periodic.PeriodicScheduler",
+			"config.schedulers.test.infer_every":   "1m",
+			"config.schedulers.test.fit_every":     "2m",
+			"config.schedulers.test.fit_window":    "3h",
+		},
+		manifest: `
+apiVersion: operator.victoriametrics.com/v1
+kind: VMAnomaly
+spec:
+  image: {tag: "${image.tag}"}
+  license: {keyRef: {name: license, key: key}}
+  configRawYaml: |
+    reader:
+      queries:
+        test: {expr: "sum(up)"}
+    models:
+      test: {class: zscore}
+    schedulers:
+      test: {class: scheduler.periodic.PeriodicScheduler, infer_every: 1m, fit_every: 2m, fit_window: 3h}
+  reader: {datasourceURL: "http://vmsingle-datasource:8428", samplingPeriod: 1m}
+  writer: {datasourceURL: "http://vmsingle-datasource:8428"}
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources: {requests: {storage: 1Gi}}
+`,
+		kinds:      []string{"vmanomaly"},
+		healthPath: "/health",
+		ignore: []string{
+			"ServiceAccount/vmanomaly-compat",
+			"StatefulSet/vmanomaly-compat serviceAccountName=",
+			"StatefulSet/vmanomaly-compat container[vmanomaly].port=monitoring-http",
+			"StatefulSet/vmanomaly-compat volume=license",
+			"StatefulSet/vmanomaly-compat volume=tls-assets",
+		},
+		prepare: func(t *testing.T, kubeconfig, namespace string) {
+			_, err := kubectl(kubeconfig, `
+apiVersion: v1
+kind: Secret
+metadata: {name: license}
+stringData: {key: dummy}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMSingle
+metadata: {name: datasource}
+spec: {}
+`, "apply", "-n", namespace, "-f", "-")
+			require.NoError(t, err)
+		},
 	},
 }
 
@@ -274,8 +478,22 @@ func TestOperatorMigration(t *testing.T) {
 					require.NoError(t, err, "%s did not become %s", k, status)
 				}
 			}
+			if tc.prepare != nil {
+				tc.prepare(t, kc, namespace)
+			}
+			var points []dataPoint
+			checkData := func(phase string) {
+				t.Helper()
+				if tc.data == nil {
+					return
+				}
+				requireData(t, ctx, client, namespace, tc.data, points)
+				points = append(points, writeData(t, ctx, client, namespace, tc.data, namespace+"-"+phase))
+			}
 			chartDir := filepath.Join(chartsDir, tc.chart)
 			chartArgs := migrationHelmArgs(chartDir, namespace, tc.values)
+			manifest, err := tc.expandManifest(chartDir)
+			require.NoError(t, err)
 			forgetRelease := func() {
 				t.Helper()
 				_, err := kubectl(kc, "", "delete", "secrets", "-n", namespace, "-l", fmt.Sprintf("owner=helm,name=%s", compatName))
@@ -287,15 +505,19 @@ func TestOperatorMigration(t *testing.T) {
 			chartObjs := waitForRollout(t, ctx, kc, namespace, tc.kinds, workloadKinds, byChart)
 			chartPVCs, err := releaseObjects(kc, namespace, "persistentvolumeclaims")
 			require.NoError(t, err)
+			requireAvailable(t, ctx, client, namespace, tc.health(), chartObjs)
+			checkData("chart")
 
 			forgetRelease()
-			_, err = kubectl(kc, compatManifest(tc.manifest), "apply", "-n", namespace, "-f", "-")
+			_, err = kubectl(kc, compatManifest(manifest), "apply", "-n", namespace, "-f", "-")
 			require.NoError(t, err)
 			waitForStatus("operational")
 			operatorObjs := waitForRollout(t, ctx, kc, namespace, tc.kinds, workloadKinds, byOperator)
 			requireSameContract(t, operatorObjs, chartObjs, tc.ignore, "chart %s differs from the operator", tc.chart)
 			requireKept(t, chartPVCs, mustReleaseObjects(t, kc, namespace, "persistentvolumeclaims"))
 			requireKept(t, chartObjs, operatorObjs)
+			requireAvailable(t, ctx, client, namespace, tc.health(), operatorObjs)
+			checkData("operator")
 
 			for _, k := range crKinds {
 				_, err = kubectl(kc, "", "patch", strings.ToLower(k), compatName, "-n", namespace, "--type=merge", "-p", `{"spec":{"paused":true}}`)
@@ -315,6 +537,8 @@ func TestOperatorMigration(t *testing.T) {
 			requireSameContract(t, chartObjs, migratedObjs, nil, "chart %s changed after migrating back from the operator", tc.chart)
 			requireKept(t, chartPVCs, mustReleaseObjects(t, kc, namespace, "persistentvolumeclaims"))
 			requireKept(t, operatorObjs, migratedObjs)
+			requireAvailable(t, ctx, client, namespace, tc.health(), migratedObjs)
+			checkData("migrated")
 		})
 	}
 }
@@ -530,7 +754,18 @@ func waitForRollout(t *testing.T, ctx context.Context, kubeconfig, namespace str
 				return false, nil
 			}
 		}
-		return !slices.ContainsFunc(objs, func(o *unstructured.Unstructured) bool { return isWorkload(o) && !rolledOut(o) }), nil
+		if slices.ContainsFunc(objs, func(o *unstructured.Unstructured) bool { return isWorkload(o) && !rolledOut(o) }) {
+			return false, nil
+		}
+		out, err := kubectl(kubeconfig, "", "get", "pods", "-n", namespace, "-o", "json", "-l", "app.kubernetes.io/instance="+compatName)
+		if err != nil {
+			return false, nil
+		}
+		var pods unstructured.UnstructuredList
+		if err := json.Unmarshal(out, &pods); err != nil {
+			return false, nil
+		}
+		return !slices.ContainsFunc(pods.Items, func(p unstructured.Unstructured) bool { return p.GetDeletionTimestamp() != nil }), nil
 	})
 	require.NoError(t, err, "workloads for %v did not roll out", workloadKinds)
 	return objs
@@ -634,4 +869,100 @@ func releaseObjects(kubeconfig, namespace, resources string) ([]*unstructured.Un
 		objs[i] = &list.Items[i]
 	}
 	return objs, nil
+}
+
+func serviceRequest(ctx context.Context, client *kubernetes.Clientset, namespace, target, body string) ([]byte, error) {
+	svc, rest, _ := strings.Cut(target, "/")
+	p, query, _ := strings.Cut(rest, "?")
+	req := client.CoreV1().RESTClient().Get()
+	if body != "" {
+		req = client.CoreV1().RESTClient().Post().SetHeader("Content-Type", "application/json").Body([]byte(body))
+	}
+	req = req.AbsPath("/api/v1/namespaces", namespace, "services", svc+":http", "proxy", p)
+	values, err := url.ParseQuery(query)
+	if err != nil {
+		return nil, err
+	}
+	for k, vs := range values {
+		for _, v := range vs {
+			req = req.Param(k, v)
+		}
+	}
+	return req.DoRaw(ctx)
+}
+
+func pollService(ctx context.Context, client *kubernetes.Clientset, namespace, target, body string, done func([]byte) bool) ([]byte, error) {
+	var out []byte
+	var lastErr error
+	err := wait.PollUntilContextTimeout(ctx, pollingInterval, pollingTimeout, true, func(ctx context.Context) (bool, error) {
+		out, lastErr = serviceRequest(ctx, client, namespace, target, body)
+		return lastErr == nil && done(out), nil
+	})
+	if lastErr != nil {
+		return out, lastErr
+	}
+	return out, err
+}
+
+func requireAvailable(t *testing.T, ctx context.Context, client *kubernetes.Clientset, namespace, healthPath string, objs []*unstructured.Unstructured) {
+	t.Helper()
+	for _, o := range objs {
+		if o.GetKind() != "Service" {
+			continue
+		}
+		ports, _, _ := unstructured.NestedSlice(o.Object, "spec", "ports")
+		if !slices.ContainsFunc(ports, func(p any) bool { return p.(map[string]any)["name"] == "http" }) {
+			continue
+		}
+		_, err := pollService(ctx, client, namespace, o.GetName()+healthPath, "", func([]byte) bool { return true })
+		require.NoError(t, err, "Service %s is not available", o.GetName())
+	}
+}
+
+func writeData(t *testing.T, ctx context.Context, client *kubernetes.Clientset, namespace string, d *dataCheck, id string) dataPoint {
+	t.Helper()
+	target, body := d.write(id, time.Now())
+	_, err := pollService(ctx, client, namespace, target, body, func([]byte) bool { return true })
+	if err != nil {
+		logDiagnostics(t, ctx, client, namespace)
+	}
+	require.NoError(t, err, "cannot write %s", id)
+	out, err := pollService(ctx, client, namespace, d.read(id), "", func(out []byte) bool { return bytes.Contains(out, []byte(id)) })
+	if err != nil {
+		logDiagnostics(t, ctx, client, namespace)
+	}
+	require.NoError(t, err, "cannot read %s after writing it: %s", id, out)
+	return dataPoint{id: id, result: string(out)}
+}
+
+func requireData(t *testing.T, ctx context.Context, client *kubernetes.Clientset, namespace string, d *dataCheck, points []dataPoint) {
+	t.Helper()
+	for _, p := range points {
+		out, err := pollService(ctx, client, namespace, d.read(p.id), "", func(out []byte) bool { return string(out) == p.result })
+		if err != nil {
+			logDiagnostics(t, ctx, client, namespace)
+		}
+		require.NoError(t, err, "%s differs from what was read before migration:\nbefore: %s\nafter:  %s", p.id, p.result, out)
+	}
+}
+
+func logDiagnostics(t *testing.T, ctx context.Context, client *kubernetes.Clientset, namespace string) {
+	t.Helper()
+	pods, err := client.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		t.Logf("cannot list pods: %s", err)
+		return
+	}
+	tail := int64(50)
+	for _, p := range pods.Items {
+		t.Logf("pod %s: phase=%s terminating=%t node=%s", p.Name, p.Status.Phase, p.DeletionTimestamp != nil, p.Spec.NodeName)
+		for _, c := range p.Spec.Containers {
+			logs, err := client.CoreV1().Pods(namespace).GetLogs(p.Name, &corev1.PodLogOptions{Container: c.Name, TailLines: &tail}).DoRaw(ctx)
+			if err != nil {
+				t.Logf("cannot get logs of %s/%s: %s", p.Name, c.Name, err)
+				continue
+			}
+			t.Logf("logs of %s/%s:\n%s", p.Name, c.Name, logs)
+		}
+	}
 }
