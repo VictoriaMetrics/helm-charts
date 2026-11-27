@@ -1,6 +1,11 @@
 ## Next release
 
-- TODO
+**Update note 1**: prometheus-node-exporter 6.x renders its default filesystem collector arguments from `prometheus-node-exporter.defaultArgs` and adds `prometheus-node-exporter.extraArgs` after them. If your values set `--collector.filesystem.mount-points-exclude` or `--collector.filesystem.fs-types-exclude` in `prometheus-node-exporter.extraArgs`, move them to `prometheus-node-exporter.defaultArgs`, otherwise node exporter fails to start because of the repeated flags.
+
+- bump operator dependency chart to version 0.69.0 (operator v0.76.0). See full changelog [here](https://github.com/VictoriaMetrics/operator/releases/tag/v0.76.0)
+- bump grafana dependency chart to version 14.5.1 (Grafana 13.3.2)
+- bump kube-state-metrics dependency chart to version 9.1.0
+- bump prometheus-node-exporter dependency chart to version 6.0.0 (node exporter v1.13.1). Its default filesystem collector arguments moved from `extraArgs` to `defaultArgs`, see update note 1.
 
 ## v0.99.1
 
