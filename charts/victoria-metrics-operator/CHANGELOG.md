@@ -1,5 +1,6 @@
 ## Next release
 
+- updates operator to [v0.76.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.76.0) version
 - render `extraHostPathMounts` in the operator pod. It was documented in `values.yaml` but never used by the templates.
 - set `seccompProfile.type` to `RuntimeDefault` for victoria-metrics-operator
 
