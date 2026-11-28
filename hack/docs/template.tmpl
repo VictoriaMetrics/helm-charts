@@ -59,6 +59,17 @@
 {{ end }}
 
 {{- define "chart.installSection" -}}
+{{- $chartName := include "chart.name" . }}
+{{- $legacyNaming := false }}
+{{- $deploymentMode := false }}
+{{- range .Values }}
+  {{- if and (eq .Key "useLegacyNaming") (eq (trimAll "`" (default .Default .AutoDefault)) "true") }}
+    {{- $legacyNaming = true }}
+  {{- end }}
+  {{- if eq .Key "server.mode" }}
+    {{- $deploymentMode = true }}
+  {{- end }}
+{{- end }}
 ## How to install
 
 Access a Kubernetes cluster.
@@ -72,30 +83,48 @@ helm repo add vm https://victoriametrics.github.io/helm-charts/
 
 helm repo update
 ```
-List versions of `vm/{{ template "chart.name" . }}` chart available to installation:
+List versions of `vm/{{ $chartName }}` chart available to installation:
 
 ```console
-helm search repo vm/{{ template "chart.name" . }} -l
+helm search repo vm/{{ $chartName }} -l
 ```
 
-### Install `{{ template "chart.name" . }}` chart
+### Install `{{ $chartName }}` chart
 
-Export default values of `{{ template "chart.name" . }}` chart to file `values.yaml`:
+Export default values of `{{ $chartName }}` chart to file `values.yaml`:
 
   - For HTTPS repository
 
     ```console
-    helm show values vm/{{ template "chart.name" . }} > values.yaml
+    helm show values vm/{{ $chartName }} > values.yaml
     ```
   - For OCI repository
 
     ```console
-    helm show values oci://ghcr.io/victoriametrics/helm-charts/{{ template "chart.name" . }} > values.yaml
+    helm show values oci://ghcr.io/victoriametrics/helm-charts/{{ $chartName }} > values.yaml
     ```
 
 Change the values according to the need of the environment in ``values.yaml`` file.
+{{- if $legacyNaming }}
 
-{{- $release := (include "chart.name" .) | replace "-" " " | initials }}
+For new installations set `useLegacyNaming: false` in ``values.yaml`` to use resource names and labels compatible with the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/):
+
+```yaml
+useLegacyNaming: false
+{{- if $deploymentMode }}
+server:
+  mode: deployment
+{{- end }}
+```
+{{- if $deploymentMode }}
+
+`server.mode: statefulSet` is not supported with operator-compatible naming, as the VictoriaMetrics operator runs a single-node instance as a Deployment.
+{{- end }}
+
+> Don't change `useLegacyNaming` for existing installations: resource names, labels and selectors change, so workloads have to be recreated.
+{{- end }}
+
+{{- $release := $chartName | replace "-" " " | initials }}
 
 > Consider setting `.Values.nameOverride` to a small value like `{{ $release }}` to avoid hitting resource name limits of 63 characters
 
@@ -104,13 +133,13 @@ Test the installation with command:
   - For HTTPS repository
 
     ```console
-    helm install {{ $release }} vm/{{ template "chart.name" . }} -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install {{ $release }} vm/{{ $chartName }} -f values.yaml -n NAMESPACE --debug --dry-run
     ```
 
   - For OCI repository
 
     ```console
-    helm install {{ $release }} oci://ghcr.io/victoriametrics/helm-charts/{{ template "chart.name" . }} -f values.yaml -n NAMESPACE --debug --dry-run
+    helm install {{ $release }} oci://ghcr.io/victoriametrics/helm-charts/{{ $chartName }} -f values.yaml -n NAMESPACE --debug --dry-run
     ```
 
 Install chart with command:
@@ -118,13 +147,13 @@ Install chart with command:
   - For HTTPS repository
 
     ```console
-    helm install {{ $release }} vm/{{ template "chart.name" . }} -f values.yaml -n NAMESPACE
+    helm install {{ $release }} vm/{{ $chartName }} -f values.yaml -n NAMESPACE
     ```
 
   - For OCI repository
 
     ```console
-    helm install {{ $release }} oci://ghcr.io/victoriametrics/helm-charts/{{ template "chart.name" . }} -f values.yaml -n NAMESPACE
+    helm install {{ $release }} oci://ghcr.io/victoriametrics/helm-charts/{{ $chartName }} -f values.yaml -n NAMESPACE
     ```
 
 Get the pods lists by running this commands:
@@ -189,10 +218,44 @@ Before installing this chart, ensure your environment meets the following requir
 
 Additional requirements depend on your configuration:
 
-* **Persistent storage** - Required if you enable persistent volumes for data retention (enabled by default)
+* **Persistent storage** - Required if you enable persistent volumes for data retention
 * **kubectl** - Needed for cluster management and troubleshooting
+{{- if kindIs "map" . }}
+{{- with .operator }}
+* **VictoriaMetrics operator** - Installed by this chart by default, must be [installed](https://docs.victoriametrics.com/helm/victoria-metrics-operator/) separately if `{{ . }}` is `false`
+{{- end }}
+{{- end }}
 
 For installation instructions, refer to the official documentation:
 * [Installing Helm](https://helm.sh/docs/intro/install/)
 * [Installing kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+{{- end -}}
+
+{{- define "chart.resourceNamingSection" -}}
+## Resource Naming
+
+By default, this chart uses release-name based resource naming for historical reasons and
+backwards compatibility with existing deployments.
+
+> [!WARNING]
+> For new deployments, it is recommended to set `useLegacyNaming: false` to use operator-style
+> names (e.g. `{{ .kind }}-<release>`). This aligns resource names with the
+> [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) convention and
+> simplifies future migration to operator-managed resources.
+{{- if .migration }}
+
+### Migration to the VictoriaMetrics operator
+
+To move this release to resources managed by the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/),
+generate the equivalent custom resource from your values with [helm-converter](https://docs.victoriametrics.com/operator/helm-converter/).
+{{- end }}
+{{- end -}}
+
+{{- define "chart.operatorNote" -}}
+> [!NOTE]
+> This chart doesn't render Deployments, StatefulSets, DaemonSets or Services for VictoriaMetrics, VictoriaLogs and VictoriaTraces components.
+> It renders custom resources, and the [VictoriaMetrics operator](https://docs.victoriametrics.com/operator/) creates and manages workloads from them.
+> Component values like {{ range $i, $spec := .specs }}{{ if $i }}{{ if eq (add1 $i) (len $.specs) }} or {{ else }}, {{ end }}{{ end }}`{{ $spec }}`{{ end }} are passed to the custom resource spec as is,
+> so only fields described in the [operator API reference](https://docs.victoriametrics.com/operator/api/) can be configured.
+> If you need full control over Kubernetes resources, use [standalone charts](https://docs.victoriametrics.com/helm/#list-of-charts) instead.
 {{- end -}}

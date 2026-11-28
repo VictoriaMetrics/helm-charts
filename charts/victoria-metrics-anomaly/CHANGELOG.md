@@ -1,6 +1,7 @@
 ## Next release
 
 - upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.33.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1331)
+- added `useLegacyNaming` option. When set to `false`, resource names use the operator-style convention (`<type>-<release>`) instead of the default release-name based naming.
 
 ## v1.12.21
 
