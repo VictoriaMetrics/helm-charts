@@ -20,7 +20,7 @@ tags:
 
 ## Quick start
 
-Install the chart in single-node mode:
+Install the chart with a single storage node:
 
 ```sh
 helm install vmestimator vm/victoria-metrics-estimator
@@ -29,16 +29,18 @@ helm install vmestimator vm/victoria-metrics-estimator
 Configure vmagent to replicate remote write traffic to:
 
 ```text
-http://vmestimator-single-vmestimator:8490/cardinality/api/v1/write
+http://vmestimator-storage-vmestimator:8490/cardinality/api/v1/write
 ```
 
-For cluster mode:
+Cardinality estimations are exposed at `http://vmestimator-storage-vmestimator:8490/metrics`.
+
+Each storage node maintains estimations only for the data it received, so enable select nodes to run several storage nodes:
 
 ```sh
-helm install vmestimator vm/victoria-metrics-estimator --set mode=cluster
+helm install vmestimator vm/victoria-metrics-estimator --set storage.replicaCount=3 --set select.enabled=true
 ```
 
-Send remote write traffic to the `vmestimator-storage-vmestimator-insert` service and scrape cardinality estimates from the `vmestimator-select-vmestimator` service. See the [vmestimator documentation](https://docs.victoriametrics.com/victoriametrics/vmestimator/) for architecture and vmagent configuration details.
+Select nodes query all storage nodes and expose merged estimations at `http://vmestimator-select-vmestimator:8490/metrics`, while storage nodes expose local estimations at `/cardinality/metrics`. The storage Service is headless, so remote write requests are sent to all storage nodes resolved by its DNS name. See the [vmestimator documentation](https://docs.victoriametrics.com/victoriametrics/vmestimator/) for architecture and vmagent configuration details.
 
 {{ include "chart.installSection" . }}
 

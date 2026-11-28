@@ -1,15 +1,30 @@
 {{- define "vmestimator.validate" -}}
-  {{- if not (has .Values.mode (list "single" "cluster")) -}}
-    {{- fail ".Values.mode must be either single or cluster" -}}
+  {{- if hasKey .Values "mode" -}}
+    {{- fail "`.Values.mode` is removed, storage nodes always run, set `.Values.select.enabled: true` to merge estimations of several storage nodes" -}}
   {{- end -}}
-  {{- if and (eq .Values.mode "cluster") (lt (int .Values.storage.replicaCount) 1) -}}
-    {{- fail ".Values.storage.replicaCount must be at least 1 in cluster mode" -}}
+  {{- if hasKey .Values "single" -}}
+    {{- fail "`.Values.single` is removed, use `.Values.storage` instead" -}}
+  {{- end -}}
+  {{- if and (lt (int .Values.storage.replicaCount) 1) (not (and .Values.select.enabled (.Values.select.extraArgs | default dict).storageNode)) -}}
+    {{- fail ".Values.storage.replicaCount must be positive, unless .Values.select.extraArgs.storageNode points to external storage nodes" -}}
   {{- end -}}
   {{- include "vmestimator.validateNaming" (dict "root" .) -}}
-  {{- $components := ternary (list "single") (list "storage" "select") (eq .Values.mode "single") -}}
-  {{- range $component := $components -}}
+  {{- range $component := include "vmestimator.components" . | fromYamlArray -}}
     {{- include "vmestimator.validateNaming" (dict "root" $ "component" $component) -}}
   {{- end -}}
+{{- end -}}
+
+{{- define "vmestimator.components" -}}
+  {{- ternary (list "storage" "select") (list "storage") (eq (toString .Values.select.enabled) "true") | toYaml -}}
+{{- end -}}
+
+{{- /*
+vmestimator.queryComponent returns the component exposing cardinality estimations of all storage nodes:
+select if it's enabled and has replicas, storage otherwise.
+*/ -}}
+{{- define "vmestimator.queryComponent" -}}
+  {{- $select := .Values.select -}}
+  {{- ternary "select" "storage" (and (eq (toString $select.enabled) "true") (gt (int $select.replicaCount) 0)) -}}
 {{- end -}}
 
 {{- define "vmestimator.validateNaming" -}}
@@ -24,10 +39,10 @@
 
 {{- /*
 vmestimator.fullname resolves the fully qualified name of a chart resource.
-Pass "component" as one of "single", "storage" or "select" for a
-per-component resource, or omit it for a chart-wide shared resource
-(ConfigMap, ServiceAccount) — the latter honors a root-level
-fullnameOverride/global.fullnameOverride, matching every other chart.
+Pass "component" as "storage" or "select" for a per-component
+resource, or omit it for a chart-wide shared resource (ConfigMap, ServiceAccount)
+— the latter honors a root-level fullnameOverride/global.fullnameOverride,
+matching every other chart.
 */ -}}
 {{- define "vmestimator.fullname" -}}
   {{- include "vmestimator.validateNaming" . -}}
@@ -38,10 +53,47 @@ fullnameOverride/global.fullnameOverride, matching every other chart.
   {{- end -}}
 {{- end -}}
 
+{{- /*
+vmestimator.appValues resolves the configuration dict for a workload component. If select nodes run,
+storage nodes expose local cardinality estimations at /cardinality/metrics unless set explicitly.
+*/ -}}
+{{- define "vmestimator.appValues" -}}
+  {{- $app := deepCopy (index .root.Values .component | default dict) -}}
+  {{- if and (eq .component "storage") (eq (include "vmestimator.queryComponent" .root) "select") -}}
+    {{- $extraArgs := $app.extraArgs | default dict -}}
+    {{- if not (hasKey $extraArgs "cardinalityMetrics.exposeAt") -}}
+      {{- $_ := set $extraArgs "cardinalityMetrics.exposeAt" "/cardinality/metrics" -}}
+      {{- $_ := set $app "extraArgs" $extraArgs -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $app | toYaml -}}
+{{- end -}}
+
+{{- define "vmestimator.port" -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" .) -}}
+  {{- include "vm.port.from.flag" (dict "flag" ($app.extraArgs | default dict).httpListenAddr "default" $app.service.port) -}}
+{{- end -}}
+
+{{- /*
+vmestimator.cardinalityPath resolves the effective HTTP path vmestimator exposes
+cardinality_estimate metrics at for a component.
+*/ -}}
+{{- define "vmestimator.cardinalityPath" -}}
+  {{- $root := .root -}}
+  {{- $component := .component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
+  {{- $extraArgs := $app.extraArgs | default dict -}}
+  {{- if hasKey $extraArgs "cardinalityMetrics.exposeAt" -}}
+    {{- index $extraArgs "cardinalityMetrics.exposeAt" -}}
+  {{- else -}}
+    /metrics
+  {{- end -}}
+{{- end -}}
+
 {{- define "vmestimator.args" -}}
   {{- $root := .root -}}
   {{- $component := .component -}}
-  {{- $app := index $root.Values $component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $args := dict "httpListenAddr" (printf ":%v" $app.service.port) -}}
   {{- if ne $component "select" -}}
     {{- $_ := set $args "config" (printf "/etc/vmestimator/%s" $root.Values.config.key) -}}
@@ -69,7 +121,7 @@ fullnameOverride/global.fullnameOverride, matching every other chart.
   {{- $root := .root -}}
   {{- $component := .component -}}
   {{- $kind := .kind -}}
-  {{- $app := index $root.Values $component -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
   {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
   {{- $configChecksum := and (ne $component "select") (not $root.Values.config.existingConfigMap) -}}
@@ -116,7 +168,7 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: vmestimator
+        - name: {{ $component }}
           {{- if $root.Values.securityContext.enabled }}
           securityContext: {{ include "vm.securityContext" (dict "securityContext" $root.Values.securityContext "helm" $root) | nindent 12 }}
           {{- end }}
@@ -190,24 +242,20 @@ spec:
       {{- end }}
 {{- end -}}
 
-{{- define "vmestimator.serviceName" -}}
-  {{- $nameSuffix := .nameSuffix | default "" -}}
-  {{- printf "%s%s" ((include "vmestimator.fullname" (dict "root" .root "component" .component)) | trunc (int (sub 63 (len $nameSuffix)))) $nameSuffix | trimSuffix "-" -}}
-{{- end -}}
-
+{{- /*
+vmestimator.service renders the Service of a component. The storage Service is the headless governing
+Service of the storage StatefulSet.
+*/ -}}
 {{- define "vmestimator.service" -}}
   {{- $root := .root -}}
   {{- $component := .component -}}
-  {{- $headless := .headless | default false -}}
-  {{- $nameSuffix := .nameSuffix | default "" -}}
-  {{- $app := index $root.Values $component -}}
-  {{- $addrFlag := ($app.extraArgs | default dict).httpListenAddr -}}
-  {{- $port := include "vm.port.from.flag" (dict "flag" $addrFlag "default" $app.service.port) -}}
+  {{- $headless := eq $component "storage" -}}
+  {{- $app := fromYaml (include "vmestimator.appValues" (dict "root" $root "component" $component)) -}}
   {{- $ctx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) "extraLabels" $app.service.labels -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "vmestimator.serviceName" (dict "root" $root "component" $component "nameSuffix" $nameSuffix) }}
+  name: {{ include "vmestimator.fullname" (dict "root" $root "component" $component) }}
   namespace: {{ include "vm.namespace" $ctx }}
   labels: {{ include "vm.labels" $ctx | nindent 4 }}
   {{- $_ := unset $ctx "extraLabels" }}
@@ -215,21 +263,65 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ ternary "ClusterIP" $app.service.type $headless }}
   {{- if $headless }}
+  type: ClusterIP
   clusterIP: None
   publishNotReadyAddresses: true
+  {{- else }}
+  type: {{ $app.service.type }}
   {{- end }}
   ports:
     - name: http
-      port: {{ $port }}
+      port: {{ include "vmestimator.port" (dict "root" $root "component" $component) }}
       targetPort: http
       protocol: TCP
   selector: {{ include "vm.selectorLabels" $ctx | nindent 4 }}
 {{- end -}}
 
 {{- /*
-vmestimator.kind returns the resource kind of the given component ("single", "storage" or "select"),
+vmestimator.monitor renders the VMServiceScrape of a component. It also collects cardinality
+estimations of the query component if they're exposed at a separate path.
+*/ -}}
+{{- define "vmestimator.monitor" -}}
+  {{- $root := .root -}}
+  {{- $component := .component -}}
+  {{- $ctx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) -}}
+  {{- $paths := list "/metrics" -}}
+  {{- if eq $component (include "vmestimator.queryComponent" $root) -}}
+    {{- $paths = append $paths (include "vmestimator.cardinalityPath" (dict "root" $root "component" $component)) | compact | uniq -}}
+  {{- end -}}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: {{ include "vmestimator.fullname" (dict "root" $root "component" $component) }}
+  namespace: {{ include "vm.namespace" $ctx }}
+  {{- $_ := set $ctx "extraLabels" $root.Values.serviceMonitor.extraLabels }}
+  labels: {{ include "vm.labels" $ctx | nindent 4 }}
+  {{- $_ := unset $ctx "extraLabels" }}
+  {{- with $root.Values.serviceMonitor.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  endpoints:
+    {{- range $paths }}
+    - port: http
+      path: {{ . }}
+      {{- with $root.Values.serviceMonitor.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $root.Values.serviceMonitor.metricRelabelings }}
+      metricRelabelConfigs: {{ toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ include "vm.namespace" $ctx }}
+  selector:
+    matchLabels: {{ include "vm.commonLabels" $ctx | nindent 6 }}
+{{- end -}}
+
+{{- /*
+vmestimator.kind returns the resource kind of the given component ("storage" or "select"),
 or of the chart-wide shared resources when the component is empty. It is used both as the
 resource name prefix and as the `app.kubernetes.io/name` label value.
 */ -}}

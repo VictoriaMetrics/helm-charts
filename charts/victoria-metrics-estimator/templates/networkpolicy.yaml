@@ -1,7 +1,6 @@
 {{- if .Values.networkPolicy.enabled }}
 {{- $root := . }}
-{{- $components := ternary (list "single") (list "storage" "select") (eq .Values.mode "single") }}
-{{- range $component := $components }}
+{{- range $component := include "vmestimator.components" . | fromYamlArray }}
 {{- $ctx := dict "helm" $root "appKey" $component "kindOverride" (include "vmestimator.kind" $component) }}
 ---
 apiVersion: networking.k8s.io/v1

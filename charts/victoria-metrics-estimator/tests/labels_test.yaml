@@ -10,67 +10,67 @@ capabilities:
   apiVersions:
     - operator.victoriametrics.com/v1beta1
 tests:
-  - it: keeps selectors consistent with pod labels in single mode
+  - it: keeps selectors consistent with pod labels without select
     set:
       networkPolicy.enabled: true
       serviceMonitor.enabled: true
-      single.podDisruptionBudget.enabled: true
+      storage.podDisruptionBudget.enabled: true
     asserts:
       - template: workload.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
+          value: vmestimator-storage-RELEASE-NAME
         equal:
           path: spec.selector.matchLabels
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: vmestimator-single
+            app.kubernetes.io/name: vmestimator-storage
             managed-by: vm-operator
       - template: workload.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
+          value: vmestimator-storage-RELEASE-NAME
         equal:
           path: spec.template.metadata.labels
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: vmestimator-single
+            app.kubernetes.io/name: vmestimator-storage
             managed-by: vm-operator
       - template: workload.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
+          value: vmestimator-storage-RELEASE-NAME
         isSubset:
           path: metadata.labels
           content:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: vmestimator-single
+            app.kubernetes.io/name: vmestimator-storage
       - template: service.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
+          value: vmestimator-storage-RELEASE-NAME
         equal:
           path: spec.selector
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: vmestimator-single
+            app.kubernetes.io/name: vmestimator-storage
             managed-by: vm-operator
       - template: pdb.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
+          value: vmestimator-storage-RELEASE-NAME
         equal:
           path: spec.selector.matchLabels
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: vmestimator-single
+            app.kubernetes.io/name: vmestimator-storage
             managed-by: vm-operator
       - template: monitor.yaml
         equal:
@@ -78,18 +78,25 @@ tests:
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: vmestimator-single
+            app.kubernetes.io/name: vmestimator-storage
             managed-by: vm-operator
+      - template: service.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: vmestimator-storage
       - template: networkpolicy.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-single-RELEASE-NAME
+          value: vmestimator-storage-RELEASE-NAME
         equal:
           path: spec.podSelector.matchLabels
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: vmestimator-single
+            app.kubernetes.io/name: vmestimator-storage
             managed-by: vm-operator
       - template: configmap.yaml
         isSubset:
@@ -100,9 +107,9 @@ tests:
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: vmestimator
 
-  - it: keeps selectors consistent with pod labels in cluster mode
+  - it: keeps selectors consistent with pod labels with select
     set:
-      mode: cluster
+      select.enabled: true
       networkPolicy.enabled: true
       serviceMonitor.enabled: true
       storage.podDisruptionBudget.enabled: true
@@ -190,17 +197,6 @@ tests:
       - template: service.yaml
         documentSelector:
           path: metadata.name
-          value: vmestimator-storage-RELEASE-NAME-insert
-        equal:
-          path: spec.selector
-          value:
-            app.kubernetes.io/component: monitoring
-            app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: vmestimator-storage
-            managed-by: vm-operator
-      - template: service.yaml
-        documentSelector:
-          path: metadata.name
           value: vmestimator-select-RELEASE-NAME
         equal:
           path: spec.selector
@@ -232,12 +228,26 @@ tests:
             app.kubernetes.io/name: vmestimator-select
             managed-by: vm-operator
       - template: monitor.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-select-RELEASE-NAME
         equal:
           path: spec.selector.matchLabels
           value:
             app.kubernetes.io/component: monitoring
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: vmestimator-select
+            managed-by: vm-operator
+      - template: monitor.yaml
+        documentSelector:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/component: monitoring
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: vmestimator-storage
             managed-by: vm-operator
       - template: networkpolicy.yaml
         documentSelector:
@@ -272,7 +282,7 @@ tests:
 
   - it: keeps extra pod labels out of selectors
     set:
-      single.podLabels.team: observability
+      storage.podLabels.team: observability
     asserts:
       - template: workload.yaml
         equal:

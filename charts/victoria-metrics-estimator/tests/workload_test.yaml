@@ -2,18 +2,94 @@ suite: vmestimator workloads
 templates:
   - workload.yaml
 tests:
-  - it: renders single mode
+  - it: renders only a single-replica storage StatefulSet without select
     asserts:
       - hasDocuments:
           count: 1
       - isKind:
-          of: Deployment
+          of: StatefulSet
+      - equal:
+          path: metadata.name
+          value: vmestimator-storage-RELEASE-NAME
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.serviceName
+          value: vmestimator-storage-RELEASE-NAME
       - contains:
           path: spec.template.spec.containers[0].args
           content: --config=/etc/vmestimator/streams.yaml
       - matchRegex:
           path: spec.template.metadata.annotations["checksum/config"]
           pattern: ^[a-f0-9]{64}$
+  - it: runs several storage nodes without select
+    set:
+      storage.replicaCount: 3
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.replicas
+          value: 3
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/cardinality/metrics
+  - it: rejects removed mode value
+    set:
+      mode: cluster
+    asserts:
+      - failedTemplate:
+          errorMessage: "`.Values.mode` is removed, storage nodes always run, set `.Values.select.enabled: true` to merge estimations of several storage nodes"
+  - it: rejects removed single values
+    set:
+      single.replicaCount: 1
+    asserts:
+      - failedTemplate:
+          errorMessage: "`.Values.single` is removed, use `.Values.storage` instead"
+  - it: rejects zero storage replicas without external storage nodes
+    set:
+      storage.replicaCount: 0
+      select.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: .Values.storage.replicaCount must be positive, unless .Values.select.extraArgs.storageNode points to external storage nodes
+  - it: allows zero storage replicas with external storage nodes
+    set:
+      storage.replicaCount: 0
+      select.enabled: true
+      select.extraArgs.storageNode: http://external-storage:8490
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 0
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --storageNode=http://external-storage:8490
+        documentIndex: 1
+  - it: storage nodes expose estimations at /metrics if select has no replicas
+    set:
+      select.enabled: true
+      select.replicaCount: 0
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/cardinality/metrics
+        documentIndex: 0
+  - it: without select exposes cardinality estimates at /metrics by default
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/cardinality/metrics
+  - it: without select honors an explicit storage.extraArgs.cardinalityMetrics.exposeAt
+    set:
+      storage.extraArgs:
+        cardinalityMetrics.exposeAt: /custom/estimates
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/custom/estimates
   - it: omits the checksum for an external ConfigMap
     set:
       config.existingConfigMap: external-config
@@ -25,7 +101,7 @@ tests:
           value: external-config
   - it: derives the container port from the listener
     set:
-      single.extraArgs.httpListenAddr: ":9000"
+      storage.extraArgs.httpListenAddr: ":9000"
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
@@ -33,9 +109,9 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].ports[0].containerPort
           value: 9000
-  - it: renders cluster mode
+  - it: renders storage and select nodes
     set:
-      mode: cluster
+      select.enabled: true
       storage.replicaCount: 2
       storage.extraArgs.httpListenAddr: ":9001"
     asserts:
@@ -44,8 +120,28 @@ tests:
       - isKind:
           of: StatefulSet
         documentIndex: 0
+      - equal:
+          path: spec.replicas
+          value: 2
+        documentIndex: 0
+      - equal:
+          path: spec.serviceName
+          value: vmestimator-storage-RELEASE-NAME
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --cardinalityMetrics.exposeAt=/cardinality/metrics
+        documentIndex: 0
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: storage
+        documentIndex: 0
       - isKind:
           of: Deployment
+        documentIndex: 1
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: select
         documentIndex: 1
       - contains:
           path: spec.template.spec.containers[0].args
@@ -53,17 +149,17 @@ tests:
         documentIndex: 1
   - it: preserves component fullname overrides
     set:
-      single.fullnameOverride: custom-single
+      storage.fullnameOverride: custom-storage
     asserts:
       - equal:
           path: metadata.name
-          value: custom-single
+          value: custom-storage
 
   - it: component fullname override wins over the chart-level fullnameOverride
     set:
       fullnameOverride: shared
-      single.fullnameOverride: custom-single
+      storage.fullnameOverride: custom-storage
     asserts:
       - equal:
           path: metadata.name
-          value: custom-single
+          value: custom-storage
