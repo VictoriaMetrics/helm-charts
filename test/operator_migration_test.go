@@ -409,8 +409,6 @@ spec:
 		kinds:      []string{"vmanomaly"},
 		healthPath: "/health",
 		ignore: []string{
-			"ServiceAccount/vmanomaly-compat",
-			"StatefulSet/vmanomaly-compat serviceAccountName=",
 			"StatefulSet/vmanomaly-compat container[vmanomaly].port=monitoring-http",
 			"StatefulSet/vmanomaly-compat volume=license",
 			"StatefulSet/vmanomaly-compat volume=tls-assets",

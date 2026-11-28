@@ -8,6 +8,7 @@ templates:
   - route.yaml
   - server.yaml
   - service.yaml
+  - serviceaccount.yaml
 set:
   license.key: dummy
   config.reader.datasource_url: http://x
@@ -139,3 +140,25 @@ tests:
           path: metadata.name
           value: vmanomaly-RELEASE-NAME
         template: service.yaml
+  - it: ServiceAccount is used by pods with legacy naming
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-victoria-metrics-anomaly
+        template: serviceaccount.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: RELEASE-NAME-victoria-metrics-anomaly
+        template: server.yaml
+  - it: ServiceAccount is used by pods with operator naming
+    set:
+      useLegacyNaming: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: vmanomaly-RELEASE-NAME
+        template: serviceaccount.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: vmanomaly-RELEASE-NAME
+        template: server.yaml

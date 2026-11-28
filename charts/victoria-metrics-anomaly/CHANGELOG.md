@@ -1,5 +1,6 @@
 ## Next release
 
+- create the ServiceAccount configured with `serviceAccount.*` values and run pods with it. Previously these values were ignored.
 - upgraded [`vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/) to [1.33.1](https://docs.victoriametrics.com/anomaly-detection/changelog/#v1331)
 
 ## v1.12.21
